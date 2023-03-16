@@ -1,9 +1,11 @@
 import React, { useMemo, useState } from "react";
+
 import classNames from "classnames";
 import { chunk, map, includes } from "lodash";
 
 import { RenderOrSpinner } from "components/loading";
 import { Colors } from "style/constants";
+
 import Color from "./Color";
 
 export type ColorGridProps = StandardComponentProps & {
@@ -42,16 +44,20 @@ const ColorGrid = ({
 
   const vl = useMemo(() => (value !== undefined ? value : _value), [_value, value]);
 
-  const defaultColor = useMemo(() => {
-    return typeof useDefault === "string" ? useDefault : Colors.COLOR_NO_COLOR;
-  }, [useDefault]);
+  const defaultColor = useMemo(
+    () => (typeof useDefault === "string" ? useDefault : Colors.COLOR_NO_COLOR),
+    [useDefault],
+  );
 
   const [cs, defaultUsed] = useMemo(() => {
     /* We have to configure the color accounting for a potential default here
        instead of in the Color component (and we cannot pass in useDefault to
        the Color component) because we have to make sure that the useDefault
        color is not already in the grid. */
-    if ((useDefault === true || typeof useDefault === "string") && !includes(colors, defaultColor)) {
+    if (
+      (useDefault === true || typeof useDefault === "string") &&
+      !includes(colors, defaultColor)
+    ) {
       return [[defaultColor, ...colors], true];
     }
     return [colors, false];
@@ -66,7 +72,7 @@ const ColorGrid = ({
       onChange?.(v, e);
       setValue(v);
     },
-    [onChange, defaultUsed, treatDefaultAsNull, defaultColor]
+    [onChange, defaultUsed, treatDefaultAsNull, defaultColor],
   );
 
   const colorGroups = useMemo(() => chunk(cs, Math.ceil(cs.length / colorsPerRow)), [cs]);
@@ -86,7 +92,7 @@ const ColorGrid = ({
           onClick={(e: React.MouseEvent<HTMLDivElement>) => _onChange(c, e)}
         />
       ),
-    [colorSize, colorClassName, colorStyle, selectable, vl, _onChange]
+    [colorSize, colorClassName, colorStyle, selectable, vl, _onChange],
   );
 
   return (
@@ -97,7 +103,7 @@ const ColorGrid = ({
         ) : (
           <React.Fragment>
             {map(colorGroups, (group: string[], i: number) => (
-              <div className={"color-row"} key={i}>
+              <div className="color-row" key={i}>
                 {map(group, (c: string, j: number) => renderColor(c, j))}
               </div>
             ))}

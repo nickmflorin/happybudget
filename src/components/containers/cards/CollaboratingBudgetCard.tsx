@@ -7,6 +7,8 @@ export type CollaboratingBudgetCardProps = Omit<
   "cornerActions" | "dropdown"
 >;
 
-const CollaboratingBudgetCard = (props: CollaboratingBudgetCardProps): JSX.Element => <GenericBudgetCard {...props} />;
+const CollaboratingBudgetCard = (props: CollaboratingBudgetCardProps): JSX.Element => (
+  <GenericBudgetCard {...props} />
+);
 
 export default React.memo(CollaboratingBudgetCard);

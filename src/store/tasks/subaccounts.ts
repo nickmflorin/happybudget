@@ -1,11 +1,12 @@
+import { isNil, map, filter } from "lodash";
 import { SagaIterator } from "redux-saga";
 import { StrictEffect, CallEffect, call, put, fork, all, select } from "redux-saga/effects";
-import { isNil, map, filter } from "lodash";
 
 import * as api from "api";
 import { tabling, notifications, redux, http } from "lib";
-import * as actions from "../actions";
+
 import * as contacts from "./contacts";
+import * as actions from "../actions";
 
 type R = Tables.SubAccountRowData;
 type C = Model.SubAccount;
@@ -13,7 +14,7 @@ type P = Http.SubAccountPayload;
 
 type PublicSubAccountsTableActionMap<
   B extends Model.Template | Model.Budget,
-  M extends Model.Account | Model.SubAccount
+  M extends Model.Account | Model.SubAccount,
 > = Redux.ActionCreatorMap<
   Omit<Redux.TableActionPayloadMap<C>, "invalidate">,
   SubAccountsTableActionContext<B, M, true>
@@ -26,7 +27,7 @@ type PublicSubAccountsTableActionMap<
 
 type AuthenticatedSubAccountsTableActionMap<
   B extends Model.Template | Model.Budget,
-  M extends Model.Account | Model.SubAccount
+  M extends Model.Account | Model.SubAccount,
 > = Redux.ActionCreatorMap<
   Omit<Redux.AuthenticatedTableActionPayloadMap<R, C>, "invalidate">,
   SubAccountsTableActionContext<B, M, false>
@@ -44,7 +45,7 @@ type AuthenticatedSubAccountsTableActionMap<
 
 type PublicSubAccountsTableTaskConfig<
   B extends Model.Template | Model.Budget,
-  M extends Model.Account | Model.SubAccount
+  M extends Model.Account | Model.SubAccount,
 > = Omit<
   Table.TaskConfig<
     R,
@@ -55,13 +56,15 @@ type PublicSubAccountsTableTaskConfig<
   >,
   "selectStore"
 > & {
-  readonly selectIndexedStore: (s: Application.Store) => Redux.ModelIndexedStore<Modules.AccountOrSubAccountStore<M>>;
+  readonly selectIndexedStore: (
+    s: Application.Store,
+  ) => Redux.ModelIndexedStore<Modules.AccountOrSubAccountStore<M>>;
   readonly selectBudgetStore: (s: Application.Store) => Modules.PublicBudget.Store;
 };
 
 type AuthenticatedSubAccountsTableTaskConfig<
   B extends Model.Template | Model.Budget,
-  M extends Model.Account | Model.SubAccount
+  M extends Model.Account | Model.SubAccount,
 > = Omit<
   Table.TaskConfig<
     R,
@@ -73,27 +76,34 @@ type AuthenticatedSubAccountsTableTaskConfig<
   "selectStore"
 > & {
   readonly initialState: Modules.AccountOrSubAccountStore<M>;
-  readonly selectIndexedStore: (s: Application.Store) => Redux.ModelIndexedStore<Modules.AccountOrSubAccountStore<M>>;
+  readonly selectIndexedStore: (
+    s: Application.Store,
+  ) => Redux.ModelIndexedStore<Modules.AccountOrSubAccountStore<M>>;
   readonly selectBudgetStore: (s: Application.Store) => Modules.BudgetStoreLookup<B, false>;
 };
 
-const isAuthenticatedConfig = <B extends Model.Template | Model.Budget, M extends Model.Account | Model.SubAccount>(
-  config: PublicSubAccountsTableTaskConfig<B, M> | AuthenticatedSubAccountsTableTaskConfig<B, M>
+const isAuthenticatedConfig = <
+  B extends Model.Template | Model.Budget,
+  M extends Model.Account | Model.SubAccount,
+>(
+  config: PublicSubAccountsTableTaskConfig<B, M> | AuthenticatedSubAccountsTableTaskConfig<B, M>,
 ): config is AuthenticatedSubAccountsTableTaskConfig<B, M> =>
   (config as AuthenticatedSubAccountsTableTaskConfig<B, M>).actions.handleEvent !== undefined;
 
 const requestFringes = <
   M extends Model.Account | Model.SubAccount,
   B extends Model.Budget | Model.Template,
-  PUBLIC extends boolean
+  PUBLIC extends boolean,
 >(
-  config: PublicSubAccountsTableTaskConfig<B, M> | AuthenticatedSubAccountsTableTaskConfig<B, M>
+  config: PublicSubAccountsTableTaskConfig<B, M> | AuthenticatedSubAccountsTableTaskConfig<B, M>,
 ) =>
-  function* task(action: Redux.Action<null, SubAccountsTableActionContext<B, M, PUBLIC>>): SagaIterator {
+  function* task(
+    action: Redux.Action<null, SubAccountsTableActionContext<B, M, PUBLIC>>,
+  ): SagaIterator {
     const r: Http.ListResponse<Model.Fringe> = yield http.request(
       api.getFringes,
       action.context,
-      action.context.budgetId
+      action.context.budgetId,
     );
     /*
 		Note: There are cases here where the previous response could have failed
@@ -104,14 +114,15 @@ const requestFringes = <
 		*/
     if (isAuthenticatedConfig(config) && r.data.length === 0) {
       // If there is no table data, we want to default create two rows.
-      const bulkCreateResponse: Http.ServiceResponse<typeof api.bulkCreateFringes> = yield http.request(
-        api.bulkCreateFringes,
-        action.context,
-        action.context.budgetId,
-        { data: [{}, {}] }
-      );
+      const bulkCreateResponse: Http.ServiceResponse<typeof api.bulkCreateFringes> =
+        yield http.request(api.bulkCreateFringes, action.context, action.context.budgetId, {
+          data: [{}, {}],
+        });
       yield put(
-        config.actions.updateBudgetInState({ id: action.context.budgetId, data: bulkCreateResponse.parent as B }, {})
+        config.actions.updateBudgetInState(
+          { id: action.context.budgetId, data: bulkCreateResponse.parent as B },
+          {},
+        ),
       );
       const rsp = yield call(() => ({ data: bulkCreateResponse.children, count: r.data.length }));
       return rsp as Http.ListResponse<Model.Fringe>;
@@ -124,34 +135,37 @@ const requestFringes = <
 const requestSupplementaryTableData = <
   B extends Model.Template | Model.Budget,
   M extends Model.Account | Model.SubAccount,
-  PUBLIC extends boolean
+  PUBLIC extends boolean,
 >(
-  config: PublicSubAccountsTableTaskConfig<B, M> | AuthenticatedSubAccountsTableTaskConfig<B, M>
+  config: PublicSubAccountsTableTaskConfig<B, M> | AuthenticatedSubAccountsTableTaskConfig<B, M>,
 ) =>
-  function* task(action: Redux.Action<null, SubAccountsTableActionContext<B, M, PUBLIC>>): SagaIterator {
+  function* task(
+    action: Redux.Action<null, SubAccountsTableActionContext<B, M, PUBLIC>>,
+  ): SagaIterator {
     const effects: [
       CallEffect<Redux.ListRequestEffectRTWithError<Model.Tag>>,
       CallEffect<Redux.ListRequestEffectRTWithError<string>>,
-      CallEffect<Redux.ListRequestEffectRTWithError<Model.Fringe>>
+      CallEffect<Redux.ListRequestEffectRTWithError<Model.Fringe>>,
     ] = [
       redux.wrapListRequestEffect(http.request(api.getSubAccountUnits, action.context), action, {
-        selectStore: (s: Application.Store) => s.subaccountUnits
+        selectStore: (s: Application.Store) => s.subaccountUnits,
       }),
       redux.wrapListRequestEffect(http.request(api.getFringeColors, action.context), action, {
-        selectStore: (s: Application.Store) => s.fringeColors
+        selectStore: (s: Application.Store) => s.fringeColors,
       }),
       redux.wrapListRequestEffect(call(requestFringes(config), action), action, {
-        selectStore: (s: Application.Store) => config.selectBudgetStore(s).fringes
-      })
+        selectStore: (s: Application.Store) => config.selectBudgetStore(s).fringes,
+      }),
     ];
     const [subaccountUnits, fringeColors, fringes]: [
       Http.RenderedListResponse<Model.Tag> | null,
       Http.RenderedListResponse<string> | null,
-      Http.RenderedListResponse<Model.Fringe> | null
+      Http.RenderedListResponse<Model.Fringe> | null,
     ] = yield redux.wrapListRequestEffects(effects, {
-      errorMessage: action.context.errorMessage || "There was an error retrieving supplementary table data.",
+      errorMessage:
+        action.context.errorMessage || "There was an error retrieving supplementary table data.",
       table: config.table,
-      errorDetail: "The table may not behave as expected."
+      errorDetail: "The table may not behave as expected.",
     });
     if (subaccountUnits !== null) {
       yield put(actions.responseSubAccountUnitsAction(subaccountUnits, {}));
@@ -164,29 +178,39 @@ const requestSupplementaryTableData = <
         parentId: action.context.parentId,
         parentType: action.context.parentType,
         domain: action.context.domain,
-        budgetId: action.context.budgetId
+        budgetId: action.context.budgetId,
       };
       if (http.listResponseFailed(fringes)) {
         if (isAuthenticatedConfig(config)) {
           yield put(
             config.actions.responseFringes(fringes, {
               ...fringesContext,
-              public: false
-            })
+              public: false,
+            }),
           );
         } else {
           yield put(
             config.actions.responseFringes(fringes, {
               ...fringesContext,
-              public: true
-            })
+              public: true,
+            }),
           );
         }
       } else {
         if (isAuthenticatedConfig(config)) {
-          yield put(config.actions.responseFringes({ models: fringes.data }, { ...fringesContext, public: false }));
+          yield put(
+            config.actions.responseFringes(
+              { models: fringes.data },
+              { ...fringesContext, public: false },
+            ),
+          );
         } else {
-          yield put(config.actions.responseFringes({ models: fringes.data }, { ...fringesContext, public: true }));
+          yield put(
+            config.actions.responseFringes(
+              { models: fringes.data },
+              { ...fringesContext, public: true },
+            ),
+          );
         }
       }
     }
@@ -195,19 +219,21 @@ const requestSupplementaryTableData = <
 const getRequestEffects = <
   B extends Model.Template | Model.Budget,
   M extends Model.Account | Model.SubAccount,
-  PUBLIC extends boolean
+  PUBLIC extends boolean,
 >(
   config: PublicSubAccountsTableTaskConfig<B, M> | AuthenticatedSubAccountsTableTaskConfig<B, M>,
-  action: Redux.Action<Redux.TableRequestPayload, SubAccountsTableActionContext<B, M, PUBLIC>>
+  action: Redux.Action<Redux.TableRequestPayload, SubAccountsTableActionContext<B, M, PUBLIC>>,
 ): [
   CallEffect<Http.ListResponse<Model.SubAccount>>,
   CallEffect<Http.ListResponse<Model.Group>>,
   CallEffect<Http.ListResponse<Model.Markup>>,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  CallEffect<any>
+  CallEffect<any>,
 ] => {
-  const requestService = action.context.parentType === "account" ? api.getAccountChildren : api.getSubAccountChildren;
-  const requestGroupsService = action.context.parentType === "account" ? api.getAccountGroups : api.getSubAccountGroups;
+  const requestService =
+    action.context.parentType === "account" ? api.getAccountChildren : api.getSubAccountChildren;
+  const requestGroupsService =
+    action.context.parentType === "account" ? api.getAccountGroups : api.getSubAccountGroups;
   const requestMarkupsService =
     action.context.parentType === "account" ? api.getAccountMarkups : api.getSubAccountMarkups;
   return [
@@ -241,19 +267,19 @@ const getRequestEffects = <
     call(requestSupplementaryTableData(config), {
       payload: null,
       type: action.type,
-      context: action.context
-    } as Redux.Action<null, SubAccountsTableActionContext<B, M, PUBLIC>>)
+      context: action.context,
+    } as Redux.Action<null, SubAccountsTableActionContext<B, M, PUBLIC>>),
   ];
 };
 
 export const createPublicTableTaskSet = <
   B extends Model.Template | Model.Budget,
-  M extends Model.Account | Model.SubAccount
+  M extends Model.Account | Model.SubAccount,
 >(
-  config: PublicSubAccountsTableTaskConfig<B, M>
+  config: PublicSubAccountsTableTaskConfig<B, M>,
 ): Redux.TableTaskMap<SubAccountsTableActionContext<B, M, true>> => {
   function* request(
-    action: Redux.Action<Redux.TableRequestPayload, SubAccountsTableActionContext<B, M, true>>
+    action: Redux.Action<Redux.TableRequestPayload, SubAccountsTableActionContext<B, M, true>>,
   ): SagaIterator {
     if (redux.tableRequestActionIsListIds(action)) {
       throw new Error("Requesting by individual IDs is only supported in authenticated modes.");
@@ -262,28 +288,31 @@ export const createPublicTableTaskSet = <
       redux.canUseCachedIndexedListResponse(
         config.selectIndexedStore(s),
         (si: Modules.AccountOrSubAccountStore<M>) => si.table,
-        action.context.parentId
-      )
+        action.context.parentId,
+      ),
     );
     if (!canUseCachedResponse || redux.requestActionIsForced(action)) {
       yield put(config.actions.loading(true, action.context));
       const effects = getRequestEffects(
         config,
-        action as Redux.Action<Redux.RequestPayload, SubAccountsTableActionContext<B, M, true>>
+        action as Redux.Action<Redux.RequestPayload, SubAccountsTableActionContext<B, M, true>>,
       );
       try {
         const [models, groups, markups]: [
           Http.ListResponse<C>,
           Http.ListResponse<Model.Group>,
-          Http.ListResponse<Model.Markup>
+          Http.ListResponse<Model.Markup>,
         ] = yield all(effects);
         yield put(
-          config.actions.response({ models: models.data, groups: groups.data, markups: markups.data }, action.context)
+          config.actions.response(
+            { models: models.data, groups: groups.data, markups: markups.data },
+            action.context,
+          ),
         );
       } catch (e: unknown) {
         config.table.handleRequestError(e as Error, {
           message: action.context.errorMessage || "There was an error retrieving the table data.",
-          dispatchClientErrorToSentry: true
+          dispatchClientErrorToSentry: true,
         });
         // Non api.RequestError will be thrown in the above block.
         yield put(config.actions.response({ error: e as api.RequestError }, action.context));
@@ -297,46 +326,48 @@ export const createPublicTableTaskSet = <
 
 export const createAuthenticatedTableTaskSet = <
   B extends Model.Template | Model.Budget,
-  M extends Model.Account | Model.SubAccount
+  M extends Model.Account | Model.SubAccount,
 >(
-  config: AuthenticatedSubAccountsTableTaskConfig<B, M>
+  config: AuthenticatedSubAccountsTableTaskConfig<B, M>,
 ): Redux.AuthenticatedTableTaskMap<R, SubAccountsTableActionContext<B, M, false>> => {
   const selectTableStore = (
     s: Application.Store,
-    ctx: SubAccountsTableActionContext<B, M, false>
+    ctx: SubAccountsTableActionContext<B, M, false>,
   ): Tables.SubAccountTableStore => {
     const baseStore = config.selectIndexedStore(s);
     return baseStore[ctx.parentId].table || config.initialState.table;
   };
 
   function* request(
-    action: Redux.Action<Redux.TableRequestPayload, SubAccountsTableActionContext<B, M, false>>
+    action: Redux.Action<Redux.TableRequestPayload, SubAccountsTableActionContext<B, M, false>>,
   ): SagaIterator {
     if (redux.tableRequestActionIsListIds(action)) {
       const requestService =
-        action.context.parentType === "account" ? api.getAccountChildren : api.getSubAccountChildren;
+        action.context.parentType === "account"
+          ? api.getAccountChildren
+          : api.getSubAccountChildren;
       const r: Http.ListResponse<Model.SubAccount> = yield http.request(
         requestService,
         action.context,
         action.context.parentId,
-        { ids: action.payload.ids }
+        { ids: action.payload.ids },
       );
       yield put(
         config.actions.handleEvent(
           {
             type: "modelsUpdated",
-            payload: map(r.data, (m: Model.SubAccount) => ({ model: m }))
+            payload: map(r.data, (m: Model.SubAccount) => ({ model: m })),
           },
-          action.context
-        )
+          action.context,
+        ),
       );
     } else {
       const canUseCachedResponse = yield select((s: Application.Store) =>
         redux.canUseCachedIndexedListResponse(
           config.selectIndexedStore(s),
           (si: Modules.AccountOrSubAccountStore<M>) => si.table,
-          action.context.parentId
-        )
+          action.context.parentId,
+        ),
       );
       if (!canUseCachedResponse || redux.requestActionIsForced(action)) {
         yield put(config.actions.loading(true, action.context));
@@ -348,7 +379,7 @@ export const createAuthenticatedTableTaskSet = <
           const [models, groups, markups]: [
             Http.ListResponse<C>,
             Http.ListResponse<Model.Group>,
-            Http.ListResponse<Model.Markup>
+            Http.ListResponse<Model.Markup>,
           ] = yield all(effects);
           if (models.data.length === 0) {
             const bulkCreateService =
@@ -360,30 +391,34 @@ export const createAuthenticatedTableTaskSet = <
               bulkCreateService,
               action.context,
               action.context.parentId,
-              { data: [{}, {}] }
+              { data: [{}, {}] },
             );
             yield put(
               config.actions.response(
                 { models: r.children, groups: groups.data, markups: markups.data },
-                action.context
-              )
+                action.context,
+              ),
             );
           } else {
             yield put(
               config.actions.response(
                 { models: models.data, groups: groups.data, markups: markups.data },
-                action.context
-              )
+                action.context,
+              ),
             );
           }
         } catch (e: unknown) {
           const err = e as Error;
-          if (err instanceof api.PermissionError && err.code === api.ErrorCodes.permission.PRODUCT_PERMISSION_ERROR) {
+          if (
+            err instanceof api.PermissionError &&
+            err.code === api.ErrorCodes.permission.PRODUCT_PERMISSION_ERROR
+          ) {
             notifications.ui.banner.lookupAndNotify("budgetSubscriptionPermissionError");
           } else {
             config.table.handleRequestError(e as Error, {
-              message: action.context.errorMessage || "There was an error retrieving the table data.",
-              dispatchClientErrorToSentry: true
+              message:
+                action.context.errorMessage || "There was an error retrieving the table data.",
+              dispatchClientErrorToSentry: true,
             });
           }
           yield put(config.actions.response({ error: e as api.RequestError }, action.context));
@@ -394,59 +429,71 @@ export const createAuthenticatedTableTaskSet = <
     }
   }
 
-  const bulkCreateTask: (e: Table.RowAddEvent<R>, ctx: SubAccountsTableActionContext<B, M, false>) => SagaIterator =
-    tabling.createBulkTask({
-      table: config.table,
-      service: (ctx: SubAccountsTableActionContext<B, M, false>) =>
-        (ctx.parentType === "account" ? api.bulkCreateAccountChildren : api.bulkCreateSubAccountChildren) as (
-          id: number,
-          payload: Http.BulkCreatePayload<Http.AccountPayload>,
-          options?: Http.RequestOptions
-        ) => Promise<Http.AncestryListResponse<B, M, Model.SubAccount>>,
-      selectStore: selectTableStore,
-      responseActions: (
-        ctx: SubAccountsTableActionContext<B, M, false>,
-        r: Http.AncestryListResponse<B, M, C>,
-        e: Table.RowAddEvent<R>
-      ) => [
-        config.actions.updateBudgetInState({ id: r.budget.id, data: r.budget }, {}),
-        config.actions.updateParentInState(
-          { id: r.parent.id, data: r.parent },
-          { id: r.parent.id, domain: ctx.domain, budgetId: ctx.budgetId, public: ctx.public }
-        ),
-        config.actions.handleEvent(
-          {
-            type: "placeholdersActivated",
-            payload: { placeholderIds: e.placeholderIds, models: r.children }
-          },
-          ctx
-        )
-      ],
-      performCreate: (
-        ctx: SubAccountsTableActionContext<B, M, false>,
-        p: Http.BulkCreatePayload<Http.SubAccountPayload>
-      ): [number, Http.BulkCreatePayload<Http.SubAccountPayload>] => [ctx.parentId, p]
-    });
+  const bulkCreateTask: (
+    e: Table.RowAddEvent<R>,
+    ctx: SubAccountsTableActionContext<B, M, false>,
+  ) => SagaIterator = tabling.createBulkTask({
+    table: config.table,
+    service: (ctx: SubAccountsTableActionContext<B, M, false>) =>
+      (ctx.parentType === "account"
+        ? api.bulkCreateAccountChildren
+        : api.bulkCreateSubAccountChildren) as (
+        id: number,
+        payload: Http.BulkCreatePayload<Http.AccountPayload>,
+        options?: Http.RequestOptions,
+      ) => Promise<Http.AncestryListResponse<B, M, Model.SubAccount>>,
+    selectStore: selectTableStore,
+    responseActions: (
+      ctx: SubAccountsTableActionContext<B, M, false>,
+      r: Http.AncestryListResponse<B, M, C>,
+      e: Table.RowAddEvent<R>,
+    ) => [
+      config.actions.updateBudgetInState({ id: r.budget.id, data: r.budget }, {}),
+      config.actions.updateParentInState(
+        { id: r.parent.id, data: r.parent },
+        { id: r.parent.id, domain: ctx.domain, budgetId: ctx.budgetId, public: ctx.public },
+      ),
+      config.actions.handleEvent(
+        {
+          type: "placeholdersActivated",
+          payload: { placeholderIds: e.placeholderIds, models: r.children },
+        },
+        ctx,
+      ),
+    ],
+    performCreate: (
+      ctx: SubAccountsTableActionContext<B, M, false>,
+      p: Http.BulkCreatePayload<Http.SubAccountPayload>,
+    ): [number, Http.BulkCreatePayload<Http.SubAccountPayload>] => [ctx.parentId, p],
+  });
 
   function* bulkUpdateTask(
     ctx: SubAccountsTableActionContext<B, M, false>,
-    requestPayload: Http.BulkUpdatePayload<Http.AccountPayload>
+    requestPayload: Http.BulkUpdatePayload<Http.AccountPayload>,
   ): SagaIterator {
-    const service = ctx.parentType === "account" ? api.bulkUpdateAccountChildren : api.bulkUpdateSubAccountChildren;
+    const service =
+      ctx.parentType === "account"
+        ? api.bulkUpdateAccountChildren
+        : api.bulkUpdateSubAccountChildren;
     config.table.saving(true);
     try {
-      const r: Http.ServiceResponse<typeof service> = yield http.request(service, ctx, ctx.parentId, requestPayload);
+      const r: Http.ServiceResponse<typeof service> = yield http.request(
+        service,
+        ctx,
+        ctx.parentId,
+        requestPayload,
+      );
       yield put(config.actions.updateBudgetInState({ id: r.budget.id, data: r.budget as B }, {}));
       yield put(
         config.actions.updateParentInState(
           { id: r.parent.id, data: r.parent as M },
-          { id: r.parent.id, domain: ctx.domain, budgetId: ctx.budgetId, public: ctx.public }
-        )
+          { id: r.parent.id, domain: ctx.domain, budgetId: ctx.budgetId, public: ctx.public },
+        ),
       );
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, {
         message: ctx.errorMessage || "There was an error updating the table rows.",
-        dispatchClientErrorToSentry: true
+        dispatchClientErrorToSentry: true,
       });
     } finally {
       config.table.saving(false);
@@ -455,19 +502,25 @@ export const createAuthenticatedTableTaskSet = <
 
   function* updateMarkupTask(
     ctx: SubAccountsTableActionContext<B, M, false>,
-    changes: Table.RowChange<R, Table.MarkupRow<R>>[]
+    changes: Table.RowChange<R, Table.MarkupRow<R>>[],
   ): SagaIterator {
     if (changes.length !== 0) {
-      const effects: (StrictEffect | null)[] = map(changes, (ch: Table.RowChange<R, Table.MarkupRow<R>>) => {
-        const payload = tabling.rows.patchPayload<R, C, Http.MarkupPayload>(ch, config.table.getColumns());
-        if (!isNil(payload)) {
-          return http.request(api.updateMarkup, ctx, tabling.rows.markupId(ch.id), payload);
-        }
-        return null;
-      });
+      const effects: (StrictEffect | null)[] = map(
+        changes,
+        (ch: Table.RowChange<R, Table.MarkupRow<R>>) => {
+          const payload = tabling.rows.patchPayload<R, C, Http.MarkupPayload>(
+            ch,
+            config.table.getColumns(),
+          );
+          if (!isNil(payload)) {
+            return http.request(api.updateMarkup, ctx, tabling.rows.markupId(ch.id), payload);
+          }
+          return null;
+        },
+      );
       const validEffects: StrictEffect[] = filter(
         effects,
-        (eff: StrictEffect | null) => eff !== null
+        (eff: StrictEffect | null) => eff !== null,
       ) as StrictEffect[];
 
       config.table.saving(true);
@@ -483,7 +536,7 @@ export const createAuthenticatedTableTaskSet = <
       } catch (err: unknown) {
         config.table.handleRequestError(err as Error, {
           message: ctx.errorMessage || "There was an error updating the table rows.",
-          dispatchClientErrorToSentry: true
+          dispatchClientErrorToSentry: true,
         });
       } finally {
         config.table.saving(false);
@@ -491,17 +544,24 @@ export const createAuthenticatedTableTaskSet = <
     }
   }
 
-  function* deleteGroups(ctx: SubAccountsTableActionContext<B, M, false>, ids: number[]): SagaIterator {
+  function* deleteGroups(
+    ctx: SubAccountsTableActionContext<B, M, false>,
+    ids: number[],
+  ): SagaIterator {
     yield all(map(ids, (id: number) => http.request(api.deleteGroup, ctx, id)));
   }
 
   function* bulkDeleteRows(
     ctx: SubAccountsTableActionContext<B, M, false>,
     ids: number[],
-    markupIds?: number[]
+    markupIds?: number[],
   ): SagaIterator {
-    const service = ctx.parentType === "account" ? api.bulkDeleteAccountChildren : api.bulkDeleteSubAccountChildren;
-    const markupService = ctx.parentType === "account" ? api.bulkDeleteAccountMarkups : api.bulkDeleteSubAccountMarkups;
+    const service =
+      ctx.parentType === "account"
+        ? api.bulkDeleteAccountChildren
+        : api.bulkDeleteSubAccountChildren;
+    const markupService =
+      ctx.parentType === "account" ? api.bulkDeleteAccountMarkups : api.bulkDeleteSubAccountMarkups;
     /* Note: We have do these operations sequentially, since they will both
 			 update the Budget in state and we cannot risk running into race
 			 conditions. */
@@ -516,8 +576,8 @@ export const createAuthenticatedTableTaskSet = <
       yield put(
         config.actions.updateParentInState(
           { id: r.parent.id, data: r.parent as M },
-          { id: r.parent.id, domain: ctx.domain, budgetId: ctx.budgetId, public: ctx.public }
-        )
+          { id: r.parent.id, domain: ctx.domain, budgetId: ctx.budgetId, public: ctx.public },
+        ),
       );
       yield put(config.actions.updateBudgetInState({ id: r.budget.id, data: r.budget as B }, {}));
     }
@@ -525,49 +585,50 @@ export const createAuthenticatedTableTaskSet = <
 
   function* handleRemoveRowFromGroupEvent(
     e: Table.RowRemoveFromGroupEvent,
-    ctx: SubAccountsTableActionContext<B, M, false>
+    ctx: SubAccountsTableActionContext<B, M, false>,
   ): SagaIterator {
     const ids = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
     const requestPayload: Http.BulkUpdatePayload<P> = {
       data: map(ids, (id: Table.ModelRowId) => ({
         id,
-        group: null
-      }))
+        group: null,
+      })),
     };
     yield fork(
       bulkUpdateTask,
       { errorMessage: "There was an error removing the row from the group.", ...ctx },
-      requestPayload
+      requestPayload,
     );
   }
 
   function* handleAddRowToGroupEvent(
     e: Table.RowAddToGroupEvent,
-    ctx: SubAccountsTableActionContext<B, M, false>
+    ctx: SubAccountsTableActionContext<B, M, false>,
   ): SagaIterator {
     const ids = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
     const requestPayload: Http.BulkUpdatePayload<P> = {
       data: map(ids, (id: Table.ModelRowId) => ({
         id,
-        group: tabling.rows.groupId(e.payload.group)
-      }))
+        group: tabling.rows.groupId(e.payload.group),
+      })),
     };
     yield fork(
       bulkUpdateTask,
       { errorMessage: "There was an error adding the row to the group.", ...ctx },
-      requestPayload
+      requestPayload,
     );
   }
 
   function* handleRowInsertEvent(
     e: Table.RowInsertEvent<R>,
-    ctx: SubAccountsTableActionContext<B, M, false>
+    ctx: SubAccountsTableActionContext<B, M, false>,
   ): SagaIterator {
-    const service = ctx.parentType === "account" ? api.createAccountChild : api.createSubAccountChild;
+    const service =
+      ctx.parentType === "account" ? api.createAccountChild : api.createSubAccountChild;
     const r: C = yield http.request(service, ctx, ctx.parentId, {
       previous: e.payload.previous,
       group: isNil(e.payload.group) ? null : tabling.rows.groupId(e.payload.group),
-      ...tabling.rows.postPayload<R, C, P>(e.payload.data, config.table.getColumns())
+      ...tabling.rows.postPayload<R, C, P>(e.payload.data, config.table.getColumns()),
     });
     /* The Group is not attributed to the Model in a detail response, so if the
 		   group did change we have to use the value from the event payload. */
@@ -577,21 +638,21 @@ export const createAuthenticatedTableTaskSet = <
           type: "modelsAdded",
           payload: {
             model: r,
-            group: !isNil(e.payload.group) ? tabling.rows.groupId(e.payload.group) : null
-          }
+            group: !isNil(e.payload.group) ? tabling.rows.groupId(e.payload.group) : null,
+          },
         },
-        ctx
-      )
+        ctx,
+      ),
     );
   }
 
   function* handleRowPositionChangedEvent(
     e: Table.RowPositionChangedEvent,
-    ctx: SubAccountsTableActionContext<B, M, false>
+    ctx: SubAccountsTableActionContext<B, M, false>,
   ): SagaIterator {
     const r: C = yield http.request(api.updateSubAccount, ctx, e.payload.id, {
       previous: e.payload.previous,
-      group: isNil(e.payload.newGroup) ? null : tabling.rows.groupId(e.payload.newGroup)
+      group: isNil(e.payload.newGroup) ? null : tabling.rows.groupId(e.payload.newGroup),
     });
     /* The Group is not attributed to the Model in a detail response, so if the
 		   group did change we have to use the value from the event payload. */
@@ -601,15 +662,18 @@ export const createAuthenticatedTableTaskSet = <
           type: "modelsUpdated",
           payload: {
             model: r,
-            group: !isNil(e.payload.newGroup) ? tabling.rows.groupId(e.payload.newGroup) : null
-          }
+            group: !isNil(e.payload.newGroup) ? tabling.rows.groupId(e.payload.newGroup) : null,
+          },
         },
-        ctx
-      )
+        ctx,
+      ),
     );
   }
 
-  function* handleRowAddEvent(e: Table.RowAddEvent<R>, ctx: SubAccountsTableActionContext<B, M, false>): SagaIterator {
+  function* handleRowAddEvent(
+    e: Table.RowAddEvent<R>,
+    ctx: SubAccountsTableActionContext<B, M, false>,
+  ): SagaIterator {
     if (!isNil(bulkCreateTask)) {
       yield call(bulkCreateTask, e, ctx);
     }
@@ -617,30 +681,35 @@ export const createAuthenticatedTableTaskSet = <
 
   function* handleRowDeleteEvent(
     e: Table.RowDeleteEvent,
-    ctx: SubAccountsTableActionContext<B, M, false>
+    ctx: SubAccountsTableActionContext<B, M, false>,
   ): SagaIterator {
     const ids: Table.RowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
     if (ids.length !== 0) {
       config.table.saving(true);
 
-      const modelRowIds = filter(ids, (id: Table.RowId) => tabling.rows.isModelRowId(id)) as number[];
+      const modelRowIds = filter(ids, (id: Table.RowId) =>
+        tabling.rows.isModelRowId(id),
+      ) as number[];
 
       const markupRowIds = map(
         filter(ids, (id: Table.RowId) => tabling.rows.isMarkupRowId(id)) as Table.MarkupRowId[],
-        (id: Table.MarkupRowId) => tabling.rows.markupId(id)
+        (id: Table.MarkupRowId) => tabling.rows.markupId(id),
       );
 
       const groupRowIds = map(
         filter(ids, (id: Table.RowId) => tabling.rows.isGroupRowId(id)) as Table.GroupRowId[],
-        (id: Table.GroupRowId) => tabling.rows.groupId(id)
+        (id: Table.GroupRowId) => tabling.rows.groupId(id),
       );
 
       try {
-        yield all([call(deleteGroups, ctx, groupRowIds), call(bulkDeleteRows, ctx, modelRowIds, markupRowIds)]);
+        yield all([
+          call(deleteGroups, ctx, groupRowIds),
+          call(bulkDeleteRows, ctx, modelRowIds, markupRowIds),
+        ]);
       } catch (err: unknown) {
         config.table.handleRequestError(err as Error, {
           message: ctx.errorMessage || "There was an error removing the table rows.",
-          dispatchClientErrorToSentry: true
+          dispatchClientErrorToSentry: true,
         });
       } finally {
         config.table.saving(false);
@@ -650,28 +719,37 @@ export const createAuthenticatedTableTaskSet = <
 
   function* handleDataChangeEvent(
     e: Table.DataChangeEvent<R>,
-    ctx: SubAccountsTableActionContext<B, M, false>
+    ctx: SubAccountsTableActionContext<B, M, false>,
   ): SagaIterator {
     const merged = tabling.events.consolidateRowChanges<R>(e.payload);
 
-    const markupChanges: Table.RowChange<R, Table.MarkupRow<R>>[] = filter(merged, (value: Table.RowChange<R>) =>
-      tabling.rows.isMarkupRowId(value.id)
+    const markupChanges: Table.RowChange<R, Table.MarkupRow<R>>[] = filter(
+      merged,
+      (value: Table.RowChange<R>) => tabling.rows.isMarkupRowId(value.id),
     ) as Table.RowChange<R, Table.MarkupRow<R>>[];
 
-    const dataChanges: Table.RowChange<R, Table.ModelRow<R>>[] = filter(merged, (value: Table.RowChange<R>) =>
-      tabling.rows.isModelRowId(value.id)
+    const dataChanges: Table.RowChange<R, Table.ModelRow<R>>[] = filter(
+      merged,
+      (value: Table.RowChange<R>) => tabling.rows.isModelRowId(value.id),
     ) as Table.RowChange<R, Table.ModelRow<R>>[];
     yield fork(updateMarkupTask, ctx, markupChanges);
     if (dataChanges.length !== 0) {
-      const requestPayload = tabling.rows.createBulkUpdatePayload<R, C, P>(dataChanges, config.table.getColumns());
+      const requestPayload = tabling.rows.createBulkUpdatePayload<R, C, P>(
+        dataChanges,
+        config.table.getColumns(),
+      );
       if (requestPayload.data.length !== 0) {
         yield call(bulkUpdateTask, ctx, requestPayload);
       }
     }
   }
 
-  function* handleGroupAddEvent(e: Table.GroupAddEvent, ctx: SubAccountsTableActionContext<B, M, false>): SagaIterator {
-    const service = ctx.parentType === "account" ? api.createAccountGroup : api.createSubAccountGroup;
+  function* handleGroupAddEvent(
+    e: Table.GroupAddEvent,
+    ctx: SubAccountsTableActionContext<B, M, false>,
+  ): SagaIterator {
+    const service =
+      ctx.parentType === "account" ? api.createAccountGroup : api.createSubAccountGroup;
     const r: Model.Group = yield http.request(service, ctx, ctx.parentId, e.payload);
     yield put(config.actions.handleEvent({ type: "modelsAdded", payload: r }, ctx));
     e.onSuccess?.(r);
@@ -679,16 +757,22 @@ export const createAuthenticatedTableTaskSet = <
 
   function* handleMarkupAddEvent(
     e: Table.MarkupAddEvent,
-    ctx: SubAccountsTableActionContext<B, M, false>
+    ctx: SubAccountsTableActionContext<B, M, false>,
   ): SagaIterator {
-    const service = ctx.parentType === "account" ? api.createAccountMarkup : api.createSubAccountMarkup;
-    const r: Http.AncestryResponse<B, M, Model.Markup> = yield http.request(service, ctx, ctx.parentId, e.payload);
+    const service =
+      ctx.parentType === "account" ? api.createAccountMarkup : api.createSubAccountMarkup;
+    const r: Http.AncestryResponse<B, M, Model.Markup> = yield http.request(
+      service,
+      ctx,
+      ctx.parentId,
+      e.payload,
+    );
     yield put(config.actions.updateBudgetInState({ id: r.budget.id, data: r.budget }, {}));
     yield put(
       config.actions.updateParentInState(
         { id: r.parent.id, data: r.parent },
-        { id: r.parent.id, domain: ctx.domain, budgetId: ctx.budgetId, public: ctx.public }
-      )
+        { id: r.parent.id, domain: ctx.domain, budgetId: ctx.budgetId, public: ctx.public },
+      ),
     );
     yield put(config.actions.handleEvent({ type: "modelsAdded", payload: r.data }, ctx));
     e.onSuccess?.(r);
@@ -696,20 +780,20 @@ export const createAuthenticatedTableTaskSet = <
 
   function* handleMarkupUpdateEvent(
     e: Table.MarkupUpdateEvent,
-    ctx: SubAccountsTableActionContext<B, M, false>
+    ctx: SubAccountsTableActionContext<B, M, false>,
   ): SagaIterator {
     const r: Http.AncestryResponse<B, M, Model.Markup> = yield http.request(
       api.updateMarkup,
       ctx,
       e.payload.id,
-      e.payload.data
+      e.payload.data,
     );
     yield put(config.actions.updateBudgetInState({ id: r.budget.id, data: r.budget }, {}));
     yield put(
       config.actions.updateParentInState(
         { id: r.parent.id, data: r.parent },
-        { id: r.parent.id, domain: ctx.domain, budgetId: ctx.budgetId, public: ctx.public }
-      )
+        { id: r.parent.id, domain: ctx.domain, budgetId: ctx.budgetId, public: ctx.public },
+      ),
     );
     yield put(config.actions.handleEvent({ type: "modelsUpdated", payload: r.data }, ctx));
     e.onSuccess?.(r);
@@ -717,21 +801,40 @@ export const createAuthenticatedTableTaskSet = <
 
   return {
     request,
-    handleChangeEvent: tabling.createChangeEventHandler<R, SubAccountsTableActionContext<B, M, false>>({
+    handleChangeEvent: tabling.createChangeEventHandler<
+      R,
+      SubAccountsTableActionContext<B, M, false>
+    >({
       rowRemoveFromGroup: handleRemoveRowFromGroupEvent,
       rowAddToGroup: handleAddRowToGroupEvent,
       rowDelete: handleRowDeleteEvent,
       dataChange: handleDataChangeEvent,
       rowAdd: handleRowAddEvent,
-      rowInsert: tabling.task(handleRowInsertEvent, config.table, "There was an error adding the table rows."),
-      groupAdd: tabling.task(handleGroupAddEvent, config.table, "There was an error creating the group."),
-      markupAdd: tabling.task(handleMarkupAddEvent, config.table, "There was an error creating the markup."),
-      markupUpdate: tabling.task(handleMarkupUpdateEvent, config.table, "There was an error updating the markup."),
+      rowInsert: tabling.task(
+        handleRowInsertEvent,
+        config.table,
+        "There was an error adding the table rows.",
+      ),
+      groupAdd: tabling.task(
+        handleGroupAddEvent,
+        config.table,
+        "There was an error creating the group.",
+      ),
+      markupAdd: tabling.task(
+        handleMarkupAddEvent,
+        config.table,
+        "There was an error creating the markup.",
+      ),
+      markupUpdate: tabling.task(
+        handleMarkupUpdateEvent,
+        config.table,
+        "There was an error updating the markup.",
+      ),
       rowPositionChanged: tabling.task(
         handleRowPositionChangedEvent,
         config.table,
-        "There was an error moving the table rows."
-      )
-    })
+        "There was an error moving the table rows.",
+      ),
+    }),
   };
 };

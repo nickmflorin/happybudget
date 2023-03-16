@@ -1,12 +1,14 @@
 import { useMemo, useState, useRef } from "react";
-import { MultiValue, SingleValue } from "react-select";
+
 import { isNil } from "lodash";
+import { MultiValue, SingleValue } from "react-select";
 
 import { notifications } from "lib";
+
 import { parseMultiModelSelectValues, parseSingleModelSelectValues } from "./util";
 
 export const InitialSelectRef: SelectInstance = {
-  ...notifications.ui.InitialNotificationsManager
+  ...notifications.ui.InitialNotificationsManager,
 };
 
 export const useSelect = (): NonNullRef<SelectInstance> => {
@@ -14,7 +16,9 @@ export const useSelect = (): NonNullRef<SelectInstance> => {
   return ref;
 };
 
-export const useSelectIfNotDefined = (select?: NonNullRef<SelectInstance>): NonNullRef<SelectInstance> => {
+export const useSelectIfNotDefined = (
+  select?: NonNullRef<SelectInstance>,
+): NonNullRef<SelectInstance> => {
   const ref = useRef<SelectInstance>(InitialSelectRef);
   const returnRef = useMemo(() => (!isNil(select) ? select : ref), [select, ref.current]);
   return returnRef;
@@ -23,7 +27,7 @@ export const useSelectIfNotDefined = (select?: NonNullRef<SelectInstance>): NonN
 export const InitialHeaderTemplateSelectRef: HeaderTemplateSelectInstance = {
   ...InitialSelectRef,
   /* eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars */
-  addOption: (m: Model.HeaderTemplate | Model.SimpleHeaderTemplate) => {}
+  addOption: (m: Model.HeaderTemplate | Model.SimpleHeaderTemplate) => {},
 };
 
 export const useHeaderTemplateSelect = (): NonNullRef<HeaderTemplateSelectInstance> => {
@@ -32,7 +36,7 @@ export const useHeaderTemplateSelect = (): NonNullRef<HeaderTemplateSelectInstan
 };
 
 export const useHeaderTemplateSelectIfNotDefined = (
-  select?: NonNullRef<HeaderTemplateSelectInstance>
+  select?: NonNullRef<HeaderTemplateSelectInstance>,
 ): NonNullRef<HeaderTemplateSelectInstance> => {
   const ref = useRef<HeaderTemplateSelectInstance>(InitialHeaderTemplateSelectRef);
   const returnRef = useMemo(() => (!isNil(select) ? select : ref), [select, ref.current]);
@@ -54,8 +58,9 @@ type UseMultiModelSelectProps<M extends Model.Model> =
   | UseMultiModelSyncSelectProps<M>;
 
 const isMultiAsync = <M extends Model.Model>(
-  props: UseMultiModelSelectProps<M>
-): props is UseMultiModelAsyncSelectProps<M> => (props as UseMultiModelAsyncSelectProps<M>).isAsync === true;
+  props: UseMultiModelSelectProps<M>,
+): props is UseMultiModelAsyncSelectProps<M> =>
+  (props as UseMultiModelAsyncSelectProps<M>).isAsync === true;
 
 type UseMultiModelSelectReturnType<M extends Model.Model> = {
   readonly value: MultiValue<ModelSelectOption<M>> | undefined;
@@ -64,13 +69,13 @@ type UseMultiModelSelectReturnType<M extends Model.Model> = {
 };
 
 export const useMultiModelSelect = <M extends Model.Model>(
-  props: UseMultiModelSelectProps<M>
+  props: UseMultiModelSelectProps<M>,
 ): UseMultiModelSelectReturnType<M> => {
   const [data, setData] = useState<M[]>([]);
 
   const convertedValue = useMemo<MultiValue<ModelSelectOption<M>> | undefined>(
     () => parseMultiModelSelectValues(isMultiAsync(props) ? data : props.options, props.value),
-    [props]
+    [props],
   );
 
   return { value: convertedValue, onResponse: (rsp: Http.ListResponse<M>) => setData(rsp.data) };
@@ -91,8 +96,9 @@ type UseSingleModelSelectProps<M extends Model.Model> =
   | UseSingleModelSyncSelectProps<M>;
 
 const isSingleAsync = <M extends Model.Model>(
-  props: UseSingleModelSelectProps<M>
-): props is UseSingleModelAsyncSelectProps<M> => (props as UseSingleModelAsyncSelectProps<M>).isAsync === true;
+  props: UseSingleModelSelectProps<M>,
+): props is UseSingleModelAsyncSelectProps<M> =>
+  (props as UseSingleModelAsyncSelectProps<M>).isAsync === true;
 
 type UseSingleModelSelectReturnType<M extends Model.Model> = {
   readonly value: SingleValue<ModelSelectOption<M>> | undefined;
@@ -101,13 +107,13 @@ type UseSingleModelSelectReturnType<M extends Model.Model> = {
 };
 
 export const useSingleModelSelect = <M extends Model.Model>(
-  props: UseSingleModelSelectProps<M>
+  props: UseSingleModelSelectProps<M>,
 ): UseSingleModelSelectReturnType<M> => {
   const [data, setData] = useState<M[]>([]);
 
   const convertedValue = useMemo<SingleValue<ModelSelectOption<M>> | undefined>(
     () => parseSingleModelSelectValues(isSingleAsync(props) ? data : props.options, props.value),
-    [props]
+    [props],
   );
   return { value: convertedValue, onResponse: (rsp: Http.ListResponse<M>) => setData(rsp.data) };
 };

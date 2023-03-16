@@ -1,7 +1,8 @@
 import React from "react";
+
+import { LoadingOutlined } from "@ant-design/icons";
 import classNames from "classnames";
 import { Spin, SpinProps } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
 
 import { withSize } from "components/hocs";
 

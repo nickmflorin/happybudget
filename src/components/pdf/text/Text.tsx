@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import { isNil, includes } from "lodash";
+
 import { PrimitiveText } from "../primitive";
 import { TextProps as PrimitiveTextProps } from "../primitive/Text";
 
@@ -12,7 +13,7 @@ const Text = ({ styles, ...props }: TextProps): JSX.Element => (
     {...props}
     className={classNames("text", props.className, {
       bold: !isNil(styles) && includes(styles, "bold"),
-      italic: !isNil(styles) && includes(styles, "italic")
+      italic: !isNil(styles) && includes(styles, "italic"),
     })}
   />
 );

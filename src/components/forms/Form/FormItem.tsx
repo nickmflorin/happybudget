@@ -24,9 +24,13 @@ const FormItem = ({
     {...props}
     className={classNames("form-item", props.className, {
       "horizontal-layout-override": horizontalLayoutOverride,
-      "vertical-layout-override": verticalLayoutOverride
+      "vertical-layout-override": verticalLayoutOverride,
     })}
-    label={!isNil(props.label) ? <FormLabelContent dataType={dataType}>{props.label}</FormLabelContent> : undefined}
+    label={
+      !isNil(props.label) ? (
+        <FormLabelContent dataType={dataType}>{props.label}</FormLabelContent>
+      ) : undefined
+    }
   >
     {props.children}
   </AntdForm.Item>

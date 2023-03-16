@@ -1,15 +1,15 @@
 import { useEffect } from "react";
+
 import { useSelector, useDispatch } from "react-redux";
 import { Redirect, Switch } from "react-router-dom";
 
 import { PublicBudgetLayout } from "components/layout";
 import { Route, PathParamsRoute } from "components/routes";
 
-import { actions, selectors } from "../store";
-
 import Account from "./Account";
 import Accounts from "./Accounts";
 import SubAccount from "./SubAccount";
+import { actions, selectors } from "../store";
 
 type PublicBudgetProps = {
   readonly budgetId: number;
@@ -19,35 +19,47 @@ type PublicBudgetProps = {
 const PublicBudget = (props: PublicBudgetProps): JSX.Element => {
   const dispatch = useDispatch();
   const budget = useSelector((s: Application.Store) =>
-    selectors.selectBudgetDetail<Model.Budget, true>(s, { domain: "budget", public: true })
+    selectors.selectBudgetDetail<Model.Budget, true>(s, { domain: "budget", public: true }),
   );
   const budgetLoading = useSelector((s: Application.Store) =>
-    selectors.selectBudgetLoading(s, { domain: "budget", public: true })
+    selectors.selectBudgetLoading(s, { domain: "budget", public: true }),
   );
 
   useEffect(() => {
-    dispatch(actions.pub.requestBudgetAction(null, { budgetId: props.budgetId, domain: "budget", public: true }));
+    dispatch(
+      actions.pub.requestBudgetAction(null, {
+        budgetId: props.budgetId,
+        domain: "budget",
+        public: true,
+      }),
+    );
   }, [props.budgetId]);
 
   return (
     <PublicBudgetLayout budgetLoading={budgetLoading}>
       <Switch>
-        <Redirect exact from={"/pub/:tokenId/budgets/:budgetId"} to={"/pub/:tokenId/budgets/:budgetId/accounts"} />
+        <Redirect
+          exact
+          from="/pub/:tokenId/budgets/:budgetId"
+          to="/pub/:tokenId/budgets/:budgetId/accounts"
+        />
         <PathParamsRoute<{ accountId: number }>
           pub={true}
           params={["accountId"]}
-          path={"/pub/:tokenId/budgets/:budgetId/accounts/:accountId"}
-          render={(params: { accountId: number }) => <Account {...props} id={params.accountId} budget={budget} />}
+          path="/pub/:tokenId/budgets/:budgetId/accounts/:accountId"
+          render={(params: { accountId: number }) => (
+            <Account {...props} id={params.accountId} budget={budget} />
+          )}
         />
         <Route
           pub={true}
-          path={"/pub/:tokenId/budgets/:budgetId/accounts"}
+          path="/pub/:tokenId/budgets/:budgetId/accounts"
           render={() => <Accounts {...props} budget={budget} />}
         />
         <PathParamsRoute<{ subaccountId: number }>
           pub={true}
           params={["subaccountId"]}
-          path={"/pub/:tokenId/budgets/:budgetId/subaccounts/:subaccountId"}
+          path="/pub/:tokenId/budgets/:budgetId/subaccounts/:subaccountId"
           render={(params: { subaccountId: number }) => (
             <SubAccount {...props} id={params.subaccountId} budget={budget} />
           )}

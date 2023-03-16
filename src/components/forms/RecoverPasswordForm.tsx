@@ -1,12 +1,12 @@
 import React from "react";
+
 import classNames from "classnames";
 
+import { util } from "lib";
 import { Form } from "components";
 import { PrimaryButton } from "components/buttons";
 import { EmailInput } from "components/fields";
 import { RouterLink } from "components/links";
-
-import { util } from "lib";
 
 export type IRecoverPasswordFormValues = {
   readonly email: string;
@@ -28,7 +28,7 @@ const RecoverPasswordForm: React.FC<RecoverPasswordFormProps> = ({
     onFinish={(values: IRecoverPasswordFormValues) => onSubmit(values)}
   >
     <Form.Item
-      name={"email"}
+      name="email"
       rules={[
         { required: true, message: "Please enter a valid email." },
         () => ({
@@ -38,19 +38,19 @@ const RecoverPasswordForm: React.FC<RecoverPasswordFormProps> = ({
               return Promise.reject("The email does not meet our requirements.");
             }
             return Promise.resolve();
-          }
-        })
+          },
+        }),
       ]}
     >
-      <EmailInput size={"large"} />
+      <EmailInput size="large" />
     </Form.Item>
     <Form.Footer>
-      <PrimaryButton loading={loading} xlarge={true} className={"btn--landing"} htmlType={"submit"}>
-        {"Submit"}
+      <PrimaryButton loading={loading} xlarge={true} className="btn--landing" htmlType="submit">
+        Submit
       </PrimaryButton>
-      <div className={"switch-text"}>
-        {"Back to"}
-        <RouterLink to={"/login"}>{"Log In"}</RouterLink>
+      <div className="switch-text">
+        Back to
+        <RouterLink to="/login">Log In</RouterLink>
       </div>
     </Form.Footer>
   </Form.Form>

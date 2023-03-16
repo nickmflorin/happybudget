@@ -13,7 +13,7 @@ interface CreateGroupModalProps<R extends Table.RowData, M extends Model.RowHttp
 const CreateGroupModal = <
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  MM extends Model.SimpleAccount | Model.SimpleSubAccount
+  MM extends Model.SimpleAccount | Model.SimpleSubAccount,
 >({
   parentId,
   children,
@@ -23,14 +23,19 @@ const CreateGroupModal = <
 }: CreateGroupModalProps<R, M>): JSX.Element => (
   <CreateModelModal<Model.Group>
     {...props}
-    title={"Subtotal"}
-    titleIcon={"folder"}
+    title="Subtotal"
+    titleIcon="folder"
     createSync={(payload: Http.GroupPayload, callbacks: CreateModelCallbacks<Model.Group>) =>
       table.dispatchEvent({ type: "groupAdd", payload, ...callbacks })
     }
   >
     {(form: FormInstance<Http.GroupPayload>) => (
-      <GroupForm<MM> form={form} parentType={parentType} parentId={parentId} initialValues={{ children }} />
+      <GroupForm<MM>
+        form={form}
+        parentType={parentType}
+        parentId={parentId}
+        initialValues={{ children }}
+      />
     )}
   </CreateModelModal>
 );

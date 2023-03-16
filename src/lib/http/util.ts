@@ -27,19 +27,19 @@ import { util } from "lib";
 export const orderBy = <M extends Model.HttpModel, F extends string>(
   data: M[],
   ordering: Http.Ordering<F>,
-  user?: Model.User | null
+  user?: Model.User | null,
 ): M[] => {
   // We are only concerned with fields in the ordering that have a non-0 order.
   const fields = map(
     filter(ordering, (o: Http.FieldOrder<F>) => o.order !== 0),
-    (o: Http.FieldOrder<F>) => o.field
+    (o: Http.FieldOrder<F>) => o.field,
   );
 
   /* The lodash orderBy method requires that we specify the ordering as "asc"
      or "desc". */
   const directions: ("asc" | "desc")[] = map(
     filter(ordering, (o: Http.FieldOrder<F>) => o.order !== 0),
-    (o: Http.FieldOrder<F>) => (o.order === 1 ? "asc" : "desc")
+    (o: Http.FieldOrder<F>) => (o.order === 1 ? "asc" : "desc"),
   );
 
   /* A model that is comprised of the numeric ID and any field-value pairs
@@ -62,17 +62,20 @@ export const orderBy = <M extends Model.HttpModel, F extends string>(
                should convert it to a date such that the Moment object is what
                the field is ordered by. */
           if (!isNil(v) && typeof v === "string") {
-            const vAsDate = util.dates.toLocalizedMoment(v, { warnOnInvalid: false, tz: user?.timezone });
+            const vAsDate = util.dates.toLocalizedMoment(v, {
+              warnOnInvalid: false,
+              tz: user?.timezone,
+            });
             if (!isNil(vAsDate)) {
               return { ...currM, [f]: vAsDate };
             }
           }
           return { ...currM, [f]: v };
         },
-        { id: m.id } as ModelFromOrderedFields
-      )
+        { id: m.id } as ModelFromOrderedFields,
+      ),
     ],
-    []
+    [],
   );
 
   /* Order the models that are comprised of just the ordering fields by the
@@ -80,5 +83,7 @@ export const orderBy = <M extends Model.HttpModel, F extends string>(
   const orderedFieldModels = rootOrderBy(models, fields, directions);
   /* Sort the original models by the location of the corresponding ID in the
      ordered field models. */
-  return sortBy(data, (m: M) => findIndex(orderedFieldModels, (oM: ModelFromOrderedFields) => oM.id === m.id));
+  return sortBy(data, (m: M) =>
+    findIndex(orderedFieldModels, (oM: ModelFromOrderedFields) => oM.id === m.id),
+  );
 };

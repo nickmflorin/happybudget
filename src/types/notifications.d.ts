@@ -45,41 +45,49 @@ declare type AppNotification<L extends AppNotificationLevel = AppNotificationLev
   readonly message?: string;
 };
 
-declare type UINotificationData<L extends AppNotificationLevel = AppNotificationLevel> = AppNotification<L> & {
-  readonly closable?: boolean;
-  readonly detail?: UINotificationDetail;
-  readonly duration?: number;
-  readonly includeLink?: IncludeLink | undefined;
-};
+declare type UINotificationData<L extends AppNotificationLevel = AppNotificationLevel> =
+  AppNotification<L> & {
+    readonly closable?: boolean;
+    readonly detail?: UINotificationDetail;
+    readonly duration?: number;
+    readonly includeLink?: IncludeLink | undefined;
+  };
 
-declare type UINotification<L extends AppNotificationLevel = AppNotificationLevel> = UINotificationData<L> & {
-  /*
+declare type UINotification<L extends AppNotificationLevel = AppNotificationLevel> =
+  UINotificationData<L> & {
+    /*
 	Each UINotification that is in the state managed by the reducer needs to
 	have a unique ID so that we can reference that ID if we need to remove or
 	perform another action on that notification specifically in the future.
 	*/
-  readonly id: number;
-  readonly remove: () => void;
-};
+    readonly id: number;
+    readonly remove: () => void;
+  };
 
 declare type UIFieldNotification = {
   readonly field: string;
   readonly message: string;
 };
 
-declare type UIExistingNotificationId = "budgetSubscriptionPermissionError" | "budgetCountPermissionError";
+declare type UIExistingNotificationId =
+  | "budgetSubscriptionPermissionError"
+  | "budgetCountPermissionError";
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 type DefaultExistingNotificationParams = Record<string, never>;
 type ExistingNotificationParams = Record<string, unknown>;
 
-declare type UIExistingNotification<T extends ExistingNotificationParams = DefaultExistingNotificationParams> = (
-  props: T
-) => UINotificationData;
+declare type UIExistingNotification<
+  T extends ExistingNotificationParams = DefaultExistingNotificationParams,
+> = (props: T) => UINotificationData;
 
-declare type UIExistingNotifications = { [key in UIExistingNotificationId]: UIExistingNotification };
+declare type UIExistingNotifications = {
+  [key in UIExistingNotificationId]: UIExistingNotification;
+};
 
-declare type InferExistingNotificationParams<T> = T extends UIExistingNotification<infer P> ? P : never;
+declare type InferExistingNotificationParams<T> = T extends UIExistingNotification<infer P>
+  ? P
+  : never;
 
 declare type FieldWithErrors = { readonly name: string; readonly errors: string[] };
 
@@ -93,22 +101,28 @@ declare type InternalNotification = InternalNotificationObj | Error | string;
 declare type UINotificationsHandler = {
   readonly getNotifications: (
     notifications: SingleOrArray<UINotificationType>,
-    opts?: UINotificationOptions
+    opts?: UINotificationOptions,
   ) => UINotificationData[];
   readonly getRequestErrorNotifications: (
-    e: import("api/errors").ClientError | import("api/errors").NetworkError | import("api/errors").ServerError,
-    opts?: UINotificationOptions & { readonly dispatchClientErrorToSentry?: boolean }
+    e:
+      | import("api/errors").ClientError
+      | import("api/errors").NetworkError
+      | import("api/errors").ServerError,
+    opts?: UINotificationOptions & { readonly dispatchClientErrorToSentry?: boolean },
   ) => UINotificationData[];
 };
 
 declare type UINotificationsManager = {
-  readonly notify: (notifications: SingleOrArray<UINotificationType>, opts?: UINotificationOptions) => UINotification[];
+  readonly notify: (
+    notifications: SingleOrArray<UINotificationType>,
+    opts?: UINotificationOptions,
+  ) => UINotification[];
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   readonly lookupAndNotify: (id: UIExistingNotificationId, params: any) => UINotification[];
   readonly clearNotifications: (ids?: SingleOrArray<number>) => void;
   readonly handleRequestError: (
     e: Error,
-    opts?: UINotificationOptions & { readonly dispatchClientErrorToSentry?: boolean }
+    opts?: UINotificationOptions & { readonly dispatchClientErrorToSentry?: boolean },
   ) => UINotification[];
   readonly notifications: UINotification[];
 };

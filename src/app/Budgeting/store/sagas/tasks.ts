@@ -11,7 +11,10 @@ type ActionTypeLookup<B extends Model.Budget | Model.Template, PUBLIC extends bo
   readonly domain: B["domain"];
   readonly pub: PUBLIC;
   readonly loadingBudget: Redux.ActionCreator<boolean, BudgetActionContext<B, PUBLIC>>;
-  readonly responseBudget: Redux.ActionCreator<Http.RenderedDetailResponse<B>, BudgetActionContext<B, PUBLIC>>;
+  readonly responseBudget: Redux.ActionCreator<
+    Http.RenderedDetailResponse<B>,
+    BudgetActionContext<B, PUBLIC>
+  >;
   // Currently, this action is not wired to anything but may be in the future.
   readonly loadingAccount: Redux.ActionCreator<boolean, AccountActionContext<B, PUBLIC>>;
   readonly responseAccount: Redux.ActionCreator<
@@ -29,7 +32,7 @@ type ActionTypeLookup<B extends Model.Budget | Model.Template, PUBLIC extends bo
 const ACTION_LOOKUPS: [
   ActionTypeLookup<Model.Budget, false>,
   ActionTypeLookup<Model.Template, false>,
-  ActionTypeLookup<Model.Budget, true>
+  ActionTypeLookup<Model.Budget, true>,
 ] = [
   {
     domain: "budget",
@@ -39,7 +42,7 @@ const ACTION_LOOKUPS: [
     loadingAccount: actions.budget.account.loadingAccountAction,
     responseAccount: actions.budget.account.responseAccountAction,
     loadingSubAccount: actions.budget.subAccount.loadingSubAccountAction,
-    responseSubAccount: actions.budget.subAccount.responseSubAccountAction
+    responseSubAccount: actions.budget.subAccount.responseSubAccountAction,
   },
   {
     domain: "template",
@@ -49,7 +52,7 @@ const ACTION_LOOKUPS: [
     loadingAccount: actions.template.account.loadingAccountAction,
     responseAccount: actions.template.account.responseAccountAction,
     loadingSubAccount: actions.template.subAccount.loadingSubAccountAction,
-    responseSubAccount: actions.template.subAccount.responseSubAccountAction
+    responseSubAccount: actions.template.subAccount.responseSubAccountAction,
   },
   {
     domain: "budget",
@@ -59,21 +62,22 @@ const ACTION_LOOKUPS: [
     loadingAccount: actions.pub.account.loadingAccountAction,
     responseAccount: actions.pub.account.responseAccountAction,
     loadingSubAccount: actions.pub.subAccount.loadingSubAccountAction,
-    responseSubAccount: actions.pub.subAccount.responseSubAccountAction
-  }
+    responseSubAccount: actions.pub.subAccount.responseSubAccountAction,
+  },
 ];
 
 const isActionLookupOfType = <B extends Model.Budget | Model.Template, PUBLIC extends boolean>(
   /* eslint-disable @typescript-eslint/no-explicit-any */
   lookup: ActionTypeLookup<any, any>,
   domain: B["domain"],
-  pub: PUBLIC
+  pub: PUBLIC,
 ): lookup is ActionTypeLookup<B, PUBLIC> =>
-  (lookup as ActionTypeLookup<B, PUBLIC>).domain === domain && (lookup as ActionTypeLookup<B, PUBLIC>).pub === pub;
+  (lookup as ActionTypeLookup<B, PUBLIC>).domain === domain &&
+  (lookup as ActionTypeLookup<B, PUBLIC>).pub === pub;
 
 const getLookup = <B extends Model.Budget | Model.Template, PUBLIC extends boolean>(
   domain: B["domain"],
-  pub: PUBLIC
+  pub: PUBLIC,
 ): ActionTypeLookup<B, PUBLIC> => {
   for (let i = 0; i < ACTION_LOOKUPS.length; i++) {
     const lookup = ACTION_LOOKUPS[i];
@@ -84,7 +88,9 @@ const getLookup = <B extends Model.Budget | Model.Template, PUBLIC extends boole
   throw new Error(`Action lookup not mapped for domain=${domain}, public=${String(pub)}.`);
 };
 
-export function* getBudget(action: Redux.Action<Redux.RequestPayload, BudgetActionContext>): SagaIterator {
+export function* getBudget(
+  action: Redux.Action<Redux.RequestPayload, BudgetActionContext>,
+): SagaIterator {
   /*
 	Unlike the requests to get a SubAccount or an Account, we do not need to
 	be concerned with only performing the request in the case that the Budget
@@ -97,7 +103,11 @@ export function* getBudget(action: Redux.Action<Redux.RequestPayload, BudgetActi
 
   yield put(lookup.loadingBudget(true, action.context));
   try {
-    const response: Model.Budget = yield http.request(api.getBudget, action.context, action.context.budgetId);
+    const response: Model.Budget = yield http.request(
+      api.getBudget,
+      action.context,
+      action.context.budgetId,
+    );
     yield put(lookup.responseBudget(response, action.context));
   } catch (e: unknown) {
     const err = e as Error;
@@ -119,20 +129,26 @@ export function* getBudget(action: Redux.Action<Redux.RequestPayload, BudgetActi
   }
 }
 
-export function* getAccount(action: Redux.Action<Redux.RequestPayload, AccountActionContext>): SagaIterator {
+export function* getAccount(
+  action: Redux.Action<Redux.RequestPayload, AccountActionContext>,
+): SagaIterator {
   // Only perform the request if the data is not already in the store.
-  const exists = yield select((s: Application.Store) => {
-    return redux.canUseCachedIndexedDetailResponse(
+  const exists = yield select((s: Application.Store) =>
+    redux.canUseCachedIndexedDetailResponse(
       selectors.selectIndexedAccounts(s, action.context),
       (si: Modules.AccountOrSubAccountStore<Model.Account>) => si.detail,
-      action.context.id
-    );
-  });
+      action.context.id,
+    ),
+  );
   if (!exists || redux.requestActionIsForced(action)) {
     const lookup = getLookup(action.context.domain, action.context.public);
     yield put(lookup.loadingAccount(true, action.context));
     try {
-      const response: Model.Account = yield http.request(api.getAccount, action.context, action.context.id);
+      const response: Model.Account = yield http.request(
+        api.getAccount,
+        action.context,
+        action.context.id,
+      );
       yield put(lookup.responseAccount(response, action.context));
     } catch (e: unknown) {
       const err = e as Error;
@@ -155,20 +171,26 @@ export function* getAccount(action: Redux.Action<Redux.RequestPayload, AccountAc
   }
 }
 
-export function* getSubAccount(action: Redux.Action<Redux.RequestPayload, SubAccountActionContext>): SagaIterator {
+export function* getSubAccount(
+  action: Redux.Action<Redux.RequestPayload, SubAccountActionContext>,
+): SagaIterator {
   // Only perform the request if the data is not already in the store.
-  const exists = yield select((s: Application.Store) => {
-    return redux.canUseCachedIndexedDetailResponse(
+  const exists = yield select((s: Application.Store) =>
+    redux.canUseCachedIndexedDetailResponse(
       selectors.selectIndexedSubAccounts(s, action.context),
       (si: Modules.AccountOrSubAccountStore<Model.SubAccount>) => si.detail,
-      action.context.id
-    );
-  });
+      action.context.id,
+    ),
+  );
   if (!exists || redux.requestActionIsForced(action)) {
     const lookup = getLookup(action.context.domain, action.context.public);
     yield put(lookup.loadingSubAccount(true, action.context));
     try {
-      const response: Model.SubAccount = yield http.request(api.getSubAccount, action.context, action.context.id);
+      const response: Model.SubAccount = yield http.request(
+        api.getSubAccount,
+        action.context,
+        action.context.id,
+      );
       yield put(lookup.responseSubAccount(response, action.context));
     } catch (e: unknown) {
       const err = e as Error;

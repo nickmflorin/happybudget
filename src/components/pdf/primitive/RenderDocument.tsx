@@ -1,6 +1,7 @@
 import React from "react";
-import { pdfjs, Document as ReactPdfDoc } from "react-pdf/dist/esm/entry.webpack";
+
 import { isNil } from "lodash";
+import { pdfjs, Document as ReactPdfDoc } from "react-pdf/dist/esm/entry.webpack";
 
 import { WrappedSpinner, RenderOrSpinner } from "components";
 

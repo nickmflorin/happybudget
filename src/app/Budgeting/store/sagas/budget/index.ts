@@ -4,13 +4,12 @@ import { spawn, takeLatest } from "redux-saga/effects";
 import { tabling } from "lib";
 import * as store from "store";
 
-import * as selectors from "../../selectors";
-import * as actions from "../../actions/budget";
-import * as tasks from "../tasks";
-
-import analysisSaga from "./analysis";
 import accountSaga from "./account";
+import analysisSaga from "./analysis";
 import subAccountSaga from "./subAccount";
+import * as actions from "../../actions/budget";
+import * as selectors from "../../selectors";
+import * as tasks from "../tasks";
 
 export * as accounts from "./accounts";
 export * as actuals from "./actuals";
@@ -22,10 +21,12 @@ const FringesActionMap = {
   loading: actions.loadingFringesAction,
   response: actions.responseFringesAction,
   updateBudgetInState: actions.updateBudgetInStateAction,
-  setSearch: actions.setFringesSearchAction
+  setSearch: actions.setFringesSearchAction,
 };
 
-export const createFringesTableSaga = (table: Table.TableInstance<Tables.FringeRowData, Model.Fringe>) =>
+export const createFringesTableSaga = (
+  table: Table.TableInstance<Tables.FringeRowData, Model.Fringe>,
+) =>
   tabling.sagas.createAuthenticatedTableSaga<
     Tables.FringeRowData,
     Model.Fringe,
@@ -39,7 +40,7 @@ export const createFringesTableSaga = (table: Table.TableInstance<Tables.FringeR
       selectBaseStore: (s: Application.Store) => s.budget,
       selectParentTableStore: (
         s: Application.Store,
-        ctx: FringesTableActionContext<Model.Budget, Model.Account | Model.SubAccount, false>
+        ctx: FringesTableActionContext<Model.Budget, Model.Account | Model.SubAccount, false>,
       ) => selectors.selectSubAccountsTableStore(s, ctx),
       actions: {
         ...FringesActionMap,
@@ -47,7 +48,7 @@ export const createFringesTableSaga = (table: Table.TableInstance<Tables.FringeR
           account: actions.account.invalidateAccountAction,
           subaccount: actions.subAccount.invalidateSubAccountAction,
           accountSubAccountsTable: actions.account.invalidateAction,
-          subaccountSubAccountsTable: actions.subAccount.invalidateAction
+          subaccountSubAccountsTable: actions.subAccount.invalidateAction,
         },
         requestParentTableData: (
           id: number,
@@ -56,7 +57,7 @@ export const createFringesTableSaga = (table: Table.TableInstance<Tables.FringeR
           ctx: Omit<
             FringesTableActionContext<Model.Budget, Model.Account | Model.SubAccount, false>,
             "parentId" | "parentType"
-          >
+          >,
         ): Redux.Action<
           Redux.TableRequestPayload,
           SubAccountsTableActionContext<Model.Budget, Model.Account | Model.SubAccount, false>
@@ -67,7 +68,7 @@ export const createFringesTableSaga = (table: Table.TableInstance<Tables.FringeR
               parentType,
               domain: ctx.domain,
               public: ctx.public,
-              budgetId: ctx.budgetId
+              budgetId: ctx.budgetId,
             }) as Redux.Action<
               Redux.TableRequestPayload,
               SubAccountsTableActionContext<Model.Budget, Model.Account | Model.SubAccount, false>
@@ -78,7 +79,7 @@ export const createFringesTableSaga = (table: Table.TableInstance<Tables.FringeR
             parentType: parentType,
             domain: ctx.domain,
             public: ctx.public,
-            budgetId: ctx.budgetId
+            budgetId: ctx.budgetId,
           }) as Redux.Action<
             Redux.TableRequestPayload,
             SubAccountsTableActionContext<Model.Budget, Model.Account | Model.SubAccount, false>
@@ -91,7 +92,7 @@ export const createFringesTableSaga = (table: Table.TableInstance<Tables.FringeR
           ctx: Omit<
             FringesTableActionContext<Model.Budget, Model.Account | Model.SubAccount, false>,
             "parentId" | "parentType"
-          >
+          >,
         ): Redux.Action<
           Redux.RequestPayload,
           AccountActionContext<Model.Budget, false> | SubAccountActionContext<Model.Budget, false>
@@ -101,24 +102,25 @@ export const createFringesTableSaga = (table: Table.TableInstance<Tables.FringeR
               id,
               domain: ctx.domain,
               public: ctx.public,
-              budgetId: ctx.budgetId
+              budgetId: ctx.budgetId,
             }) as Redux.Action<
               Redux.RequestPayload,
-              AccountActionContext<Model.Budget, false> | SubAccountActionContext<Model.Budget, false>
+              | AccountActionContext<Model.Budget, false>
+              | SubAccountActionContext<Model.Budget, false>
             >;
           }
           return actions.subAccount.requestSubAccountAction(payload, {
             id,
             domain: ctx.domain,
             public: ctx.public,
-            budgetId: ctx.budgetId
+            budgetId: ctx.budgetId,
           }) as Redux.Action<
             Redux.RequestPayload,
             AccountActionContext<Model.Budget, false> | SubAccountActionContext<Model.Budget, false>
           >;
-        }
-      }
-    })
+        },
+      },
+    }),
   });
 
 export default function* rootSaga(): SagaIterator {

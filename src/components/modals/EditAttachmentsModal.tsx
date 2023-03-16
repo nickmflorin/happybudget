@@ -1,7 +1,6 @@
-import { ui } from "lib";
+import { ui, notifications } from "lib";
 import { EditAttachments, EditAttachmentsProps } from "components/files";
 
-import { notifications } from "lib";
 import { Modal } from "./generic";
 
 type EditAttachmentsModalProps = ModalProps &
@@ -21,7 +20,7 @@ const EditAttachmentsModal = ({
   const modal = ui.useModalIfNotDefined(props.modal);
 
   return (
-    <Modal {...props} modal={modal} title={"Attachments"} titleIcon={"paperclip"} footer={null}>
+    <Modal {...props} modal={modal} title="Attachments" titleIcon="paperclip" footer={null}>
       <EditAttachments
         path={path}
         modelId={modelId}
@@ -33,7 +32,7 @@ const EditAttachmentsModal = ({
           notifications.internal.notify({
             error: e,
             level: "error",
-            dispatchToSentry: true
+            dispatchToSentry: true,
           });
           modal.current.notify({ message: "There was an error downloading your attachment." });
         }}

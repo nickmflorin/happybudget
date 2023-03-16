@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+
 import { reduce, uniq, filter, isNil } from "lodash";
 
 import { hooks, model, tabling } from "lib";
@@ -8,32 +9,38 @@ import usePublicAttachments from "./usePublicAttachments";
 
 interface UseAttachmentsProps<
   R extends Tables.ActualRowData | Tables.SubAccountRowData | Tables.ContactRowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel,
 > {
   readonly table: Table.TableInstance<R, M>;
   readonly path: (id: number) => string;
   readonly listAttachments: (
     id: number,
     query?: Http.ListQuery,
-    options?: Http.RequestOptions
+    options?: Http.RequestOptions,
   ) => Promise<Http.ListResponse<Model.Attachment>>;
-  readonly deleteAttachment: (id: number, objId: number, options?: Http.RequestOptions) => Promise<null>;
+  readonly deleteAttachment: (
+    id: number,
+    objId: number,
+    options?: Http.RequestOptions,
+  ) => Promise<null>;
 }
 
-type UseAttachmentsReturnType<R extends Tables.ActualRowData | Tables.SubAccountRowData | Tables.ContactRowData> = [
+type UseAttachmentsReturnType<
+  R extends Tables.ActualRowData | Tables.SubAccountRowData | Tables.ContactRowData,
+> = [
   (row: R) => string,
   (value: string) => Model.SimpleAttachment[],
   (id: number) => void,
   JSX.Element | null,
   (row: Table.ModelRow<R>, attachment: Model.Attachment) => void,
-  (row: Table.ModelRow<R>, id: number) => void
+  (row: Table.ModelRow<R>, id: number) => void,
 ];
 
 const useAttachments = <
   R extends Tables.ActualRowData | Tables.SubAccountRowData | Tables.ContactRowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel,
 >(
-  props: UseAttachmentsProps<R, M>
+  props: UseAttachmentsProps<R, M>,
 ): UseAttachmentsReturnType<R> => {
   const [editAttachments, setEditAttachments] = useState<number | null>(null);
 
@@ -44,12 +51,15 @@ const useAttachments = <
         payload: {
           id: row.id,
           data: {
-            attachments: filter(row.data.attachments, (a: Model.SimpleAttachment) => a.id !== rowId)
-          } as Partial<R>
-        }
+            attachments: filter(
+              row.data.attachments,
+              (a: Model.SimpleAttachment) => a.id !== rowId,
+            ),
+          } as Partial<R>,
+        },
       });
     },
-    [props.table]
+    [props.table],
   );
 
   const addAttachment = useMemo(
@@ -61,30 +71,40 @@ const useAttachments = <
           data: {
             attachments: [
               ...(row.data.attachments || []),
-              { id: attachment.id, name: attachment.name, extension: attachment.extension, url: attachment.url }
-            ]
-          } as Partial<R>
-        }
+              {
+                id: attachment.id,
+                name: attachment.name,
+                extension: attachment.extension,
+                url: attachment.url,
+              },
+            ],
+          } as Partial<R>,
+        },
       });
     },
-    [props.table]
+    [props.table],
   );
 
   const processAttachmentsCellForClipboard = usePublicAttachments();
 
   const processAttachmentsCellFromClipboard = hooks.useDynamicCallback((value: string) => {
     const modelRows = filter(props.table.getRows(), (r: Table.Row<R>) =>
-      tabling.rows.isModelRow(r)
+      tabling.rows.isModelRow(r),
     ) as Table.ModelRow<R>[];
     const attachments = reduce(
       modelRows,
-      (curr: Model.SimpleAttachment[], r: Table.ModelRow<R>) => uniq([...curr, ...(r.data.attachments || [])]),
-      []
+      (curr: Model.SimpleAttachment[], r: Table.ModelRow<R>) =>
+        uniq([...curr, ...(r.data.attachments || [])]),
+      [],
     );
-    return model.getModels<Model.SimpleAttachment>(attachments, model.parseIdsFromDeliminatedString(value), {
-      warnOnMissing: false,
-      modelName: "attachment"
-    });
+    return model.getModels<Model.SimpleAttachment>(
+      attachments,
+      model.parseIdsFromDeliminatedString(value),
+      {
+        warnOnMissing: false,
+        modelName: "attachment",
+      },
+    );
   });
 
   const modal = useMemo(() => {
@@ -107,13 +127,13 @@ const useAttachments = <
             } else {
               console.warn(
                 `Suspicous Behavior: After attachment was added, row with ID
-                ${editAttachments} did not refer to a model row.`
+                ${editAttachments} did not refer to a model row.`,
               );
             }
           } else {
             console.warn(
               `Suspicous Behavior: After attachment was added, could not find row in
-              state for ID ${editAttachments}.`
+              state for ID ${editAttachments}.`,
             );
           }
         }}
@@ -125,13 +145,13 @@ const useAttachments = <
             } else {
               console.warn(
                 `Suspicous Behavior: After attachment was added, row with ID
-                ${editAttachments} did not refer to a model row.`
+                ${editAttachments} did not refer to a model row.`,
               );
             }
           } else {
             console.warn(
               `Suspicous Behavior: After attachment was added, could not find row in
-              state for ID ${editAttachments}.`
+              state for ID ${editAttachments}.`,
             );
           }
         }}
@@ -145,7 +165,7 @@ const useAttachments = <
     setEditAttachments,
     modal,
     addAttachment,
-    removeAttachment
+    removeAttachment,
   ];
 };
 

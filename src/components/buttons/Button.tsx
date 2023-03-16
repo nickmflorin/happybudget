@@ -1,18 +1,20 @@
 import React, { useState, useMemo, forwardRef, ForwardedRef } from "react";
+
 import classNames from "classnames";
 import { isNil } from "lodash";
-
 import { Button as AntDButton } from "antd";
 import { ButtonProps as AntDButtonProps } from "antd/lib/button";
 
 import { ui } from "lib";
-
 import { Spinner, ShowHide, Icon, VerticalFlexCenter } from "components";
 import { withSize } from "components/hocs";
-import { TooltipWrapper } from "components/tooltips";
 import { SpinnerProps } from "components/loading/Spinner";
+import { TooltipWrapper } from "components/tooltips";
 
-type PrivateButtonProps = Omit<AntDButtonProps, "disabled" | "icon" | "size" | keyof StandardComponentProps> &
+type PrivateButtonProps = Omit<
+  AntDButtonProps,
+  "disabled" | "icon" | "size" | keyof StandardComponentProps
+> &
   ClickableProps &
   StandardComponentProps & {
     readonly loading?: boolean;
@@ -44,7 +46,7 @@ const Button = (
     spinnerProps,
     ...props
   }: PrivateButtonProps,
-  ref: ForwardedRef<HTMLButtonElement>
+  ref: ForwardedRef<HTMLButtonElement>,
 ): JSX.Element => {
   const isDisabled = useMemo(() => disabled === true && isNil(tooltip), [disabled, tooltip]);
   /* If the button is disabled but has a tooltip, the only way to show the
@@ -95,7 +97,7 @@ const Button = (
         onClick={(e: React.MouseEvent<HTMLButtonElement>) => !isFakeDisabled && props.onClick?.(e)}
         className={classNames("btn", className, {
           disabled: isDisabled,
-          "fake-disabled": isFakeDisabled
+          "fake-disabled": isFakeDisabled,
         })}
         disabled={isDisabled}
         onMouseEnter={() => setIsHovered(!isHovered)}
@@ -104,7 +106,11 @@ const Button = (
         {prefix}
         {children}
         <ShowHide show={withDropdownCaret}>
-          <Icon className={"caret"} icon={dropdownCaretState === "open" ? "caret-up" : "caret-down"} weight={"solid"} />
+          <Icon
+            className="caret"
+            icon={dropdownCaretState === "open" ? "caret-up" : "caret-down"}
+            weight="solid"
+          />
         </ShowHide>
       </AntDButton>
     </TooltipWrapper>

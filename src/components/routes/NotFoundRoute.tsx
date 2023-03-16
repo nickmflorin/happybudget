@@ -1,5 +1,7 @@
 import React from "react";
+
 import { Route } from "react-router-dom";
+
 import NotFoundPage from "./NotFoundPage";
 
 type NotFoundRouteProps = {
@@ -7,6 +9,10 @@ type NotFoundRouteProps = {
 };
 
 const NotFoundRoute = (props: NotFoundRouteProps) =>
-  props.auto === true ? <Route component={NotFoundPage} /> : <Route path={"/404"} component={NotFoundPage} />;
+  props.auto === true ? (
+    <Route component={NotFoundPage} />
+  ) : (
+    <Route path="/404" component={NotFoundPage} />
+  );
 
 export default React.memo(NotFoundRoute);

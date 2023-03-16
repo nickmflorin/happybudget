@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+
 import { useSelector, useDispatch } from "react-redux";
 
 import * as store from "store";
@@ -20,16 +21,14 @@ const useDrawer = (config: UseDrawerConfig): UseDrawerReturnType => {
   const dispatch = useDispatch();
   const isOpen = useSelector(store.selectors.selectApplicationDrawerOpen);
 
-  const drawer = useMemo(() => {
-    return <Drawer>{config.render()}</Drawer>;
-  }, [config.render]);
+  const drawer = useMemo(() => <Drawer>{config.render()}</Drawer>, [config.render]);
 
   return {
     drawer,
     isOpen,
     open: () => dispatch(store.actions.setApplicationDrawerAction(true, {})),
     close: () => dispatch(store.actions.setApplicationDrawerAction(false, {})),
-    toggle: () => dispatch(store.actions.setApplicationDrawerAction("TOGGLE", {}))
+    toggle: () => dispatch(store.actions.setApplicationDrawerAction("TOGGLE", {})),
   };
 };
 

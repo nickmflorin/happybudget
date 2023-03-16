@@ -1,11 +1,11 @@
 import { useEffect, useState, useRef, useMemo } from "react";
-import { isNil, map, filter } from "lodash";
+
 import classNames from "classnames";
+import { isNil, map, filter } from "lodash";
 
 import * as api from "api";
 import { ui, tabling, pdf, util, http } from "lib";
 import * as store from "store";
-
 import { ExportActualsPdfForm } from "components/forms";
 import { PreviewModal } from "components/modals";
 import { ActualsTable } from "tabling";
@@ -18,7 +18,7 @@ type C = Table.DataColumn<R, M>;
 
 const ActualColumns = filter(
   ActualsTable.Columns,
-  (c: Table.Column<R, M>) => tabling.columns.isDataColumn(c) && c.includeInPdf !== false
+  (c: Table.Column<R, M>) => tabling.columns.isDataColumn(c) && c.includeInPdf !== false,
 ) as C[];
 
 const DEFAULT_OPTIONS: ExportActualsPdfFormOptions = {
@@ -26,9 +26,9 @@ const DEFAULT_OPTIONS: ExportActualsPdfFormOptions = {
   date: util.dates.toDisplayDate() as string,
   columns: filter(
     map(ActualColumns, (column: C) => tabling.columns.normalizedField<R, M>(column)),
-    (field: string | undefined) => !isNil(field)
+    (field: string | undefined) => !isNil(field),
   ),
-  header: `<h2>Sample Title ${new Date().getFullYear()}</h2><p>Sample Subtitle</p>`
+  header: `<h2>Sample Title ${new Date().getFullYear()}</h2><p>Sample Subtitle</p>`,
 };
 
 interface ActualsPdfFuncProps {
@@ -71,15 +71,15 @@ const ActualsPreviewModal = ({
     () =>
       (opts: ExportActualsPdfFormOptions): PdfActualsTable.Options => ({
         ...opts,
-        header: pdf.parsers.convertHtmlIntoNodes(opts.header || "") || []
+        header: pdf.parsers.convertHtmlIntoNodes(opts.header || "") || [],
       }),
-    []
+    [],
   );
 
   useEffect(() => {
     setOptions({
       ...DEFAULT_OPTIONS,
-      header: `<h2>${budget.name}</h2><p>Actuals Summary</p>`
+      header: `<h2>${budget.name}</h2><p>Actuals Summary</p>`,
     });
   }, [budget.name]);
 
@@ -98,7 +98,7 @@ const ActualsPreviewModal = ({
               budget,
               contacts: cs,
               actuals: response.data,
-              options: convertOptions(options)
+              options: convertOptions(options),
             });
             previewer.current?.render(pdfComponent);
           } else {
@@ -117,11 +117,11 @@ const ActualsPreviewModal = ({
           budget,
           contacts: cs,
           actuals,
-          options: convertOptions(options)
+          options: convertOptions(options),
         });
       }
     },
-    [budget, cs, actuals, options]
+    [budget, cs, actuals, options],
   );
 
   return (
@@ -138,11 +138,14 @@ const ActualsPreviewModal = ({
         form={form}
         initialValues={{
           ...DEFAULT_OPTIONS,
-          header: `<h2>${budget.name}</h2><p>Actuals Summary</p>`
+          header: `<h2>${budget.name}</h2><p>Actuals Summary</p>`,
         }}
         disabled={isNil(actuals)}
         columns={ActualColumns}
-        onValuesChange={(changedValues: Partial<ExportActualsPdfFormOptions>, values: ExportActualsPdfFormOptions) => {
+        onValuesChange={(
+          changedValues: Partial<ExportActualsPdfFormOptions>,
+          values: ExportActualsPdfFormOptions,
+        ) => {
           setOptions(values);
           previewer.current?.refreshRequired();
         }}

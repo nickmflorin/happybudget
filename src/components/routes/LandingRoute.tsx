@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+
 import { Route, RouteProps, Redirect } from "react-router-dom";
 
 import * as api from "api";
@@ -32,7 +33,7 @@ const LandingRoute = (props: RouteProps): JSX.Element => {
     return <ApplicationSpinner visible={true} />;
   } else {
     return (
-      <div className={"landing-content"}>
+      <div className="landing-content">
         <Route {...props} />
       </div>
     );

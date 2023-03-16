@@ -1,7 +1,6 @@
 import React from "react";
 
 import { budgeting } from "lib";
-
 import { Portal, BreadCrumbs } from "components/layout";
 
 interface ActualsPageProps {
@@ -11,7 +10,7 @@ interface ActualsPageProps {
 
 const ActualsPage = ({ budget, children }: ActualsPageProps): JSX.Element => (
   <React.Fragment>
-    <Portal id={"breadcrumbs"}>
+    <Portal id="breadcrumbs">
       <BreadCrumbs<{ b: Model.Budget }>
         params={{ b: budget }}
         items={[
@@ -22,17 +21,17 @@ const ActualsPage = ({ budget, children }: ActualsPageProps): JSX.Element => (
               primary: true,
               label: b.name,
               tooltip: { content: "Top Sheet", placement: "bottom" },
-              url: budgeting.urls.getUrl(b)
-            })
+              url: budgeting.urls.getUrl(b),
+            }),
           },
           {
             requiredParams: ["b"],
             func: ({ b }: { b: Model.Budget }) => ({
               id: b.id,
               label: "Actuals Log",
-              url: `/budgets/${b.id}/actuals`
-            })
-          }
+              url: `/budgets/${b.id}/actuals`,
+            }),
+          },
         ]}
       />
     </Portal>

@@ -88,11 +88,11 @@ form {
         flex-grow: 100;
       }
 
-			.ant-form-item-label {
-				padding-left: 0px !important;
-				margin-right: 10px;
-				line-height: 28px;
-			}
+      .ant-form-item-label {
+        padding-left: 0px !important;
+        margin-right: 10px;
+        line-height: 28px;
+      }
     }
 
     &.vertical-layout-override {
@@ -163,7 +163,7 @@ form {
 
     .ant-form-item-control {
       .ant-form-item-extra {
-        font-size: $medium-text-size;;
+        font-size: $medium-text-size;
         line-height: 12px;
         min-height: 12px;
         margin-top: 6px;
@@ -181,7 +181,7 @@ form {
       div[role="alert"] {
         font-weight: 500;
         margin-top: 5px;
-        font-size: $small-text-size;;
+        font-size: $small-text-size;
         line-height: 12px;
         margin-left: 5px;
       }

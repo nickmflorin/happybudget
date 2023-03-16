@@ -12,7 +12,7 @@ const ActionMap = {
   request: actions.requestAction,
   loading: actions.loadingAction,
   response: actions.responseAction,
-  setSearch: actions.setSearchAction
+  setSearch: actions.setSearchAction,
 };
 
 export const createTableSaga = (table: Table.TableInstance<R, M>) =>
@@ -22,6 +22,6 @@ export const createTableSaga = (table: Table.TableInstance<R, M>) =>
     tasks: store.tasks.accounts.createPublicTableTaskSet<B>({
       table,
       actions: ActionMap,
-      selectStore: (state: Application.Store) => state.public.budget.accounts
-    })
+      selectStore: (state: Application.Store) => state.public.budget.accounts,
+    }),
   });

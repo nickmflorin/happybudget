@@ -1,6 +1,7 @@
 import { useMemo } from "react";
-import { ValueFormatterParams } from "@ag-grid-community/core";
+
 import { isNil } from "lodash";
+import { ValueFormatterParams } from "@ag-grid-community/core";
 
 const useFormattedValue = <
   R extends Table.RowData,
@@ -8,9 +9,9 @@ const useFormattedValue = <
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   V extends string | number | null = string | number | null,
-  CL extends Table.DataColumn<R, M> = Table.DataColumn<R, M>
+  CL extends Table.DataColumn<R, M> = Table.DataColumn<R, M>,
 >(
-  props: Table.ValueCellProps<R, M, C, S, V, CL>
+  props: Table.ValueCellProps<R, M, C, S, V, CL>,
 ): V => {
   const formatterParams = useMemo<ValueFormatterParams | null>(
     () =>
@@ -23,10 +24,10 @@ const useFormattedValue = <
             context: props.context,
             column: props.column,
             api: props.api,
-            columnApi: props.columnApi
+            columnApi: props.columnApi,
           }
         : null,
-    [props]
+    [props],
   );
   const cellValue = useMemo((): string | number | null => {
     if (!isNil(formatterParams)) {

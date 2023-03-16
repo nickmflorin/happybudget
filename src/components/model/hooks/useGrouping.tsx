@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+
 import { isNil } from "lodash";
 
 import { tabling } from "lib";
@@ -14,11 +15,11 @@ interface UseGroupingProps<R extends Tables.BudgetRowData, M extends Model.RowHt
 type UseGroupingReturnType<R extends Tables.BudgetRowData> = [
   JSX.Element,
   (g: Table.GroupRow<R>) => void,
-  (gs: number[]) => void
+  (gs: number[]) => void,
 ];
 
 const useGrouping = <R extends Tables.BudgetRowData, M extends Model.RowHttpModel>(
-  props: UseGroupingProps<R, M>
+  props: UseGroupingProps<R, M>,
 ): UseGroupingReturnType<R> => {
   const [groupAccounts, setGroupAccounts] = useState<number[] | undefined>(undefined);
   const [groupToEdit, setGroupToEdit] = useState<Table.GroupRow<R> | undefined>(undefined);
@@ -58,16 +59,24 @@ const useGrouping = <R extends Tables.BudgetRowData, M extends Model.RowHttpMode
       );
     }
     return <></>;
-  }, [groupToEdit, props.parentId, props.parentType, props.table, setGroupToEdit, props.onGroupUpdated]);
+  }, [
+    groupToEdit,
+    props.parentId,
+    props.parentType,
+    props.table,
+    setGroupToEdit,
+    props.onGroupUpdated,
+  ]);
 
-  const modals = useMemo((): JSX.Element => {
-    return (
+  const modals = useMemo(
+    (): JSX.Element => (
       <>
         {createGroupModal}
         {editGroupModal}
       </>
-    );
-  }, [createGroupModal, editGroupModal]);
+    ),
+    [createGroupModal, editGroupModal],
+  );
 
   return [modals, setGroupToEdit, setGroupAccounts];
 };

@@ -5,9 +5,23 @@ declare namespace Model {
 
   type PartialModel<M extends Model> = Partial<Omit<M, "id">> & Pick<M, "id">;
 
-  type RowHttpModelType = "subaccount" | "account" | "fringe" | "actual" | "contact" | "pdf-account" | "pdf-subaccount";
+  type RowHttpModelType =
+    | "subaccount"
+    | "account"
+    | "fringe"
+    | "actual"
+    | "contact"
+    | "pdf-account"
+    | "pdf-subaccount";
 
-  type HttpModelType = RowHttpModelType | "collaborator" | "markup" | "group" | "budget" | "template" | "pdf-budget";
+  type HttpModelType =
+    | RowHttpModelType
+    | "collaborator"
+    | "markup"
+    | "group"
+    | "budget"
+    | "template"
+    | "pdf-budget";
 
   type HttpModel = {
     readonly id: number;
@@ -56,14 +70,18 @@ declare namespace Model {
     slug: S;
   };
 
-  type _InferChoice<ARGS> = ARGS extends [number, string, string] ? Choice<ARGS[0], ARGS[1], ARGS[2]> : never;
-  type _DistributeChoice<T> = T extends [infer I, infer N, infer S] ? _InferChoice<[I, N, S]> : never;
+  type _InferChoice<ARGS> = ARGS extends [number, string, string]
+    ? Choice<ARGS[0], ARGS[1], ARGS[2]>
+    : never;
+  type _DistributeChoice<T> = T extends [infer I, infer N, infer S]
+    ? _InferChoice<[I, N, S]>
+    : never;
 
   type DynamicChoices<
     CH extends Choice<I, N, S>,
     I extends number = number,
     N extends string = string,
-    S extends string = string
+    S extends string = string,
   > = {
     [key in CH["slug"]]: CH;
   };
@@ -72,11 +90,14 @@ declare namespace Model {
     CH extends Choice<I, N, S>,
     I extends number = number,
     N extends string = string,
-    S extends string = string
+    S extends string = string,
   > = {
     readonly choices: CH[];
     readonly get: (id: I | S) => CH;
-    readonly infer: (name: string, options?: Omit<InferModelFromNameParams<CH>, "getName">) => CH | null;
+    readonly infer: (
+      name: string,
+      options?: Omit<InferModelFromNameParams<CH>, "getName">,
+    ) => CH | null;
   } & DynamicChoices<CH, I, N, S>;
 
   type MarkupUnitChoices = [0, "Percent", "percent"] | [1, "Flat", "flat"];
@@ -85,10 +106,16 @@ declare namespace Model {
   type FringeUnitChoices = [0, "Percent", "percent"] | [1, "Flat", "flat"];
   type FringeUnit = _DistributeChoice<FringeUnitChoices>;
 
-  type ContactTypeChoices = [0, "Contractor", "contractor"] | [1, "Employee", "employee"] | [2, "Vendor", "vendor"];
+  type ContactTypeChoices =
+    | [0, "Contractor", "contractor"]
+    | [1, "Employee", "employee"]
+    | [2, "Vendor", "vendor"];
   type ContactType = _DistributeChoice<ContactTypeChoices>;
 
-  type CollaboratorAccessTypeChoices = [0, "View Only", "view_only"] | [1, "Editor", "editor"] | [2, "Owner", "owner"];
+  type CollaboratorAccessTypeChoices =
+    | [0, "View Only", "view_only"]
+    | [1, "Editor", "editor"]
+    | [2, "Owner", "owner"];
   type CollaboratorAccessType = _DistributeChoice<CollaboratorAccessTypeChoices>;
 
   type ActualImportSourceChoices = [0, "Bank Account", "bank_account"];
@@ -334,7 +361,7 @@ declare namespace Model {
       readonly ancestors?: [
         SimpleBudget | SimpleTemplate,
         Omit<SimpleAccount, "order">,
-        ...Array<Omit<SimpleSubAccount, "order">>
+        ...Array<Omit<SimpleSubAccount, "order">>,
       ];
     };
 
@@ -348,7 +375,11 @@ declare namespace Model {
       readonly children_markups: Markup[];
     };
 
-  type Ancestor = SimpleBudget | SimpleTemplate | Omit<SimpleAccount, "order"> | Omit<SimpleSubAccount, "order">;
+  type Ancestor =
+    | SimpleBudget
+    | SimpleTemplate
+    | Omit<SimpleAccount, "order">
+    | Omit<SimpleSubAccount, "order">;
 
   type ActualOwner = SimpleMarkup | Omit<SimpleSubAccount, "order" | "domain">;
 

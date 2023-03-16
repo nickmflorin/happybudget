@@ -2,6 +2,7 @@ import { isNil, reduce, filter } from "lodash";
 import { Moment } from "moment";
 
 import { tabling, util, formatters } from "lib";
+
 import { columns } from "../../generic";
 
 type R = Tables.ActualRowData;
@@ -16,7 +17,7 @@ const Columns: Table.Column<R, M>[] = [
     pdfFlexGrow: true,
     flex: 2,
     dataType: "longText",
-    pdfFooter: { value: "Grand Total" }
+    pdfFooter: { value: "Grand Total" },
   }),
   columns.SelectColumn({
     field: "contact",
@@ -27,7 +28,7 @@ const Columns: Table.Column<R, M>[] = [
     minWidth: 120,
     cellRenderer: { data: "ContactCell" },
     cellEditor: "ContactEditor",
-    dataType: "contact"
+    dataType: "contact",
   }),
   columns.BodyColumn<R, M, string | null>({
     field: "date",
@@ -41,14 +42,13 @@ const Columns: Table.Column<R, M>[] = [
     cellEditorPopup: true,
     cellEditorPopupPosition: "below",
     valueFormatter: formatters.dateFormatter((v: string | number | Moment) =>
-      console.error(`Could not parse date value ${String(v)} for field 'date'.`)
+      console.error(`Could not parse date value ${String(v)} for field 'date'.`),
     ),
     valueSetter: tabling.columns.dateValueSetter("date"),
-    pdfFormatter: (params: NativeFormatterParams<string | Moment>) => formatters.dateFormatter(params),
+    pdfFormatter: (params: NativeFormatterParams<string | Moment>) =>
+      formatters.dateFormatter(params),
     dataType: "date",
-    processCellForCSV: (row: R) => {
-      return (!isNil(row.date) && util.dates.toDate(row.date)) || "";
-    }
+    processCellForCSV: (row: R) => (!isNil(row.date) && util.dates.toDate(row.date)) || "",
   }),
   columns.TagSelectColumn({
     field: "actual_type",
@@ -58,7 +58,7 @@ const Columns: Table.Column<R, M>[] = [
     cellRenderer: { data: "ActualTypeCell" },
     cellEditor: "ActualTypeEditor",
     width: 140,
-    minWidth: 140
+    minWidth: 140,
   }),
   columns.BodyColumn<R, M, number | null>({
     field: "value",
@@ -69,16 +69,16 @@ const Columns: Table.Column<R, M>[] = [
     pdfWidth: 0.1,
     flex: 1,
     footer: {
-      cellStyle: { textAlign: "right" }
+      cellStyle: { textAlign: "right" },
     },
     pdfFormatter: (params: NativeFormatterParams<number>) =>
       isNil(params)
         ? "0.0"
         : formatters.currencyFormatter((v: string | number) =>
-            console.error(`Could not parse currency value ${String(v)} for PDF field 'value'.`)
+            console.error(`Could not parse currency value ${String(v)} for PDF field 'value'.`),
           )(params),
     valueFormatter: formatters.currencyFormatter((v: string | number) =>
-      console.error(`Could not parse currency value ${String(v)} for field 'value'.`)
+      console.error(`Could not parse currency value ${String(v)} for field 'value'.`),
     ),
     valueSetter: tabling.columns.numericValueSetter("value"),
     dataType: "currency",
@@ -89,8 +89,8 @@ const Columns: Table.Column<R, M>[] = [
       reduce(
         filter(rows, (r: Table.BodyRow<R>) => tabling.rows.isModelRow(r)) as Table.ModelRow<R>[],
         (sum: number, s: Table.ModelRow<R>) => sum + (s.data.value || 0),
-        0
-      )
+        0,
+      ),
   }),
   columns.SelectColumn<R, M, Model.SimpleSubAccount | Model.SimpleMarkup | null>({
     field: "owner",
@@ -100,7 +100,7 @@ const Columns: Table.Column<R, M>[] = [
     width: 200,
     pdfWidth: 0.1,
     getHttpValue: (
-      value: Model.SimpleSubAccount | Model.SimpleMarkup | null
+      value: Model.SimpleSubAccount | Model.SimpleMarkup | null,
     ): Model.GenericHttpModel<"markup"> | Model.GenericHttpModel<"subaccount"> | null => {
       if (!isNil(value)) {
         return { id: value.id, type: value.type };
@@ -108,17 +108,20 @@ const Columns: Table.Column<R, M>[] = [
       return value;
     },
     processCellForCSV: (row: R) =>
-      !isNil(row.owner) ? util.conditionalJoinString(row.owner.identifier, row.owner.description) : "",
-    processCellForClipboard: (row: R) => (!isNil(row.owner) ? `internal-${row.owner.type}-${row.owner.id}` : ""),
+      !isNil(row.owner)
+        ? util.conditionalJoinString(row.owner.identifier, row.owner.description)
+        : "",
+    processCellForClipboard: (row: R) =>
+      !isNil(row.owner) ? `internal-${row.owner.type}-${row.owner.id}` : "",
     cellRenderer: { data: "ActualOwnerCell" },
-    cellEditor: "ActualOwnerEditor"
+    cellEditor: "ActualOwnerEditor",
   }),
   columns.AttachmentsColumn({
     field: "attachments",
     width: 140,
     minWidth: 140,
     canBeExported: false,
-    includeInPdf: false
+    includeInPdf: false,
   }),
   columns.BodyColumn<R, M>({
     field: "purchase_order",
@@ -128,7 +131,7 @@ const Columns: Table.Column<R, M>[] = [
     minWidth: 100,
     flex: 1,
     dataType: "number",
-    pdfWidth: 0.08
+    pdfWidth: 0.08,
   }),
   columns.BodyColumn<R, M>({
     field: "payment_id",
@@ -138,7 +141,7 @@ const Columns: Table.Column<R, M>[] = [
     minWidth: 80,
     flex: 1,
     dataType: "number",
-    pdfWidth: 0.08
+    pdfWidth: 0.08,
   }),
   columns.BodyColumn<R, M>({
     field: "notes",
@@ -148,8 +151,8 @@ const Columns: Table.Column<R, M>[] = [
     minWidth: 100,
     pdfWidth: 0.13,
     flex: 1,
-    dataType: "longText"
-  })
+    dataType: "longText",
+  }),
 ];
 
 export default Columns;

@@ -4,7 +4,11 @@ interface HorizontalFlexCenterProps extends StandardComponentProps {
   children: ReactNode;
 }
 
-const HorizontalFlexCenter: React.FC<HorizontalFlexCenterProps> = ({ children, className, style = {} }) => (
+const HorizontalFlexCenter: React.FC<HorizontalFlexCenterProps> = ({
+  children,
+  className,
+  style = {},
+}) => (
   <div
     className={className}
     style={{
@@ -12,7 +16,7 @@ const HorizontalFlexCenter: React.FC<HorizontalFlexCenterProps> = ({ children, c
       display: "flex",
       flexDirection: "row",
       justifyContent: "center",
-      alignItems: "center"
+      alignItems: "center",
     }}
   >
     {children}

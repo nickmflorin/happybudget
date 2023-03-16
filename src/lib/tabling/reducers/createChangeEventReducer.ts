@@ -2,9 +2,14 @@ import { isNil, filter, includes } from "lodash";
 
 import { tabling, redux, util } from "lib";
 
-import createRowAddEventReducer from "./createRowAddEventReducer";
 import createDataChangeEventReducer from "./createDataChangeEventReducer";
-import { reorderRows, groupRowFromState, removeRowsFromTheirGroupsIfTheyExist, updateRowGroup } from "./util";
+import createRowAddEventReducer from "./createRowAddEventReducer";
+import {
+  reorderRows,
+  groupRowFromState,
+  removeRowsFromTheirGroupsIfTheyExist,
+  updateRowGroup,
+} from "./util";
 
 /**
  * Reducer that removes rows from the current table state S and returns the
@@ -28,20 +33,25 @@ import { reorderRows, groupRowFromState, removeRowsFromTheirGroupsIfTheyExist, u
  *
  * @returns The updated table state S with the rows removed.
  */
-const rowDeleteEventReducer = <R extends Table.RowData, S extends Redux.TableStore<R> = Redux.TableStore<R>>(
+const rowDeleteEventReducer = <
+  R extends Table.RowData,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
+>(
   s: S,
-  e: Table.RowDeleteEvent
+  e: Table.RowDeleteEvent,
 ): S => {
   const ids: Table.RowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
 
   const modelRows: Table.ModelRow<R>[] = redux.findModelsInData<Table.ModelRow<R>>(
     filter(s.data, (r: Table.BodyRow<R>) => tabling.rows.isModelRow(r)) as Table.ModelRow<R>[],
-    filter(ids, (id: Table.ModelRowId | Table.MarkupRowId) => tabling.rows.isModelRowId(id)) as Table.ModelRowId[]
+    filter(ids, (id: Table.ModelRowId | Table.MarkupRowId) =>
+      tabling.rows.isModelRowId(id),
+    ) as Table.ModelRowId[],
   );
   const newState = removeRowsFromTheirGroupsIfTheyExist(s, modelRows);
   return reorderRows({
     ...newState,
-    data: filter(newState.data, (ri: Table.BodyRow<R>) => !includes(ids, ri.id))
+    data: filter(newState.data, (ri: Table.BodyRow<R>) => !includes(ids, ri.id)),
   });
 };
 
@@ -49,57 +59,79 @@ const createRowRemoveFromGroupEventReducer = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C extends Redux.ActionContext = Redux.ActionContext
+  C extends Redux.ActionContext = Redux.ActionContext,
 >(
-  config: Table.AuthenticatedReducerConfig<R, M, S, C>
+  config: Table.AuthenticatedReducerConfig<R, M, S, C>,
 ): Redux.BasicReducer<S, Table.RowRemoveFromGroupEvent> => {
   const groupRowManager = new tabling.rows.GroupRowManager<R, M>({ columns: config.columns });
 
   return (s: S = config.initialState, e: Table.RowRemoveFromGroupEvent): S => {
-    const ids: Table.ModelRowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
+    const ids: Table.ModelRowId[] = Array.isArray(e.payload.rows)
+      ? e.payload.rows
+      : [e.payload.rows];
     const g: Table.GroupRow<R> | null = groupRowFromState<R, S>(s, e.payload.group);
     if (!isNil(g)) {
       return reorderRows({
         ...s,
-        data: util.replaceInArray<Table.BodyRow<R>>(s.data, { id: g.id }, groupRowManager.removeChildren(g, ids))
+        data: util.replaceInArray<Table.BodyRow<R>>(
+          s.data,
+          { id: g.id },
+          groupRowManager.removeChildren(g, ids),
+        ),
       });
     }
     return s;
   };
 };
 
-const rowAddToGroupEventReducer = <R extends Table.RowData, S extends Redux.TableStore<R> = Redux.TableStore<R>>(
+const rowAddToGroupEventReducer = <
+  R extends Table.RowData,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
+>(
   s: S,
-  e: Table.RowAddToGroupEvent
+  e: Table.RowAddToGroupEvent,
 ): S => reorderRows(updateRowGroup(s, e.payload.rows, e.payload.group));
 
-const rowInsertEventReducer = <R extends Table.RowData, S extends Redux.TableStore<R> = Redux.TableStore<R>>(
+const rowInsertEventReducer = <
+  R extends Table.RowData,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
+>(
   s: S,
   /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-  e: Table.RowInsertEvent<R>
+  e: Table.RowInsertEvent<R>,
 ): S => s;
 
-const rowPositionChangedEventReducer = <R extends Table.RowData, S extends Redux.TableStore<R> = Redux.TableStore<R>>(
+const rowPositionChangedEventReducer = <
+  R extends Table.RowData,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
+>(
   s: S,
   /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-  e: Table.RowPositionChangedEvent
+  e: Table.RowPositionChangedEvent,
 ): S => s;
 
-type ChangeEventReducers<R extends Table.RowData, S extends Redux.TableStore<R> = Redux.TableStore<R>> = {
-  readonly [Property in keyof Omit<Table.ChangeEvents<R>, "dataChange">]: Redux.BasicReducerWithDefinedState<
-    S,
-    Table.ChangeEvents<R>[Property]
-  >;
+type ChangeEventReducers<
+  R extends Table.RowData,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
+> = {
+  readonly [Property in keyof Omit<
+    Table.ChangeEvents<R>,
+    "dataChange"
+  >]: Redux.BasicReducerWithDefinedState<S, Table.ChangeEvents<R>[Property]>;
 };
 
 const createChangeEventReducer = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C extends Redux.ActionContext = Redux.ActionContext
+  C extends Redux.ActionContext = Redux.ActionContext,
 >(
-  config: Table.AuthenticatedReducerConfig<R, M, S, C>
-): Redux.BasicDynamicReducer<S, Redux.RecalculateRowReducerCallback<S, R>, Table.ChangeEvent<R>> => {
+  config: Table.AuthenticatedReducerConfig<R, M, S, C>,
+): Redux.BasicDynamicReducer<
+  S,
+  Redux.RecalculateRowReducerCallback<S, R>,
+  Table.ChangeEvent<R>
+> => {
   const changeEventReducers: ChangeEventReducers<R, S> = {
     rowAdd: createRowAddEventReducer(config),
     rowDelete: rowDeleteEventReducer,
@@ -111,20 +143,23 @@ const createChangeEventReducer = <
     groupAdd: redux.reducers.identityReducerWithDefinedState,
     groupUpdate: redux.reducers.identityReducerWithDefinedState,
     markupAdd: redux.reducers.identityReducerWithDefinedState,
-    markupUpdate: redux.reducers.identityReducerWithDefinedState
+    markupUpdate: redux.reducers.identityReducerWithDefinedState,
   };
   const dataChangeReducer = createDataChangeEventReducer(config);
 
   return (
     state: S = config.initialState,
     e: Table.ChangeEvent<R>,
-    recalculateRow?: Redux.RecalculateRowReducerCallback<S, R>
+    recalculateRow?: Redux.RecalculateRowReducerCallback<S, R>,
   ): S => {
     let newState = { ...state };
     if (e.type === "dataChange") {
       newState = dataChangeReducer(newState, e, recalculateRow);
     } else {
-      const reducer = changeEventReducers[e.type] as Redux.BasicReducerWithDefinedState<S, typeof e>;
+      const reducer = changeEventReducers[e.type] as Redux.BasicReducerWithDefinedState<
+        S,
+        typeof e
+      >;
       newState = reducer(state, e);
     }
 
@@ -135,7 +170,7 @@ const createChangeEventReducer = <
         newState = {
           ...newState,
           eventHistory: [...newState.eventHistory, e],
-          eventIndex: newState.eventHistory.length
+          eventIndex: newState.eventHistory.length,
         };
       } else {
         /*

@@ -1,6 +1,6 @@
 import classNames from "classnames";
-import { ui } from "lib";
 
+import { ui } from "lib";
 import { Icon } from "components";
 
 interface ModalTitleProps extends StandardComponentProps {
@@ -8,13 +8,11 @@ interface ModalTitleProps extends StandardComponentProps {
   readonly title: string;
 }
 
-const ModalTitle = ({ icon, title, ...props }: ModalTitleProps): JSX.Element => {
-  return (
-    <div {...props} className={classNames("ant-modal-title", "modal-title", props.className)}>
-      {ui.iconIsJSX(icon) ? icon : <Icon icon={icon} weight={"regular"} />}
-      {title}
-    </div>
-  );
-};
+const ModalTitle = ({ icon, title, ...props }: ModalTitleProps): JSX.Element => (
+  <div {...props} className={classNames("ant-modal-title", "modal-title", props.className)}>
+    {ui.iconIsJSX(icon) ? icon : <Icon icon={icon} weight="regular" />}
+    {title}
+  </div>
+);
 
 export default ModalTitle;

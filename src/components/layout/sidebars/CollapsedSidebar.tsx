@@ -1,9 +1,9 @@
 import React from "react";
-import { Link } from "react-router-dom";
+
 import classNames from "classnames";
+import { Link } from "react-router-dom";
 
 import * as store from "store";
-
 import { Icon } from "components";
 import { IconButton } from "components/buttons";
 import { LeafLogo } from "components/svgs";
@@ -26,18 +26,18 @@ const CollapsedSidebar = ({ toggle, ...props }: CollapsedSidebarProps): JSX.Elem
       renderItem={(item: ICollapsedSidebarItem) => <GenericSidebarItem {...item} />}
     >
       <IconButton
-        className={"btn--sidebar-toggle"}
+        className="btn--sidebar-toggle"
         icon={(params: ClickableIconCallbackParams) => {
           if (params.isHovered === true) {
-            return <Icon icon={"arrow-alt-to-left"} green={true} weight={"light"} />;
+            return <Icon icon="arrow-alt-to-left" green={true} weight="light" />;
           } else {
-            return <Icon icon={"bars"} weight={"light"} />;
+            return <Icon icon="bars" weight="light" />;
           }
         }}
         onClick={() => toggle()}
       />
-      <div className={"logo-container"}>
-        <Link className={"logo-link"} to={user === null ? "/login" : "/"}>
+      <div className="logo-container">
+        <Link className="logo-link" to={user === null ? "/login" : "/"}>
           <LeafLogo />
         </Link>
       </div>

@@ -24,17 +24,26 @@ type JoinStringConfig = {
 export function conditionalJoinString(arg0: JoinStringArg): string;
 export function conditionalJoinString(arg0: JoinStringArg, config: JoinStringConfig): string;
 export function conditionalJoinString(arg0: JoinStringArg, arg1: JoinStringArg): string;
-export function conditionalJoinString(arg0: JoinStringArg, arg1: JoinStringArg, config: JoinStringConfig): string;
-export function conditionalJoinString(arg0: JoinStringArg, arg1: JoinStringArg, arg2: JoinStringArg): string;
+export function conditionalJoinString(
+  arg0: JoinStringArg,
+  arg1: JoinStringArg,
+  config: JoinStringConfig,
+): string;
 export function conditionalJoinString(
   arg0: JoinStringArg,
   arg1: JoinStringArg,
   arg2: JoinStringArg,
-  config: JoinStringConfig
+): string;
+export function conditionalJoinString(
+  arg0: JoinStringArg,
+  arg1: JoinStringArg,
+  arg2: JoinStringArg,
+  config: JoinStringConfig,
 ): string;
 
 export function conditionalJoinString(...args: (JoinStringArg | JoinStringConfig)[]): string {
-  const isConfig = (a: JoinStringArg | JoinStringConfig): a is JoinStringConfig => typeof a === "object";
+  const isConfig = (a: JoinStringArg | JoinStringConfig): a is JoinStringConfig =>
+    typeof a === "object";
 
   let config: JoinStringConfig | null = null;
   let reversedArgs = args.slice().reverse();
@@ -62,7 +71,7 @@ export function conditionalJoinString(...args: (JoinStringArg | JoinStringConfig
         return [...curr, String(part)];
       }
     },
-    []
+    [],
   );
   const delimeter = config?.delimeter || " ";
   const result = metabolizedParts.join(delimeter);

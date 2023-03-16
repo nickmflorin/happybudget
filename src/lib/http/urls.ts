@@ -6,7 +6,7 @@ import { forEach, isNil, reduce, includes } from "lodash";
  *
  * @param url The URL for which we want to get the query parameters from.
  */
- export const getQueryParams = (url: string): Record<string, string> => {
+export const getQueryParams = (url: string): Record<string, string> => {
   const anchor = document.createElement("a");
   anchor.href = url;
 
@@ -47,7 +47,7 @@ type AddQueryParamsToUrlOptions = {
 export const addQueryParamsToUrl = (
   url: string,
   query: Http.Query = {},
-  options?: AddQueryParamsToUrlOptions
+  options?: AddQueryParamsToUrlOptions,
 ): string => {
   const existingQuery = getQueryParams(url);
   const newQuery = query || {};
@@ -61,7 +61,9 @@ export const addQueryParamsToUrl = (
          check here and log if it fails. */
       if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
         const exclusion: QueryParamsExclusion = options?.exclude || [];
-        if (typeof exclusion === "function" ? exclusion(value) !== true : !includes(exclusion, value)) {
+        if (
+          typeof exclusion === "function" ? exclusion(value) !== true : !includes(exclusion, value)
+        ) {
           urlParams.append(key, encodeURIComponent(value));
         }
       } else {
@@ -84,7 +86,9 @@ export const addQueryParamsToUrl = (
  *                 compatible string.  Each field in the object should have
  *                 value 1 or -1.
  */
-export const convertOrderingQueryToString = <F extends string = string>(ordering: Http.Ordering<F>): string => {
+export const convertOrderingQueryToString = <F extends string = string>(
+  ordering: Http.Ordering<F>,
+): string => {
   const orderingStrings: string[] = reduce(
     ordering,
     (prev: string[], order: Http.FieldOrder<F>) => {
@@ -95,7 +99,7 @@ export const convertOrderingQueryToString = <F extends string = string>(ordering
       }
       return prev;
     },
-    []
+    [],
   );
   if (orderingStrings.length !== 0) {
     return orderingStrings.join(",");

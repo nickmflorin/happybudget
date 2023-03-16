@@ -1,8 +1,10 @@
 import React, { useMemo } from "react";
-import { find, isNil } from "lodash";
+
 import classNames from "classnames";
+import { find, isNil } from "lodash";
 
 import { OrderingArrowIcon } from "components/icons";
+
 import DropdownMenu from "./DropdownMenu";
 
 export type OrderingDropdownMenuProps<F extends string = string> = Omit<
@@ -31,7 +33,7 @@ const OrderingDropdownMenu = <F extends string = string>({
         }
         return { order: fieldOrder.order };
       },
-    [ordering]
+    [ordering],
   );
 
   return (
@@ -41,16 +43,18 @@ const OrderingDropdownMenu = <F extends string = string>({
       keepDropdownOpenOnClick={true}
       menuClassName={classNames("ordering-menu", props.className)}
       onChange={(e: MenuChangeEvent<OrderingMenuItemState, OrderingMenuModel<F>>) => {
-        const currentOrder: Http.FieldOrder<F> | undefined = find(ordering, { field: e.model.id }) as
-          | Http.FieldOrder<F>
-          | undefined;
+        const currentOrder: Http.FieldOrder<F> | undefined = find(ordering, {
+          field: e.model.id,
+        }) as Http.FieldOrder<F> | undefined;
         if (isNil(currentOrder)) {
           console.error(`Could not find ordering for field ${e.model.id} in state!`);
         } else {
           onChange(e.model.id, currentOrder.order === 0 ? -1 : currentOrder.order === -1 ? 1 : 0);
         }
       }}
-      itemIconAfterLabel={(m: OrderingMenuModel<F>, s: OrderingMenuItemState) => <OrderingArrowIcon order={s.order} />}
+      itemIconAfterLabel={(m: OrderingMenuModel<F>, s: OrderingMenuItemState) => (
+        <OrderingArrowIcon order={s.order} />
+      )}
     />
   );
 };

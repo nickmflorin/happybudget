@@ -4,5 +4,5 @@ export const Environments: Application.Environments = {
   LOCAL: "local",
   __ALL__: ["app", "dev", "local"],
   __NON_PROD__: ["dev", "local"],
-  __REMOTE__: ["dev", "app"]
+  __REMOTE__: ["dev", "app"],
 };

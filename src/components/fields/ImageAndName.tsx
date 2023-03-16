@@ -14,22 +14,22 @@ export type IImageAndNameRef = {
 
 const ImageAndName = (
   { initialValues, ...props }: ImageAndNameProps,
-  ref: ForwardedRef<IImageAndNameRef>
+  ref: ForwardedRef<IImageAndNameRef>,
 ): JSX.Element => {
   const [firstName, setFirstName] = useState<string | null>(initialValues?.first_name || null);
   const [lastName, setLastName] = useState<string | null>(initialValues?.last_name || null);
 
   useImperativeHandle(ref, () => ({
     setFirstName,
-    setLastName
+    setLastName,
   }));
 
   return (
-    <div className={"image-and-name"}>
+    <div className="image-and-name">
       <UserImageUploader {...props} firstName={firstName} lastName={lastName} />
-      <div className={"name-wrapper"}>
-        <div className={"name"}>{firstName}</div>
-        <div className={"name"}>{lastName}</div>
+      <div className="name-wrapper">
+        <div className="name">{firstName}</div>
+        <div className="name">{lastName}</div>
       </div>
     </div>
   );

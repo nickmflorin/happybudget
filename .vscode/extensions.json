@@ -3,6 +3,6 @@
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
     "stylelint.vscode-stylelint",
-    "Orta.vscode-jest",
+    "Orta.vscode-jest"
   ]
 }

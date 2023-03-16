@@ -1,20 +1,19 @@
 import React from "react";
+
 import classNames from "classnames";
 import { isNil, map } from "lodash";
 
-import Tag from "./Tag";
 import EmptyTag from "./EmptyTag";
+import Tag from "./Tag";
 
-const isEmptyTagsPropsNotComponent = (props: EmptyTagProps | JSX.Element): props is EmptyTagProps => {
-  return typeof props === "object";
-};
+const isEmptyTagsPropsNotComponent = (props: EmptyTagProps | JSX.Element): props is EmptyTagProps =>
+  typeof props === "object";
 
-const emptyTagPropsOrComponent = (props: JSX.Element | EmptyTagProps): JSX.Element => {
-  return isEmptyTagsPropsNotComponent(props) ? <EmptyTag {...props} /> : props;
-};
+const emptyTagPropsOrComponent = (props: JSX.Element | EmptyTagProps): JSX.Element =>
+  isEmptyTagsPropsNotComponent(props) ? <EmptyTag {...props} /> : props;
 
 const isPluralityWithModel = <M extends Model.Model = Model.Model>(
-  m: M | PluralityWithModel<M>
+  m: M | PluralityWithModel<M>,
 ): m is PluralityWithModel<M> => (m as PluralityWithModel<M>).model !== undefined;
 
 /**
@@ -33,26 +32,26 @@ const isPluralityWithModel = <M extends Model.Model = Model.Model>(
  * (3) Children <Tag> Components:
  *     <MultipleTags><Tag /><Tag /></MultipleTags>
  */
-export const MultipleTags = <M extends Model.Model = Model.Model>(props: MultipleTagsProps<M>): JSX.Element => (
+export const MultipleTags = <M extends Model.Model = Model.Model>(
+  props: MultipleTagsProps<M>,
+): JSX.Element => (
   <div className={classNames("multiple-tags-wrapper", props.className)} style={props.style}>
     {!isNil(props.models) ? (
       props.models.length !== 0 || isNil(props.onMissing) ? (
-        map(props.models, (m: M | PluralityWithModel<M>, index: number) => {
-          return (
-            <Tag
-              key={index}
-              {...props.tagProps}
-              model={isPluralityWithModel(m) ? m.model : m}
-              isPlural={isPluralityWithModel(m) ? m.isPlural : props.tagProps?.isPlural}
-            />
-          );
-        })
+        map(props.models, (m: M | PluralityWithModel<M>, index: number) => (
+          <Tag
+            key={index}
+            {...props.tagProps}
+            model={isPluralityWithModel(m) ? m.model : m}
+            isPlural={isPluralityWithModel(m) ? m.isPlural : props.tagProps?.isPlural}
+          />
+        ))
       ) : (
         emptyTagPropsOrComponent(props.onMissing)
       )
     ) : !isNil(props.tags) ? (
       props.tags.length !== 0 || isNil(props.onMissing) ? (
-        map(props.tags, (tag: ITag, index: number) => {
+        map(props.tags, (tag: ITag, index: number) => (
           /* For each object, ITag, in the series, the ITag object can
 							 explicitly set the color, textColor and uppercase setting for
 							 that created <Tag>.  However, these fields are optional for each
@@ -60,18 +59,16 @@ export const MultipleTags = <M extends Model.Model = Model.Model>(props: Multipl
                can be applied to all created <Tag> components based on the
 							 textColor, color and uppercase setting supplied globally as props
 							 to this MultipleTags component. */
-          return (
-            <Tag
-              key={index}
-              text={tag.text}
-              {...props.tagProps}
-              color={!isNil(tag.color) ? tag.color : props.tagProps?.color}
-              textColor={!isNil(tag.textColor) ? tag.textColor : props.tagProps?.textColor}
-              uppercase={!isNil(tag.uppercase) ? tag.uppercase : props.tagProps?.uppercase}
-              colorIndex={index}
-            />
-          );
-        })
+          <Tag
+            key={index}
+            text={tag.text}
+            {...props.tagProps}
+            color={!isNil(tag.color) ? tag.color : props.tagProps?.color}
+            textColor={!isNil(tag.textColor) ? tag.textColor : props.tagProps?.textColor}
+            uppercase={!isNil(tag.uppercase) ? tag.uppercase : props.tagProps?.uppercase}
+            colorIndex={index}
+          />
+        ))
       ) : isEmptyTagsPropsNotComponent(props.onMissing) ? (
         <EmptyTag {...props.onMissing} />
       ) : (

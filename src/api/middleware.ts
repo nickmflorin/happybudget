@@ -17,13 +17,14 @@ export const HttpErrorResponseMiddlware =
     /* I don't fully understand why, because if this is the case then the Axios
        type bindings are wrong, but occassionally error.request will not be
        defined. */
-    const url = !isNil(error.request) && !isNil(error.request.config) ? error.request.config.url : undefined;
+    const url =
+      !isNil(error.request) && !isNil(error.request.config) ? error.request.config.url : undefined;
     if (!isNil(error.response)) {
       const err = parsers.parseErrorFromResponse(error.response, forceLogout);
       if (err === null) {
         // If this happens, then there is something wrong with the parsers.
         throw new Error(
-          "Inconsistent response handling - Axios indicated a request error but it was not detected by parsers."
+          "Inconsistent response handling - Axios indicated a request error but it was not detected by parsers.",
         );
       }
       throw err;

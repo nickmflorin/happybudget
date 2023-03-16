@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+
 import { isNil } from "lodash";
 
 import * as api from "api";
@@ -24,8 +25,12 @@ const AuthenticatedBudget = (props: AuthenticatedBudgetProps): JSX.Element => {
   const tableActions = useMemo(
     () => (params: Table.AuthenticatedMenuActionParams<R, M>) => {
       let _actions: Table.AuthenticatedMenuActions<R, M> = [
-        ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
-        framework.actions.ExportPdfAction(props.onExportPdf)
+        ...(isNil(props.actions)
+          ? []
+          : Array.isArray(props.actions)
+          ? props.actions
+          : props.actions(params)),
+        framework.actions.ExportPdfAction(props.onExportPdf),
       ];
       if (!isNil(props.parent)) {
         _actions = [
@@ -36,17 +41,22 @@ const AuthenticatedBudget = (props: AuthenticatedBudgetProps): JSX.Element => {
             create: api.createBudgetPublicToken,
             onCreated: (token: Model.PublicToken) => props.onShared(token),
             onUpdated: (token: Model.PublicToken) => props.onShareUpdated(token),
-            onDeleted: () => props.onUnshared()
-          })
+            onDeleted: () => props.onUnshared(),
+          }),
         ];
       }
       return _actions;
     },
-    [props.parent, props.actions, props.onShared]
+    [props.parent, props.actions, props.onShared],
   );
 
   return (
-    <AuthenticatedTable<Model.Budget> {...props} includeCollaborators={true} columns={Columns} actions={tableActions} />
+    <AuthenticatedTable<Model.Budget>
+      {...props}
+      includeCollaborators={true}
+      columns={Columns}
+      actions={tableActions}
+    />
   );
 };
 

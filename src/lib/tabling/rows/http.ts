@@ -3,19 +3,19 @@ import { isNil, reduce } from "lodash";
 import { tabling } from "lib";
 
 const issueWarningsForParsedFieldColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
-  col: Table.BodyColumn<R, M>
+  col: Table.BodyColumn<R, M>,
 ) => {
   if (col.parsedFields?.length === 0) {
     console.warn(
       `Empty array found for 'parsedFields' attribute of column ${col.field}. ` +
-        "The 'parsedFields' array must contain at least 1 field."
+        "The 'parsedFields' array must contain at least 1 field.",
     );
   }
   if (!isNil(col.getHttpValue)) {
     console.warn(
       `Column ${col.field} defines 'getHttpValue' but also defines 'parsedFields'. ` +
         "The 'getHttpValue' callback is ignored because the column's contribution " +
-        "to the HTTP payload is dictated by the individual 'parsedFields'."
+        "to the HTTP payload is dictated by the individual 'parsedFields'.",
     );
   }
 };
@@ -24,10 +24,10 @@ export const patchPayload = <
   R extends Table.RowData,
   M extends Model.RowHttpModel,
   P extends Http.PayloadObj,
-  RW extends Table.EditableRow<R> = Table.EditableRow<R>
+  RW extends Table.EditableRow<R> = Table.EditableRow<R>,
 >(
   change: Table.RowChange<R, RW>,
-  cs: Table.ModelColumn<R, M, Table.RawRowValue>[]
+  cs: Table.ModelColumn<R, M, Table.RawRowValue>[],
 ): P | null =>
   reduce(
     cs,
@@ -54,7 +54,7 @@ export const patchPayload = <
               }
               return curr;
             },
-            {}
+            {},
           );
           return { ...p, ...updates };
         } else {
@@ -74,17 +74,17 @@ export const patchPayload = <
       }
       return p;
     },
-    {} as P
+    {} as P,
   );
 
 export const bulkPatchPayload = <
   R extends Table.RowData,
   M extends Model.RowHttpModel,
   P extends Http.PayloadObj,
-  RW extends Table.EditableRow<R> = Table.EditableRow<R>
+  RW extends Table.EditableRow<R> = Table.EditableRow<R>,
 >(
   change: Table.RowChange<R, RW>,
-  cs: Table.ModelColumn<R, M, Table.RawRowValue>[]
+  cs: Table.ModelColumn<R, M, Table.RawRowValue>[],
 ): Http.ModelBulkUpdatePayload<P> | null => {
   const patch = patchPayload<R, M, P, RW>(change, cs);
   if (!isNil(patch)) {
@@ -97,14 +97,15 @@ export const bulkPatchPayloads = <
   R extends Table.RowData,
   M extends Model.RowHttpModel,
   P extends Http.PayloadObj,
-  RW extends Table.EditableRow<R> = Table.EditableRow<R>
+  RW extends Table.EditableRow<R> = Table.EditableRow<R>,
 >(
   p: Table.DataChangePayload<R, RW> | Table.DataChangeEvent<R, RW>,
-  cs: Table.ModelColumn<R, M, Table.RawRowValue>[]
+  cs: Table.ModelColumn<R, M, Table.RawRowValue>[],
 ): Http.ModelBulkUpdatePayload<P>[] => {
   const isEvent = (
-    obj: Table.DataChangePayload<R, RW> | Table.DataChangeEvent<R, RW>
-  ): obj is Table.DataChangeEvent<R, RW> => (obj as Table.DataChangeEvent<R, RW>).type === "dataChange";
+    obj: Table.DataChangePayload<R, RW> | Table.DataChangeEvent<R, RW>,
+  ): obj is Table.DataChangeEvent<R, RW> =>
+    (obj as Table.DataChangeEvent<R, RW>).type === "dataChange";
 
   const payload: Table.DataChangePayload<R, RW> = isEvent(p) ? p.payload : p;
   const changes: Table.RowChange<R, RW>[] = Array.isArray(payload) ? payload : [payload];
@@ -118,15 +119,19 @@ export const bulkPatchPayloads = <
       }
       return prev;
     },
-    []
+    [],
   );
 };
 
-export const postPayload = <R extends Table.RowData, M extends Model.RowHttpModel, P extends Http.PayloadObj>(
+export const postPayload = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel,
+  P extends Http.PayloadObj,
+>(
   data: Partial<R>,
-  cs: Table.ModelColumn<R, M, Table.RawRowValue>[]
-): P => {
-  return reduce(
+  cs: Table.ModelColumn<R, M, Table.RawRowValue>[],
+): P =>
+  reduce(
     cs,
     (p: P, col: Table.ModelColumn<R, M, Table.RawRowValue>) => {
       if (tabling.columns.isBodyColumn(col)) {
@@ -141,24 +146,26 @@ export const postPayload = <R extends Table.RowData, M extends Model.RowHttpMode
       }
       return p;
     },
-    {} as P
+    {} as P,
   );
-};
 
-export const postPayloads = <R extends Table.RowData, M extends Model.RowHttpModel, P extends Http.PayloadObj>(
+export const postPayloads = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel,
+  P extends Http.PayloadObj,
+>(
   p: Table.RowAddDataPayload<R> | Table.RowAddDataEvent<R>,
-  cs: Table.ModelColumn<R, M, Table.RawRowValue>[]
+  cs: Table.ModelColumn<R, M, Table.RawRowValue>[],
 ): P[] => {
-  const isEvent = (obj: Table.RowAddDataPayload<R> | Table.RowAddDataEvent<R>): obj is Table.RowAddDataEvent<R> =>
-    (obj as Table.RowAddDataEvent<R>).type === "rowAdd";
+  const isEvent = (
+    obj: Table.RowAddDataPayload<R> | Table.RowAddDataEvent<R>,
+  ): obj is Table.RowAddDataEvent<R> => (obj as Table.RowAddDataEvent<R>).type === "rowAdd";
 
   const payload: Table.RowAddDataPayload<R> = isEvent(p) ? p.payload : p;
   return reduce(
     payload,
-    (prev: P[], addition: Partial<R>) => {
-      return [...prev, postPayload<R, M, P>(addition, cs)];
-    },
-    [] as P[]
+    (prev: P[], addition: Partial<R>) => [...prev, postPayload<R, M, P>(addition, cs)],
+    [] as P[],
   );
 };
 
@@ -166,17 +173,17 @@ export const createBulkUpdatePayload = <
   R extends Table.RowData,
   M extends Model.RowHttpModel,
   P extends Http.PayloadObj,
-  RW extends Table.EditableRow<R> = Table.EditableRow<R>
+  RW extends Table.EditableRow<R> = Table.EditableRow<R>,
 >(
   p: Table.DataChangePayload<R, RW>,
-  cs: Table.ModelColumn<R, M, Table.RawRowValue>[]
+  cs: Table.ModelColumn<R, M, Table.RawRowValue>[],
 ): Http.BulkUpdatePayload<P> => ({ data: bulkPatchPayloads<R, M, P, RW>(p, cs) });
 
 export const createBulkCreatePayload = <
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  P extends Http.PayloadObj
+  P extends Http.PayloadObj,
 >(
   p: Partial<R>[],
-  cs: Table.ModelColumn<R, M, Table.RawRowValue>[]
+  cs: Table.ModelColumn<R, M, Table.RawRowValue>[],
 ): Http.BulkCreatePayload<P> => ({ data: postPayloads<R, M, P>(p, cs) });

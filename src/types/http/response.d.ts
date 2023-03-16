@@ -22,7 +22,9 @@ declare namespace Http {
   type FailedDetailResponse = {
     readonly error: import("api").RequestError;
   };
-  type RenderedDetailResponse<T extends Model.HttpModel> = SuccessfulDetailResponse<T> | FailedDetailResponse;
+  type RenderedDetailResponse<T extends Model.HttpModel> =
+    | SuccessfulDetailResponse<T>
+    | FailedDetailResponse;
 
   type FailedTableResponse = {
     readonly error: import("api").RequestError;
@@ -40,9 +42,10 @@ declare namespace Http {
     readonly fileUrl: string;
   };
 
-  type MarkupResponseTypes<B extends Model.BaseBudget, PARENT extends Model.Account | Model.SubAccount> =
-    | ParentChildResponse<B, Model.Markup>
-    | AncestryResponse<B, PARENT, Model.Markup>;
+  type MarkupResponseTypes<
+    B extends Model.BaseBudget,
+    PARENT extends Model.Account | Model.SubAccount,
+  > = ParentChildResponse<B, Model.Markup> | AncestryResponse<B, PARENT, Model.Markup>;
 
   type ReorderResponse = { data: number[] };
 
@@ -50,14 +53,17 @@ declare namespace Http {
     readonly parent: PARENT;
   };
 
-  type ParentChildResponse<PARENT extends Model.HttpModel, CHILD extends Model.HttpModel> = ParentResponse<PARENT> & {
+  type ParentChildResponse<
+    PARENT extends Model.HttpModel,
+    CHILD extends Model.HttpModel,
+  > = ParentResponse<PARENT> & {
     readonly data: CHILD;
   };
 
   type AncestryResponse<
     GP extends Model.HttpModel,
     PARENT extends Model.HttpModel,
-    CHILD extends Model.HttpModel
+    CHILD extends Model.HttpModel,
   > = ParentChildResponse<PARENT, CHILD> & {
     readonly budget: GP;
   };
@@ -66,8 +72,10 @@ declare namespace Http {
     readonly children: CHILD[];
   };
 
-  type ParentChildListResponse<PARENT extends Model.HttpModel, CHILD extends Model.HttpModel> = ParentResponse<PARENT> &
-    ChildListResponse<CHILD>;
+  type ParentChildListResponse<
+    PARENT extends Model.HttpModel,
+    CHILD extends Model.HttpModel,
+  > = ParentResponse<PARENT> & ChildListResponse<CHILD>;
 
   type ParentsResponse<GP extends Model.HttpModel, PARENT extends Model.HttpModel> = {
     readonly budget: GP;
@@ -77,7 +85,7 @@ declare namespace Http {
   type AncestryListResponse<
     GP extends Model.HttpModel,
     PARENT extends Model.HttpModel,
-    CHILD extends Model.HttpModel
+    CHILD extends Model.HttpModel,
   > = ParentChildListResponse<PARENT, CHILD> & {
     readonly budget: GP;
   };

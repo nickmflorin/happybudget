@@ -1,7 +1,7 @@
 import React, { useState, useMemo, forwardRef } from "react";
-import { map } from "lodash";
-import classNames from "classnames";
 
+import classNames from "classnames";
+import { map } from "lodash";
 import { InputRef, Input as AntDInput, Popover as AntDPopover } from "antd";
 import { InputProps as AntDInputProps } from "antd/lib/input";
 
@@ -13,7 +13,7 @@ const validationNames: PasswordValidationName[] = [
   { id: "uppercase", name: "One uppercase letter" },
   { id: "number", name: "One number" },
   { id: "character", name: "One special character" },
-  { id: "minChar", name: "8+ characters" }
+  { id: "minChar", name: "8+ characters" },
 ];
 
 const initialValidationState = {
@@ -21,11 +21,11 @@ const initialValidationState = {
   uppercase: false,
   number: false,
   character: false,
-  minChar: false
+  minChar: false,
 };
 
 const ValidationItems = (props: { validationState: PasswordValidationState }) => (
-  <ul className={"validation-items"}>
+  <ul className="validation-items">
     {map(validationNames, item => (
       <li key={item.id} className={classNames({ strikethrough: props.validationState[item.id] })}>
         {item.name}
@@ -47,9 +47,10 @@ export type PasswordInputProps = PrivatePasswordInputProps & UseSizeProps;
 
 const PasswordInput = (
   { hasValidator, ...props }: PrivatePasswordInputProps,
-  ref: React.ForwardedRef<InputRef>
+  ref: React.ForwardedRef<InputRef>,
 ): JSX.Element => {
-  const [validationState, setValidationState] = useState<PasswordValidationState>(initialValidationState);
+  const [validationState, setValidationState] =
+    useState<PasswordValidationState>(initialValidationState);
 
   const handleValidation = useMemo(
     () => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,31 +60,32 @@ const PasswordInput = (
         uppercase: /[A-Z|Ç|Ş|Ö|Ü|İ|Ğ]/.test(e.target.value),
         number: /[0-9]/.test(e.target.value),
         character: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(e.target.value),
-        minChar: e.target.value.length >= 8
+        minChar: e.target.value.length >= 8,
       });
     },
-    [props.onChange]
+    [props.onChange],
   );
 
-  const children = useMemo(() => {
-    return (
+  const children = useMemo(
+    () => (
       <AntDInput.Password
-        placeholder={"Password"}
-        prefix={<Icon icon={"lock"} weight={"solid"} />}
+        placeholder="Password"
+        prefix={<Icon icon="lock" weight="solid" />}
         ref={ref}
         {...props}
         className={classNames("input", "input--password", props.className)}
         onChange={handleValidation}
       />
-    );
-  }, [props, handleValidation]);
+    ),
+    [props, handleValidation],
+  );
 
   if (hasValidator) {
     return (
       <AntDPopover
-        placement={"right"}
+        placement="right"
         content={<MemoizedValidationItems validationState={validationState} />}
-        trigger={"focus"}
+        trigger="focus"
       >
         {children}
       </AntDPopover>
@@ -94,7 +96,7 @@ const PasswordInput = (
 };
 
 export default withSize<PasswordInputProps, StandardSize, "size", InputRef>({
-  hasRef: true
+  hasRef: true,
 })(forwardRef(PasswordInput)) as React.ForwardRefRenderFunction<
   InputRef,
   PasswordInputProps & { readonly ref?: React.ForwardedRef<InputRef> }

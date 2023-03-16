@@ -1,19 +1,19 @@
 import React, { useMemo } from "react";
-import { Dispatch } from "redux";
-import { useDispatch, useSelector } from "react-redux";
+
 import { isNil, find } from "lodash";
+import { useDispatch, useSelector } from "react-redux";
+import { Dispatch } from "redux";
 
 import * as api from "api";
 import { tabling, hooks } from "lib";
 import * as store from "store";
-
-import { framework } from "tabling/generic";
-
 import { selectors } from "app/Budgeting/store";
 import { CreateContactParams, EditContactParams } from "components/model/hooks";
-import { useAttachments, useContacts } from "../hooks";
+import { framework } from "tabling/generic";
+
 import AuthenticatedTable, { AuthenticatedTableProps } from "./AuthenticatedTable";
 import Columns from "./Columns";
+import { useAttachments, useContacts } from "../hooks";
 
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
@@ -29,11 +29,11 @@ export type AuthenticatedBudgetProps<P extends Model.Account | Model.SubAccount>
 };
 
 const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
-  props: AuthenticatedBudgetProps<P>
+  props: AuthenticatedBudgetProps<P>,
 ): JSX.Element => {
   const budget: Model.Budget | null = useSelector(
     (s: Application.Store) =>
-      selectors.selectBudgetDetail(s, { domain: "budget", public: false }) as Model.Budget | null
+      selectors.selectBudgetDetail(s, { domain: "budget", public: false }) as Model.Budget | null,
   );
 
   const dispatch: Dispatch = useDispatch();
@@ -46,12 +46,12 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
     attachmentsModal,
     addAttachment,
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-    removeAttachment
+    removeAttachment,
   ] = useAttachments({
     table: props.table.current,
     listAttachments: api.getSubAccountAttachments,
     deleteAttachment: api.deleteSubAccountAttachment,
-    path: (id: number) => `/v1/subaccounts/${id}/attachments/`
+    path: (id: number) => `/v1/subaccounts/${id}/attachments/`,
   });
 
   const onContactCreated = useMemo(
@@ -66,24 +66,24 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
         if (!isNil(row) && tabling.rows.isModelRow(row)) {
           let rowChange: Table.RowChange<R, Table.ModelRow<R>> = {
             id: row.id,
-            data: { contact: { oldValue: row.data.contact || null, newValue: m.id } }
+            data: { contact: { oldValue: row.data.contact || null, newValue: m.id } },
           };
           /* If the Row does not already specify a rate and the Contact does
 						 specify a rate, use the rate that is specified for the Contact. */
           if (m.rate !== null && row.data.rate === null) {
             rowChange = {
               ...rowChange,
-              data: { ...rowChange.data, rate: { oldValue: row.data.rate, newValue: m.rate } }
+              data: { ...rowChange.data, rate: { oldValue: row.data.rate, newValue: m.rate } },
             };
           }
           props.table.current.dispatchEvent({
             type: "dataChange",
-            payload: rowChange
+            payload: rowChange,
           });
         }
       }
     },
-    [props.table.current]
+    [props.table.current],
   );
 
   const onContactUpdated = useMemo(
@@ -92,30 +92,35 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
       const rowId = params.rowId;
       if (!isNil(rowId)) {
         const row: Table.BodyRow<R> | null = props.table.current.getRow(rowId);
-        if (!isNil(row) && tabling.rows.isModelRow(row) && row.data.rate === null && m.rate !== null) {
+        if (
+          !isNil(row) &&
+          tabling.rows.isModelRow(row) &&
+          row.data.rate === null &&
+          m.rate !== null
+        ) {
           props.table.current.dispatchEvent({
             type: "dataChange",
             payload: {
               id: row.id,
-              data: { rate: { oldValue: row.data.rate, newValue: m.rate } }
-            }
+              data: { rate: { oldValue: row.data.rate, newValue: m.rate } },
+            },
           });
         }
       }
     },
-    [props.table.current]
+    [props.table.current],
   );
 
   const {
     modals,
     data: cs,
     columns: columnsWithContacts,
-    onCellFocusChanged
+    onCellFocusChanged,
   } = useContacts({
     table: props.table,
     columns: Columns,
     onCreated: onContactCreated,
-    onUpdated: onContactUpdated
+    onUpdated: onContactUpdated,
   });
 
   const columns = useMemo(
@@ -128,8 +133,8 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
           cellRendererParams: {
             ...col.cellRendererParams,
             onAttachmentAdded: addAttachment,
-            uploadAttachmentsPath: (id: number) => `/v1/subaccounts/${id}/attachments/`
-          }
+            uploadAttachmentsPath: (id: number) => `/v1/subaccounts/${id}/attachments/`,
+          },
         }),
         contact: {
           onDataChange: (id: Table.ModelRowId, change: Table.CellChange) => {
@@ -143,27 +148,34 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
                 if (!isNil(contact) && !isNil(contact.rate)) {
                   props.table.current.dispatchEvent({
                     type: "dataChange",
-                    payload: { id: row.id, data: { rate: { oldValue: row.data.rate, newValue: contact.rate } } }
+                    payload: {
+                      id: row.id,
+                      data: { rate: { oldValue: row.data.rate, newValue: contact.rate } },
+                    },
                   });
                 }
               }
             }
-          }
-        }
+          },
+        },
       }),
     [
       hooks.useDeepEqualMemo(columnsWithContacts),
       addAttachment,
       processAttachmentsCellFromClipboard,
-      processAttachmentsCellForClipboard
-    ]
+      processAttachmentsCellForClipboard,
+    ],
   );
 
   const tableActions = useMemo(
     () => (params: Table.AuthenticatedMenuActionParams<R, M>) => {
       let _actions: Table.AuthenticatedMenuActions<R, M> = [
-        ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
-        framework.actions.ExportPdfAction(props.onExportPdf)
+        ...(isNil(props.actions)
+          ? []
+          : Array.isArray(props.actions)
+          ? props.actions
+          : props.actions(params)),
+        framework.actions.ExportPdfAction(props.onExportPdf),
       ];
       if (!isNil(budget)) {
         _actions = [
@@ -174,13 +186,13 @@ const AuthenticatedBudget = <P extends Model.Account | Model.SubAccount>(
             create: api.createBudgetPublicToken,
             onCreated: (token: Model.PublicToken) => props.onShared(token),
             onUpdated: (token: Model.PublicToken) => props.onShareUpdated(token),
-            onDeleted: () => props.onUnshared()
-          })
+            onDeleted: () => props.onUnshared(),
+          }),
         ];
       }
       return _actions;
     },
-    [budget, props.actions, props.onShared]
+    [budget, props.actions, props.onShared],
   );
 
   return (

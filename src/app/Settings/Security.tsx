@@ -2,17 +2,16 @@ import React from "react";
 
 import * as api from "api";
 import { ui, notifications } from "lib";
-
 import { Tile } from "components/containers";
 import { ChangePasswordForm } from "components/forms";
-import { Page } from "components/layout";
 import { ChangePasswordFormValues } from "components/forms/ChangePasswordForm";
+import { Page } from "components/layout";
 
 const Security = (): JSX.Element => {
   const form = ui.form.useForm<ChangePasswordFormValues>();
 
   return (
-    <Page className={"security"} title={"Security"}>
+    <Page className="security" title="Security">
       <Tile style={{ maxWidth: 500 }}>
         <ChangePasswordForm
           form={form}
@@ -20,7 +19,7 @@ const Security = (): JSX.Element => {
             form.setLoading(true);
             const payload: Http.ChangePasswordPayload = {
               password: values.password,
-              new_password: values.new_password
+              new_password: values.new_password,
             };
             api
               .changeUserPassword(payload)
@@ -28,8 +27,8 @@ const Security = (): JSX.Element => {
                 notifications.ui.banner.notify({
                   level: "success",
                   message: "Your password was successfully changed.",
-                  duration: 5000
-                })
+                  duration: 5000,
+                }),
               )
               .catch((e: Error) => form.handleRequestError(e))
               .finally(() => form.setLoading(false));

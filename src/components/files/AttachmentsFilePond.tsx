@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { FilePond } from "react-filepond";
+
 import { ActualFileObject, FilePondFile, ProgressServerConfigFunction } from "filepond/types";
 import { map } from "lodash";
+import { FilePond } from "react-filepond";
 
 import * as api from "api";
 import { notifications } from "lib";
@@ -11,7 +12,11 @@ interface AttachmentsFilePondProps {
   readonly path: string;
   readonly onAttachmentRemoved?: (id: number) => void;
   readonly onAttachmentAdded?: (m: Model.Attachment) => void;
-  readonly deleteAttachment: (id: number, objId: number, options?: Http.RequestOptions) => Promise<null>;
+  readonly deleteAttachment: (
+    id: number,
+    objId: number,
+    options?: Http.RequestOptions,
+  ) => Promise<null>;
 }
 
 const AttachmentsFilePond = (props: AttachmentsFilePondProps): JSX.Element => {
@@ -24,11 +29,11 @@ const AttachmentsFilePond = (props: AttachmentsFilePondProps): JSX.Element => {
       files={files as unknown as ActualFileObject[]}
       onupdatefiles={setFiles}
       allowMultiple={true}
-      labelIdle={"Drag & Drop or Click to Browse"}
-      labelFileProcessingError={(error: { body: string }) => {
-        return error.body || "There was an error processing the attachment.";
-      }}
-      name={"files"}
+      labelIdle="Drag & Drop or Click to Browse"
+      labelFileProcessingError={(error: { body: string }) =>
+        error.body || "There was an error processing the attachment."
+      }
+      name="files"
       server={{
         revert: (uniqueFileId: string, load: () => void, error: (text: string) => void) => {
           const attachmentId = parseInt(uniqueFileId);
@@ -55,7 +60,7 @@ const AttachmentsFilePond = (props: AttachmentsFilePondProps): JSX.Element => {
           load: (p: string | Record<string, unknown>) => void,
           error: (errorText: string) => void,
           progress: ProgressServerConfigFunction,
-          abort: () => void
+          abort: () => void,
         ) => {
           const request = api.xhr.uploadAttachmentFile(file, props.path, {
             error: (e: Http.ApiError) => {
@@ -67,15 +72,15 @@ const AttachmentsFilePond = (props: AttachmentsFilePondProps): JSX.Element => {
               map(ms, (m: Model.Attachment) => {
                 load(String(m.id));
                 props.onAttachmentAdded?.(m);
-              })
+              }),
           });
           return {
             abort: () => {
               request.abort();
               abort();
-            }
+            },
           };
-        }
+        },
       }}
     />
   );

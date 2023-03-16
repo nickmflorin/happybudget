@@ -1,11 +1,11 @@
 import { useEffect, useState, useMemo } from "react";
-import { useHistory, useLocation } from "react-router-dom";
+
 import { isNil } from "lodash";
+import { useHistory, useLocation } from "react-router-dom";
 
-import * as config from "config";
 import * as api from "api";
+import * as config from "config";
 import { ui, notifications } from "lib";
-
 import { LandingFormContainer } from "components/containers";
 import { LoginForm } from "components/forms";
 import { ILoginFormValues } from "components/forms/LoginForm";
@@ -16,7 +16,7 @@ import {
   UnverifiedEmailNotification,
   PasswordTokenExpiredNotification,
   PasswordTokenInvalidNotification,
-  UITokenNotificationRedirectData
+  UITokenNotificationRedirectData,
 } from "./Notifications";
 
 const Login = (): JSX.Element => {
@@ -30,7 +30,10 @@ const Login = (): JSX.Element => {
 
   const handleLoginError = useMemo(
     () => (e: Error) => {
-      if (e instanceof api.AuthenticationError && e.code === api.ErrorCodes.auth.ACCOUNT_NOT_VERIFIED) {
+      if (
+        e instanceof api.AuthenticationError &&
+        e.code === api.ErrorCodes.auth.ACCOUNT_NOT_VERIFIED
+      ) {
         /* The Backend & Frontend need to have consistent configurations for
            email verification and email in general, if they do not a user will
 					 potentially not be able to login and not be able to verify their
@@ -40,7 +43,7 @@ const Login = (): JSX.Element => {
           console.error(
             "User login is being prevented due to an unverified email, but email " +
               "verification is disabled.  This indicates a mismatch in configuration " +
-              "between the API and application."
+              "between the API and application.",
           );
         }
         /* The error should include a User ID - which is required such that we
@@ -52,7 +55,7 @@ const Login = (): JSX.Element => {
           console.error(
             `The user's email confirmation token has expired, but we cannot
 							resend the verification email because the response did not include
-							the user's ID.`
+							the user's ID.`,
           );
         }
         form.notify(
@@ -63,16 +66,16 @@ const Login = (): JSX.Element => {
                 level: "success",
                 message: "Confirmation email successfully sent.",
                 detail: "Please check your inbox.",
-                closable: true
+                closable: true,
               }),
-            onError: (err: Error) => form.handleRequestError(err)
-          })
+            onError: (err: Error) => form.handleRequestError(err),
+          }),
         );
       } else {
         form.handleRequestError(e);
       }
     },
-    [form.handleRequestError]
+    [form.handleRequestError],
   );
 
   useEffect(() => {
@@ -86,7 +89,7 @@ const Login = (): JSX.Element => {
           if (isNil(n.userId)) {
             console.error(
               `Email confirmation token has expired, but we cannot
-								resend the email because the response did not include the user's ID.`
+								resend the email because the response did not include the user's ID.`,
             );
           }
           form.notify(
@@ -97,10 +100,10 @@ const Login = (): JSX.Element => {
                   level: "success",
                   message: "Confirmation email successfully sent.",
                   detail: "Please check your inbox.",
-                  closable: true
+                  closable: true,
                 }),
-              onError: (err: Error) => form.handleRequestError(err)
-            })
+              onError: (err: Error) => form.handleRequestError(err),
+            }),
           );
         } else {
           form.notify(EmailTokenInvalidNotification());
@@ -110,7 +113,7 @@ const Login = (): JSX.Element => {
           if (isNil(n.userId)) {
             console.error(
               `Password recovery token has expired, but we cannot
-								resend the email because the response did not include the user's ID.`
+								resend the email because the response did not include the user's ID.`,
             );
           }
           form.notify(PasswordTokenExpiredNotification());
@@ -126,7 +129,7 @@ const Login = (): JSX.Element => {
   }, [location.state]);
 
   return (
-    <LandingFormContainer title={"Sign In"} subTitle={"Cloud based budgeting at your fingertips."}>
+    <LandingFormContainer title="Sign In" subTitle="Cloud based budgeting at your fingertips.">
       <LoginForm
         form={form}
         loading={loading}
@@ -149,14 +152,14 @@ const Login = (): JSX.Element => {
           notifications.internal.notify({
             level: "error",
             dispatchToSentry: true,
-            message: notifications.objToJson(error)
+            message: notifications.objToJson(error),
           });
         }}
         onGoogleError={(error: Record<string, unknown>) => {
           notifications.internal.notify({
             level: "error",
             dispatchToSentry: true,
-            message: notifications.objToJson(error)
+            message: notifications.objToJson(error),
           });
           form.notify("There was an error authenticating with Google.");
         }}

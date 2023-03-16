@@ -1,5 +1,11 @@
 declare namespace Table {
-  type Name = "account-subaccounts" | "accounts" | "subaccount-subaccounts" | "fringes" | "actuals" | "contacts";
+  type Name =
+    | "account-subaccounts"
+    | "accounts"
+    | "subaccount-subaccounts"
+    | "fringes"
+    | "actuals"
+    | "contacts";
 
   type AgGridProps = import("@ag-grid-community/react/lib/interfaces").AgGridReactProps;
 
@@ -17,7 +23,10 @@ declare namespace Table {
 
   type FirstDataRenderedEvent = import("@ag-grid-community/core").FirstDataRenderedEvent;
 
-  type CreateTableDataConfig<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
+  type CreateTableDataConfig<
+    R extends RowData,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
+  > = {
     readonly response: Http.SuccessfulTableResponse<M>;
     readonly columns: ModelColumn<R, M>[];
     readonly getModelRowChildren?: (m: M) => number[];
@@ -107,7 +116,7 @@ declare namespace Table {
     C extends Context = Context,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
+    V extends RawRowValue = any,
   > {
     readonly tableContext: C;
     readonly table: TableInstance<R, M>;
@@ -143,7 +152,7 @@ declare namespace Table {
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any,
-    CL extends RealColumn<R, M, V> = BodyColumn<R, M, V>
+    CL extends RealColumn<R, M, V> = BodyColumn<R, M, V>,
   > extends Omit<import("@ag-grid-community/core").ICellRendererParams, "value" | "data">,
       StandardComponentProps {
     readonly data: R;
@@ -157,7 +166,10 @@ declare namespace Table {
     readonly suffixChildren?: JSX.Element;
     readonly icon?: IconOrElement | ((row: BodyRow<R>) => IconOrElement | undefined | null);
     readonly innerCellClassName?: string | undefined | ((r: Row<R>) => string | undefined);
-    readonly innerCellStyle?: React.CSSProperties | undefined | ((r: Row<R>) => React.CSSProperties | undefined);
+    readonly innerCellStyle?:
+      | React.CSSProperties
+      | undefined
+      | ((r: Row<R>) => React.CSSProperties | undefined);
     readonly table: TableInstance<R, M>;
     /*
 		Note: This is only applied for the data grid rows/cells - so we have to
@@ -177,7 +189,7 @@ declare namespace Table {
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends RawRowValue = any,
-    CL extends RealColumn<R, M, V> = BodyColumn<R, M, V>
+    CL extends RealColumn<R, M, V> = BodyColumn<R, M, V>,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   > = Omit<CellProps<R, M, C, S, any, CL>, "value"> & {
     readonly children: import("react").ReactNode;
@@ -189,7 +201,7 @@ declare namespace Table {
     C extends Context = Context,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
     V extends string | number | null = string | number | null,
-    CL extends DataColumn<R, M, V> = BodyColumn<R, M, V>
+    CL extends DataColumn<R, M, V> = BodyColumn<R, M, V>,
   > = CellProps<R, M, C, S, V, CL> & {
     /*
 		This is used for extending cells.  Normally, the value formatter will be
@@ -203,11 +215,18 @@ declare namespace Table {
     R extends RowData = RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     C extends Context = Context,
-    S extends Redux.TableStore<R> = Redux.TableStore<R>
-  > = Omit<ValueCellProps<R, M, C, S, number | null, CalculatedColumn<R, M, number | null>>, "prefixChildren"> & {
-    readonly hasInfo?: boolean | ((cell: CellConstruct<ModelRow<R>, CalculatedColumn<R, M>>) => boolean | undefined);
+    S extends Redux.TableStore<R> = Redux.TableStore<R>,
+  > = Omit<
+    ValueCellProps<R, M, C, S, number | null, CalculatedColumn<R, M, number | null>>,
+    "prefixChildren"
+  > & {
+    readonly hasInfo?:
+      | boolean
+      | ((cell: CellConstruct<ModelRow<R>, CalculatedColumn<R, M>>) => boolean | undefined);
     readonly onInfoClicked?: (cell: CellConstruct<ModelRow<R>, CalculatedColumn<R, M>>) => void;
-    readonly infoTooltip?: (cell: CellConstruct<ModelRow<R>, CalculatedColumn<R, M>>) => TooltipContent | null;
+    readonly infoTooltip?: (
+      cell: CellConstruct<ModelRow<R>, CalculatedColumn<R, M>>,
+    ) => TooltipContent | null;
   };
 
   /* ------------------------- Framework ------------------------------------ */
@@ -244,7 +263,7 @@ declare namespace Table {
 
   type ColSpanParams<
     R extends RowData,
-    M extends Model.RowHttpModel = Model.RowHttpModel
+    M extends Model.RowHttpModel = Model.RowHttpModel,
   > = import("@ag-grid-community/core").ColSpanParams & {
     readonly columns: RealColumn<R, M>[];
   };
@@ -269,7 +288,7 @@ declare namespace Table {
 
   type ParsedColumnField<
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
+    V extends RawRowValue = any,
   > = {
     field: string;
     value: V;
@@ -279,13 +298,15 @@ declare namespace Table {
 
   type EditColumnRowConfig<
     R extends RowData = RowData,
-    RW extends NonPlaceholderBodyRow<R> = NonPlaceholderBodyRow<R>
+    RW extends NonPlaceholderBodyRow<R> = NonPlaceholderBodyRow<R>,
   > = {
     readonly typeguard: (row: NonPlaceholderBodyRow<R>) => row is RW;
     readonly conditional?: (row: RW) => boolean;
     readonly behavior: EditRowActionBehavior;
     readonly action: (row: RW, hovered: boolean) => void;
-    readonly tooltip?: string | ((row: RW, params: { hovered: boolean; disabled: boolean }) => string);
+    readonly tooltip?:
+      | string
+      | ((row: RW, params: { hovered: boolean; disabled: boolean }) => string);
     readonly disabled?: boolean | ((row: RW, hovered: boolean) => boolean);
   };
 
@@ -308,13 +329,19 @@ declare namespace Table {
     ? ActionColumn<R, M>
     : never;
 
-  type InferActionColumn<C extends Column> = C extends ActionColumn<infer R, infer M> ? ActionColumn<R, M> : never;
+  type InferActionColumn<C extends Column> = C extends ActionColumn<infer R, infer M>
+    ? ActionColumn<R, M>
+    : never;
 
   type InferBodyColumn<C extends Column> = C extends BodyColumn<infer R, infer M, infer V>
     ? BodyColumn<R, M, V>
     : never;
 
-  type InferCalculatedColumn<C extends Column> = C extends CalculatedColumn<infer R, infer M, infer V>
+  type InferCalculatedColumn<C extends Column> = C extends CalculatedColumn<
+    infer R,
+    infer M,
+    infer V
+  >
     ? CalculatedColumn<R, M, V>
     : never;
 
@@ -330,7 +357,7 @@ declare namespace Table {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     R extends RowData = any,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    M extends Model.RowHttpModel = any
+    M extends Model.RowHttpModel = any,
   > = {
     readonly index?: number;
     readonly cellRenderer?: string | Partial<GridSet<string>>;
@@ -348,7 +375,7 @@ declare namespace Table {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     M extends Model.RowHttpModel = any,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
+    V extends RawRowValue = any,
   > = {
     /*
 		The field is used to pull data from the Model M in the case that the
@@ -402,7 +429,7 @@ declare namespace Table {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     M extends Model.RowHttpModel = any,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
+    V extends RawRowValue = any,
   > = BaseColumn &
     BaseModelColumn<R, M, V> & {
       readonly cType: "fake";
@@ -414,12 +441,16 @@ declare namespace Table {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     M extends Model.RowHttpModel = any,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
-  > = Omit<Partial<FakeColumn<R, M, V>>, "field" | "nullValue"> & Pick<FakeColumn<R, M, V>, "field" | "nullValue">;
+    V extends RawRowValue = any,
+  > = Omit<Partial<FakeColumn<R, M, V>>, "field" | "nullValue"> &
+    Pick<FakeColumn<R, M, V>, "field" | "nullValue">;
 
   type ActionColumnId = "checkbox" | "edit" | "drag";
 
-  type ActionColumn<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = BaseColumn &
+  type ActionColumn<
+    R extends RowData,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
+  > = BaseColumn &
     BaseRealColumn<R, M> & {
       readonly cType: "action";
       readonly colId: ActionColumnId;
@@ -429,7 +460,7 @@ declare namespace Table {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     R extends RowData = any,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    M extends Model.RowHttpModel = any
+    M extends Model.RowHttpModel = any,
   > = Omit<Partial<ActionColumn<R, M>>, "colId">;
 
   type BaseDataColumn<
@@ -438,7 +469,7 @@ declare namespace Table {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     M extends Model.RowHttpModel = any,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
+    V extends RawRowValue = any,
   > = BaseModelColumn<R, M, V> & {
     // This field will be used to pull data from the Markup model if applicable.
     readonly markupField?: keyof Model.Markup;
@@ -498,7 +529,7 @@ declare namespace Table {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     M extends Model.RowHttpModel = any,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
+    V extends RawRowValue = any,
   > = BaseColumn &
     BaseRealColumn<R, M> &
     BaseDataColumn<R, M, V> & {
@@ -531,8 +562,9 @@ declare namespace Table {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     M extends Model.RowHttpModel = any,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
-  > = Omit<Partial<BodyColumn<R, M, V>>, "field" | "nullValue"> & Pick<BodyColumn<R, M, V>, "field" | "nullValue">;
+    V extends RawRowValue = any,
+  > = Omit<Partial<BodyColumn<R, M, V>>, "field" | "nullValue"> &
+    Pick<BodyColumn<R, M, V>, "field" | "nullValue">;
 
   type CalculatedColumn<
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -540,7 +572,7 @@ declare namespace Table {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     M extends Model.RowHttpModel = any,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
+    V extends RawRowValue = any,
   > = BaseColumn &
     BaseRealColumn<R, M> &
     BaseDataColumn<R, M, V> & {
@@ -553,7 +585,7 @@ declare namespace Table {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     M extends Model.RowHttpModel = any,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
+    V extends RawRowValue = any,
   > = Omit<Partial<CalculatedColumn<R, M, V>>, "field" | "nullValue"> &
     Pick<CalculatedColumn<R, M, V>, "field" | "nullValue">;
 
@@ -563,7 +595,7 @@ declare namespace Table {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     M extends Model.RowHttpModel = any,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
+    V extends RawRowValue = any,
   > = BodyColumn<R, M, V> | CalculatedColumn<R, M, V>;
 
   type ModelColumn<
@@ -572,7 +604,7 @@ declare namespace Table {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     M extends Model.RowHttpModel = any,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
+    V extends RawRowValue = any,
   > = DataColumn<R, M, V> | FakeColumn<R, M, V>;
 
   type RealColumn<
@@ -581,7 +613,7 @@ declare namespace Table {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     M extends Model.RowHttpModel = any,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
+    V extends RawRowValue = any,
   > = BodyColumn<R, M, V> | CalculatedColumn<R, M, V> | ActionColumn<R, M>;
 
   type Column<
@@ -590,7 +622,7 @@ declare namespace Table {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     M extends Model.RowHttpModel = any,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
+    V extends RawRowValue = any,
   > = BodyColumn<R, M, V> | ActionColumn<R, M> | CalculatedColumn<R, M, V> | FakeColumn<R, M, V>;
 
   interface FooterColumn<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
@@ -618,7 +650,9 @@ declare namespace Table {
 
   type CellClassName = ClassName<import("@ag-grid-community/core").CellClassParams>;
 
-  type CellStyle = import("@ag-grid-community/core").CellStyle | import("@ag-grid-community/core").CellStyleFunc;
+  type CellStyle =
+    | import("@ag-grid-community/core").CellStyle
+    | import("@ag-grid-community/core").CellStyleFunc;
 
   type Context = Record<string, unknown>;
 
@@ -631,7 +665,7 @@ declare namespace Table {
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
+    V extends RawRowValue = any,
   > = {
     readonly row?: Row<R>;
     readonly colIndex: number;
@@ -647,7 +681,7 @@ declare namespace Table {
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
+    V extends RawRowValue = any,
   > = (params: PdfCellCallbackParams<R, M, V>) => RV;
 
   type PdfOptionalCellCallback<
@@ -655,14 +689,14 @@ declare namespace Table {
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
+    V extends RawRowValue = any,
   > = RV | PdfCellCallback<RV, R, M, V> | undefined;
 
   interface _PdfCellClassName<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
+    V extends RawRowValue = any,
   > {
     [n: number]: PdfOptionalCellCallback<string, R, M, V> | _PdfCellClassName<R, M, V>;
   }
@@ -671,30 +705,32 @@ declare namespace Table {
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
+    V extends RawRowValue = any,
   > = PdfOptionalCellCallback<string, R, M, V> | _PdfCellClassName<R, M, V>;
 
   interface _PdfCellStyle<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
+    V extends RawRowValue = any,
   > {
-    [n: number]: PdfOptionalCellCallback<import("@react-pdf/types").Style, R, M, V> | _PdfCellStyle<R, M, V>;
+    [n: number]:
+      | PdfOptionalCellCallback<import("@react-pdf/types").Style, R, M, V>
+      | _PdfCellStyle<R, M, V>;
   }
 
   type PdfCellStyle<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
+    V extends RawRowValue = any,
   > = PdfOptionalCellCallback<import("@react-pdf/types").Style, R, M, V> | _PdfCellStyle<R, M, V>;
 
   type PdfCellStandardProps<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
+    V extends RawRowValue = any,
   > = {
     readonly style?: PdfCellStyle<R, M, V>;
     readonly className?: PdfCellClassName<R, M, V>;
@@ -713,7 +749,10 @@ declare namespace Table {
     readonly apis: GridApis;
   };
 
-  type CellFocusChangedParams<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
+  type CellFocusChangedParams<
+    R extends RowData,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
+  > = {
     readonly cell: Cell<R, M>;
     readonly previousCell: Cell<R, M> | null;
     readonly apis: GridApis;
@@ -755,7 +794,9 @@ declare namespace Table {
 
   type RowNameLabelType = number | string | null;
 
-  type RowStringGetter<R extends Row<RowData>> = RowNameLabelType | FnWithTypedArgs<RowNameLabelType, [R]>;
+  type RowStringGetter<R extends Row<RowData>> =
+    | RowNameLabelType
+    | FnWithTypedArgs<RowNameLabelType, [R]>;
 
   type _RawRowValue = string | number | Array<string> | Array<number>;
   type _RowValueObj = Record<string, _RawRowValue | null>;
@@ -770,7 +811,11 @@ declare namespace Table {
     readonly gridId: Grid;
   };
 
-  type IBodyRow<RId extends RowId, TP extends BodyRowType, D extends RowData> = IRow<RId, TP, "data"> & {
+  type IBodyRow<RId extends RowId, TP extends BodyRowType, D extends RowData> = IRow<
+    RId,
+    TP,
+    "data"
+  > & {
     readonly data: D;
   };
 
@@ -792,7 +837,11 @@ declare namespace Table {
     readonly groupData: Pick<Model.Group, "name" | "color">;
   };
 
-  type MarkupRow<R extends RowData> = IBodyRow<MarkupRowId, "markup", Pick<R, keyof Model.Markup>> & {
+  type MarkupRow<R extends RowData> = IBodyRow<
+    MarkupRowId,
+    "markup",
+    Pick<R, keyof Model.Markup>
+  > & {
     readonly children: number[];
     readonly markupData: Pick<Model.Markup, "unit" | "rate">;
   };
@@ -809,13 +858,21 @@ declare namespace Table {
 
   type RowWithName<D extends RowData> = ModelRow<D & { name: string | null }>;
 
-  type RowWithDescription<D extends RowData> = ModelRow<D & { description: string | null }> | MarkupRow<D>;
+  type RowWithDescription<D extends RowData> =
+    | ModelRow<D & { description: string | null }>
+    | MarkupRow<D>;
 
-  type RowWithIdentifier<D extends RowData> = ModelRow<D & { identifier: string | null }> | MarkupRow<D>;
+  type RowWithIdentifier<D extends RowData> =
+    | ModelRow<D & { identifier: string | null }>
+    | MarkupRow<D>;
   /* ------------------------- Rows -------------------------------------- */
 
   /* ------------------------- Multi-User ---------------------------------- */
-  type ShareConfig<T extends Model.PublicHttpModel, R extends RowData, M extends Model.RowHttpModel> = {
+  type ShareConfig<
+    T extends Model.PublicHttpModel,
+    R extends RowData,
+    M extends Model.RowHttpModel,
+  > = {
     readonly instance: T;
     readonly table: TableInstance<R, M>;
     readonly onCreated?: (token: Model.PublicToken) => void;
@@ -824,7 +881,7 @@ declare namespace Table {
     readonly create: (
       id: number,
       payload: Http.PublicTokenPayload,
-      options: Http.RequestOptions
+      options: Http.RequestOptions,
     ) => Promise<Model.PublicToken>;
   };
 
@@ -839,10 +896,10 @@ declare namespace Table {
     M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
     C extends Redux.ActionContext = Redux.ActionContext,
-    A extends Redux.ActionCreatorMap<Omit<Redux.TableActionPayloadMap<M>, "invalidate">, C> = Redux.ActionCreatorMap<
+    A extends Redux.ActionCreatorMap<
       Omit<Redux.TableActionPayloadMap<M>, "invalidate">,
       C
-    >
+    > = Redux.ActionCreatorMap<Omit<Redux.TableActionPayloadMap<M>, "invalidate">, C>,
   > = Redux.TaskConfig<A, C> & {
     readonly table: TableInstance<R, M>;
     readonly selectStore: (state: Application.Store, ctx: C) => S;
@@ -851,14 +908,16 @@ declare namespace Table {
   type DefaultValueOnCreate<R extends RowData> = R[keyof R] | ((r: Partial<R>) => R[keyof R]);
   type DefaultValueOnUpdate<R extends RowData> = R[keyof R] | ((r: ModelRow<R>) => R[keyof R]);
   type DefaultDataOnCreate<R extends RowData> = Partial<R> | ((r: Partial<R>) => Partial<R>);
-  type DefaultDataOnUpdate<R extends RowData> = R | ((r: ModelRow<R>, ch: RowChangeData<R, ModelRow<R>>) => Partial<R>);
+  type DefaultDataOnUpdate<R extends RowData> =
+    | R
+    | ((r: ModelRow<R>, ch: RowChangeData<R, ModelRow<R>>) => Partial<R>);
 
   type ReducerConfig<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
     C extends Redux.ActionContext = Redux.ActionContext,
-    A extends Redux.TableActionCreatorMap<M, C> = Redux.TableActionCreatorMap<M, C>
+    A extends Redux.TableActionCreatorMap<M, C> = Redux.TableActionCreatorMap<M, C>,
   > = Omit<TaskConfig<R, M, S, C, A>, "table" | "selectStore"> & {
     readonly initialState: S;
     readonly columns: ModelColumn<R, M>[];
@@ -872,7 +931,11 @@ declare namespace Table {
     M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
     C extends Redux.ActionContext = Redux.ActionContext,
-    A extends Redux.AuthenticatedTableActionCreatorMap<R, M, C> = Redux.AuthenticatedTableActionCreatorMap<R, M, C>
+    A extends Redux.AuthenticatedTableActionCreatorMap<
+      R,
+      M,
+      C
+    > = Redux.AuthenticatedTableActionCreatorMap<R, M, C>,
   > = ReducerConfig<R, M, S, C, A>;
 
   type PublicSagaConfig<
@@ -884,7 +947,10 @@ declare namespace Table {
       Redux.TableActionCreatorMap<M, C>,
       "request"
     >,
-    T extends Optional<Redux.TableTaskMap<C>, "request"> = Optional<Redux.TableTaskMap<C>, "request">
+    T extends Optional<Redux.TableTaskMap<C>, "request"> = Optional<
+      Redux.TableTaskMap<C>,
+      "request"
+    >,
   > = Redux.SagaConfig<T, A, C> & {
     readonly selectStore: (state: Application.Store, ctx: C) => S;
   };
@@ -897,11 +963,17 @@ declare namespace Table {
     A extends Optional<
       Pick<Redux.AuthenticatedTableActionCreatorMap<R, M, C>, "request" | "handleEvent">,
       "request"
-    > = Optional<Pick<Redux.AuthenticatedTableActionCreatorMap<R, M, C>, "request" | "handleEvent">, "request">,
+    > = Optional<
+      Pick<Redux.AuthenticatedTableActionCreatorMap<R, M, C>, "request" | "handleEvent">,
+      "request"
+    >,
     T extends Optional<
       Pick<Redux.AuthenticatedTableTaskMap<R, C>, "request" | "handleChangeEvent">,
       "request"
-    > = Optional<Pick<Redux.AuthenticatedTableTaskMap<R, C>, "request" | "handleChangeEvent">, "request">
+    > = Optional<
+      Pick<Redux.AuthenticatedTableTaskMap<R, C>, "request" | "handleChangeEvent">,
+      "request"
+    >,
   > = Redux.SagaConfig<T, A, C> & {
     readonly selectStore: (state: Application.Store, ctx: C) => S;
   };
@@ -917,7 +989,10 @@ declare namespace Table {
 
   type TableInstanceAttachmentAction = () => void;
 
-  type TableInstance<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = DataGridInstance &
+  type TableInstance<
+    R extends RowData,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
+  > = DataGridInstance &
     UINotificationsManager & {
       readonly saving: (v: boolean) => void;
       readonly getColumns: () => ModelColumn<R, M>[];
@@ -926,7 +1001,10 @@ declare namespace Table {
       readonly getRows: () => BodyRow<R>[];
       readonly getRowsAboveAndIncludingFocusedRow: () => BodyRow<R>[];
       readonly dispatchEvent: (event: SingleOrArray<Event<R, M>>) => void;
-      readonly changeColumnVisibility: (changes: SingleOrArray<ColumnVisibilityChange>, sizeToFit?: boolean) => void;
+      readonly changeColumnVisibility: (
+        changes: SingleOrArray<ColumnVisibilityChange>,
+        sizeToFit?: boolean,
+      ) => void;
     };
 
   /*
@@ -955,7 +1033,9 @@ declare namespace Table {
     readonly active?: boolean;
     // If being wrapped in a Dropdown, the onClick prop will not be used.
     readonly onClick?: () => void;
-    readonly wrapInDropdown?: (children: import("react").ReactChild | import("react").ReactChild[]) => JSX.Element;
+    readonly wrapInDropdown?: (
+      children: import("react").ReactChild | import("react").ReactChild[],
+    ) => JSX.Element;
     /*
 		We have to allow the onClick prop and ID prop to pass through the entire
 		component to the render method in the case that we are rendering a button
@@ -966,7 +1046,10 @@ declare namespace Table {
     readonly render?: MenuActionRenderFunc;
   };
 
-  type PublicMenuActionParams<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
+  type PublicMenuActionParams<
+    R extends RowData,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
+  > = {
     readonly apis: GridApis | null;
     readonly columns: DataColumn<R, M>[];
     readonly hiddenColumns?: HiddenColumns;
@@ -974,7 +1057,7 @@ declare namespace Table {
 
   type AuthenticatedMenuActionParams<
     R extends RowData,
-    M extends Model.RowHttpModel = Model.RowHttpModel
+    M extends Model.RowHttpModel = Model.RowHttpModel,
   > = PublicMenuActionParams<R, M> & {
     readonly selectedRows: EditableRow<R>[];
   };
@@ -983,44 +1066,40 @@ declare namespace Table {
     V,
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
-    T extends PublicMenuActionParams<R, M> = PublicMenuActionParams<R, M>
+    T extends PublicMenuActionParams<R, M> = PublicMenuActionParams<R, M>,
   > = (params: T) => V;
 
   type MenuAction<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
-    T extends PublicMenuActionParams<R, M> = PublicMenuActionParams<R, M>
+    T extends PublicMenuActionParams<R, M> = PublicMenuActionParams<R, M>,
   > = MenuActionObj | MenuActionCallback<MenuActionObj, R, M, T>;
 
   type MenuActions<
     R extends RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
-    T extends PublicMenuActionParams<R, M> = PublicMenuActionParams<R, M>
+    T extends PublicMenuActionParams<R, M> = PublicMenuActionParams<R, M>,
   > = Array<MenuAction<R, M, T>> | MenuActionCallback<MenuAction<R, M, T>[], R, M, T>;
 
-  type PublicMenuAction<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = MenuAction<
-    R,
-    M,
-    PublicMenuActionParams<R, M>
-  >;
+  type PublicMenuAction<
+    R extends RowData,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
+  > = MenuAction<R, M, PublicMenuActionParams<R, M>>;
 
-  type AuthenticatedMenuAction<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = MenuAction<
-    R,
-    M,
-    AuthenticatedMenuActionParams<R, M>
-  >;
+  type AuthenticatedMenuAction<
+    R extends RowData,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
+  > = MenuAction<R, M, AuthenticatedMenuActionParams<R, M>>;
 
-  type PublicMenuActions<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = MenuActions<
-    R,
-    M,
-    PublicMenuActionParams<R, M>
-  >;
+  type PublicMenuActions<
+    R extends RowData,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
+  > = MenuActions<R, M, PublicMenuActionParams<R, M>>;
 
-  type AuthenticatedMenuActions<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = MenuActions<
-    R,
-    M,
-    AuthenticatedMenuActionParams<R, M>
-  >;
+  type AuthenticatedMenuActions<
+    R extends RowData,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
+  > = MenuActions<R, M, AuthenticatedMenuActionParams<R, M>>;
 
   type FooterGridConfig<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
     readonly id: "page" | "footer";

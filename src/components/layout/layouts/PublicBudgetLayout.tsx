@@ -8,7 +8,12 @@ export type PublicBudgetLayoutProps = Omit<
 >;
 
 const PublicBudgetLayout = (props: PublicBudgetLayoutProps): JSX.Element => (
-  <BudgetLayout {...props} showHeaderLeafLogo={true} showHeaderTextLogo={false} showHeaderSidebarToggle={false}>
+  <BudgetLayout
+    {...props}
+    showHeaderLeafLogo={true}
+    showHeaderTextLogo={false}
+    showHeaderSidebarToggle={false}
+  >
     {props.children}
   </BudgetLayout>
 );

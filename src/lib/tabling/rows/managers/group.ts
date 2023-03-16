@@ -10,7 +10,7 @@ type CreateGroupRowConfig = {
 
 class GroupRowManager<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel,
 > extends BodyRowManager<Table.GroupRow<R>, R, M, [Model.Group]> {
   constructor(config: Omit<BodyRowManagerConfig<Table.GroupRow<R>, R, M>, "rowType">) {
     super({ ...config, rowType: "group" });
@@ -18,7 +18,7 @@ class GroupRowManager<
 
   getValueForRow<V extends Table.RawRowValue, C extends Table.ModelColumn<R, M, V>>(
     col: C,
-    group: Model.Group
+    group: Model.Group,
   ): V | undefined {
     // The FakeColumn(s) are not applicable for Groups.
     if (tabling.columns.isDataColumn<R, M>(col) && !isNil(col.groupField)) {
@@ -34,7 +34,7 @@ class GroupRowManager<
     const IDs: number[] = Array.isArray(Ids) ? Ids : [Ids];
     return {
       ...row,
-      children: filter(row.children, (child: number) => !includes(IDs, child))
+      children: filter(row.children, (child: number) => !includes(IDs, child)),
     };
   }
 
@@ -43,15 +43,15 @@ class GroupRowManager<
       ...this.createBasic(
         {
           ...config,
-          id: tabling.rows.groupRowId(config.model.id)
+          id: tabling.rows.groupRowId(config.model.id),
         },
-        config.model
+        config.model,
       ),
       children: config.model.children,
       groupData: {
         name: config.model.name,
-        color: config.model.color
-      }
+        color: config.model.color,
+      },
     };
   }
 }

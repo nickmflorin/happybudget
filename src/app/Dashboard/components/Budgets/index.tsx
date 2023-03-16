@@ -1,14 +1,14 @@
 import React, { useState, useMemo } from "react";
-import { Dispatch } from "redux";
-import { Switch, Route } from "react-router-dom";
+
 import { useDispatch } from "react-redux";
+import { Switch, Route } from "react-router-dom";
+import { Dispatch } from "redux";
 
 import { EditBudgetModal } from "components/modals";
 
 import Active from "./Active";
 import Archive from "./Archive";
 import Collaborating from "./Collaborating";
-
 import { actions } from "../../store";
 
 type BudgetsProps = {
@@ -39,21 +39,25 @@ const Budgets = (props: BudgetsProps): JSX.Element => {
         );
         setEditModal(modal);
       },
-    []
+    [],
   );
 
   return (
     <React.Fragment>
       <Switch>
         <Route
-          path={"/budgets"}
-          render={() => <Active {...props} onEdit={(b: Model.SimpleBudget) => editBudget(b, false)} />}
+          path="/budgets"
+          render={() => (
+            <Active {...props} onEdit={(b: Model.SimpleBudget) => editBudget(b, false)} />
+          )}
         />
         <Route
-          path={"/archive"}
-          render={() => <Archive {...props} onEdit={(b: Model.SimpleBudget) => editBudget(b, true)} />}
+          path="/archive"
+          render={() => (
+            <Archive {...props} onEdit={(b: Model.SimpleBudget) => editBudget(b, true)} />
+          )}
         />
-        <Route path={"/collaborating"} render={() => <Collaborating {...props} />} />
+        <Route path="/collaborating" render={() => <Collaborating {...props} />} />
       </Switch>
       {editModal}
     </React.Fragment>

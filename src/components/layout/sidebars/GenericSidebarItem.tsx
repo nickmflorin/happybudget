@@ -1,7 +1,8 @@
 import React, { ReactNode, useMemo } from "react";
-import { useHistory, useLocation } from "react-router-dom";
-import { isNil } from "lodash";
+
 import classNames from "classnames";
+import { isNil } from "lodash";
+import { useHistory, useLocation } from "react-router-dom";
 
 import { ui } from "lib";
 import { ShowHide, Separator } from "components";
@@ -9,14 +10,17 @@ import { TooltipWrapper } from "components/tooltips";
 
 const GenericSidebarItem = <T extends ISidebarItem>(
   props: Omit<T, "children"> &
-    StandardComponentProps & { readonly children?: ReactNode; readonly closeSidebarOnClick?: () => void }
+    StandardComponentProps & {
+      readonly children?: ReactNode;
+      readonly closeSidebarOnClick?: () => void;
+    },
 ): JSX.Element => {
   const history = useHistory();
   const location = useLocation();
 
   const active = useMemo(
     () => ui.layout.sidebarItemIsActive(props, location),
-    [props.active, location.pathname, props.to, props.activePathRegexes]
+    [props.active, location.pathname, props.to, props.activePathRegexes],
   );
 
   if (props.hidden === true) {
@@ -24,9 +28,12 @@ const GenericSidebarItem = <T extends ISidebarItem>(
   }
   return (
     <TooltipWrapper tooltip={props.tooltip}>
-      <div style={props.style} className={classNames("sidebar-menu-item", { active }, props.className)}>
+      <div
+        style={props.style}
+        className={classNames("sidebar-menu-item", { active }, props.className)}
+      >
         <div
-          className={"sidebar-menu-item-content"}
+          className="sidebar-menu-item-content"
           onClick={() => {
             props.closeSidebarOnClick?.();
             if (!isNil(props.to)) {
@@ -37,17 +44,19 @@ const GenericSidebarItem = <T extends ISidebarItem>(
           }}
         >
           <ShowHide show={!isNil(props.icon)}>
-            <div className={"icon-container"}>{active && !isNil(props.activeIcon) ? props.activeIcon : props.icon}</div>
+            <div className="icon-container">
+              {active && !isNil(props.activeIcon) ? props.activeIcon : props.icon}
+            </div>
           </ShowHide>
           {props.children}
           <ShowHide show={!isNil(props.tagText)}>
-            <div className={"sidebar-menu-item-tag-container"}>
-              <div className={"sidebar-menu-item-tag"}>{props.tagText}</div>
+            <div className="sidebar-menu-item-tag-container">
+              <div className="sidebar-menu-item-tag">{props.tagText}</div>
             </div>
           </ShowHide>
         </div>
         <ShowHide show={props.separatorAfter === true}>
-          <Separator color={"#3f4252"} style={{ width: "80%" }} />
+          <Separator color="#3f4252" style={{ width: "80%" }} />
         </ShowHide>
       </div>
     </TooltipWrapper>

@@ -1,5 +1,5 @@
-import * as core from "../../core";
 import * as types from "./types";
+import * as core from "../../core";
 
 export const isIconPrefix = (i: unknown): i is types.IconPrefix => types.IconPrefixes.contains(i);
 

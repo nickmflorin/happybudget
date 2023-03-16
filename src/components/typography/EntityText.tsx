@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+
 import classNames from "classnames";
 import { isNil } from "lodash";
 
@@ -17,7 +18,11 @@ type EntiyTextPartProps = StandardComponentProps & {
   readonly fillEmpty?: boolean | string;
 };
 
-export const EntityTextPart = ({ children, fillEmpty, ...props }: EntiyTextPartProps): JSX.Element => {
+export const EntityTextPart = ({
+  children,
+  fillEmpty,
+  ...props
+}: EntiyTextPartProps): JSX.Element => {
   const _children = useMemo(() => {
     if (!isNil(children)) {
       return children;
@@ -39,8 +44,18 @@ export const EntityTextIdentifier = (props: EntiyTextPartProps): JSX.Element => 
   <EntityTextPart {...props} className={classNames("entity-text-identifier", props.className)} />
 );
 
-const EntityText: React.FC<EntityTextProps> = ({ children, fillEmpty, description, identifier, model, ...props }) => {
-  const entityModel = useMemo(() => (!isNil(model) ? model : !isNil(children) ? children : null), [model, children]);
+const EntityText: React.FC<EntityTextProps> = ({
+  children,
+  fillEmpty,
+  description,
+  identifier,
+  model,
+  ...props
+}) => {
+  const entityModel = useMemo(
+    () => (!isNil(model) ? model : !isNil(children) ? children : null),
+    [model, children],
+  );
 
   const _identifier = useMemo(() => {
     if (!isNil(identifier)) {
@@ -62,7 +77,7 @@ const EntityText: React.FC<EntityTextProps> = ({ children, fillEmpty, descriptio
         : !isNil(entityModel) && libmodel.isModelWithDescription(entityModel)
         ? entityModel.description
         : undefined,
-    [entityModel, description]
+    [entityModel, description],
   );
 
   return (

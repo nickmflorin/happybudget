@@ -3,6 +3,7 @@ import { Column } from "@ag-grid-community/core";
 
 import { tabling, budgeting, formatters } from "lib";
 import { Icon } from "components";
+
 import { columns } from "../../generic";
 
 type R = Tables.SubAccountRowData;
@@ -14,7 +15,7 @@ const Columns: Table.Column<R, M>[] = [
     markupField: "identifier",
     pdfHeaderName: "Acct #",
     pdfWidth: 0.08,
-    pdfCellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } }
+    pdfCellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } },
   }),
   columns.BodyColumn<R, M, string | null>({
     field: "description",
@@ -41,28 +42,35 @@ const Columns: Table.Column<R, M>[] = [
     cellRendererParams: {
       /* For the MarkupRow, we need to remove the flex styling so we can justify
          the Icon at the right end of the cell. */
-      innerCellStyle: (row: Table.BodyRow<R>) => (tabling.rows.isMarkupRow(row) ? { display: "block" } : {}),
+      innerCellStyle: (row: Table.BodyRow<R>) =>
+        tabling.rows.isMarkupRow(row) ? { display: "block" } : {},
       icon: (row: Table.BodyRow<R>) =>
-        tabling.rows.isMarkupRow(row) ? <Icon icon={"percentage"} weight={"light"} /> : undefined
+        tabling.rows.isMarkupRow(row) ? <Icon icon="percentage" weight="light" /> : undefined,
     },
     colSpan: (params: Table.ColSpanParams<R, M>) => {
       const row: Table.BodyRow<R> = params.data;
-      if ((tabling.rows.isModelRow(row) && row.children.length !== 0) || tabling.rows.isMarkupRow(row)) {
+      if (
+        (tabling.rows.isModelRow(row) && row.children.length !== 0) ||
+        tabling.rows.isMarkupRow(row)
+      ) {
         const agColumns: Column[] | undefined = params.columnApi?.getAllDisplayedColumns();
         if (!isNil(agColumns)) {
           const originalCalculatedColumns = map(
             tabling.columns.filterCalculatedColumns(params.columns),
-            (col: Table.CalculatedColumn<R, M>) => col.field
+            (col: Table.CalculatedColumn<R, M>) => col.field,
           );
-          const indexOfDescriptionColumn = findIndex(agColumns, (col: Column) => col.getColId() === "description");
+          const indexOfDescriptionColumn = findIndex(
+            agColumns,
+            (col: Column) => col.getColId() === "description",
+          );
           const indexOfFirstCalculatedColumn = findIndex(agColumns, (col: Column) =>
-            includes(originalCalculatedColumns, col.getColId())
+            includes(originalCalculatedColumns, col.getColId()),
           );
           return indexOfFirstCalculatedColumn - indexOfDescriptionColumn;
         }
       }
       return 1;
-    }
+    },
   }),
   columns.AttachmentsColumn({
     field: "attachments",
@@ -71,7 +79,7 @@ const Columns: Table.Column<R, M>[] = [
     /* Note: This also gets triggered for the PDF model form, but that is okay
        because the PDF model form has a domain property as well. */
     isApplicableForModel: (m: Model.SubAccount) => m.domain === "budget",
-    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder"], r)
+    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder"], r),
   }),
   columns.SelectColumn({
     field: "contact",
@@ -87,7 +95,7 @@ const Columns: Table.Column<R, M>[] = [
     /* Note: This also gets triggered for the PDF model form, but that is okay
        because the PDF model form has a domain property as well. */
     isApplicableForModel: (m: Model.SubAccount) => m.domain === "budget",
-    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder"], r)
+    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder"], r),
   }),
   columns.BodyColumn<R, M, number | null>({
     field: "quantity",
@@ -113,7 +121,7 @@ const Columns: Table.Column<R, M>[] = [
       } else {
         return [];
       }
-    }
+    },
   }),
   columns.TagSelectColumn({
     field: "unit",
@@ -123,7 +131,7 @@ const Columns: Table.Column<R, M>[] = [
     cellEditor: "SubAccountUnitEditor",
     width: 100,
     pdfWidth: 0.07,
-    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder"], r)
+    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder"], r),
   }),
   columns.BodyColumn<R, M, number | null>({
     field: "multiplier",
@@ -133,7 +141,7 @@ const Columns: Table.Column<R, M>[] = [
     pdfWidth: 0.05,
     valueSetter: tabling.columns.numericValueSetter("multiplier"),
     dataType: "number",
-    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder"], r)
+    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder"], r),
   }),
   columns.BodyColumn<R, M, number | null>({
     field: "rate",
@@ -142,11 +150,11 @@ const Columns: Table.Column<R, M>[] = [
     width: 100,
     pdfWidth: 0.05,
     valueFormatter: formatters.currencyFormatter((v: string | number) =>
-      console.error(`Could not parse currency value ${String(v)} for field 'rate'.`)
+      console.error(`Could not parse currency value ${String(v)} for field 'rate'.`),
     ),
     valueSetter: tabling.columns.numericValueSetter("rate"),
     dataType: "currency",
-    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder"], r)
+    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder"], r),
   }),
   columns.SelectColumn<R, M, number[]>({
     field: "fringes",
@@ -155,7 +163,7 @@ const Columns: Table.Column<R, M>[] = [
     width: 140,
     nullValue: [],
     includeInPdf: false,
-    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder"], r)
+    isApplicableForRowType: (r: Table.RowType) => includes(["model", "placeholder"], r),
   }),
   columns.EstimatedColumn<R, M>({
     field: "estimated",
@@ -164,10 +172,10 @@ const Columns: Table.Column<R, M>[] = [
       isNil(params) || params === ""
         ? "0.00"
         : formatters.currencyFormatter((v: string | number) =>
-            console.error(`Could not parse currency value ${String(v)} for field 'estimated'.`)
+            console.error(`Could not parse currency value ${String(v)} for field 'estimated'.`),
           )(params),
     pdfValueGetter: budgeting.valueGetters.estimatedValueGetter,
-    pdfWidth: 0.12
+    pdfWidth: 0.12,
   }),
   columns.ActualColumn<R, M>({
     field: "actual",
@@ -177,13 +185,13 @@ const Columns: Table.Column<R, M>[] = [
       isNil(params) || params === ""
         ? "0.00"
         : formatters.currencyFormatter((v: string | number) =>
-            console.error(`Could not parse currency value ${String(v)} for field 'actual'.`)
+            console.error(`Could not parse currency value ${String(v)} for field 'actual'.`),
           )(params),
     pdfValueGetter: budgeting.valueGetters.actualValueGetter,
     pdfWidth: 0.12,
     /* Note: This also gets triggered for the PDF model form, but that is okay
        because the PDF model form has a domain property as well. */
-    isApplicableForModel: (m: Model.SubAccount) => m.domain === "budget"
+    isApplicableForModel: (m: Model.SubAccount) => m.domain === "budget",
   }),
   columns.VarianceColumn<R, M>({
     field: "variance",
@@ -192,19 +200,27 @@ const Columns: Table.Column<R, M>[] = [
       isNil(params) || params === ""
         ? "0.00"
         : formatters.currencyFormatter((v: string | number) =>
-            console.error(`Could not parse currency value ${String(v)} for field 'variance'.`)
+            console.error(`Could not parse currency value ${String(v)} for field 'variance'.`),
           )(params),
     pdfValueGetter: budgeting.valueGetters.varianceValueGetter,
     pdfWidth: 0.12,
     /* Note: This also gets triggered for the PDF model form, but that is okay
        because the PDF model form has a domain property as well. */
-    isApplicableForModel: (m: Model.SubAccount) => m.domain === "budget"
+    isApplicableForModel: (m: Model.SubAccount) => m.domain === "budget",
   }),
   columns.FakeColumn({ field: "nominal_value", nullValue: 0.0, defaultValueOnCreate: 0.0 }),
   columns.FakeColumn({ field: "markup_contribution", nullValue: 0.0, defaultValueOnCreate: 0.0 }),
   columns.FakeColumn({ field: "fringe_contribution", nullValue: 0.0, defaultValueOnCreate: 0.0 }),
-  columns.FakeColumn({ field: "accumulated_fringe_contribution", nullValue: 0.0, defaultValueOnCreate: 0.0 }),
-  columns.FakeColumn({ field: "accumulated_markup_contribution", nullValue: 0.0, defaultValueOnCreate: 0.0 })
+  columns.FakeColumn({
+    field: "accumulated_fringe_contribution",
+    nullValue: 0.0,
+    defaultValueOnCreate: 0.0,
+  }),
+  columns.FakeColumn({
+    field: "accumulated_markup_contribution",
+    nullValue: 0.0,
+    defaultValueOnCreate: 0.0,
+  }),
 ];
 
 export default Columns;

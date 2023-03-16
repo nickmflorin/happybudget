@@ -1,11 +1,12 @@
 import { useState, useMemo } from "react";
+
 import { isNil, find, reduce, map } from "lodash";
 import { Form as RootForm } from "antd";
 
 import { util, ui, notifications } from "lib";
 
 export const useForm = <T extends Record<string, unknown>>(
-  form?: Partial<FormInstance<T>> | undefined
+  form?: Partial<FormInstance<T>> | undefined,
 ): FormInstance<T> => {
   const _useAntdForm = RootForm.useForm();
   const antdForm = _useAntdForm[0];
@@ -23,23 +24,23 @@ export const useForm = <T extends Record<string, unknown>>(
             return util.replaceInArray<FieldWithErrors>(
               curr,
               { name: e.field },
-              { ...existing, errors: [...existing.errors, e.message] }
+              { ...existing, errors: [...existing.errors, e.message] },
             );
           } else {
             return [...curr, { name: e.field, errors: [e.message] }];
           }
         },
-        []
+        [],
       );
       antdForm.setFields(fieldsWithErrors);
     },
-    [antdForm.setFields]
+    [antdForm.setFields],
   );
 
   const NotificationsHandler = notifications.ui.useNotificationsManager({
     handleFieldErrors,
     defaultBehavior: "replace",
-    defaultClosable: false
+    defaultClosable: false,
   });
 
   const clearFieldErrors = useMemo(
@@ -50,10 +51,14 @@ export const useForm = <T extends Record<string, unknown>>(
          to go away. */
       const currentFields: T = antdForm.getFieldsValue();
       antdForm.setFields(
-        map(Object.keys(currentFields), (key: string) => ({ name: key, value: currentFields[key], errors: [] }))
+        map(Object.keys(currentFields), (key: string) => ({
+          name: key,
+          value: currentFields[key],
+          errors: [],
+        })),
       );
     },
-    []
+    [],
   );
 
   const clearNotifications = useMemo(
@@ -61,11 +66,11 @@ export const useForm = <T extends Record<string, unknown>>(
       NotificationsHandler.clearNotifications(ids);
       clearFieldErrors();
     },
-    []
+    [],
   );
 
-  const wrapForm = useMemo<FormInstance<T>>(() => {
-    return {
+  const wrapForm = useMemo<FormInstance<T>>(
+    () => ({
       ...antdForm,
       autoFocusField: form?.autoFocusField,
       ...NotificationsHandler,
@@ -89,16 +94,17 @@ export const useForm = <T extends Record<string, unknown>>(
         }
       },
       loading,
-      ...form
-    };
-  }, [form, antdForm, loading, NotificationsHandler]);
+      ...form,
+    }),
+    [form, antdForm, loading, NotificationsHandler],
+  );
 
   return wrapForm;
 };
 
 export const useFormIfNotDefined = <T extends Record<string, unknown>>(
   options?: Partial<FormInstance<T>> | undefined,
-  form?: FormInstance<T>
+  form?: FormInstance<T>,
 ): FormInstance<T> => {
   const newForm = useForm(options);
   return useMemo(() => (!isNil(form) ? form : newForm), [form, newForm]);

@@ -1,14 +1,14 @@
 import React, { forwardRef, ForwardedRef } from "react";
-import classNames from "classnames";
 
-import { ui } from "lib";
+import classNames from "classnames";
 import { isNil } from "lodash";
 
+import { ui } from "lib";
 import { UseSizeConfig } from "lib/ui/hooks";
 
 type WithSizeConfig<
   T extends string = StandardSize,
-  P extends UseSizeProps<T, string> = UseSizeProps<T, "size">
+  P extends UseSizeProps<T, string> = UseSizeProps<T, "size">,
 > = Omit<UseSizeConfig<T, P>, "options"> & {
   readonly classNamePrefix?: string;
   readonly hasRef?: boolean;
@@ -23,12 +23,12 @@ export const withSize =
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     REF = any,
     P extends UseSizeProps<T, string> = UseSizeProps<T, SP>,
-    CT extends PROPS & P = PROPS & P
+    CT extends PROPS & P = PROPS & P,
   >(
-    conf?: WithSizeConfig<T, P>
+    conf?: WithSizeConfig<T, P>,
   ) =>
   (
-    Component: React.FunctionComponent<PROPS>
+    Component: React.FunctionComponent<PROPS>,
   ): typeof conf extends { readonly hasRef: true }
     ? React.ForwardRefRenderFunction<REF, CT & { readonly ref?: ForwardedRef<REF> }>
     : React.FunctionComponent<CT> => {
@@ -37,7 +37,8 @@ export const withSize =
 
       let injectedProps = { ...props };
 
-      const options = conf?.options || (["xsmall", "small", "medium", "standard", "large", "xlarge"] as T[]);
+      const options =
+        conf?.options || (["xsmall", "small", "medium", "standard", "large", "xlarge"] as T[]);
       delete injectedProps[conf?.sizeProp || "size"];
       for (let i = 0; i < options.length; i++) {
         delete injectedProps[options[i]];

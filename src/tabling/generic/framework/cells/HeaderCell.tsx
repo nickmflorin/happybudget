@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
-import { isNil, find } from "lodash";
-import classNames from "classnames";
 
+import classNames from "classnames";
+import { isNil, find } from "lodash";
 import { Column } from "@ag-grid-community/core";
 
 import { tabling, ui } from "lib";
@@ -21,8 +21,10 @@ interface IHeaderCompParams {
   showColumnMenu(menuButton: HTMLElement): void;
 }
 
-export interface HeaderCellProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
-  extends Omit<IHeaderCompParams, "column">,
+export interface HeaderCellProps<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+> extends Omit<IHeaderCompParams, "column">,
     StandardComponentProps {
   onEdit?: (field: string, column: Table.BodyColumn<R, M>) => void;
   column: Table.RealColumn<R, M>;
@@ -33,38 +35,44 @@ const HeaderCell = <R extends Table.RowData, M extends Model.RowHttpModel = Mode
   displayName,
   className,
   style = {},
-  onEdit
+  onEdit,
 }: HeaderCellProps<R, M>): JSX.Element => {
   const dataType: Table.ColumnDataType | null = useMemo(
     () =>
-      tabling.columns.isDataColumn(column) ? find(tabling.columns.ColumnTypes, { id: column.dataType }) || null : null,
-    [column]
+      tabling.columns.isDataColumn(column)
+        ? find(tabling.columns.ColumnTypes, { id: column.dataType }) || null
+        : null,
+    [column],
   );
 
   const columnStyle = useMemo(
-    () => (!isNil(dataType) ? tabling.columns.getColumnTypeCSSStyle(dataType, { header: true }) : {}),
-    [dataType]
+    () =>
+      !isNil(dataType) ? tabling.columns.getColumnTypeCSSStyle(dataType, { header: true }) : {},
+    [dataType],
   );
 
   return (
-    <div className={classNames("inner-cell--header", className)} style={{ ...columnStyle, ...style }}>
+    <div
+      className={classNames("inner-cell--header", className)}
+      style={{ ...columnStyle, ...style }}
+    >
       {!isNil(dataType) && !isNil(dataType.icon) && (
         <VerticalFlexCenter>
           {ui.iconIsJSX(dataType.icon) ? (
             dataType.icon
           ) : (
-            <Icon className={"icon--table-header"} icon={dataType.icon} weight={"solid"} />
+            <Icon className="icon--table-header" icon={dataType.icon} weight="solid" />
           )}
         </VerticalFlexCenter>
       )}
-      <div className={"text"}>{displayName}</div>
+      <div className="text">{displayName}</div>
       {!isNil(onEdit) && tabling.columns.isBodyColumn(column) && (
         <VerticalFlexCenter>
           <IconButton
-            iconSize={"xsmall"}
+            iconSize="xsmall"
             style={{ float: "right", width: 12 }}
-            size={"xsmall"}
-            icon={<Icon icon={"edit"} weight={"solid"} />}
+            size="xsmall"
+            icon={<Icon icon="edit" weight="solid" />}
             onClick={() => !isNil(column.field) && onEdit(column.field, column)}
           />
         </VerticalFlexCenter>

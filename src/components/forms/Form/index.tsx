@@ -1,17 +1,17 @@
 import React, { useEffect, forwardRef, useMemo, ForwardedRef } from "react";
-import { filter, isNil, find, indexOf, map } from "lodash";
-import classNames from "classnames";
 
+import classNames from "classnames";
+import { filter, isNil, find, indexOf, map } from "lodash";
 import { Form as RootForm, InputRef } from "antd";
 
+import { ui } from "lib";
 import { RenderWithSpinner } from "components";
 import { Notifications } from "components/notifications";
-import { ui } from "lib";
 
 import FieldError from "./FieldError";
 import Footer from "./Footer";
-import FormItemSection from "./FormItemSection";
 import FormItemComp from "./FormItem";
+import FormItemSection from "./FormItemSection";
 import FormLabel from "./FormLabel";
 import FormTitle from "./FormTitle";
 
@@ -47,10 +47,10 @@ const withFormItemFirstInputFocused = <
     children: JSX.Element[] | JSX.Element;
     name: string;
     [key: string]: unknown;
-  }
+  },
 >(
   Component: React.ComponentType<P>,
-  formProps: Omit<PrivateFormProps<T>, "loading" | "children">
+  formProps: Omit<PrivateFormProps<T>, "loading" | "children">,
 ) => {
   const FormItem = (props: P): JSX.Element => {
     const newChildren = useMemo<JSX.Element[]>(() => {
@@ -93,7 +93,9 @@ const withFormItemFirstInputFocused = <
 							 apply it since we are messing with the AntD form mechanics
 							 here. */
             defaultValue={
-              !isNil(formProps.initialValues) && !isNil(props.name) ? formProps.initialValues[props.name] : undefined
+              !isNil(formProps.initialValues) && !isNil(props.name)
+                ? formProps.initialValues[props.name]
+                : undefined
             }
             onChange={(e: React.ChangeEvent<HTMLInputElement> | number) => {
               /*
@@ -118,19 +120,22 @@ const withFormItemFirstInputFocused = <
               }
               if (!isNil(inputChildren[0].props.onChange)) {
                 const handler = inputChildren[0].props.onChange as (
-                  e: React.ChangeEvent<HTMLInputElement> | number
+                  e: React.ChangeEvent<HTMLInputElement> | number,
                 ) => void;
                 handler(e);
               }
             }}
           />,
-          ...c.slice(firstInputIndex + 1)
+          ...c.slice(firstInputIndex + 1),
         ];
       }
       return c;
     }, []);
 
-    const newProps = { ...props, children: newChildren.length === 1 ? newChildren[0] : newChildren };
+    const newProps = {
+      ...props,
+      children: newChildren.length === 1 ? newChildren[0] : newChildren,
+    };
     return <Component {...newProps} />;
   };
   return React.memo(FormItem);
@@ -150,7 +155,7 @@ const PrivateForm = <T extends Record<string, unknown> = any>(
     ...props
   }: PrivateFormProps<T>,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  ref: ForwardedRef<any>
+  ref: ForwardedRef<any>,
 ): JSX.Element => {
   const firstRender = ui.useTrackFirstRender();
   const childrenArray = useMemo<JSX.Element[]>(() => {
@@ -175,7 +180,9 @@ const PrivateForm = <T extends Record<string, unknown> = any>(
 			 default.  Otherwise, we do not focus the first field by default. */
     const defaultAutoFocusFirstField = props.form.isInModal === true ? true : false;
     const propAutoFocusField = !isNil(autoFocusField) ? autoFocusField : props.form.autoFocusField;
-    const useAutoFocusField = !isNil(propAutoFocusField) ? propAutoFocusField : defaultAutoFocusFirstField;
+    const useAutoFocusField = !isNil(propAutoFocusField)
+      ? propAutoFocusField
+      : defaultAutoFocusFirstField;
 
     /* We cannot use the HOC components after the first render.  This is because
 			 AntD always rerenders the entire form when a field changes, so whenever
@@ -185,31 +192,54 @@ const PrivateForm = <T extends Record<string, unknown> = any>(
 			 Form.Item(s) would not update appropriately when props change. */
     if (firstRender === true) {
       if (useAutoFocusField === true) {
-        const formItemChildren = filter(c, (ci: JSX.Element) => ci.type === RootForm.Item || ci.type === FormItemComp);
+        const formItemChildren = filter(
+          c,
+          (ci: JSX.Element) => ci.type === RootForm.Item || ci.type === FormItemComp,
+        );
         if (formItemChildren.length !== 0) {
           const firstFormItemIndex = indexOf(c, formItemChildren[0]);
           if (firstFormItemIndex !== -1) {
             const AutFocusFirstInputFormItemComponent = withFormItemFirstInputFocused<T>(
               formItemChildren[0].type,
-              props
+              props,
             );
             const newComponent = (
-              <AutFocusFirstInputFormItemComponent key={firstFormItemIndex} {...formItemChildren[0].props} />
+              <AutFocusFirstInputFormItemComponent
+                key={firstFormItemIndex}
+                {...formItemChildren[0].props}
+              />
             );
-            c = [...c.slice(0, firstFormItemIndex), newComponent, ...c.slice(firstFormItemIndex + 1)];
+            c = [
+              ...c.slice(0, firstFormItemIndex),
+              newComponent,
+              ...c.slice(firstFormItemIndex + 1),
+            ];
           }
         }
       } else if (typeof useAutoFocusField === "number") {
-        const formItemChildren = filter(c, (ci: JSX.Element) => ci.type === RootForm.Item || ci.type === FormItemComp);
+        const formItemChildren = filter(
+          c,
+          (ci: JSX.Element) => ci.type === RootForm.Item || ci.type === FormItemComp,
+        );
         const formItemAtIndex = formItemChildren[useAutoFocusField];
         if (!isNil(formItemAtIndex)) {
           const formItemIndexInOverall = indexOf(c, formItemChildren[useAutoFocusField]);
           if (formItemIndexInOverall !== -1) {
-            const AutFocusFirstInputFormItemComponent = withFormItemFirstInputFocused<T>(formItemAtIndex.type, props);
-            const newComponent = (
-              <AutFocusFirstInputFormItemComponent key={formItemIndexInOverall} {...formItemAtIndex.props} />
+            const AutFocusFirstInputFormItemComponent = withFormItemFirstInputFocused<T>(
+              formItemAtIndex.type,
+              props,
             );
-            c = [...c.slice(0, formItemIndexInOverall), newComponent, ...c.slice(formItemIndexInOverall + 1)];
+            const newComponent = (
+              <AutFocusFirstInputFormItemComponent
+                key={formItemIndexInOverall}
+                {...formItemAtIndex.props}
+              />
+            );
+            c = [
+              ...c.slice(0, formItemIndexInOverall),
+              newComponent,
+              ...c.slice(formItemIndexInOverall + 1),
+            ];
           }
         }
       }
@@ -217,9 +247,10 @@ const PrivateForm = <T extends Record<string, unknown> = any>(
     return c;
   }, [children]);
 
-  const footer = useMemo<JSX.Element | undefined>(() => {
-    return find(childrenArray, (child: JSX.Element) => child.type === Footer);
-  }, [childrenArray]);
+  const footer = useMemo<JSX.Element | undefined>(
+    () => find(childrenArray, (child: JSX.Element) => child.type === Footer),
+    [childrenArray],
+  );
 
   return (
     <RootForm
@@ -232,17 +263,29 @@ const PrivateForm = <T extends Record<string, unknown> = any>(
         }
         props.onValuesChange?.(changedValues, values);
       }}
-      name={!isNil(props.name) ? props.name : props.form.isInModal === true ? "form_in_modal" : undefined}
+      name={
+        !isNil(props.name)
+          ? props.name
+          : props.form.isInModal === true
+          ? "form_in_modal"
+          : undefined
+      }
       ref={ref}
       className={classNames(props.className, "form", { condensed })}
     >
       {!isNil(title) &&
         (typeof title === "string" && !isNil(titleIcon) ? (
-          <div {...formHeaderProps} className={classNames("form-header", formHeaderProps?.className)}>
+          <div
+            {...formHeaderProps}
+            className={classNames("form-header", formHeaderProps?.className)}
+          >
             <FormTitle icon={titleIcon} title={title} />
           </div>
         ) : (
-          <div {...formHeaderProps} className={classNames("form-header", formHeaderProps?.className)}>
+          <div
+            {...formHeaderProps}
+            className={classNames("form-header", formHeaderProps?.className)}
+          >
             {title}
           </div>
         ))}
@@ -251,7 +294,7 @@ const PrivateForm = <T extends Record<string, unknown> = any>(
           filter(childrenArray, (child: JSX.Element) => child.type !== Footer),
           (element: JSX.Element, index: number) => (
             <React.Fragment key={index}>{element}</React.Fragment>
-          )
+          ),
         )}
         <Notifications notifications={props.form.notifications} />
         {!isNil(footer) && footer}
@@ -268,7 +311,7 @@ const exportable = {
   Footer: Footer,
   Item: FormItemComp,
   ItemSection: FormItemSection,
-  Label: FormLabel
+  Label: FormLabel,
 };
 
 export default exportable;

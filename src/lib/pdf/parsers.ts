@@ -2,8 +2,8 @@ import { isNil, includes, reduce, map, uniq, filter } from "lodash";
 
 import * as typeguards from "./typeguards";
 
-export const convertTagsToFontStyles = (tags: Pdf.SupportedFontStyleTag[]): Pdf.FontStyleName[] => {
-  return reduce(
+export const convertTagsToFontStyles = (tags: Pdf.SupportedFontStyleTag[]): Pdf.FontStyleName[] =>
+  reduce(
     typeguards.SupportedPdfFontStyles,
     (names: Pdf.FontStyleName[], style: Pdf.SupportedFontStyle) => {
       if (includes(tags, style.tag)) {
@@ -11,13 +11,10 @@ export const convertTagsToFontStyles = (tags: Pdf.SupportedFontStyleTag[]): Pdf.
       }
       return names;
     },
-    []
+    [],
   );
-};
 
-export const cleanText = (text: string) => {
-  return text.replace("\n", "").trim();
-};
+export const cleanText = (text: string) => text.replace("\n", "").trim();
 
 export const removeWhitespace = (node: Node) => {
   for (let i = node.childNodes.length; i-- > 0; ) {
@@ -52,8 +49,8 @@ export const removeUnsupportedNodes = (element: Node): Node[] => {
                   ...curr,
                   ...filter(
                     child.childNodes,
-                    (n: Node) => n.nodeType !== Node.ELEMENT_NODE || n.childNodes.length !== 0
-                  )
+                    (n: Node) => n.nodeType !== Node.ELEMENT_NODE || n.childNodes.length !== 0,
+                  ),
                 ];
               } else if (child.nodeType === Node.TEXT_NODE) {
                 return [...curr, child];
@@ -66,10 +63,12 @@ export const removeUnsupportedNodes = (element: Node): Node[] => {
           }
           return curr;
         },
-        []
+        [],
       );
       node.childNodes.forEach((child: Node) => node.removeChild(child));
-      map(Array.isArray(newNodes) ? newNodes : [newNodes], (child: Node) => node.appendChild(child));
+      map(Array.isArray(newNodes) ? newNodes : [newNodes], (child: Node) =>
+        node.appendChild(child),
+      );
     }
   };
   _prune(element);
@@ -107,7 +106,7 @@ export const structureNode = (node: Node): Pdf.HTMLNode[] => {
         return {
           data: cleanText(text),
           type: "text",
-          tag: null
+          tag: null,
         };
       }
       return null;
@@ -132,12 +131,12 @@ export const structureNode = (node: Node): Pdf.HTMLNode[] => {
           return {
             tag,
             type: nodeType,
-            data: nodeValue
+            data: nodeValue,
           } as Pdf.HTMLNode;
         }
         const children = filter(
           map(n.childNodes, (ni: Node) => structure(ni)),
-          (ni: Pdf.HTMLNode | null) => !isNil(ni)
+          (ni: Pdf.HTMLNode | null) => !isNil(ni),
         ) as Pdf.HTMLNode[];
 
         // This can often happen if there is no text inside of the node.
@@ -164,7 +163,7 @@ export const structureNode = (node: Node): Pdf.HTMLNode[] => {
       }
       return [...curr];
     },
-    []
+    [],
   );
 };
 
@@ -175,6 +174,5 @@ export const convertHtmlIntoDoc = (html: string): Node => {
   return element;
 };
 
-export const convertHtmlIntoNodes = (html: string): Pdf.HTMLNode[] => {
-  return structureNode(convertHtmlIntoDoc(html));
-};
+export const convertHtmlIntoNodes = (html: string): Pdf.HTMLNode[] =>
+  structureNode(convertHtmlIntoDoc(html));

@@ -1,10 +1,12 @@
 import React, { ReactNode, useMemo } from "react";
+
 import classNames from "classnames";
 import { isNil, find, map, filter } from "lodash";
+
 import { WrapInApplicationSpinner } from "components";
 
-import PageHeader from "./PageHeader";
 import PageFooter from "./PageFooter";
+import PageHeader from "./PageHeader";
 
 type PageProps = StandardComponentProps & {
   /* Required for pages that do not have a full page table in them to get the
@@ -19,19 +21,23 @@ type PageProps = StandardComponentProps & {
 };
 
 const Page = (props: PageProps): JSX.Element => {
-  const footer = useMemo<JSX.Element | undefined>(() => {
-    return find(
-      Array.isArray(props.children) ? props.children : [props.children],
-      (child: JSX.Element) => child.type === PageFooter
-    ) as JSX.Element | undefined;
-  }, [props.children]);
+  const footer = useMemo<JSX.Element | undefined>(
+    () =>
+      find(
+        Array.isArray(props.children) ? props.children : [props.children],
+        (child: JSX.Element) => child.type === PageFooter,
+      ) as JSX.Element | undefined,
+    [props.children],
+  );
 
-  const childrenArray = useMemo<JSX.Element[]>(() => {
-    return filter(
-      Array.isArray(props.children) ? props.children : [props.children],
-      (child: JSX.Element) => child.type !== PageFooter
-    ) as JSX.Element[];
-  }, [props.children]);
+  const childrenArray = useMemo<JSX.Element[]>(
+    () =>
+      filter(
+        Array.isArray(props.children) ? props.children : [props.children],
+        (child: JSX.Element) => child.type !== PageFooter,
+      ) as JSX.Element[],
+    [props.children],
+  );
 
   return (
     <div className={classNames("page", props.pageProps?.className)} style={props.pageProps?.style}>
@@ -39,7 +45,9 @@ const Page = (props: PageProps): JSX.Element => {
       <WrapInApplicationSpinner loading={props.loading}>
         {childrenArray.length !== 0 && (
           <div
-            className={classNames("page-content", props.className, { scrollable: props.contentScrollable })}
+            className={classNames("page-content", props.className, {
+              scrollable: props.contentScrollable,
+            })}
             style={props.style}
           >
             {map(childrenArray, (element: JSX.Element, index: number) => (
@@ -48,12 +56,20 @@ const Page = (props: PageProps): JSX.Element => {
           </div>
         )}
       </WrapInApplicationSpinner>
-      {!isNil(props.footer) ? <PageFooter>{props.footer}</PageFooter> : !isNil(footer) ? footer : <></>}
+      {!isNil(props.footer) ? (
+        <PageFooter>{props.footer}</PageFooter>
+      ) : !isNil(footer) ? (
+        footer
+      ) : (
+        <></>
+      )}
     </div>
   );
 };
 
-const Memoized = React.memo(Page) as React.MemoExoticComponent<(props: PageProps) => JSX.Element> & {
+const Memoized = React.memo(Page) as React.MemoExoticComponent<
+  (props: PageProps) => JSX.Element
+> & {
   Footer: typeof PageFooter;
   Header: typeof PageHeader;
 };

@@ -1,7 +1,9 @@
 import React from "react";
+
 import classNames from "classnames";
 
 import { EntityText } from "components/typography";
+
 import TableModelMenu from "./TableModelMenu";
 
 export type ActualOwnersMenuProps = Omit<
@@ -18,7 +20,9 @@ const ActualOwnersMenu = (props: ActualOwnersMenuProps) => (
     {...props}
     className={classNames("actual-owner-menu", props.className)}
     getModelIdentifier={(m: Model.ActualOwner) => `${m.type}-${m.id}`}
-    onChange={(e: MenuChangeEvent<MenuItemSelectedState, Model.ActualOwner>) => props.onChange(e.model, e.event)}
+    onChange={(e: MenuChangeEvent<MenuItemSelectedState, Model.ActualOwner>) =>
+      props.onChange(e.model, e.event)
+    }
     itemProps={{ className: "actual-owner-menu-item" }}
     searchIndices={["description", "identifier"]}
     clientSearching={false}
@@ -26,10 +30,12 @@ const ActualOwnersMenu = (props: ActualOwnersMenuProps) => (
       {
         id: "no-data",
         label: "No Sub-Accounts, Details or Markups",
-        showOnNoData: true
-      }
+        showOnNoData: true,
+      },
     ]}
-    renderItemContent={(model: Model.ActualOwner) => <EntityText fillEmpty={"---------"}>{model}</EntityText>}
+    renderItemContent={(model: Model.ActualOwner) => (
+      <EntityText fillEmpty="---------">{model}</EntityText>
+    )}
   />
 );
 

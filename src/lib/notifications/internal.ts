@@ -12,15 +12,15 @@ type InternalNotificationOptions = Pick<InternalNotificationObj, "dispatchToSent
 const consoleMethodMap: { [key in AppNotificationConsoleLevel]: "warn" | "error" | "info" } = {
   warning: "warn",
   error: "error",
-  info: "info"
+  info: "info",
 };
 
-const consoleMethod = (level: AppNotificationConsoleLevel): Console["warn" | "error" | "info"] => {
-  return console[consoleMethodMap[level]];
-};
+const consoleMethod = (level: AppNotificationConsoleLevel): Console["warn" | "error" | "info"] =>
+  console[consoleMethodMap[level]];
 
-const isNotificationObj = (n: InternalNotification | Error | string): n is InternalNotificationObj =>
-  typeof n !== "string" && !(n instanceof Error);
+const isNotificationObj = (
+  n: InternalNotification | Error | string,
+): n is InternalNotificationObj => typeof n !== "string" && !(n instanceof Error);
 
 /**
  * For a given InternalNotification and set of notification options, determines
@@ -40,7 +40,10 @@ const isNotificationObj = (n: InternalNotification | Error | string): n is Inter
  * @param {(InternalNotificationOptions)} opts:
  *   The options that affect how the notification is dispatched.
  */
- const shouldDispatchToSentry = (e: InternalNotification, opts?: InternalNotificationOptions): boolean => {
+const shouldDispatchToSentry = (
+  e: InternalNotification,
+  opts?: InternalNotificationOptions,
+): boolean => {
   const optsSentry = opts?.dispatchToSentry !== undefined ? opts?.dispatchToSentry : true;
   if (isNotificationObj(e)) {
     return e.dispatchToSentry !== undefined ? e.dispatchToSentry : optsSentry;
@@ -50,7 +53,7 @@ const isNotificationObj = (n: InternalNotification | Error | string): n is Inter
 
 const notificationLevel = (
   e: InternalNotification | Error | string,
-  opts?: InternalNotificationOptions
+  opts?: InternalNotificationOptions,
 ): "error" | "warning" => {
   if (isNotificationObj(e)) {
     return e.level !== undefined
@@ -91,7 +94,7 @@ const consoleMessage = (e: InternalNotification | Error | string): string | Erro
  * @param {(InternalNotificationOptions)} opts:
  *   The options that affect how the notification is dispatched.
  */
- export const notify = (e: InternalNotification, opts?: InternalNotificationOptions): void => {
+export const notify = (e: InternalNotification, opts?: InternalNotificationOptions): void => {
   const dispatchToSentry = shouldDispatchToSentry(e, opts);
   const level = notificationLevel(e, opts);
 
@@ -153,7 +156,7 @@ type ParamV<P extends Redux.ActionPayload = Redux.ActionPayload> =
 
 export const inconsistentStateError = <P extends Redux.ActionPayload = Redux.ActionPayload>(
   e: InconsistentStateError<P>,
-  opts?: InternalNotificationOptions
+  opts?: InternalNotificationOptions,
 ): void => {
   const { action, payload, ...context } = e;
   const actionString: string | undefined = !isNil(action)
@@ -174,7 +177,11 @@ export const inconsistentStateError = <P extends Redux.ActionPayload = Redux.Act
   const addParam = (message: string, paramName: string, paramValue: ParamV<P>) =>
     paramValue !== undefined ? addParamValue(message, paramName, paramValue) : message;
 
-  let message = addParam(addParam("Inconsistent State!", "action", actionString), "payload", payloadString);
+  let message = addParam(
+    addParam("Inconsistent State!", "action", actionString),
+    "payload",
+    payloadString,
+  );
   Object.keys(context).forEach((key: string) => {
     message = addParam(message, key, context[key]);
   });
@@ -183,7 +190,7 @@ export const inconsistentStateError = <P extends Redux.ActionPayload = Redux.Act
     dispatchToSentry: true,
     level: "warning",
     ...opts,
-    message
+    message,
   });
 };
 
@@ -195,14 +202,14 @@ export const handleRequestError = (e: SingleOrArray<Error>, opts?: InternalNotif
         dispatchToSentry: true,
         level: "error",
         ...opts,
-        error: er
+        error: er,
       });
     } else if (er instanceof api.NetworkError) {
       notify({
         dispatchToSentry: false,
         level: "error",
         ...opts,
-        error: er
+        error: er,
       });
     } else if (!(er instanceof api.ForceLogout)) {
       throw er;

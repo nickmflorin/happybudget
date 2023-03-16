@@ -1,4 +1,5 @@
 import React from "react";
+
 import classNames from "classnames";
 import { isNil } from "lodash";
 
@@ -11,12 +12,12 @@ export type AttachmentTextProps = StandardComponentProps & {
 
 const AttachmentText: React.FC<AttachmentTextProps> = ({ children, additionalCount, ...props }) => (
   <div {...props} className={classNames("attachment-text", props.className)}>
-    <div className={"icon-wrapper"} style={{ marginRight: 4 }}>
-      <FileIcon className={"icon--attachment"} name={children.name} ext={children.extension} />
+    <div className="icon-wrapper" style={{ marginRight: 4 }}>
+      <FileIcon className="icon--attachment" name={children.name} ext={children.extension} />
     </div>
-    <div className={"content-text"}>{children.name}</div>
+    <div className="content-text">{children.name}</div>
     {!isNil(additionalCount) && additionalCount !== 0 && (
-      <div className={"additional-count"}>{`(${additionalCount} more...)`}</div>
+      <div className="additional-count">{`(${additionalCount} more...)`}</div>
     )}
   </div>
 );

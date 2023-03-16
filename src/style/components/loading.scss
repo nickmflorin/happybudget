@@ -2,7 +2,7 @@ $loading-size-standards: (
   "large": 30px,
   "standard": 25px,
   "medium": 20px,
-  "small": 15px
+  "small": 15px,
 );
 
 .ant-spin {
@@ -17,7 +17,7 @@ $loading-size-standards: (
   @include standard_size_variants($loading-size-standards);
 
   .anticon {
-		@include size(100%);
+    @include size(100%);
     color: inherit;
 
     svg {
@@ -29,7 +29,7 @@ $loading-size-standards: (
 }
 
 .spinner-wrapper {
-	@include size(100%);
+  @include size(100%);
   position: absolute;
   top: 0;
   left: 0;
@@ -42,8 +42,8 @@ $loading-size-standards: (
 
 .icon-or-spinner {
   position: relative;
-	@include size(14px);
-	@include vertical-flex-c();
+  @include size(14px);
+  @include vertical-flex-c();
 
   .spinner-wrapper {
     @include size(100% !important);
@@ -53,10 +53,10 @@ $loading-size-standards: (
       position: absolute !important;
       top: 0;
       left: 0;
-			@include size(100% !important);
+      @include size(100% !important);
 
       .anticon-loading {
-				@include size(100% !important);
+        @include size(100% !important);
       }
     }
   }
@@ -71,7 +71,7 @@ $loading-size-standards: (
   height: $large-size;
 
   .spinner-wrapper {
-		@include size(22px);
+    @include size(22px);
     position: relative;
     margin-right: 4px;
 
@@ -96,7 +96,7 @@ $loading-size-standards: (
 
   .text-container {
     font-family: $roboto;
-    font-size: $medium-text-size;;
+    font-size: $medium-text-size;
     font-weight: 500;
     color: $text-tertiary;
     line-height: $large-size;

@@ -10,7 +10,7 @@
     }
 
     .ant-upload-select-picture-card {
-			@include size(100% !important);
+      @include size(100% !important);
       margin: 0 !important;
       position: relative;
       background-color: $white;
@@ -22,7 +22,7 @@
       }
 
       img {
-				@include size(100%);
+        @include size(100%);
         object-fit: cover !important;
       }
     }
@@ -33,7 +33,7 @@
 
     .upload-indicator {
       .icon {
-				@include size(25px);
+        @include size(25px);
       }
     }
   }
@@ -47,9 +47,9 @@
     width: 50%;
     display: flex;
 
-		.ant-upload-select-picture-card {
-			border: none !important;
-		}
+    .ant-upload-select-picture-card {
+      border: none !important;
+    }
 
     .ant-upload {
       justify-content: left !important;
@@ -58,7 +58,7 @@
 
     .upload-text {
       font-family: $roboto;
-      font-size: $medium-text-size;;
+      font-size: $medium-text-size;
       margin-left: 10px;
       flex-grow: 100;
     }
@@ -83,7 +83,7 @@
         .icon {
           color: $text-secondary !important;
           &.fa-camera {
-						@include size(26px);
+            @include size(26px);
           }
           svg {
             color: $text-secondary !important;

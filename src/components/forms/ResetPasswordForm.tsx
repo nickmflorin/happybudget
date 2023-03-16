@@ -1,12 +1,12 @@
 import React from "react";
+
 import classNames from "classnames";
 
+import { util } from "lib";
 import { Form } from "components";
 import { PrimaryButton } from "components/buttons";
 import { PasswordInput } from "components/fields";
 import { RouterLink } from "components/links";
-
-import { util } from "lib";
 
 export type IResetPasswordFormValues = {
   readonly password: string;
@@ -29,7 +29,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
     onFinish={(values: IResetPasswordFormValues) => onSubmit(values)}
   >
     <Form.Item
-      name={"password"}
+      name="password"
       rules={[
         { required: true, message: "Please enter a valid password." },
         () => ({
@@ -38,21 +38,21 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
               return Promise.reject("The password does not meet our requirements.");
             }
             return Promise.resolve();
-          }
-        })
+          },
+        }),
       ]}
     >
-      <PasswordInput size={"large"} hasValidator={true} />
+      <PasswordInput size="large" hasValidator={true} />
     </Form.Item>
     <Form.Item
-      name={"confirm"}
+      name="confirm"
       rules={[
         { required: true, message: "Please confirm your password.", min: 8 },
         ({
-          getFieldValue
+          getFieldValue,
         }: {
           getFieldValue: (
-            field: keyof IResetPasswordFormValues
+            field: keyof IResetPasswordFormValues,
           ) => IResetPasswordFormValues[keyof IResetPasswordFormValues];
         }) => ({
           validator(rule: unknown, value: string) {
@@ -60,19 +60,19 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
               return Promise.reject("The two passwords that you entered do not match!");
             }
             return Promise.resolve();
-          }
-        })
+          },
+        }),
       ]}
     >
-      <PasswordInput size={"large"} placeholder={"Confirm"} hasValidator={true} />
+      <PasswordInput size="large" placeholder="Confirm" hasValidator={true} />
     </Form.Item>
     <Form.Footer>
-      <PrimaryButton xlarge={true} loading={loading} className={"btn--landing"} htmlType={"submit"}>
-        {"Reset"}
+      <PrimaryButton xlarge={true} loading={loading} className="btn--landing" htmlType="submit">
+        Reset
       </PrimaryButton>
-      <div className={"switch-text"}>
-        {"Back to"}
-        <RouterLink to={"/login"}>{"Log In"}</RouterLink>
+      <div className="switch-text">
+        Back to
+        <RouterLink to="/login">Log In</RouterLink>
       </div>
     </Form.Footer>
   </Form.Form>

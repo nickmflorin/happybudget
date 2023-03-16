@@ -9,12 +9,10 @@ const IdentifierCell = <
   B extends Model.Budget | Model.Template = Model.Budget | Model.Template,
   PUBLIC extends boolean = boolean,
   C extends BudgetActionContext<B, PUBLIC> = BudgetActionContext<B, PUBLIC>,
-  S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>
+  S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>,
 >(
-  props: Table.ValueCellProps<R, M, C, S, string | null>
-): JSX.Element => {
-  return <ValueCell<R, M, C, S, string | null> {...props} />;
-};
+  props: Table.ValueCellProps<R, M, C, S, string | null>,
+): JSX.Element => <ValueCell<R, M, C, S, string | null> {...props} />;
 
 export default framework.connectCellToStore<
   Table.ValueCellProps<

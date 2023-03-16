@@ -7,7 +7,10 @@ declare type IconWeight = "light" | "regular" | "solid";
 
 declare type IconOrElement = IconProp | JSX.Element;
 
-declare type IconProps = Omit<import("@fortawesome/react-fontawesome").FontAwesomeIconProps, "icon"> & {
+declare type IconProps = Omit<
+  import("@fortawesome/react-fontawesome").FontAwesomeIconProps,
+  "icon"
+> & {
   readonly icon?: IconProp | undefined | null;
   readonly dimension?: Dimension;
   readonly prefix?: import("@fortawesome/fontawesome-svg-core").IconPrefix;

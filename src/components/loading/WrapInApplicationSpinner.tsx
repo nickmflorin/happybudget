@@ -1,4 +1,5 @@
 import React, { ReactNode, useEffect } from "react";
+
 import { useDispatch } from "react-redux";
 
 import { setApplicationLoadingAction } from "store/actions";
@@ -12,7 +13,7 @@ interface WrapInApplicationSpinnerProps {
 const WrapInApplicationSpinner: React.FC<WrapInApplicationSpinnerProps> = ({
   loading,
   children,
-  hideWhileLoading = false
+  hideWhileLoading = false,
 }) => {
   const dispatch: Redux.Dispatch = useDispatch();
 

@@ -4,7 +4,7 @@ import { isParentSidebarItem } from "./typeguards";
 
 export const sidebarItemIsActive = (
   item: IExpandedSidebarItem | ICollapsedSidebarItem,
-  location: { pathname: string }
+  location: { pathname: string },
 ): boolean => {
   if (isParentSidebarItem(item)) {
     for (let i = 0; i < item.submenu.length; i++) {

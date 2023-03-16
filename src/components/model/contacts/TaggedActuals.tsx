@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
+
 import classNames from "classnames";
 import { map } from "lodash";
 
 import * as api from "api";
 import { http } from "lib";
-
 import { Pagination, RenderOrSpinner, NoData } from "components";
+
 import TaggedActual from "./TaggedActual";
 
 type TaggedActualsProps = StandardComponentProps & {
@@ -14,7 +15,12 @@ type TaggedActualsProps = StandardComponentProps & {
   readonly onError: (e: Error) => void;
 };
 
-const TaggedActuals = ({ contactId, title, onError, ...props }: TaggedActualsProps): JSX.Element => {
+const TaggedActuals = ({
+  contactId,
+  title,
+  onError,
+  ...props
+}: TaggedActualsProps): JSX.Element => {
   const [taggedActuals, setTaggedActuals] = useState<Model.TaggedActual[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -38,8 +44,8 @@ const TaggedActuals = ({ contactId, title, onError, ...props }: TaggedActualsPro
 
   return (
     <div {...props} className={classNames("tagged-actuals", props.className)}>
-      <div className={"tagged-actuals-header"}>
-        <h4 className={"tagged-actuals-title"}>{title}</h4>
+      <div className="tagged-actuals-header">
+        <h4 className="tagged-actuals-title">{title}</h4>
         <Pagination
           hideOnSinglePage={true}
           small={true}
@@ -52,7 +58,7 @@ const TaggedActuals = ({ contactId, title, onError, ...props }: TaggedActualsPro
       </div>
       <RenderOrSpinner loading={loading}>
         {responseWasReceived && taggedActuals.length === 0 ? (
-          <NoData subTitle={"No history"} />
+          <NoData subTitle="No history" />
         ) : (
           <React.Fragment>
             {map(taggedActuals, (a: Model.TaggedActual, i: number) => (

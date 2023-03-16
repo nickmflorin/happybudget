@@ -1,9 +1,9 @@
 import React, { useImperativeHandle } from "react";
-import RCSelect, { Props, GroupBase } from "react-select";
+
 import classNames from "classnames";
+import RCSelect, { Props, GroupBase } from "react-select";
 
 import { notifications } from "lib";
-
 import { ConditionalWrapper } from "components";
 import { InputFieldNotifications } from "components/notifications";
 
@@ -12,7 +12,7 @@ import Option from "./options/Option";
 export type SelectProps<
   O extends SelectOption,
   M extends boolean = false,
-  G extends SelectGroupBase<O> = SelectGroupBase<O>
+  G extends SelectGroupBase<O> = SelectGroupBase<O>,
 > = Props<O, M, G> & {
   readonly borderless?: boolean;
   readonly wrapperStyle?: React.CSSProperties;
@@ -22,7 +22,7 @@ export type SelectProps<
 export const useSelectRef = (select: NonNullRef<SelectInstance> | undefined) => {
   const notificationsManager = notifications.ui.useNotificationsManager({
     defaultBehavior: "replace",
-    defaultClosable: true
+    defaultClosable: true,
   });
 
   useImperativeHandle(select, () => ({ ...notificationsManager }));
@@ -30,7 +30,11 @@ export const useSelectRef = (select: NonNullRef<SelectInstance> | undefined) => 
   return { ...notificationsManager };
 };
 
-const Select = <O extends SelectOption, M extends boolean = false, G extends GroupBase<O> = GroupBase<O>>({
+const Select = <
+  O extends SelectOption,
+  M extends boolean = false,
+  G extends GroupBase<O> = GroupBase<O>,
+>({
   borderless,
   wrapperStyle,
   ...props
@@ -46,10 +50,10 @@ const Select = <O extends SelectOption, M extends boolean = false, G extends Gro
           "react-select-container",
           props.className,
           { disabled: props.isDisabled },
-          { borderless }
+          { borderless },
         )}
-        classNamePrefix={"react-select"}
-        menuPosition={"fixed"}
+        classNamePrefix="react-select"
+        menuPosition="fixed"
       />
       <InputFieldNotifications notifications={notificationsManager.notifications} />
     </ConditionalWrapper>

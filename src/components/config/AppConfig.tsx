@@ -25,7 +25,7 @@ export const AppConfig = (props: { children: JSX.Element }) => {
        The default export from the "config/fontAwesome/configure" file should be the asynchronous
        configuration method.
        */
-    import("config/configuration/fontAwesome/configure").then((module: ConfigureModule) => {
+    import("config/configuration/fontAwesome").then((module: ConfigureModule) => {
       module
         .default()
         .then(() => {

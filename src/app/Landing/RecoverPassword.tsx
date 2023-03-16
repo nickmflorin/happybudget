@@ -2,7 +2,6 @@ import { useState } from "react";
 
 import * as api from "api";
 import { ui } from "lib";
-
 import { LandingFormContainer } from "components/containers";
 import { RecoverPasswordForm } from "components/forms";
 import { IRecoverPasswordFormValues } from "components/forms/RecoverPasswordForm";
@@ -12,7 +11,7 @@ const RecoverPassword = (): JSX.Element => {
   const form = ui.form.useForm<IRecoverPasswordFormValues>();
 
   return (
-    <LandingFormContainer title={"Reset password"}>
+    <LandingFormContainer title="Reset password">
       <RecoverPasswordForm
         style={{ marginTop: 20 }}
         form={form}
@@ -26,7 +25,7 @@ const RecoverPassword = (): JSX.Element => {
                 level: "success",
                 message: "Email successfully sent.",
                 detail: "Please check your inbox.",
-                closable: true
+                closable: true,
               });
             })
             .catch((e: Error) => form.handleRequestError(e))

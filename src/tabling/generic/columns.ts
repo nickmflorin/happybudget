@@ -4,70 +4,70 @@ import { SuppressKeyboardEventParams, CellClassParams } from "@ag-grid-community
 import { util, tabling, budgeting, notifications, formatters } from "lib";
 
 export const ActionColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
-  col: Table.PartialActionColumn<R, M> & { readonly colId: Table.ActionColumnId }
+  col: Table.PartialActionColumn<R, M> & { readonly colId: Table.ActionColumnId },
 ): Table.ActionColumn<R, M> => ({
   ...col,
   cType: "action",
   suppressSizeToFit: true,
   resizable: false,
-  cellClass: tabling.aggrid.mergeClassNamesFn("cell--action", col.cellClass)
+  cellClass: tabling.aggrid.mergeClassNamesFn("cell--action", col.cellClass),
 });
 
 export const FakeColumn = (col: Table.PartialFakeColumn): Table.FakeColumn => ({
   ...col,
-  cType: "fake"
+  cType: "fake",
 });
 
 export const CalculatedColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
   col: Omit<Table.PartialCalculatedColumn<R, M>, "nullValue">,
-  width?: number
-): Table.CalculatedColumn<R, M> => {
-  return {
-    ...col,
-    cellStyle: { textAlign: "right", ...col?.cellStyle },
-    /* We do not want to use the cell renderers for the body cells because it
+  width?: number,
+): Table.CalculatedColumn<R, M> => ({
+  ...col,
+  cellStyle: { textAlign: "right", ...col?.cellStyle },
+  /* We do not want to use the cell renderers for the body cells because it
        slows rendering down dramatically. */
-    cellRenderer: {
-      data: "CalculatedCell",
-      footer: "CalculatedCell",
-      page: "CalculatedCell"
-    },
-    nullValue: 0.0,
-    cType: "calculated",
-    dataType: "sum",
-    suppressSizeToFit: true,
-    width: !isNil(width) ? width : 100,
-    cellClass: (params: CellClassParams) => {
-      if (!isNaN(parseFloat(params.value)) && parseFloat(params.value) < 0.0) {
-        return tabling.aggrid.mergeClassNamesFn("cell--calculated", "negative", col?.cellClass)(params);
-      }
-      return tabling.aggrid.mergeClassNamesFn("cell--calculated", col?.cellClass)(params);
-    },
-    valueFormatter: formatters.currencyFormatter((v: string | number) =>
-      console.error(`Could not parse currency value ${String(v)} for field ${col.field}.`)
-    )
-  };
-};
+  cellRenderer: {
+    data: "CalculatedCell",
+    footer: "CalculatedCell",
+    page: "CalculatedCell",
+  },
+  nullValue: 0.0,
+  cType: "calculated",
+  dataType: "sum",
+  suppressSizeToFit: true,
+  width: !isNil(width) ? width : 100,
+  cellClass: (params: CellClassParams) => {
+    if (!isNaN(parseFloat(params.value)) && parseFloat(params.value) < 0.0) {
+      return tabling.aggrid.mergeClassNamesFn(
+        "cell--calculated",
+        "negative",
+        col?.cellClass,
+      )(params);
+    }
+    return tabling.aggrid.mergeClassNamesFn("cell--calculated", col?.cellClass)(params);
+  },
+  valueFormatter: formatters.currencyFormatter((v: string | number) =>
+    console.error(`Could not parse currency value ${String(v)} for field ${col.field}.`),
+  ),
+});
 
 export const BodyColumn = <
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  V extends Table.RawRowValue = Table.RawRowValue
+  V extends Table.RawRowValue = Table.RawRowValue,
 >(
-  col: Table.PartialBodyColumn<R, M, V>
-): Table.BodyColumn<R, M, V> => {
-  return {
-    ...col,
-    cType: "body"
-  };
-};
+  col: Table.PartialBodyColumn<R, M, V>,
+): Table.BodyColumn<R, M, V> => ({
+  ...col,
+  cType: "body",
+});
 
 export const AttachmentsColumn = <
   R extends Tables.ActualRowData | Tables.SubAccountRowData | Tables.ContactRowData,
-  M extends Model.RowHttpModel
+  M extends Model.RowHttpModel,
 >(
   col: Omit<Table.PartialBodyColumn<R, M, Model.SimpleAttachment[]>, "nullValue">,
-  width?: number
+  width?: number,
 ): Table.BodyColumn<R, M, Model.SimpleAttachment[]> =>
   BodyColumn({
     ...col,
@@ -82,12 +82,13 @@ export const AttachmentsColumn = <
     cellClass: "cell--full-size",
     nullValue: [],
     width: !isNil(width) ? width : 140,
-    getHttpValue: (value: Model.SimpleAttachment[]) => map(value, (m: Model.SimpleAttachment) => m.id)
+    getHttpValue: (value: Model.SimpleAttachment[]) =>
+      map(value, (m: Model.SimpleAttachment) => m.id),
   });
 
 export const DragColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
   col: Table.PartialActionColumn<R, M>,
-  width?: number
+  width?: number,
 ): Table.ActionColumn<R, M> =>
   ActionColumn({
     ...col,
@@ -95,25 +96,25 @@ export const DragColumn = <R extends Table.RowData, M extends Model.RowHttpModel
     cellClass: ["cell--renders-html", "cell--drag"],
     cellRenderer: { data: "DragCell" },
     width: !isNil(width) ? width : 10,
-    maxWidth: !isNil(width) ? width : 10
+    maxWidth: !isNil(width) ? width : 10,
   });
 
 export const EditColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
   col: Table.PartialActionColumn<R, M>,
-  width?: number
+  width?: number,
 ): Table.ActionColumn<R, M> =>
   ActionColumn({
     cellRenderer: { data: "EditCell" },
     ...col,
     width: !isNil(width) ? width : 30,
     maxWidth: !isNil(width) ? width : 30,
-    colId: "edit"
+    colId: "edit",
   });
 
 export const CheckboxColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
   col: Table.PartialActionColumn<R, M>,
   hasEditColumn: boolean,
-  width?: number
+  width?: number,
 ): Table.ActionColumn<R, M> =>
   ActionColumn({
     cellRenderer: "EmptyCell",
@@ -130,9 +131,9 @@ export const CheckboxColumn = <R extends Table.RowData, M extends Model.RowHttpM
         whiteSpace: "unset",
         textAlign: "left",
         paddingLeft: 0,
-        paddingRight: 0
-      }
-    }
+        paddingRight: 0,
+      },
+    },
   });
 
 /* Abstract - not meant to be used by individual columns.  It just enforces that
@@ -140,11 +141,11 @@ export const CheckboxColumn = <R extends Table.RowData, M extends Model.RowHttpM
 export const SelectColumn = <
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  V extends Table.RawRowValue = Table.RawRowValue
+  V extends Table.RawRowValue = Table.RawRowValue,
 >(
-  col: Table.PartialBodyColumn<R, M, V>
-): Table.BodyColumn<R, M, V> => {
-  return BodyColumn<R, M, V>({
+  col: Table.PartialBodyColumn<R, M, V>,
+): Table.BodyColumn<R, M, V> =>
+  BodyColumn<R, M, V>({
     dataType: "singleSelect",
     suppressSizeToFit: true,
     ...col,
@@ -159,61 +160,62 @@ export const SelectColumn = <
             return true;
           }
           return false;
-        }
+        },
   });
-};
 
 export const TagSelectColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
-  col: Table.PartialBodyColumn<R, M, Model.Tag | null>
-): Table.BodyColumn<R, M, Model.Tag | null> => {
-  return SelectColumn({
+  col: Table.PartialBodyColumn<R, M, Model.Tag | null>,
+): Table.BodyColumn<R, M, Model.Tag | null> =>
+  SelectColumn({
     processCellForClipboard: (row: R) => {
-      const m: Model.Tag | undefined = util.getKeyValue<R, keyof R>(col.field)(row) as unknown as Model.Tag | undefined;
+      const m: Model.Tag | undefined = util.getKeyValue<R, keyof R>(col.field)(row) as unknown as
+        | Model.Tag
+        | undefined;
       if (m === undefined) {
         console.error(
           `Could not parse choice select column ${col.field} for clipboard,
-					row = ${notifications.objToJson(row)}.`
+					row = ${notifications.objToJson(row)}.`,
         );
         return "";
       }
       return m?.title || "";
     },
     getHttpValue: (value: Model.Tag | null): ID | null => (!isNil(value) ? value.id : null),
-    ...col
+    ...col,
   });
-};
 export const ChoiceSelectColumn = <
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  V extends Model.Choice<number, string> | null = Model.Choice<number, string> | null
+  V extends Model.Choice<number, string> | null = Model.Choice<number, string> | null,
 >(
-  col: Table.PartialBodyColumn<R, M, V>
-): Table.BodyColumn<R, M, V> => {
-  return SelectColumn<R, M, V>({
+  col: Table.PartialBodyColumn<R, M, V>,
+): Table.BodyColumn<R, M, V> =>
+  SelectColumn<R, M, V>({
     getHttpValue: (value: V | null): number | null => (!isNil(value) ? value.id : null),
     processCellForClipboard: (row: R) => {
-      const m: V | undefined = util.getKeyValue<R, keyof R>(col.field)(row) as unknown as V | undefined;
+      const m: V | undefined = util.getKeyValue<R, keyof R>(col.field)(row) as unknown as
+        | V
+        | undefined;
       if (m === undefined) {
         console.error(
           `Could not parse choice select column ${col.field} for clipboard,
-					row = ${notifications.objToJson(row)}.`
+					row = ${notifications.objToJson(row)}.`,
         );
         return "";
       }
       return m?.name || "";
     },
-    ...col
+    ...col,
   });
-};
 
 export const IdentifierColumn = <
   T extends "account" | "subaccount",
   R extends Tables.BudgetRowData,
-  M extends Model.RowHttpModel<T>
+  M extends Model.RowHttpModel<T>,
 >(
-  col: Omit<Table.PartialBodyColumn<R, M, string | null>, "nullValue">
-): Table.BodyColumn<R, M, string | null> => {
-  return BodyColumn<R, M, string | null>({
+  col: Omit<Table.PartialBodyColumn<R, M, string | null>, "nullValue">,
+): Table.BodyColumn<R, M, string | null> =>
+  BodyColumn<R, M, string | null>({
     nullValue: null,
     dataType: "number",
     smartInference: true,
@@ -223,14 +225,14 @@ export const IdentifierColumn = <
 			   column itself isn't always wide enough.  However, applying a colSpan
 				 conflicts with the colSpan of the main data grid, causing weird
 				 behavior. */
-      cellStyle: { zIndex: 1000, overflow: "visible", whiteSpace: "unset", textAlign: "left" }
+      cellStyle: { zIndex: 1000, overflow: "visible", whiteSpace: "unset", textAlign: "left" },
     },
     page: {
       /* We always want the text in the identifier cell to be present, but the
 			   column itself isn't always wide enough.  However, applying a colSpan
 				 conflicts with the colSpan of the main data grid, causing weird
 				 behavior. */
-      cellStyle: { zIndex: 1000, overflow: "visible", whiteSpace: "unset", textAlign: "left" }
+      cellStyle: { zIndex: 1000, overflow: "visible", whiteSpace: "unset", textAlign: "left" },
     },
     index: 0,
     /* We only want to use IdentifierCell's in the Footer cells because it slows
@@ -257,48 +259,47 @@ export const IdentifierColumn = <
         if (!isNil(agColumns)) {
           const originalCalculatedColumns: string[] = map(
             filter(params.columns, (c: Table.RealColumn<R, M>) =>
-              tabling.columns.isCalculatedColumn(c)
+              tabling.columns.isCalculatedColumn(c),
             ) as Table.CalculatedColumn<R, M>[],
-            (c: Table.CalculatedColumn<R, M>) => tabling.columns.normalizedField<R, M>(c)
+            (c: Table.CalculatedColumn<R, M>) => tabling.columns.normalizedField<R, M>(c),
           );
-          const indexOfIdentifierColumn = findIndex(agColumns, (c: Table.AgColumn) => c.getColId() === col.field);
+          const indexOfIdentifierColumn = findIndex(
+            agColumns,
+            (c: Table.AgColumn) => c.getColId() === col.field,
+          );
           const indexOfFirstCalculatedColumn = findIndex(agColumns, (c: Table.AgColumn) =>
-            includes(originalCalculatedColumns, c.getColId())
+            includes(originalCalculatedColumns, c.getColId()),
           );
           return indexOfFirstCalculatedColumn - indexOfIdentifierColumn;
         }
       }
       return 1;
-    }
+    },
   });
-};
 
 export const EstimatedColumn = <R extends Tables.BudgetRowData, M extends Model.RowHttpModel>(
-  props: Omit<Table.PartialCalculatedColumn<R, M>, "nullValue">
-): Table.CalculatedColumn<R, M> => {
-  return CalculatedColumn<R, M>({
+  props: Omit<Table.PartialCalculatedColumn<R, M>, "nullValue">,
+): Table.CalculatedColumn<R, M> =>
+  CalculatedColumn<R, M>({
     ...props,
     headerName: "Estimated",
-    valueGetter: budgeting.valueGetters.estimatedValueGetter
+    valueGetter: budgeting.valueGetters.estimatedValueGetter,
   });
-};
 
 export const ActualColumn = <R extends Tables.BudgetRowData, M extends Model.RowHttpModel>(
-  props: Omit<Table.PartialCalculatedColumn<R, M>, "nullValue">
-): Table.CalculatedColumn<R, M> => {
-  return CalculatedColumn<R, M>({
+  props: Omit<Table.PartialCalculatedColumn<R, M>, "nullValue">,
+): Table.CalculatedColumn<R, M> =>
+  CalculatedColumn<R, M>({
     ...props,
     headerName: "Actual",
-    valueGetter: budgeting.valueGetters.actualValueGetter
+    valueGetter: budgeting.valueGetters.actualValueGetter,
   });
-};
 
 export const VarianceColumn = <R extends Tables.BudgetRowData, M extends Model.RowHttpModel>(
-  props: Omit<Table.PartialCalculatedColumn<R, M>, "nullValue">
-): Table.CalculatedColumn<R, M> => {
-  return CalculatedColumn<R, M>({
+  props: Omit<Table.PartialCalculatedColumn<R, M>, "nullValue">,
+): Table.CalculatedColumn<R, M> =>
+  CalculatedColumn<R, M>({
     ...props,
     headerName: "Variance",
-    valueGetter: budgeting.valueGetters.varianceValueGetter
+    valueGetter: budgeting.valueGetters.varianceValueGetter,
   });
-};

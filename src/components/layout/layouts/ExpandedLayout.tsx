@@ -1,10 +1,11 @@
 import React from "react";
+
 import classNames from "classnames";
 
 import { ui } from "lib";
 
-import { ExpandedSidebar } from "../sidebars";
 import GenericLayout, { GenericLayoutProps } from "./GenericLayout";
+import { ExpandedSidebar } from "../sidebars";
 
 export interface ExpandedLayoutProps extends Omit<GenericLayoutProps, "sidebar"> {
   readonly sidebar: IExpandedSidebarItem[];
@@ -19,7 +20,9 @@ const ExpandedLayout = (props: ExpandedLayoutProps): JSX.Element => {
       showHeaderSidebarToggle={true}
       className={classNames("layout--expanded", props.className)}
       style={props.style}
-      sidebar={<ExpandedSidebar sidebar={props.sidebar} toggle={() => layout.current.toggleSidebar()} />}
+      sidebar={
+        <ExpandedSidebar sidebar={props.sidebar} toggle={() => layout.current.toggleSidebar()} />
+      }
     >
       {props.children}
     </GenericLayout>

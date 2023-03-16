@@ -1,6 +1,9 @@
 import React from "react";
+
 import { useSelector } from "react-redux";
+
 import { selectApplicationLoading } from "store/selectors";
+
 import ApplicationSpinner from "./ApplicationSpinner";
 
 const ConnectedApplicationSpinner = (): JSX.Element => {

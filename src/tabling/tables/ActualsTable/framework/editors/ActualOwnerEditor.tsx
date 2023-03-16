@@ -1,6 +1,7 @@
 import { forwardRef, ForwardedRef } from "react";
-import { useSelector } from "react-redux";
+
 import { isNil } from "lodash";
+import { useSelector } from "react-redux";
 
 import { ActualOwnersMenu } from "components/menus";
 import { framework } from "tabling/generic";
@@ -18,7 +19,7 @@ interface ActualOwnerEditorProps
 
 const ActualOwnerEditor = (
   { setSearch, ...props }: ActualOwnerEditorProps,
-  ref: ForwardedRef<Table.AgEditorRef<Model.ActualOwner | null>>
+  ref: ForwardedRef<Table.AgEditorRef<Model.ActualOwner | null>>,
 ) => {
   const owners = useSelector((state: Application.Store) => props.selector(state).owners.data);
   const search = useSelector((state: Application.Store) => props.selector(state).owners.search);
@@ -33,7 +34,7 @@ const ActualOwnerEditor = (
     Tables.ActualTableStore
   >({
     ...props,
-    forwardedRef: ref
+    forwardedRef: ref,
   });
 
   return (

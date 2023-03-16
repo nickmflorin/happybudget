@@ -13,12 +13,15 @@ interface BudgetTotalChartFormProps extends FormProps<BudgetTotalChartFormValues
 }
 
 const BudgetTotalChartForm = ({ metrics, ...props }: BudgetTotalChartFormProps) => (
-  <Form.Form {...props} condensed={true} layout={"horizontal"}>
-    <Form.Item name={"grouped"} label={"Grouped"} valuePropName={"checked"}>
+  <Form.Form {...props} condensed={true} layout="horizontal">
+    <Form.Item name="grouped" label="Grouped" valuePropName="checked">
       <Checkbox defaultChecked={props.initialValues?.grouped} />
     </Form.Item>
-    <Form.Item name={"metric"}>
-      <SingleModelSyncSelect options={metrics} getOptionLabel={(m: Charts.BudgetTotal.Metric) => m.label} />
+    <Form.Item name="metric">
+      <SingleModelSyncSelect
+        options={metrics}
+        getOptionLabel={(m: Charts.BudgetTotal.Metric) => m.label}
+      />
     </Form.Item>
   </Form.Form>
 );

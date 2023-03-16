@@ -1,10 +1,10 @@
 import React from "react";
+
 import { useDispatch } from "react-redux";
 
 import * as config from "config";
-import * as store from "store";
 import { model } from "lib";
-
+import * as store from "store";
 import { Icon } from "components";
 import { PrimaryButtonIconToggle } from "components/buttons";
 import { BudgetDropdownMenu } from "components/dropdowns";
@@ -31,10 +31,18 @@ const GenericOwnedBudget = (props: GenericOwnedBudgetProps): JSX.Element => {
       {...props}
       noDataProps={{ ...props.noDataProps, child: <BudgetEmptyIcon /> }}
       onDeleted={(b: Model.SimpleBudget) => {
-        dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_budgets", change: "decrement" }, {}));
+        dispatch(
+          store.actions.updateLoggedInUserMetricsAction(
+            { metric: "num_budgets", change: "decrement" },
+            {},
+          ),
+        );
         props.onDeleted(b);
       }}
-      confirmDeleteProps={{ suppressionKey: "delete-budget-confirmation-suppressed", title: "Delete Budget" }}
+      confirmDeleteProps={{
+        suppressionKey: "delete-budget-confirmation-suppressed",
+        title: "Delete Budget",
+      }}
       createMenuElement={
         <BudgetDropdownMenu
           key={1}
@@ -56,9 +64,9 @@ const GenericOwnedBudget = (props: GenericOwnedBudgetProps): JSX.Element => {
           }}
         >
           <PrimaryButtonIconToggle
-            breakpoint={"medium"}
-            icon={<Icon icon={"plus"} weight={"regular"} />}
-            text={"Create Budget"}
+            breakpoint="medium"
+            icon={<Icon icon="plus" weight="regular" />}
+            text="Create Budget"
           />
         </BudgetDropdownMenu>
       }

@@ -17,27 +17,28 @@ const ActionMap = {
   loading: actions.loadingAction,
   response: actions.responseAction,
   setSearch: actions.setSearchAction,
-  responseFringes: responseFringesAction
+  responseFringes: responseFringesAction,
 };
 
 export const createTableSaga = (table: Table.TableInstance<R, M>) =>
   tabling.sagas.createPublicTableSaga<R, M, Tables.SubAccountTableStore, TC>({
     actions: { ...ActionMap, request: actions.requestAction },
-    selectStore: (state: Application.Store, ctx: TC) => selectors.selectSubAccountsTableStore(state, ctx),
+    selectStore: (state: Application.Store, ctx: TC) =>
+      selectors.selectSubAccountsTableStore(state, ctx),
     tasks: store.tasks.subaccounts.createPublicTableTaskSet<B, Model.Account>({
       table,
       actions: ActionMap,
       selectBudgetStore: (state: Application.Store) =>
         selectors.selectBudgetStore<B, true>(state, {
           domain: "budget",
-          public: true
+          public: true,
         }),
       selectIndexedStore: (state: Application.Store) =>
         selectors.selectBudgetStore<B, true>(state, {
           domain: "budget",
-          public: true
-        }).account
-    })
+          public: true,
+        }).account,
+    }),
   });
 
 function* watchForRequestAction(): SagaIterator {

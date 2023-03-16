@@ -8,7 +8,7 @@ type AccountTableMultiValueProps = multivalue.MultiValueProps<ModelSelectOption<
 
 const AccountTableMultiValue = (props: AccountTableMultiValueProps) =>
   props.data.id === "topsheet" ? (
-    <multivalue.MultiValue {...props}>{"Topsheet"}</multivalue.MultiValue>
+    <multivalue.MultiValue {...props}>Topsheet</multivalue.MultiValue>
   ) : (
     <multivalue.EntityTextMultiValue {...props} />
   );
@@ -17,7 +17,7 @@ type AccountTableOptionProps = options.OptionProps<ModelSelectOption<AccountTabl
 
 const AccountTableOption = (props: AccountTableOptionProps) =>
   props.data.id === "topsheet" ? (
-    <options.Option {...props}>{"Topsheet"}</options.Option>
+    <options.Option {...props}>Topsheet</options.Option>
   ) : (
     <options.EntityTextOption {...props} />
   );
@@ -31,7 +31,7 @@ export type AccountTableProps = Omit<
 
 const AccountTableSelect = (props: AccountTableProps): JSX.Element => (
   <MultiModelSyncSelect<AccountTableModel>
-    placeholder={"Search tables..."}
+    placeholder="Search tables..."
     {...props}
     isSearchable={false}
     options={[{ id: "topsheet" }, ...props.options]}

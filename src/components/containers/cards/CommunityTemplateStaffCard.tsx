@@ -1,15 +1,18 @@
 import React, { useState, useMemo } from "react";
+
 import classNames from "classnames";
 
 import * as api from "api";
-import * as store from "store";
 import { notifications, http } from "lib";
-
+import * as store from "store";
 import { Icon } from "components";
 
 import GenericTemplateCard, { GenericTemplateCardProps } from "./GenericTemplateCard";
 
-type CommunityTemplateStaffCardProps = Omit<GenericTemplateCardProps, "dropdown" | "cornerActions"> & {
+type CommunityTemplateStaffCardProps = Omit<
+  GenericTemplateCardProps,
+  "dropdown" | "cornerActions"
+> & {
   readonly onVisibilityToggled: (b: Model.Template) => void;
 };
 
@@ -29,7 +32,11 @@ const CommunityTemplateStaffCard = ({
       setTogglingVisibility(true);
       if (props.budget.hidden === true) {
         api
-          .updateBudget<Model.Template>(props.budget.id, { hidden: false }, { cancelToken: cancelToken() })
+          .updateBudget<Model.Template>(
+            props.budget.id,
+            { hidden: false },
+            { cancelToken: cancelToken() },
+          )
           .then((response: Model.Template) => {
             setTogglingVisibility(false);
             e.item.closeParentDropdown?.();
@@ -42,7 +49,11 @@ const CommunityTemplateStaffCard = ({
           });
       } else {
         api
-          .updateBudget<Model.Template>(props.budget.id, { hidden: true }, { cancelToken: cancelToken() })
+          .updateBudget<Model.Template>(
+            props.budget.id,
+            { hidden: true },
+            { cancelToken: cancelToken() },
+          )
           .then((response: Model.Template) => {
             setTogglingVisibility(false);
             e.item.closeParentDropdown?.();
@@ -55,35 +66,37 @@ const CommunityTemplateStaffCard = ({
           });
       }
     },
-    [props.budget.id, props.budget.hidden, onVisibilityToggled]
+    [props.budget.id, props.budget.hidden, onVisibilityToggled],
   );
 
   return (
     <GenericTemplateCard
       {...props}
       disabled={props.disabled || togglingVisibility}
-      className={classNames("community-template-admin-card", props.className, { hidden: props.budget.hidden })}
+      className={classNames("community-template-admin-card", props.className, {
+        hidden: props.budget.hidden,
+      })}
       cornerActions={(iconClassName: string) => [
         {
           render: () => (
             <Icon
               className={classNames("icon--card-corner-action", iconClassName)}
-              icon={"eye-slash"}
-              weight={"solid"}
+              icon="eye-slash"
+              weight="solid"
             />
           ),
-          visible: props.budget.hidden === true
-        }
+          visible: props.budget.hidden === true,
+        },
       ]}
       dropdown={[
         {
           id: "hide_show",
           label: props.budget.hidden === true ? "Show" : "Hide",
-          icon: <Icon weight={"light"} icon={props.budget.hidden === true ? "eye" : "eye-slash"} />,
+          icon: <Icon weight="light" icon={props.budget.hidden === true ? "eye" : "eye-slash"} />,
           onClick: (e: MenuItemModelClickEvent) => toggleVisibility(e),
           loading: togglingVisibility,
-          disabled: togglingVisibility
-        }
+          disabled: togglingVisibility,
+        },
       ]}
     />
   );

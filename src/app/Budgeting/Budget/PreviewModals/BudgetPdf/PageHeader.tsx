@@ -1,7 +1,7 @@
-import React from "react";
-import { useMemo } from "react";
-import { isNil } from "lodash";
+import React, { useMemo } from "react";
+
 import { SourceObject } from "@react-pdf/types";
+import { isNil } from "lodash";
 
 import * as config from "config";
 import { View, Text, RichText, Image } from "components/pdf";
@@ -21,13 +21,15 @@ type SubHeaderImageAndInfo = {
 
 type SubHeaderItem = SubHeaderItemImage | SubHeaderItemInfo | SubHeaderImageAndInfo;
 
-const subHeaderItemHasImage = (item: SubHeaderItem): item is SubHeaderImageAndInfo | SubHeaderItemImage => {
-  return (item as SubHeaderImageAndInfo | SubHeaderItemImage).image !== undefined;
-};
+const subHeaderItemHasImage = (
+  item: SubHeaderItem,
+): item is SubHeaderImageAndInfo | SubHeaderItemImage =>
+  (item as SubHeaderImageAndInfo | SubHeaderItemImage).image !== undefined;
 
-const subHeaderItemHasInfo = (item: SubHeaderItem): item is SubHeaderImageAndInfo | SubHeaderItemInfo => {
-  return (item as SubHeaderImageAndInfo | SubHeaderItemInfo).info !== undefined;
-};
+const subHeaderItemHasInfo = (
+  item: SubHeaderItem,
+): item is SubHeaderImageAndInfo | SubHeaderItemInfo =>
+  (item as SubHeaderImageAndInfo | SubHeaderItemInfo).info !== undefined;
 
 interface PageHeaderProps {
   readonly header: PdfBudgetTable.Options["header"];
@@ -46,7 +48,7 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
     if (!isNil(props.header.left_image)) {
       subHeaderLeft = {
         ...subHeaderLeft,
-        image: props.header.left_image.url
+        image: props.header.left_image.url,
       };
     }
   }
@@ -62,7 +64,7 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
     if (!isNil(props.header.right_image)) {
       subHeaderRight = {
         ...subHeaderRight,
-        image: props.header.right_image.url
+        image: props.header.right_image.url,
       };
     }
   }
@@ -81,37 +83,46 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
           uri: image,
           method: "GET",
           body: "",
-          headers
+          headers,
         };
       },
-    []
+    [],
   );
 
   return (
     <React.Fragment>
-      <View className={"budget-page-primary-header"}>
+      <View className="budget-page-primary-header">
         <RichText nodes={props.header.header} />
-        <Text className={"budget-page-date"}>{props.date}</Text>
+        <Text className="budget-page-date">{props.date}</Text>
       </View>
       {(!isNil(subHeaderLeft) || !isNil(subHeaderRight)) && (
-        <View className={"budget-page-sub-header"}>
+        <View className="budget-page-sub-header">
           {!isNil(subHeaderLeft) && (
-            <View className={"budget-page-sub-header-left"}>
+            <View className="budget-page-sub-header-left">
               {subHeaderItemHasImage(subHeaderLeft) && (
-                <Image className={"budget-page-sub-header-image"} src={getImageSrc(subHeaderLeft.image)} />
+                <Image
+                  className="budget-page-sub-header-image"
+                  src={getImageSrc(subHeaderLeft.image)}
+                />
               )}
               {subHeaderItemHasInfo(subHeaderLeft) && (
-                <RichText className={"budget-page-sub-header-rich-text"} nodes={subHeaderLeft.info} />
+                <RichText className="budget-page-sub-header-rich-text" nodes={subHeaderLeft.info} />
               )}
             </View>
           )}
           {!isNil(subHeaderRight) && (
-            <View className={"budget-page-sub-header-right"}>
+            <View className="budget-page-sub-header-right">
               {subHeaderItemHasImage(subHeaderRight) && (
-                <Image className={"budget-page-sub-header-image"} src={getImageSrc(subHeaderRight.image)} />
+                <Image
+                  className="budget-page-sub-header-image"
+                  src={getImageSrc(subHeaderRight.image)}
+                />
               )}
               {subHeaderItemHasInfo(subHeaderRight) && (
-                <RichText className={"budget-page-sub-header-rich-text"} nodes={subHeaderRight.info} />
+                <RichText
+                  className="budget-page-sub-header-rich-text"
+                  nodes={subHeaderRight.info}
+                />
               )}
             </View>
           )}

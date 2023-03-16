@@ -1,6 +1,16 @@
-import { Saga, SagaIterator } from "redux-saga";
-import { spawn, take, call, cancel, actionChannel, delay, flush, fork, select } from "redux-saga/effects";
 import { isNil, isEqual } from "lodash";
+import { Saga, SagaIterator } from "redux-saga";
+import {
+  spawn,
+  take,
+  call,
+  cancel,
+  actionChannel,
+  delay,
+  flush,
+  fork,
+  select,
+} from "redux-saga/effects";
 
 import * as events from "./events";
 
@@ -8,9 +18,9 @@ export const createPublicTableSaga = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C extends Redux.ActionContext = Redux.ActionContext
+  C extends Redux.ActionContext = Redux.ActionContext,
 >(
-  config: Table.PublicSagaConfig<R, M, S, C>
+  config: Table.PublicSagaConfig<R, M, S, C>,
 ): Saga => {
   function* requestSaga(): SagaIterator {
     let lastTasks;
@@ -46,7 +56,7 @@ type EmptyBatch = {
 type PopulatedBatch<
   E extends Table.DataChangeEvent<R> | Table.RowAddEvent<R>,
   R extends Table.RowData,
-  C extends Redux.ActionContext = Redux.ActionContext
+  C extends Redux.ActionContext = Redux.ActionContext,
 > = {
   readonly events: E[];
   readonly context: C;
@@ -55,21 +65,24 @@ type PopulatedBatch<
 type Batch<
   E extends Table.DataChangeEvent<R> | Table.RowAddEvent<R>,
   R extends Table.RowData,
-  C extends Redux.ActionContext = Redux.ActionContext
+  C extends Redux.ActionContext = Redux.ActionContext,
 > = PopulatedBatch<E, R, C> | EmptyBatch;
 
 type BatchEventIds = "dataChange" | "rowAdd";
 
-type RunningBatches<R extends Table.RowData, C extends Redux.ActionContext = Redux.ActionContext> = {
+type RunningBatches<
+  R extends Table.RowData,
+  C extends Redux.ActionContext = Redux.ActionContext,
+> = {
   [Key in BatchEventIds]: Batch<Table.ChangeEventLookup<Key, R>, R, C>;
 };
 
 const batchIsEmpty = <
   E extends Table.DataChangeEvent<R> | Table.RowAddEvent<R>,
   R extends Table.RowData,
-  C extends Redux.ActionContext = Redux.ActionContext
+  C extends Redux.ActionContext = Redux.ActionContext,
 >(
-  batch: Batch<E, R, C>
+  batch: Batch<E, R, C>,
 ): batch is EmptyBatch => (batch as EmptyBatch).events.length === 0;
 
 /**
@@ -85,19 +98,22 @@ const batchIsEmpty = <
 const actionInconsistentWithBatch = <
   E extends Table.DataChangeEvent<R> | Table.RowAddEvent<R>,
   R extends Table.RowData,
-  C extends Redux.ActionContext = Redux.ActionContext
+  C extends Redux.ActionContext = Redux.ActionContext,
 >(
   action: Redux.Action<E, C>,
-  batch: Batch<E, R, C>
+  batch: Batch<E, R, C>,
 ): boolean => !batchIsEmpty(batch) && !isEqual(action.context, batch.context);
 
 interface Flusher<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C extends Redux.ActionContext = Redux.ActionContext
+  C extends Redux.ActionContext = Redux.ActionContext,
 > {
-  (config: Table.AuthenticatedSagaConfig<R, M, S, C>, actions: Redux.Action<Table.ChangeEvent<R>, C>[]): SagaIterator;
+  (
+    config: Table.AuthenticatedSagaConfig<R, M, S, C>,
+    actions: Redux.Action<Table.ChangeEvent<R>, C>[],
+  ): SagaIterator;
 }
 
 /**
@@ -116,16 +132,19 @@ function* flushEvents<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C extends Redux.ActionContext = Redux.ActionContext
->(config: Table.AuthenticatedSagaConfig<R, M, S, C>, actions: Redux.Action<Table.ChangeEvent<R>, C>[]): SagaIterator {
+  C extends Redux.ActionContext = Redux.ActionContext,
+>(
+  config: Table.AuthenticatedSagaConfig<R, M, S, C>,
+  actions: Redux.Action<Table.ChangeEvent<R>, C>[],
+): SagaIterator {
   let running: RunningBatches<R, C> = {
     dataChange: { context: null, events: [] },
-    rowAdd: { context: null, events: [] }
+    rowAdd: { context: null, events: [] },
   };
 
   const addEventToBatch = <E extends Table.DataChangeEvent<R> | Table.RowAddEvent<R>>(
     action: Redux.Action<E, C>,
-    runningBatches: RunningBatches<R, C>
+    runningBatches: RunningBatches<R, C>,
   ): RunningBatches<R, C> => {
     const e: E = action.payload;
     const b: Batch<Table.DataChangeEvent<R> | Table.RowAddEvent<R>, R, C> = runningBatches[e.type];
@@ -134,7 +153,10 @@ function* flushEvents<
     if (actionInconsistentWithBatch(action, b)) {
       throw new Error("Action is inconsistent with batch!");
     } else if (batchIsEmpty(b)) {
-      return { ...runningBatches, [e.type]: { ...b, events: [action.payload], context: action.context } };
+      return {
+        ...runningBatches,
+        [e.type]: { ...b, events: [action.payload], context: action.context },
+      };
     } else {
       /*
 			Because of the first check, it is guaranteed that the batch in question
@@ -146,7 +168,7 @@ function* flushEvents<
 
   const clearBatch = <E extends Table.DataChangeEvent<R> | Table.RowAddEvent<R>>(
     type: E["type"],
-    runningBatches: RunningBatches<R, C>
+    runningBatches: RunningBatches<R, C>,
   ): RunningBatches<R, C> => ({ ...runningBatches, [type]: { context: null, events: [] } });
 
   function* flushDataBatch(runningBatches: RunningBatches<R, C>): SagaIterator {
@@ -164,7 +186,9 @@ function* flushEvents<
   function* flushRowAddBatch(runningBatches: RunningBatches<R, C>): SagaIterator {
     const b: Batch<Table.RowAddEvent<R>, R, C> = runningBatches.rowAdd;
     if (!batchIsEmpty(b)) {
-      const event = events.consolidateRowAddEvents((b as PopulatedBatch<Table.RowAddDataEvent<R>, R, C>).events);
+      const event = events.consolidateRowAddEvents(
+        (b as PopulatedBatch<Table.RowAddDataEvent<R>, R, C>).events,
+      );
       if (!Array.isArray(event.payload) || event.payload.length !== 0) {
         yield fork(config.tasks.handleChangeEvent, event, b.context);
       }
@@ -218,9 +242,9 @@ export const createAuthenticatedTableSaga = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C extends Redux.ActionContext = Redux.ActionContext
+  C extends Redux.ActionContext = Redux.ActionContext,
 >(
-  config: Table.AuthenticatedSagaConfig<R, M, S, C>
+  config: Table.AuthenticatedSagaConfig<R, M, S, C>,
 ): Saga => {
   const flusher: Flusher<R, M, S, C> = flushEvents;
 

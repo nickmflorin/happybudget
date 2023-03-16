@@ -1,4 +1,5 @@
 import React from "react";
+
 import { ui } from "lib";
 
 import { ButtonProps } from "./Button";
@@ -11,7 +12,12 @@ export interface PrimaryButtonIconToggleProps extends Omit<ButtonProps, "icon" |
   readonly text: string;
 }
 
-const PrimaryButtonIconToggle = ({ icon, breakpoint, text, ...props }: PrimaryButtonIconToggleProps): JSX.Element => {
+const PrimaryButtonIconToggle = ({
+  icon,
+  breakpoint,
+  text,
+  ...props
+}: PrimaryButtonIconToggleProps): JSX.Element => {
   const isLessThan = ui.useLessThanBreakpoint(breakpoint);
   if (isLessThan) {
     return <PrimaryIconButton icon={icon} {...props} />;

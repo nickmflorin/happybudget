@@ -1,4 +1,5 @@
 import React from "react";
+
 import { useHistory } from "react-router-dom";
 
 import { Icon } from "components";
@@ -9,7 +10,10 @@ interface BudgetDropdownMenuProps {
   readonly onNewBudget: () => void;
 }
 
-const BudgetDropdownMenu: React.FC<BudgetDropdownMenuProps> = ({ children, onNewBudget }): JSX.Element => {
+const BudgetDropdownMenu: React.FC<BudgetDropdownMenuProps> = ({
+  children,
+  onNewBudget,
+}): JSX.Element => {
   const history = useHistory();
 
   return (
@@ -18,17 +22,17 @@ const BudgetDropdownMenu: React.FC<BudgetDropdownMenuProps> = ({ children, onNew
         {
           id: "new-blank-budget",
           label: "New Blank Budget",
-          icon: <Icon icon={"pencil"} weight={"light"} />,
-          onClick: () => onNewBudget()
+          icon: <Icon icon="pencil" weight="light" />,
+          onClick: () => onNewBudget(),
         },
         {
           id: "start-from-template",
           label: "Start from Template ",
-          icon: <Icon icon={"image"} weight={"light"} />,
-          onClick: () => history.push("/discover")
-        }
+          icon: <Icon icon="image" weight="light" />,
+          onClick: () => history.push("/discover"),
+        },
       ]}
-      placement={"bottomLeft"}
+      placement="bottomLeft"
     >
       {children}
     </DropdownMenu>

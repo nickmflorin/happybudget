@@ -1,11 +1,12 @@
 import { useState, useMemo } from "react";
+
 import { useHistory } from "react-router-dom";
 
 import * as api from "api";
 import { ui, notifications } from "lib";
-
 import { LandingFormContainer } from "components/containers";
 import SignupForm, { ISignupFormValues } from "components/forms/SignupForm";
+
 import { UnverifiedEmailNotification, UserNotOnWaitlistNotification } from "./Notifications";
 
 const Signup = (): JSX.Element => {
@@ -15,17 +16,20 @@ const Signup = (): JSX.Element => {
 
   const handleError = useMemo(
     () => (e: Error) => {
-      if (e instanceof api.AuthenticationError && e.code === api.ErrorCodes.auth.ACCOUNT_NOT_ON_WAITLIST) {
+      if (
+        e instanceof api.AuthenticationError &&
+        e.code === api.ErrorCodes.auth.ACCOUNT_NOT_ON_WAITLIST
+      ) {
         form.notify(UserNotOnWaitlistNotification());
       } else {
         form.handleRequestError(e);
       }
     },
-    []
+    [],
   );
 
   return (
-    <LandingFormContainer title={"Register"} subTitle={"Cloud based budgeting at your fingertips."}>
+    <LandingFormContainer title="Register" subTitle="Cloud based budgeting at your fingertips.">
       <SignupForm
         form={form}
         loading={loading}
@@ -50,14 +54,14 @@ const Signup = (): JSX.Element => {
           notifications.internal.notify({
             level: "error",
             dispatchToSentry: true,
-            message: notifications.objToJson(error)
+            message: notifications.objToJson(error),
           });
         }}
         onGoogleError={(error: Record<string, unknown>) => {
           notifications.internal.notify({
             level: "error",
             dispatchToSentry: true,
-            message: notifications.objToJson(error)
+            message: notifications.objToJson(error),
           });
           form.notify("There was an error authenticating with Google.");
         }}
@@ -77,10 +81,10 @@ const Signup = (): JSX.Element => {
                       level: "success",
                       message: "Confirmation email successfully sent.",
                       detail: "Please check your inbox.",
-                      closable: true
+                      closable: true,
                     }),
-                  onError: (err: Error) => form.handleRequestError(err)
-                })
+                  onError: (err: Error) => form.handleRequestError(err),
+                }),
               );
             })
             .catch((e: Error) => handleError(e))

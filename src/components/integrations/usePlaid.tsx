@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { usePlaidLink, PlaidAccount, PlaidLinkOptions, PlaidLinkOnSuccessMetadata } from "react-plaid-link";
+
 import { isNil, map } from "lodash";
+import {
+  usePlaidLink,
+  PlaidAccount,
+  PlaidLinkOptions,
+  PlaidLinkOnSuccessMetadata,
+} from "react-plaid-link";
 
 export type UsePlaidSuccessParams = {
   readonly publicToken: string;
@@ -25,15 +31,15 @@ const usePlaid = (props: UsePlaidProps): UsePlaidReturnType => {
         setLinkToken(null);
         props.onSuccess?.({
           publicToken,
-          accountIds: map(metadata.accounts, (account: PlaidAccount) => account.id)
+          accountIds: map(metadata.accounts, (account: PlaidAccount) => account.id),
         });
       },
       onExit: () => {
         setLinkToken(null);
       },
-      token: linkToken
+      token: linkToken,
     }),
-    [linkToken, props.onSuccess]
+    [linkToken, props.onSuccess],
   );
 
   const { open, ready, error } = usePlaidLink(config);
@@ -51,7 +57,7 @@ const usePlaid = (props: UsePlaidProps): UsePlaidReturnType => {
     () => (token: string) => {
       setLinkToken(token);
     },
-    []
+    [],
   );
 
   return { open: _open };

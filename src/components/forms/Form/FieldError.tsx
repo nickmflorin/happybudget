@@ -1,4 +1,5 @@
 import React from "react";
+
 import classNames from "classnames";
 import { isNil } from "lodash";
 
@@ -13,7 +14,7 @@ const FieldError: React.FC<FieldErrorProps> = props => {
         className={classNames("ant-form-item-explain ant-form-item-explain-error", props.className)}
         style={props.style}
       >
-        <div role={"alert"}>{props.children}</div>
+        <div role="alert">{props.children}</div>
       </div>
     );
   }

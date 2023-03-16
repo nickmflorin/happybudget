@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { Redirect, useLocation } from "react-router-dom";
+
 import { isNil, includes } from "lodash";
+import { Redirect, useLocation } from "react-router-dom";
 
 import * as api from "api";
 import { http, notifications } from "lib";
@@ -34,17 +35,20 @@ const EmailVerification = (): JSX.Element => {
                 {
                   closable: true,
                   level: "success",
-                  message: "Your email address was successfully verified."
-                }
-              ]
-            }
+                  message: "Your email address was successfully verified.",
+                },
+              ],
+            },
           });
         })
         .catch((e: Error) => {
           if (e instanceof api.RequestError) {
             if (
               e instanceof api.AuthenticationError &&
-              includes([api.ErrorCodes.auth.TOKEN_EXPIRED, api.ErrorCodes.auth.TOKEN_INVALID], e.code)
+              includes(
+                [api.ErrorCodes.auth.TOKEN_EXPIRED, api.ErrorCodes.auth.TOKEN_INVALID],
+                e.code,
+              )
             ) {
               setRedirect({
                 pathname: "/login",
@@ -52,16 +56,16 @@ const EmailVerification = (): JSX.Element => {
                   tokenNotification: {
                     tokenType: "email-confirmation",
                     userId: e.userId,
-                    code: e.code as Http.TokenErrorCode
-                  }
-                }
+                    code: e.code as Http.TokenErrorCode,
+                  },
+                },
               });
             } else {
               setRedirect({
                 pathname: "/login",
                 state: {
-                  notifications: handler.getRequestErrorNotifications(e)
-                }
+                  notifications: handler.getRequestErrorNotifications(e),
+                },
               });
             }
           } else {

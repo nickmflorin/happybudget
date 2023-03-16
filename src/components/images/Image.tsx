@@ -53,31 +53,35 @@ const Image = (props: ImageProps): JSX.Element => {
       className={classNames(
         "img-wrapper",
         { circle: props.circle, "with-icon-fallback": !isNil(props.fallbackIcon) && useFallback },
-        props.wrapperClassName
+        props.wrapperClassName,
       )}
       style={props.wrapperStyle}
       onClick={props.onClick}
     >
       {!isNil(props.overlay) && props.overlay()}
       <ShowHide show={props.tint}>
-        <div className={"image-tint"}></div>
+        <div className="image-tint"></div>
       </ShowHide>
       {!isNil(props.fallbackIcon) && useFallback ? (
-        <div className={"icon-wrapper"}>
+        <div className="icon-wrapper">
           {ui.iconIsJSX(props.fallbackIcon) ? (
             props.fallbackIcon
           ) : (
-            <Icon className={"icon--image-fallback"} icon={props.fallbackIcon} />
+            <Icon className="icon--image-fallback" icon={props.fallbackIcon} />
           )}
         </div>
       ) : (
         <img
           className={classNames("img", props.className)}
-          alt={""}
+          alt=""
           /* Just in case the SRC bypasses TS compilation and is undefined, we
 					 will just show a blank image. Note that if the SRC is indeed null,
 					 undefined or "" - it will not trigger the onError callback. */
-          src={props.src || props.fallbackSrc || "data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA="}
+          src={
+            props.src ||
+            props.fallbackSrc ||
+            "data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA="
+          }
           style={props.style}
           onLoad={() => {
             setError(null);

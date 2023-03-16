@@ -29,14 +29,15 @@ type ExplicitClientErrorResponseInfo = ExplicitErrorResponseInfo & {
 type ClientErrorResponseInfo = AxiosResponse<Http.ErrorResponse> | ExplicitClientErrorResponseInfo;
 
 const isAxiosResponse = <E extends AxiosResponse | AxiosResponse<Http.ErrorResponse>>(
-  e: ErrorResponseInfo | ClientErrorResponseInfo
+  e: ErrorResponseInfo | ClientErrorResponseInfo,
 ): e is E => (e as E).config !== undefined;
 
-const responseUrl = (e: ErrorResponseInfo): string => (isAxiosResponse(e) ? e.config.url || "" : e.url);
+const responseUrl = (e: ErrorResponseInfo): string =>
+  isAxiosResponse(e) ? e.config.url || "" : e.url;
 
 const explicitResponse = (r: ErrorResponseInfo): ExplicitErrorResponseInfo => ({
   url: responseUrl(r),
-  status: r.status
+  status: r.status,
 });
 
 const warnInconsistentResponse = (response: ErrorResponseInfo, detail: string) =>
@@ -46,26 +47,32 @@ const warnInconsistentResponse = (response: ErrorResponseInfo, detail: string) =
     message:
       `The [${response.status}] response body from the backend does not ` +
       "conform to a standard convention for indicating a client error. \n" +
-      `Reason: ${detail}`
+      `Reason: ${detail}`,
   });
 
-type PartialErrorInfo = Omit<Partial<Http.IApiResponseError<Http.ResponseErrorType, Http.ErrorCode>>, "error_type">;
+type PartialErrorInfo = Omit<
+  Partial<Http.IApiResponseError<Http.ResponseErrorType, Http.ErrorCode>>,
+  "error_type"
+>;
 
-type ErrorDefault = (response: ErrorResponseInfo, info?: PartialErrorInfo | undefined) => errors.ClientError;
+type ErrorDefault = (
+  response: ErrorResponseInfo,
+  info?: PartialErrorInfo | undefined,
+) => errors.ClientError;
 
 const errorDefaults: { [key: number]: ErrorDefault } = {
   404: (response: ErrorResponseInfo, info?: PartialErrorInfo | undefined) =>
     new errors.HttpError({
       ...explicitResponse(response),
       message: info?.message || "The requested resource could not be found.",
-      code: (info?.code as Http.HttpErrorCode) || codes.ErrorCodes.http.NOT_FOUND
+      code: (info?.code as Http.HttpErrorCode) || codes.ErrorCodes.http.NOT_FOUND,
     }),
   405: (response: ErrorResponseInfo, info?: PartialErrorInfo | undefined) =>
     new errors.HttpError({
       ...explicitResponse(response),
       message: info?.message || "This method is not allowed.",
-      code: (info?.code as Http.HttpErrorCode) || codes.ErrorCodes.http.METHOD_NOT_ALLOWED
-    })
+      code: (info?.code as Http.HttpErrorCode) || codes.ErrorCodes.http.METHOD_NOT_ALLOWED,
+    }),
 };
 
 /**
@@ -82,21 +89,21 @@ const errorDefaults: { [key: number]: ErrorDefault } = {
 const _inferUnknownError = (
   response: ErrorResponseInfo,
   detail: string,
-  error?: PartialErrorInfo
+  error?: PartialErrorInfo,
 ): errors.ClientError => {
   warnInconsistentResponse(response, detail);
   if (!isNil(error) && isNil(error.message)) {
     warnInconsistentResponse(
       response,
       "Unexpectedly received response error without a message. Original " +
-        `response error was: \n ${notifications.objToJson(error)}.`
+        `response error was: \n ${notifications.objToJson(error)}.`,
     );
   }
   if (!isNil(error) && isNil(error.code)) {
     warnInconsistentResponse(
       response,
       "Unexpectedly received response error without a code. Original " +
-        `response error was: \n ${notifications.objToJson(error)}.`
+        `response error was: \n ${notifications.objToJson(error)}.`,
     );
   }
   const defaultHandler = errorDefaults[response.status];
@@ -129,7 +136,7 @@ const _parseMultipleResponseErrors = (response: ClientErrorResponseInfo) => {
         return curr;
       }
     },
-    []
+    [],
   );
   /* If there are non field errors in the array, it is unexpected.  We must
      determine whether or not we can raise a valid FieldsError from any present
@@ -139,7 +146,7 @@ const _parseMultipleResponseErrors = (response: ClientErrorResponseInfo) => {
     const stringified = nonFieldErrors.join(", ");
     warnInconsistentResponse(
       response,
-      `Multiple errors embedded in response, but noticed invalid error type(s) ${stringified}.`
+      `Multiple errors embedded in response, but noticed invalid error type(s) ${stringified}.`,
     );
     /* Only return an UnknownClientError in the case that a FieldsError cannot
        be constructed from any of the potential `field` type errors in the
@@ -162,45 +169,48 @@ type Mapped = {
 
 type ErrorMap<E extends Http.ResponseError> = {
   readonly typeguard: (e: Http.ResponseError | Http.UnknownResponseError) => e is E;
-  readonly instantiate: (e: E, r: ClientErrorResponseInfo) => Mapped[E["error_type"] & keyof Mapped];
+  readonly instantiate: (
+    e: E,
+    r: ClientErrorResponseInfo,
+  ) => Mapped[E["error_type"] & keyof Mapped];
 };
 
 const Mapping = [
   {
     typeguard: typeguards.isResponseFieldError,
     instantiate: (e: Http.ResponseFieldError, r: ClientErrorResponseInfo) =>
-      new errors.FieldsError({ errors: [e], ...explicitResponse(r) })
+      new errors.FieldsError({ errors: [e], ...explicitResponse(r) }),
   },
   {
     typeguard: typeguards.isResponseAuthError,
     instantiate: (e: Http.ResponseAuthError, r: ClientErrorResponseInfo) =>
-      new errors.AuthenticationError({ ...e, ...explicitResponse(r) })
+      new errors.AuthenticationError({ ...e, ...explicitResponse(r) }),
   },
   {
     typeguard: typeguards.isResponseBillingError,
     instantiate: (e: Http.ResponseBillingError, r: ClientErrorResponseInfo) =>
-      new errors.BillingError({ ...e, ...explicitResponse(r) })
+      new errors.BillingError({ ...e, ...explicitResponse(r) }),
   },
   {
     typeguard: typeguards.isResponseHttpError,
     instantiate: (e: Http.ResponseHttpError, r: ClientErrorResponseInfo) =>
-      new errors.HttpError({ ...e, ...explicitResponse(r) })
+      new errors.HttpError({ ...e, ...explicitResponse(r) }),
   },
   {
     typeguard: typeguards.isResponseBadRequestError,
     instantiate: (e: Http.ResponseBadRequestError, r: ClientErrorResponseInfo) =>
-      new errors.BadRequestError({ ...e, ...explicitResponse(r) })
+      new errors.BadRequestError({ ...e, ...explicitResponse(r) }),
   },
   {
     typeguard: typeguards.isResponseFormError,
     instantiate: (e: Http.ResponseFormError, r: ClientErrorResponseInfo) =>
-      new errors.FormError({ ...e, ...explicitResponse(r) })
+      new errors.FormError({ ...e, ...explicitResponse(r) }),
   },
   {
     typeguard: typeguards.isResponsePermissionError,
     instantiate: (e: Http.ResponsePermissionError, r: ClientErrorResponseInfo) =>
-      new errors.PermissionError({ ...e, ...explicitResponse(r) })
-  }
+      new errors.PermissionError({ ...e, ...explicitResponse(r) }),
+  },
 ];
 
 /**
@@ -220,7 +230,7 @@ const _parseSingleResponseError = (response: ClientErrorResponseInfo) => {
     return _inferUnknownError(
       response,
       `Unexpectedly received response error with an error type ${responseError.error_type} that is unrecognized.`,
-      responseError
+      responseError,
     );
   }
   return _inferUnknownError(
@@ -228,15 +238,21 @@ const _parseSingleResponseError = (response: ClientErrorResponseInfo) => {
     "Unexpectedly received response error without an error type. This most likely means " +
       "the backend exception handling protocols are being bypassed.  Original " +
       `response error was: \n ${notifications.objToJson(responseError)}.`,
-    responseError
+    responseError,
   );
 };
 
-const _parseClientErrorFromResponseBody = (response: ErrorResponseInfo, body?: Http.ErrorResponse) => {
+const _parseClientErrorFromResponseBody = (
+  response: ErrorResponseInfo,
+  body?: Http.ErrorResponse,
+) => {
   if (isNil(body)) {
     return _inferUnknownError(response, "The response body could not be parsed.");
   } else if (isNil(body.errors) || !Array.isArray(body.errors)) {
-    return _inferUnknownError(response, "Unexpectedly received response body without any defined errors.");
+    return _inferUnknownError(
+      response,
+      "Unexpectedly received response body without any defined errors.",
+    );
   } else if (body.errors.length === 0) {
     return _inferUnknownError(response, "There are no errors in the response body.");
   } else if (body.errors.length !== 1) {
@@ -247,7 +263,7 @@ const _parseClientErrorFromResponseBody = (response: ErrorResponseInfo, body?: H
 };
 
 const _parseClientError = (
-  response: AxiosResponse<Http.ErrorResponse> | (ErrorResponseInfo & { readonly data: string })
+  response: AxiosResponse<Http.ErrorResponse> | (ErrorResponseInfo & { readonly data: string }),
 ) => {
   /* If the response is an AxiosResponse, then the information on the response
      body will already be parsed to JSON. */
@@ -282,7 +298,7 @@ const _parseClientError = (
  */
 export const parseErrorFromResponse = (
   response: AxiosResponse | (ErrorResponseInfo & { readonly data: string }),
-  forceLogout = true
+  forceLogout = true,
 ): Http.ApiError | errors.ForceLogout | null => {
   if (forceLogout === true && response.status == 401) {
     window.location.href = "/logout";

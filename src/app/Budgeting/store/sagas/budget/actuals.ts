@@ -18,7 +18,7 @@ const ActionMap = {
   response: actions.responseAction,
   setSearch: actions.setSearchAction,
   responseActualOwners: actions.responseActualOwnersAction,
-  loadingActualOwners: actions.loadingActualOwnersAction
+  loadingActualOwners: actions.loadingActualOwnersAction,
 };
 
 export const createTableSaga = (table: Table.TableInstance<R, M>) => {
@@ -26,13 +26,13 @@ export const createTableSaga = (table: Table.TableInstance<R, M>) => {
     table,
     selectStore: (state: Application.Store) => state.budget.actuals,
     selectOwnersSearch: (state: Application.Store) => state.budget.actuals.owners.search,
-    actions: ActionMap
+    actions: ActionMap,
   });
 
   const tableSaga = tabling.sagas.createAuthenticatedTableSaga<R, M, Tables.ActualTableStore, C>({
     actions: ActionMap,
     tasks: tasks,
-    selectStore: (state: Application.Store) => state.budget.actuals
+    selectStore: (state: Application.Store) => state.budget.actuals,
   });
 
   function* listenForSearchSaga(): SagaIterator {

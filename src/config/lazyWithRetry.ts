@@ -18,7 +18,7 @@ type LazyReturnType = { default: React.ComponentType<Record<string, unknown>> };
 const lazyWithRetry = (lazyComponent: () => Promise<LazyReturnType>) =>
   lazy(async () => {
     const pageHasAlreadyBeenForceRefreshed = JSON.parse(
-      window.localStorage.getItem("page-has-been-force-refreshed") || "false"
+      window.localStorage.getItem("page-has-been-force-refreshed") || "false",
     );
     try {
       const component = await lazyComponent();
@@ -35,7 +35,11 @@ const lazyWithRetry = (lazyComponent: () => Promise<LazyReturnType>) =>
            evaluated as potentially undefined and would not allow us to use them
            in the DOM tree.  It is purely a typing fix, as this line will never
            get reached because of the window.location.reload() */
-        return { default: lazy(() => import("./DefaultComponent")) as React.ComponentType<Record<string, unknown>> };
+        return {
+          default: lazy(() => import("./DefaultComponent")) as React.ComponentType<
+            Record<string, unknown>
+          >,
+        };
       }
       /* The page has already been reloaded.  Assuming that the user is using
          the latest version of the application, let the application crash and

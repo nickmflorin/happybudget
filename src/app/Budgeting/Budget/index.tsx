@@ -1,21 +1,21 @@
 import { useEffect, useState } from "react";
+
+import { isNil } from "lodash";
 import { useSelector, useDispatch } from "react-redux";
 import { Redirect, Switch, useHistory, useLocation, useRouteMatch } from "react-router-dom";
-import { isNil } from "lodash";
 
 import { budgeting } from "lib";
 import { Icon } from "components";
 import { BudgetLayout } from "components/layout";
 import { Route, PathParamsRoute } from "components/routes";
 
-import { actions, selectors } from "../store";
-
 import Account from "./Account";
 import Accounts from "./Accounts";
 import Actuals from "./Actuals";
 import Analysis from "./Analysis";
-import SubAccount from "./SubAccount";
 import { BudgetPreviewModal } from "./PreviewModals";
+import SubAccount from "./SubAccount";
+import { actions, selectors } from "../store";
 
 type BudgetProps = {
   readonly budgetId: number;
@@ -27,16 +27,22 @@ const Budget = (props: BudgetProps): JSX.Element => {
   const dispatch = useDispatch();
   const match = useRouteMatch();
   const budget = useSelector((s: Application.Store) =>
-    selectors.selectBudgetDetail<Model.Budget, false>(s, { domain: "budget", public: false })
+    selectors.selectBudgetDetail<Model.Budget, false>(s, { domain: "budget", public: false }),
   );
   const budgetLoading = useSelector((s: Application.Store) =>
-    selectors.selectBudgetLoading(s, { domain: "budget", public: false })
+    selectors.selectBudgetLoading(s, { domain: "budget", public: false }),
   );
 
   const [previewModalVisible, setPreviewModalVisible] = useState(false);
 
   useEffect(() => {
-    dispatch(actions.budget.requestBudgetAction(null, { budgetId: props.budgetId, domain: "budget", public: false }));
+    dispatch(
+      actions.budget.requestBudgetAction(null, {
+        budgetId: props.budgetId,
+        domain: "budget",
+        public: false,
+      }),
+    );
   }, [props.budgetId]);
 
   return (
@@ -44,46 +50,46 @@ const Budget = (props: BudgetProps): JSX.Element => {
       budgetLoading={budgetLoading}
       sidebar={[
         {
-          icon: <Icon weight={"light"} icon={"file-plus"} />,
-          activeIcon: <Icon weight={"solid"} icon={"file-plus"} />,
+          icon: <Icon weight="light" icon="file-plus" />,
+          activeIcon: <Icon weight="solid" icon="file-plus" />,
           onClick: () => history.push("/discover"),
           tooltip: {
             content: "Templates",
-            placement: "right"
-          }
+            placement: "right",
+          },
         },
         {
-          icon: <Icon weight={"light"} icon={"copy"} />,
-          activeIcon: <Icon weight={"solid"} icon={"copy"} />,
+          icon: <Icon weight="light" icon="copy" />,
+          activeIcon: <Icon weight="solid" icon="copy" />,
           onClick: () => history.push("/budgets"),
           tooltip: {
             content: "My Budgets",
-            placement: "right"
-          }
+            placement: "right",
+          },
         },
         {
-          icon: <Icon weight={"light"} icon={"address-book"} flip={"horizontal"} />,
-          activeIcon: <Icon weight={"solid"} icon={"address-book"} flip={"horizontal"} />,
+          icon: <Icon weight="light" icon="address-book" flip="horizontal" />,
+          activeIcon: <Icon weight="solid" icon="address-book" flip="horizontal" />,
           onClick: () => history.push("/contacts"),
           separatorAfter: true,
           tooltip: {
             content: "Contacts",
-            placement: "right"
-          }
+            placement: "right",
+          },
         },
         {
-          icon: <Icon weight={"light"} icon={"file-chart-line"} />,
-          activeIcon: <Icon weight={"solid"} icon={"file-chart-line"} />,
+          icon: <Icon weight="light" icon="file-chart-line" />,
+          activeIcon: <Icon weight="solid" icon="file-chart-line" />,
           onClick: () => history.push(`/budgets/${props.budgetId}/analysis`),
           active: location.pathname.startsWith(`/budgets/${props.budgetId}/analysis`),
           tooltip: {
             content: "Analysis",
-            placement: "right"
-          }
+            placement: "right",
+          },
         },
         {
-          icon: <Icon weight={"light"} icon={"file-spreadsheet"} />,
-          activeIcon: <Icon weight={"solid"} icon={"file-spreadsheet"} />,
+          icon: <Icon weight="light" icon="file-spreadsheet" />,
+          activeIcon: <Icon weight="solid" icon="file-spreadsheet" />,
           onClick: () => {
             if (!budgeting.urls.isBudgetRelatedUrl(location.pathname, props.budgetId)) {
               const budgetLastVisited = budgeting.urls.getLastVisited("budget", props.budgetId);
@@ -97,25 +103,31 @@ const Budget = (props: BudgetProps): JSX.Element => {
           active: budgeting.urls.isBudgetRelatedUrl(location.pathname, props.budgetId),
           tooltip: {
             content: "Budget",
-            placement: "right"
-          }
+            placement: "right",
+          },
         },
         {
-          icon: <Icon weight={"light"} icon={"file-invoice"} />,
-          activeIcon: <Icon weight={"solid"} icon={"file-invoice"} />,
+          icon: <Icon weight="light" icon="file-invoice" />,
+          activeIcon: <Icon weight="solid" icon="file-invoice" />,
           onClick: () => history.push(`/budgets/${props.budgetId}/actuals`),
           active: location.pathname.startsWith(`/budgets/${props.budgetId}/actuals`),
           tooltip: {
             content: "Actuals",
-            placement: "right"
-          }
-        }
+            placement: "right",
+          },
+        },
       ]}
     >
       <Switch>
         <Redirect exact from={match.url} to={`${match.url}/accounts`} />
-        <Route path={match.url + "/actuals"} render={() => <Actuals budgetId={props.budgetId} budget={budget} />} />
-        <Route path={match.url + "/analysis"} render={() => <Analysis budgetId={props.budgetId} budget={budget} />} />
+        <Route
+          path={match.url + "/actuals"}
+          render={() => <Actuals budgetId={props.budgetId} budget={budget} />}
+        />
+        <Route
+          path={match.url + "/analysis"}
+          render={() => <Analysis budgetId={props.budgetId} budget={budget} />}
+        />
         <PathParamsRoute<{ accountId: number }>
           params={["accountId"]}
           path={match.url + "/accounts/:accountId"}
@@ -131,7 +143,11 @@ const Budget = (props: BudgetProps): JSX.Element => {
         <Route
           path={match.url + "/accounts"}
           render={() => (
-            <Accounts budgetId={props.budgetId} budget={budget} setPreviewModalVisible={setPreviewModalVisible} />
+            <Accounts
+              budgetId={props.budgetId}
+              budget={budget}
+              setPreviewModalVisible={setPreviewModalVisible}
+            />
           )}
         />
         <PathParamsRoute<{ subaccountId: number }>

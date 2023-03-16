@@ -1,4 +1,5 @@
 import React from "react";
+
 import { mergeStylesFromClassName } from "style/pdf";
 
 /**
@@ -14,7 +15,7 @@ import { mergeStylesFromClassName } from "style/pdf";
 export const createPdfComponent =
   <P extends Omit<Pdf.StandardComponentProps | Pdf.StandardTextComponentProps, "className">>(
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    Component: React.FunctionComponent<P> | React.ComponentClass<P, any>
+    Component: React.FunctionComponent<P> | React.ComponentClass<P, any>,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   ): React.FunctionComponent<P & { readonly className?: string }> =>
   ({ className, ...props }: P & { readonly className?: string }): JSX.Element =>

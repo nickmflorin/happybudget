@@ -1,6 +1,6 @@
+import { reduce, filter } from "lodash";
 import { combineReducers, CombinedState } from "redux";
 
-import { reduce, filter } from "lodash";
 import { redux } from "lib";
 
 import * as actions from "./actions";
@@ -9,14 +9,18 @@ type UpdateUserAction = Redux.Action<Model.User>;
 type ClearUserAction = Redux.Action<null>;
 type UserAction = UpdateUserAction | Redux.UserMetricsAction | ClearUserAction;
 
-const isUserMetricsValueAction = (a: Redux.UserMetricsAction): a is Redux.Action<Redux.UserMetricsValuePayload> =>
+const isUserMetricsValueAction = (
+  a: Redux.UserMetricsAction,
+): a is Redux.Action<Redux.UserMetricsValuePayload> =>
   (a as Redux.Action<Redux.UserMetricsValuePayload>).payload.value !== undefined;
 
-const isUserMetricsChangeAction = (a: Redux.UserMetricsAction): a is Redux.Action<Redux.UserMetricsChangePayload> =>
+const isUserMetricsChangeAction = (
+  a: Redux.UserMetricsAction,
+): a is Redux.Action<Redux.UserMetricsChangePayload> =>
   (a as Redux.Action<Redux.UserMetricsChangePayload>).payload.change !== undefined;
 
 const isUserMetricsIncrementByAction = (
-  a: Redux.UserMetricsAction
+  a: Redux.UserMetricsAction,
 ): a is Redux.Action<Redux.UserMetricsIncrementByPayload> =>
   (a as Redux.Action<Redux.UserMetricsIncrementByPayload>).payload.incrementBy !== undefined;
 
@@ -46,13 +50,16 @@ const isUserMetricsAction = (a: UserAction): a is Redux.UserMetricsAction =>
 const isUserClearAction = (a: UserAction): a is Redux.UserMetricsAction =>
   a.type === actions.clearLoggedInUserAction.toString();
 
-const createUserReducer = (user: Model.User | null): Redux.BasicReducer<Model.User | null, UserAction> => {
+const createUserReducer = (
+  user: Model.User | null,
+): Redux.BasicReducer<Model.User | null, UserAction> => {
   /* We only need to be concerned with metrics when the store is configured
 	   with a user, and since the user cannot change from null => Model.User
 		 without reconfiguring the store (see note below) we do not need to worry
 		 about updating the metrics reducer based on the presence of a user after
 		 the store is configured. */
-  let userMetricsReducer: Redux.BasicReducer<Model.UserMetrics, Redux.UserMetricsAction> | null = null;
+  let userMetricsReducer: Redux.BasicReducer<Model.UserMetrics, Redux.UserMetricsAction> | null =
+    null;
   if (user !== null) {
     userMetricsReducer = createUserMetricsReducer(user);
   }
@@ -75,14 +82,18 @@ const createUserReducer = (user: Model.User | null): Redux.BasicReducer<Model.Us
          since a different user should trigger the reconfiguration of the entire
          store. */
       if (state.id !== action.payload.id) {
-        throw new Error("Attempting to update the store with different user than the store was configured for.");
+        throw new Error(
+          "Attempting to update the store with different user than the store was configured for.",
+        );
       }
       return { ...state, ...action.payload };
     } else if (isUserMetricsAction(action)) {
       /* This should not happen, as it would mean that the user changed from
          null to a non-null value without having reconfigured the store. */
       if (userMetricsReducer === null) {
-        throw new Error("Attempting to update user metrics when the store was not configured with a user.");
+        throw new Error(
+          "Attempting to update user metrics when the store was not configured with a user.",
+        );
       }
       return { ...state, metrics: userMetricsReducer(state.metrics, action) };
     } else if (isUserClearAction(action)) {
@@ -93,34 +104,39 @@ const createUserReducer = (user: Model.User | null): Redux.BasicReducer<Model.Us
 };
 
 const createModularApplicationReducer = <
-  S extends Application.AuthenticatedModuleReducers | Application.PublicModuleReducers
+  S extends Application.AuthenticatedModuleReducers | Application.PublicModuleReducers,
 >(
-  config: Application.ModuleConfig[]
+  config: Application.ModuleConfig[],
 ): S =>
   reduce(
     config,
-    (prev: S, moduleConfig: Application.ModuleConfig) => {
-      return { ...prev, [moduleConfig.label]: moduleConfig.rootReducer };
-    },
-    {} as S
+    (prev: S, moduleConfig: Application.ModuleConfig) => ({
+      ...prev,
+      [moduleConfig.label]: moduleConfig.rootReducer,
+    }),
+    {} as S,
   );
 
 const createPublicApplicationReducer = (
-  config: Application.StoreConfig
+  config: Application.StoreConfig,
 ): Redux.Reducer<CombinedState<Application.PublicStore>> =>
   combineReducers({
-    ...createModularApplicationReducer(filter(config.modules, (c: Application.ModuleConfig) => c.isPublic === true)),
+    ...createModularApplicationReducer(
+      filter(config.modules, (c: Application.ModuleConfig) => c.isPublic === true),
+    ),
     /* The store is configured with the tokenId, so the tokenId in the store
        should never and change and should be prevented from changing.  Thus the
        reducer is just the identity. */
-    tokenId: () => config.tokenId
+    tokenId: () => config.tokenId,
   });
 
 const createApplicationReducer = (
-  config: Application.StoreConfig
+  config: Application.StoreConfig,
 ): Redux.Reducer<CombinedState<Application.Store>, Redux.ActionContext> =>
   combineReducers({
-    ...createModularApplicationReducer(filter(config.modules, (c: Application.ModuleConfig) => c.isPublic !== true)),
+    ...createModularApplicationReducer(
+      filter(config.modules, (c: Application.ModuleConfig) => c.isPublic !== true),
+    ),
     public: createPublicApplicationReducer(config),
     contacts: redux.reducers.createAuthenticatedModelListReducer<Model.Contact>({
       initialState: redux.initialAuthenticatedModelListResponseState,
@@ -130,8 +146,8 @@ const createApplicationReducer = (
         loading: actions.loadingContactsAction,
         updateInState: actions.updateContactInStateAction,
         removeFromState: actions.removeContactFromStateAction,
-        addToState: actions.addContactToStateAction
-      }
+        addToState: actions.addContactToStateAction,
+      },
     }),
     filteredContacts: redux.reducers.createAuthenticatedModelListReducer<Model.Contact>({
       initialState: redux.initialAuthenticatedModelListResponseState,
@@ -142,35 +158,39 @@ const createApplicationReducer = (
         updateInState: actions.updateContactInStateAction,
         removeFromState: actions.removeContactFromStateAction,
         addToState: actions.addContactToStateAction,
-        setSearch: actions.setContactsSearchAction
-      }
+        setSearch: actions.setContactsSearchAction,
+      },
     }),
     subaccountUnits: redux.reducers.createModelListReducer({
       actions: { response: actions.responseSubAccountUnitsAction },
-      initialState: redux.initialListResponseState
+      initialState: redux.initialListResponseState,
     }),
     fringeColors: redux.reducers.createListReducer<string>({
       actions: { response: actions.responseFringeColorsAction },
-      initialState: redux.initialListResponseState
+      initialState: redux.initialListResponseState,
     }),
     actualTypes: redux.reducers.createModelListReducer({
       actions: { response: actions.responseActualTypesAction },
-      initialState: redux.initialListResponseState
+      initialState: redux.initialListResponseState,
     }),
     loading: redux.reducers.createSimpleBooleanReducer({
-      actions: { set: actions.setApplicationLoadingAction }
+      actions: { set: actions.setApplicationLoadingAction },
     }),
     user: redux.reducers.withActionsOnly<Model.User | null, Redux.ActionContext, UserAction>(
       createUserReducer(config.user),
       config.user,
-      [actions.updateLoggedInUserAction, actions.updateLoggedInUserMetricsAction, actions.clearLoggedInUserAction]
+      [
+        actions.updateLoggedInUserAction,
+        actions.updateLoggedInUserMetricsAction,
+        actions.clearLoggedInUserAction,
+      ],
     ),
     productPermissionModalOpen: redux.reducers.createSimpleBooleanReducer({
-      actions: { set: actions.setProductPermissionModalOpenAction }
+      actions: { set: actions.setProductPermissionModalOpenAction },
     }),
     drawerOpen: redux.reducers.createSimpleBooleanToggleReducer({
-      actions: { set: actions.setApplicationDrawerAction }
-    })
+      actions: { set: actions.setApplicationDrawerAction },
+    }),
   });
 
 export default createApplicationReducer;

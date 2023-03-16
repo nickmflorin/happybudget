@@ -1,16 +1,17 @@
 import React from "react";
+
 import classNames from "classnames";
 import { includes, isNil } from "lodash";
 
+import Row, { RowProps } from "./Row";
 import { BodyCell } from "../cells";
 import { RowExplicitBodyCellProps } from "../cells/BodyCell";
-import Row, { RowProps } from "./Row";
 
 export interface BodyRowProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   V extends Table.RawRowValue = Table.RawRowValue,
-  RW extends Table.BodyRow<R> = Table.BodyRow<R>
+  RW extends Table.BodyRow<R> = Table.BodyRow<R>,
 > extends RowProps<R, M, V> {
   readonly fillBlank?: (c: Table.DataColumn<R, M, V>) => boolean;
   readonly row?: RW;
@@ -27,7 +28,7 @@ const BodyRow = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   V extends Table.RawRowValue = Table.RawRowValue,
-  RW extends Table.BodyRow<R> = Table.BodyRow<R>
+  RW extends Table.BodyRow<R> = Table.BodyRow<R>,
 >({
   cellProps,
   ...props
@@ -41,17 +42,17 @@ const BodyRow = <
       column: Table.DataColumn<R, M, V>;
       indented: boolean;
       colIndex: number;
-    }) => {
-      return (
-        <BodyCell<R, M, V>
-          {...params}
-          hideContent={!isNil(props.applicableColumns) && !includes(props.applicableColumns, params.column.field)}
-          data={props.data}
-          row={props.row}
-          {...cellProps}
-        />
-      );
-    }}
+    }) => (
+      <BodyCell<R, M, V>
+        {...params}
+        hideContent={
+          !isNil(props.applicableColumns) && !includes(props.applicableColumns, params.column.field)
+        }
+        data={props.data}
+        row={props.row}
+        {...cellProps}
+      />
+    )}
   />
 );
 

@@ -1,9 +1,9 @@
-import InfoTooltip from "./InfoTooltip";
 import ActionTooltip from "./ActionTooltip";
+import InfoTooltip from "./InfoTooltip";
 
 const TooltipComponents: { [key in TooltipType]: React.ComponentType<TooltipProps> } = {
   info: InfoTooltip,
-  action: ActionTooltip
+  action: ActionTooltip,
 };
 
 const Tooltip = ({ type = "action", ...props }: TooltipProps): JSX.Element => {

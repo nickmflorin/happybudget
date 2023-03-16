@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from "react";
+
 import { isNil } from "lodash";
 
 import { tabling } from "lib";
@@ -10,9 +11,9 @@ const DragCell = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Table.Context = Table.Context,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 >(
-  props: Table.CellProps<R, M, C, S, null, Table.ActionColumn<R, M>>
+  props: Table.CellProps<R, M, C, S, null, Table.ActionColumn<R, M>>,
 ): JSX.Element => {
   const row: Table.BodyRow<R> = props.node.data;
   const iconRef = useRef(null);
@@ -26,7 +27,7 @@ const DragCell = <
   if (tabling.rows.isModelRow(row)) {
     return (
       <Cell {...props}>
-        <Icon ref={iconRef} className={"icon--row-drag"} weight={"solid"} icon={"grip-dots-vertical"} />
+        <Icon ref={iconRef} className="icon--row-drag" weight="solid" icon="grip-dots-vertical" />
       </Cell>
     );
   }

@@ -1,17 +1,17 @@
 import React, { useState, useMemo } from "react";
-import { Switch, Route, useHistory } from "react-router-dom";
-import { useDispatch } from "react-redux";
+
 import { isNil } from "lodash";
+import { useDispatch } from "react-redux";
+import { Switch, Route, useHistory } from "react-router-dom";
 
 import * as config from "config";
-import * as store from "store";
 import { model } from "lib";
+import * as store from "store";
 import { CreateBudgetModal } from "components/modals";
-
-import { actions } from "../../store";
 
 import Discover from "./Discover";
 import MyTemplates from "./MyTemplates";
+import { actions } from "../../store";
 
 type TemplatesProps = {
   readonly onCreateBudget: () => void;
@@ -36,25 +36,36 @@ const Templates = (props: TemplatesProps): JSX.Element => {
         _setTemplateToDerive(id);
       }
     },
-    [user]
+    [user],
   );
 
   return (
     <React.Fragment>
       <Switch>
-        <Route path={"/templates"} render={() => <MyTemplates {...props} onDeriveBudget={setTemplateToDerive} />} />
-        <Route path={"/discover"} render={() => <Discover {...props} onDeriveBudget={setTemplateToDerive} />} />
+        <Route
+          path="/templates"
+          render={() => <MyTemplates {...props} onDeriveBudget={setTemplateToDerive} />}
+        />
+        <Route
+          path="/discover"
+          render={() => <Discover {...props} onDeriveBudget={setTemplateToDerive} />}
+        />
       </Switch>
       {!isNil(templateToDerive) && (
         <CreateBudgetModal
           open={true}
           templateId={templateToDerive}
           onCancel={() => setTemplateToDerive(undefined)}
-          title={"Create Budget from Template"}
+          title="Create Budget from Template"
           onSuccess={(budget: Model.UserBudget) => {
             setTemplateToDerive(undefined);
             dispatch(actions.addBudgetToStateAction(budget, {}));
-            dispatch(store.actions.updateLoggedInUserMetricsAction({ metric: "num_budgets", change: "increment" }, {}));
+            dispatch(
+              store.actions.updateLoggedInUserMetricsAction(
+                { metric: "num_budgets", change: "increment" },
+                {},
+              ),
+            );
             history.push(`/budgets/${budget.id}/accounts`);
           }}
         />

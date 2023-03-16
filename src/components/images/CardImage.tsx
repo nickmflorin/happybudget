@@ -1,7 +1,9 @@
 import React from "react";
+
 import classNames from "classnames";
 
 import { Icon } from "components";
+
 import Image, { ImageProps } from "./Image";
 
 type CardImagePlaceholderProps = {
@@ -9,11 +11,16 @@ type CardImagePlaceholderProps = {
   readonly titleOnly?: boolean;
 };
 
-const CardImagePlaceholder: React.FC<CardImagePlaceholderProps> = React.memo(({ titleOnly, onClick }) => (
-  <div className={classNames("card-image-placeholder", { "title-only": titleOnly })} onClick={onClick}>
-    <Icon icon={"image-polaroid"} weight={"light"} />
-  </div>
-));
+const CardImagePlaceholder: React.FC<CardImagePlaceholderProps> = React.memo(
+  ({ titleOnly, onClick }) => (
+    <div
+      className={classNames("card-image-placeholder", { "title-only": titleOnly })}
+      onClick={onClick}
+    >
+      <Icon icon="image-polaroid" weight="light" />
+    </div>
+  ),
+);
 
 type CardImageProps = CardImagePlaceholderProps &
   Omit<ImageProps, "src" | "wrapperClassName" | "tint"> & {

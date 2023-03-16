@@ -1,7 +1,10 @@
 import { useState } from "react";
-import { isNil, map, reduce, filter } from "lodash";
 
-import { ProcessCellForExportParams, ProcessDataFromClipboardParams } from "@ag-grid-community/core";
+import { isNil, map, reduce, filter } from "lodash";
+import {
+  ProcessCellForExportParams,
+  ProcessDataFromClipboardParams,
+} from "@ag-grid-community/core";
 
 import { hooks, tabling } from "lib";
 
@@ -11,7 +14,7 @@ type UseAuthenticatedClipboardReturnType<R extends Table.RowData> = [
   ...UseClipboardReturnType,
   (p: ProcessCellForExportParams) => Table.RawRowValue,
   (p: ProcessDataFromClipboardParams) => string[][],
-  (p: Table.SoloCellChange<R> | null) => void
+  (p: Table.SoloCellChange<R> | null) => void,
 ];
 
 type UseAuthenticatedClipboardParams<R extends Table.RowData, M extends Model.RowHttpModel> = Omit<
@@ -25,7 +28,7 @@ type UseAuthenticatedClipboardParams<R extends Table.RowData, M extends Model.Ro
 const getWritableColumnsAfter = <R extends Table.RowData, M extends Model.RowHttpModel>(
   api: Table.ColumnApi,
   columns: Table.DataColumn<R, M>[],
-  col: Table.AgColumn
+  col: Table.AgColumn,
 ): Table.BodyColumn<R, M>[] => {
   const cols: Table.BodyColumn<R, M>[] = [];
   let current: Table.AgColumn | null = col;
@@ -42,11 +45,11 @@ const getWritableColumnsAfter = <R extends Table.RowData, M extends Model.RowHtt
 const processValueFromClipboard = <
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  V extends Table.RawRowValue = Table.RawRowValue
+  V extends Table.RawRowValue = Table.RawRowValue,
 >(
   value: string,
   c: Table.BodyColumn<R, M, V>,
-  row?: Table.BodyRow<R> // Will not be defined when adding rows.
+  row?: Table.BodyRow<R>, // Will not be defined when adding rows.
 ): V | undefined => {
   /* If the value is undefined, it is something wonky with AG Grid.  We should
 		 return the current value as to not cause data loss. */
@@ -85,20 +88,20 @@ const processValueFromClipboard = <
 const processArrayFromClipboard = <
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  V extends Table.RawRowValue = Table.RawRowValue
+  V extends Table.RawRowValue = Table.RawRowValue,
 >(
   api: Table.ColumnApi,
   cols: Table.DataColumn<R, M, V>[],
   col: Table.AgColumn,
   arr: string[],
-  row?: Table.BodyRow<R> // Will not be defined when adding rows.
+  row?: Table.BodyRow<R>, // Will not be defined when adding rows.
 ): V[] | undefined => {
   const columns = getWritableColumnsAfter<R, M>(api, cols, col);
   if (columns.length < arr.length) {
     console.warn(
       `There are ${cols.length} writable displayed columns, but the data array
       has length ${arr.length} - this most likely means there is an issue with the
-      column configuration.`
+      column configuration.`,
     );
     /* Because, due to an error, we cannot determine what column each element of
        the array is associated with - we cannot process the clipboard values for
@@ -118,18 +121,18 @@ const processArrayFromClipboard = <
       }
       return [...curr, processed];
     },
-    []
+    [],
   );
 };
 
 const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowHttpModel>(
-  params: UseAuthenticatedClipboardParams<R, M>
+  params: UseAuthenticatedClipboardParams<R, M>,
 ): UseAuthenticatedClipboardReturnType<R> => {
   const [cutCellChange, setCellCutChange] = useState<Table.SoloCellChange<R> | null>(null);
   const [processCellForClipboard, getCSVData] = useClipboard({ ...params, setCellCutChange });
 
-  const processCellFromClipboard: (p: ProcessCellForExportParams) => Table.RawRowValue = hooks.useDynamicCallback(
-    (p: ProcessCellForExportParams) => {
+  const processCellFromClipboard: (p: ProcessCellForExportParams) => Table.RawRowValue =
+    hooks.useDynamicCallback((p: ProcessCellForExportParams) => {
       if (!isNil(p.node)) {
         const node: Table.RowNode = p.node;
         const field = p.column.getColId();
@@ -139,29 +142,32 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
             p = { ...p, value: cutCellChange.oldValue };
             params.onEvent({
               type: "dataChange",
-              payload: tabling.events.cellChangeToRowChange(cutCellChange)
+              payload: tabling.events.cellChangeToRowChange(cutCellChange),
             });
             setCellCutChange(null);
           }
           const row: Table.BodyRow<R> = node.data;
-          /* The proccessed clipboard value will be undefined in the case that
-             the column is not applicable for that row. */
-          const processed: Table.InferV<typeof c> | undefined = processValueFromClipboard<R, M>(p.value, c, row);
-          /* eslint-disable-next-line  @typescript-eslint/no-unsafe-return */
+          /* The proccessed clipboard value will be undefined in the case that the column is not
+             applicable for that row. */
+          const processed: Table.InferV<typeof c> | undefined = processValueFromClipboard<R, M>(
+            p.value,
+            c,
+            row,
+          );
           return processed === undefined ? "" : processed;
         }
       }
       return "";
-    }
-  );
+    });
 
-  const processDataFromClipboard: (p: ProcessDataFromClipboardParams) => string[][] = hooks.useDynamicCallback(
-    (p: ProcessDataFromClipboardParams) => {
+  const processDataFromClipboard: (p: ProcessDataFromClipboardParams) => string[][] =
+    hooks.useDynamicCallback((p: ProcessDataFromClipboardParams) => {
       const apis: Table.GridApis | null = params.apis;
       if (!isNil(apis)) {
         const rows = tabling.aggrid.getRows(apis.grid);
         const lastIndex =
-          apis.grid.getDisplayedRowCount() - filter(rows, (r: Table.BodyRow<R>) => tabling.rows.isMarkupRow(r)).length;
+          apis.grid.getDisplayedRowCount() -
+          filter(rows, (r: Table.BodyRow<R>) => tabling.rows.isMarkupRow(r)).length;
         const focusedCell = apis.grid.getFocusedCell();
 
         /* We enforce that bulk paste operations cannot happen inside of the
@@ -216,7 +222,7 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
                 }
               }
             },
-            []
+            [],
           );
           /* Since we return the data to update existing rows at the end of this
 						 function, not the data to create new rows, the values to update the
@@ -231,14 +237,14 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
                 apis.column,
                 tabling.columns.filterDataColumns(params.columns),
                 focusedCell.column,
-                rowData
+                rowData,
               );
               if (isNil(processed)) {
                 return curr;
               }
               return [...curr, processed];
             },
-            []
+            [],
           );
 
           /* Next, we need to determine what the row data should be for the
@@ -248,15 +254,15 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
           const cols = getWritableColumnsAfter<R, M>(
             apis.column,
             tabling.columns.filterDataColumns(params.columns),
-            focusedCell.column
+            focusedCell.column,
           );
           const payload = reduce(
             processedNewRowData,
-            (curr: Partial<R>[], rowData: Table.RawRowValue[]) => {
+            (curr: Partial<R>[], rowData: Table.RawRowValue[]) =>
               /* TODO: Allow the default new row data to be defined and included
 								 in the new row data here - similiarly to how it is defined for
 								 the reducers. */
-              return [
+              [
                 ...curr,
                 reduce(
                   cols,
@@ -275,13 +281,13 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
                             if (parsedField.value === "") {
                               return {
                                 ...v,
-                                [parsedField.field]: ci.nullValue
+                                [parsedField.field]: ci.nullValue,
                               };
                             }
                             return { ...v, [parsedField.field]: parsedField.value };
                           },
-                          {} as Partial<R>
-                        )
+                          {} as Partial<R>,
+                        ),
                       };
                     } else if (rowData[index] === "") {
                       return {
@@ -289,22 +295,21 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
                         /* Note: We do not use the colId for BodyColumns(s), only
 												 the `field`, since the `field` is used to populate the
 												 rows from the models. */
-                        [ci.field]: ci.nullValue
+                        [ci.field]: ci.nullValue,
                       };
                     }
                     return { ...currD, [ci.field]: rowData[index] };
                   },
-                  {} as Partial<R>
-                )
-              ];
-            },
-            []
+                  {} as Partial<R>,
+                ),
+              ],
+            [],
           );
           if (payload.length !== 0) {
             params.onEvent({
               type: "rowAdd",
               payload,
-              placeholderIds: map(payload, () => tabling.rows.placeholderRowId())
+              placeholderIds: map(payload, () => tabling.rows.placeholderRowId()),
             });
           }
           /* All we need to do is return the data corresponding to updates to
@@ -314,10 +319,15 @@ const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowH
         }
       }
       return [];
-    }
-  );
+    });
 
-  return [processCellForClipboard, getCSVData, processCellFromClipboard, processDataFromClipboard, setCellCutChange];
+  return [
+    processCellForClipboard,
+    getCSVData,
+    processCellFromClipboard,
+    processDataFromClipboard,
+    setCellCutChange,
+  ];
 };
 
 export default useAuthenticatedClipboard;

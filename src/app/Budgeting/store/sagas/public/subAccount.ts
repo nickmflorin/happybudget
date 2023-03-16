@@ -17,7 +17,7 @@ const ActionMap = {
   loading: actions.loadingAction,
   response: actions.responseAction,
   setSearch: actions.setSearchAction,
-  responseFringes: responseFringesAction
+  responseFringes: responseFringesAction,
 };
 
 export const createTableSaga = (table: Table.TableInstance<R, M>) =>
@@ -30,14 +30,14 @@ export const createTableSaga = (table: Table.TableInstance<R, M>) =>
       selectBudgetStore: (state: Application.Store) =>
         selectors.selectBudgetStore<B, true>(state, {
           domain: "budget",
-          public: true
+          public: true,
         }),
       selectIndexedStore: (state: Application.Store) =>
         selectors.selectBudgetStore<B, true>(state, {
           domain: "budget",
-          public: true
-        }).subaccount
-    })
+          public: true,
+        }).subaccount,
+    }),
   });
 
 function* watchForRequestAction(): SagaIterator {

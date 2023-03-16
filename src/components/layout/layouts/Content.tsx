@@ -1,9 +1,11 @@
 import React from "react";
+
+import classNames from "classnames";
 import { useSelector } from "react-redux";
 import { CSSTransition, TransitionStatus } from "react-transition-group";
-import classNames from "classnames";
 
 import * as store from "store";
+
 import DrawerTarget from "./DrawerTarget";
 
 const Transitions: { [key in TransitionStatus]: React.CSSProperties } = {
@@ -11,7 +13,7 @@ const Transitions: { [key in TransitionStatus]: React.CSSProperties } = {
   entered: { display: "flex" },
   exiting: { display: "none" },
   exited: { display: "none" },
-  unmounted: { display: "none" }
+  unmounted: { display: "none" },
 };
 
 const Content = ({ children, ...props }: StandardComponentWithChildrenProps): JSX.Element => {
@@ -19,14 +21,14 @@ const Content = ({ children, ...props }: StandardComponentWithChildrenProps): JS
 
   return (
     <div {...props} className={classNames("content", props.className)}>
-      <div className={"sub-content"}>{children}</div>
+      <div className="sub-content">{children}</div>
       <CSSTransition in={drawerOpen} timeout={4000}>
         {(state: TransitionStatus) => (
           <DrawerTarget
             style={{
               transition: "all 1s",
               display: "none",
-              ...Transitions[state]
+              ...Transitions[state],
             }}
           />
         )}

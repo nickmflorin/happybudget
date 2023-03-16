@@ -2,7 +2,7 @@
 const fallbackCopyTextToClipboard = (
   text: string,
   onSuccess?: () => void,
-  onCopyError?: (e: Error | string) => void
+  onCopyError?: (e: Error | string) => void,
 ) => {
   const textArea = document.createElement("textarea");
   textArea.value = text;
@@ -31,7 +31,7 @@ const fallbackCopyTextToClipboard = (
 export const copyTextToClipboard = (
   text: string,
   onSuccess?: () => void,
-  onCopyError?: (e: Error | string) => void
+  onCopyError?: (e: Error | string) => void,
 ): void => {
   if (!navigator.clipboard) {
     fallbackCopyTextToClipboard(text);

@@ -8,7 +8,7 @@ type S = Tables.ActualTableStore;
 export const createAuthenticatedActualsTableReducer = (
   config: Table.AuthenticatedReducerConfig<R, M, S, C> & {
     readonly owners: Redux.Reducer<Redux.AuthenticatedModelListStore<Model.ActualOwner>, C>;
-  }
+  },
 ): Redux.Reducer<S, C> => {
   const generic = tabling.reducers.createAuthenticatedTableReducer<R, M, S, C>(config);
 

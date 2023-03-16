@@ -1,6 +1,6 @@
 import { useState, useMemo, ForwardedRef, forwardRef, useImperativeHandle } from "react";
-import { isNil } from "lodash";
 
+import { isNil } from "lodash";
 import { Switch } from "antd";
 
 import { Form, ShowHide } from "components";
@@ -25,7 +25,7 @@ export type IEditPublicTokenFormRef = {
 const EditPublicTokenForm = forwardRef(
   (
     { onDelete, urlFormatter, disabled, ...props }: EditPublicTokenFormProps,
-    ref: ForwardedRef<IEditPublicTokenFormRef>
+    ref: ForwardedRef<IEditPublicTokenFormRef>,
   ) => {
     const [autoExpire, _setAutoExpire] = useState(!isNil(props.initialValues?.expires_at));
 
@@ -51,14 +51,14 @@ const EditPublicTokenForm = forwardRef(
           }
         }
       },
-      [props.onValuesChange]
+      [props.onValuesChange],
     );
 
     useImperativeHandle(ref, () => ({ setAutoExpire }));
 
     return (
       <Form.Form
-        layout={"vertical"}
+        layout="vertical"
         {...props}
         onFinish={(values: EditPublicTokenFormValues) => {
           let formatted: EditPublicTokenFormValues = {};
@@ -68,31 +68,36 @@ const EditPublicTokenForm = forwardRef(
           props.onFinish?.(formatted);
         }}
       >
-        <Form.Item name={"public_id"}>
+        <Form.Item name="public_id">
           <PublicUrlInput urlFormatter={urlFormatter} actions={["copy", "visit"]} />
         </Form.Item>
-        <Form.Item label={"Auto Expire"} horizontalLayoutOverride={true}>
+        <Form.Item label="Auto Expire" horizontalLayoutOverride={true}>
           <Switch
-            checkedChildren={"ON"}
-            unCheckedChildren={"OFF"}
+            checkedChildren="ON"
+            unCheckedChildren="OFF"
             defaultChecked={!isNil(props.initialValues?.expires_at)}
             checked={autoExpire}
             onChange={(checked: boolean) => setAutoExpire(checked)}
           />
         </Form.Item>
         <ShowHide show={autoExpire}>
-          <Form.Item name={"expires_at"} horizontalLayoutOverride={true}>
-            <DatePicker disabled={!autoExpire} dateFormat={"dd/MM/yyyy"} />
+          <Form.Item name="expires_at" horizontalLayoutOverride={true}>
+            <DatePicker disabled={!autoExpire} dateFormat="dd/MM/yyyy" />
           </Form.Item>
         </ShowHide>
         <Form.Footer style={{ marginTop: 6 }}>
-          <ButtonDangerLink size={"small"} disabled={disabled} onClick={() => onDelete()} style={{ width: "100%" }}>
-            {"Stop Sharing"}
+          <ButtonDangerLink
+            size="small"
+            disabled={disabled}
+            onClick={() => onDelete()}
+            style={{ width: "100%" }}
+          >
+            Stop Sharing
           </ButtonDangerLink>
         </Form.Footer>
       </Form.Form>
     );
-  }
+  },
 );
 
 export default EditPublicTokenForm;

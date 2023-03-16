@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
-import { isNil } from "lodash";
+
 import classNames from "classnames";
+import { isNil } from "lodash";
 
 import { ShowHide } from "components";
 
@@ -63,12 +64,17 @@ const UserInitials = ({
 
   return (
     <ShowHide hide={hideOnNoInitials === true && userInitials === ""}>
-      <div className={classNames("user-initials", { circle: props.circle }, props.className)} style={props.style}>
+      <div
+        className={classNames("user-initials", { circle: props.circle }, props.className)}
+        style={props.style}
+      >
         {!isNil(overlay) && overlay()}
         <ShowHide show={isNil(renderNoInitials) || userInitials !== ""}>
-          <div className={"user-initials-text"}>{userInitials}</div>
+          <div className="user-initials-text">{userInitials}</div>
         </ShowHide>
-        <ShowHide show={!isNil(renderNoInitials) && userInitials === ""}>{renderNoInitials}</ShowHide>
+        <ShowHide show={!isNil(renderNoInitials) && userInitials === ""}>
+          {renderNoInitials}
+        </ShowHide>
       </div>
     </ShowHide>
   );

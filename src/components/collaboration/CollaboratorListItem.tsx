@@ -1,4 +1,5 @@
 import React from "react";
+
 import classNames from "classnames";
 
 import { ClearButton } from "components/buttons";
@@ -21,11 +22,16 @@ const CollaboratorListItem = ({
   onChangeAccessType,
   ...props
 }: CollaboratorListItemProps): JSX.Element => (
-  <div {...props} className={classNames("collaborator-list-item", props.className, { loading: updating || deleting })}>
-    <div className={"user-image-or-initials-container"}>
+  <div
+    {...props}
+    className={classNames("collaborator-list-item", props.className, {
+      loading: updating || deleting,
+    })}
+  >
+    <div className="user-image-or-initials-container">
       <UserImageOrInitials circle={true} user={collaborator.user} />
     </div>
-    <div className={"name-container"}>{collaborator.user.full_name}</div>
+    <div className="name-container">{collaborator.user.full_name}</div>
     <div style={{ width: 110 }}>
       <CollaboratorAccessTypeSelect
         value={collaborator.access_type.id}
@@ -39,7 +45,7 @@ const CollaboratorListItem = ({
         }}
       />
     </div>
-    <ClearButton iconSize={"small"} onClick={() => onDelete()} />
+    <ClearButton iconSize="small" onClick={() => onDelete()} />
   </div>
 );
 

@@ -1,7 +1,8 @@
 import { isNil } from "lodash";
-import { tabling, budgeting, formatters } from "lib";
 
+import { tabling, budgeting, formatters } from "lib";
 import { Icon } from "components";
+
 import { columns } from "../../generic";
 
 type R = Tables.AccountRowData;
@@ -14,7 +15,7 @@ const Columns: Table.Column<R, M>[] = [
     headerName: "Account",
     pdfHeaderName: "Acct #",
     pdfWidth: 0.1,
-    pdfCellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } }
+    pdfCellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } },
   }),
   columns.BodyColumn<R, M, string | null>({
     field: "description",
@@ -32,9 +33,10 @@ const Columns: Table.Column<R, M>[] = [
     cellRendererParams: {
       /* For the MarkupRow, we need to remove the flex styling so we can justify
          the Icon at the right end of the cell. */
-      innerCellStyle: (row: Table.BodyRow<R>) => (tabling.rows.isMarkupRow(row) ? { display: "block" } : {}),
+      innerCellStyle: (row: Table.BodyRow<R>) =>
+        tabling.rows.isMarkupRow(row) ? { display: "block" } : {},
       icon: (row: Table.BodyRow<R>) =>
-        tabling.rows.isMarkupRow(row) ? <Icon icon={"percentage"} weight={"light"} /> : undefined
+        tabling.rows.isMarkupRow(row) ? <Icon icon="percentage" weight="light" /> : undefined,
     },
     pdfHeaderName: "Category Description",
     pdfFooter: { value: "Grand Total" },
@@ -43,7 +45,7 @@ const Columns: Table.Column<R, M>[] = [
         return r.groupData.name;
       }
       return r.data.description || "";
-    }
+    },
   }),
   columns.EstimatedColumn<R, M>({
     field: "estimated",
@@ -52,10 +54,10 @@ const Columns: Table.Column<R, M>[] = [
       isNil(params) || params === ""
         ? "0.00"
         : formatters.currencyFormatter((v: string | number) =>
-            console.error(`Could not parse currency value ${String(v)} for PDF field 'estimated'.`)
+            console.error(`Could not parse currency value ${String(v)} for PDF field 'estimated'.`),
           )(params),
     pdfWidth: 0.15,
-    pdfValueGetter: budgeting.valueGetters.estimatedValueGetter
+    pdfValueGetter: budgeting.valueGetters.estimatedValueGetter,
   }),
   columns.ActualColumn<R, M>({
     field: "actual",
@@ -65,13 +67,13 @@ const Columns: Table.Column<R, M>[] = [
       isNil(params) || params === ""
         ? "0.00"
         : formatters.currencyFormatter((v: string | number) =>
-            console.error(`Could not parse currency value ${String(v)} for PDF field 'actual'.`)
+            console.error(`Could not parse currency value ${String(v)} for PDF field 'actual'.`),
           )(params),
     pdfWidth: 0.15,
     pdfValueGetter: budgeting.valueGetters.actualValueGetter,
     /* Note: This also gets triggered for the PDF model form, but that is okay
        because the PDF model form has a domain property as well. */
-    isApplicableForModel: (m: Model.Account) => m.domain === "budget"
+    isApplicableForModel: (m: Model.Account) => m.domain === "budget",
   }),
   columns.VarianceColumn<R, M>({
     field: "variance",
@@ -80,18 +82,18 @@ const Columns: Table.Column<R, M>[] = [
       isNil(params) || params === ""
         ? "0.00"
         : formatters.currencyFormatter((v: string | number) =>
-            console.error(`Could not parse currency value ${String(v)} for PDF field 'variance'.`)
+            console.error(`Could not parse currency value ${String(v)} for PDF field 'variance'.`),
           )(params),
     pdfWidth: 0.15,
     pdfValueGetter: budgeting.valueGetters.varianceValueGetter,
     /* Note: This also gets triggered for the PDF model form, but that is okay
        because the PDF model form has a domain property as well. */
-    isApplicableForModel: (m: Model.Account) => m.domain === "budget"
+    isApplicableForModel: (m: Model.Account) => m.domain === "budget",
   }),
   columns.FakeColumn({ field: "nominal_value", nullValue: 0.0 }),
   columns.FakeColumn({ field: "markup_contribution", nullValue: 0.0 }),
   columns.FakeColumn({ field: "accumulated_fringe_contribution", nullValue: 0.0 }),
-  columns.FakeColumn({ field: "accumulated_markup_contribution", nullValue: 0.0 })
+  columns.FakeColumn({ field: "accumulated_markup_contribution", nullValue: 0.0 }),
 ];
 
 export default Columns;

@@ -1,11 +1,12 @@
 import React from "react";
+
 import classNames from "classnames";
+import { isNil } from "lodash";
 
 import { ui } from "lib";
 
-import { CollapsedSidebar } from "../sidebars";
 import GenericLayout, { GenericLayoutProps } from "./GenericLayout";
-import { isNil } from "lodash";
+import { CollapsedSidebar } from "../sidebars";
 
 export type CollapsedLayoutProps = Omit<GenericLayoutProps, "sidebar"> & {
   readonly sidebar?: ICollapsedSidebarItem[];

@@ -1,9 +1,11 @@
 import React from "react";
+
 import classNames from "classnames";
 import { isNil } from "lodash";
 
 import { framework } from "tabling/generic";
 import { PublicTable, PublicTableProps } from "tabling/generic/tables";
+
 import Columns from "./Columns";
 import Framework from "./framework";
 
@@ -27,14 +29,17 @@ type OmitProps =
   | "onEditMarkup"
   | "onEditGroup";
 
-export type PublicFringesTableProps<B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount> = Omit<
-  PublicTableProps<R, M, FringesTableContext<B, P, true>, S>,
-  OmitProps
-> & {
+export type PublicFringesTableProps<
+  B extends Model.BaseBudget,
+  P extends Model.Account | Model.SubAccount,
+> = Omit<PublicTableProps<R, M, FringesTableContext<B, P, true>, S>, OmitProps> & {
   readonly budget: B | null;
 };
 
-const PublicFringesTable = <B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount>({
+const PublicFringesTable = <
+  B extends Model.BaseBudget,
+  P extends Model.Account | Model.SubAccount,
+>({
   budget,
   ...props
 }: PublicFringesTableProps<B, P>): JSX.Element => (
@@ -49,8 +54,8 @@ const PublicFringesTable = <B extends Model.BaseBudget, P extends Model.Account 
       framework.actions.ExportCSVAction<R, M>(
         props.table.current,
         params,
-        !isNil(budget) ? `${budget.name}_fringes` : "fringes"
-      )
+        !isNil(budget) ? `${budget.name}_fringes` : "fringes",
+      ),
     ]}
   />
 );

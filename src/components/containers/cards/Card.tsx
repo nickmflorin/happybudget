@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 
-import { isNil, map } from "lodash";
 import classNames from "classnames";
+import { isNil, map } from "lodash";
 
 import { Icon, ShowHide, RenderWithSpinner } from "components";
 import { IconButton } from "components/buttons";
@@ -59,7 +59,7 @@ const Card = ({
   const divProps = useMemo(() => {
     const Props = {
       ...props,
-      className: classNames("card", props.className, { disabled: loading || disabled, loading })
+      className: classNames("card", props.className, { disabled: loading || disabled, loading }),
     };
     if (!isNil(tourId)) {
       return { ...Props, "data-tour-id": tourId.replace(" ", "").toLowerCase() };
@@ -70,23 +70,27 @@ const Card = ({
   return (
     <div {...divProps}>
       {!isNil(cornerActions) && (
-        <div className={"card-corner-actions"}>
+        <div className="card-corner-actions">
           {map(cornerActions(iconClassName), (action: CardCornerAction, index: number) => {
             if (isCornerActionRender(action)) {
-              return <React.Fragment key={index}>{action.visible === true ? action.render() : <></>}</React.Fragment>;
+              return (
+                <React.Fragment key={index}>
+                  {action.visible === true ? action.render() : <></>}
+                </React.Fragment>
+              );
             }
             return <React.Fragment key={index}>{action}</React.Fragment>;
           })}
         </div>
       )}
-      <div className={"card-inner"}>
+      <div className="card-inner">
         <RenderWithSpinner spinnerProps={{ size: "small" }} loading={loading}>
           <React.Fragment>
             {!isNil(dropdown) && (
-              <DropdownMenu models={dropdown} placement={"bottomRight"}>
+              <DropdownMenu models={dropdown} placement="bottomRight">
                 <IconButton
                   className={classNames("dropdown-ellipsis", iconClassName)}
-                  icon={<Icon icon={"ellipsis-v"} weight={"light"} dimension={{ height: 26 }} />}
+                  icon={<Icon icon="ellipsis-v" weight="light" dimension={{ height: 26 }} />}
                 />
               </DropdownMenu>
             )}
@@ -101,9 +105,9 @@ const Card = ({
               className={classNames("card-footer", { "title-only": isNil(subTitle) })}
               onClick={disabled ? undefined : onClick}
             >
-              <div className={"title"}>{title}</div>
+              <div className="title">{title}</div>
               <ShowHide show={!isNil(subTitle)}>
-                <div className={"sub-title truncate"}>{subTitle}</div>
+                <div className="sub-title truncate">{subTitle}</div>
               </ShowHide>
             </div>
           </React.Fragment>

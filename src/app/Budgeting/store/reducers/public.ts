@@ -18,21 +18,23 @@ const rootReducer: Redux.Reducer<
   | AccountsTableActionContext<Model.Budget, true>
   | SubAccountsTableActionContext<Model.Budget, Model.SubAccount | Model.Account, true>
 > = combineReducers({
-  detail: redux.reducers.createDetailReducer<Model.Budget, BudgetActionContext<Model.Budget, true>>({
-    initialState: redux.initialDetailResponseState,
-    actions: {
-      loading: actions.loadingBudgetAction,
-      response: actions.responseBudgetAction
-    }
-  }),
+  detail: redux.reducers.createDetailReducer<Model.Budget, BudgetActionContext<Model.Budget, true>>(
+    {
+      initialState: redux.initialDetailResponseState,
+      actions: {
+        loading: actions.loadingBudgetAction,
+        response: actions.responseBudgetAction,
+      },
+    },
+  ),
   fringes: budgeting.reducers.createPublicFringesTableReducer<Model.Budget>({
     initialState: redux.initialTableState,
     columns: FringesColumns,
     actions: {
       loading: actions.loadingFringesAction,
       response: actions.responseFringesAction,
-      setSearch: actions.setFringesSearchAction
-    }
+      setSearch: actions.setFringesSearchAction,
+    },
   }),
   account: redux.reducers.createModelIndexedReducer<
     Modules.AccountOrSubAccountStore<Model.Account>,
@@ -43,21 +45,22 @@ const rootReducer: Redux.Reducer<
       columns: SubAccountColumns,
       actions: {
         loading: actions.account.loadingAccountAction,
-        response: actions.account.responseAccountAction
+        response: actions.account.responseAccountAction,
       },
       tableActions: {
         request: actions.account.requestAction,
         loading: actions.account.loadingAction,
         response: actions.account.responseAction,
-        setSearch: actions.account.setSearchAction
-      }
+        setSearch: actions.account.setSearchAction,
+      },
     }),
     {
       initialState: initialState.initialAccountState,
       includeAction: (a: Redux.AnyPayloadAction<SubAccountActionContext<Model.Budget, true>>) =>
         a.label === "public.account",
-      getId: (a: Redux.AnyPayloadAction<SubAccountActionContext<Model.Budget, true>>) => a.context.id
-    }
+      getId: (a: Redux.AnyPayloadAction<SubAccountActionContext<Model.Budget, true>>) =>
+        a.context.id,
+    },
   ),
   subaccount: redux.reducers.createModelIndexedReducer<
     Modules.AccountOrSubAccountStore<Model.SubAccount>,
@@ -68,21 +71,22 @@ const rootReducer: Redux.Reducer<
       columns: SubAccountColumns,
       actions: {
         loading: actions.subAccount.loadingSubAccountAction,
-        response: actions.subAccount.responseSubAccountAction
+        response: actions.subAccount.responseSubAccountAction,
       },
       tableActions: {
         request: actions.subAccount.requestAction,
         loading: actions.subAccount.loadingAction,
         response: actions.subAccount.responseAction,
-        setSearch: actions.subAccount.setSearchAction
-      }
+        setSearch: actions.subAccount.setSearchAction,
+      },
     }),
     {
       initialState: initialState.initialSubAccountState,
       includeAction: (a: Redux.AnyPayloadAction<SubAccountActionContext<Model.Budget, true>>) =>
         a.label === "public.subaccount",
-      getId: (a: Redux.AnyPayloadAction<SubAccountActionContext<Model.Budget, true>>) => a.context.id
-    }
+      getId: (a: Redux.AnyPayloadAction<SubAccountActionContext<Model.Budget, true>>) =>
+        a.context.id,
+    },
   ),
   accounts: budgeting.reducers.createPublicAccountsTableReducer<Model.Budget>({
     initialState: initialState.initialBudgetState.accounts,
@@ -90,9 +94,9 @@ const rootReducer: Redux.Reducer<
     actions: {
       loading: actions.loadingAction,
       response: actions.responseAction,
-      setSearch: actions.setSearchAction
-    }
-  })
+      setSearch: actions.setSearchAction,
+    },
+  }),
 });
 
 export default rootReducer;

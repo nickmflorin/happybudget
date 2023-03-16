@@ -4,14 +4,14 @@ import { tabling, model } from "lib";
 
 export const estimatedValueGetter = <R extends Tables.BudgetRowData>(
   row: Table.BodyRow<R>,
-  rows: Table.BodyRow<R>[]
+  rows: Table.BodyRow<R>[],
 ): number => {
   if (tabling.rows.isDataRow(row)) {
     return model.budgeting.estimatedValue(row);
   } else {
     const childrenRows: Table.DataRow<R>[] = filter(
       rows,
-      (r: Table.BodyRow<R>) => tabling.rows.isDataRow(r) && includes(row.children, r.id)
+      (r: Table.BodyRow<R>) => tabling.rows.isDataRow(r) && includes(row.children, r.id),
     ) as Table.DataRow<R>[];
     if (tabling.rows.isMarkupRow(row)) {
       /* Markup rows that are of unit FLAT only count towards the overall
@@ -33,26 +33,30 @@ export const estimatedValueGetter = <R extends Tables.BudgetRowData>(
               model.budgeting.accumulatedMarkupContribution(r) +
               model.budgeting.accumulatedFringeContribution(r) +
               model.budgeting.fringeContribution(r),
-            [row]
+            [row],
           ),
-        0.0
+        0.0,
       );
     } else {
-      return reduce(childrenRows, (curr: number, r: Table.DataRow<R>) => curr + model.budgeting.estimatedValue(r), 0.0);
+      return reduce(
+        childrenRows,
+        (curr: number, r: Table.DataRow<R>) => curr + model.budgeting.estimatedValue(r),
+        0.0,
+      );
     }
   }
 };
 
 export const actualValueGetter = <R extends Tables.BudgetRowData>(
   row: Table.BodyRow<R>,
-  rows: Table.BodyRow<R>[]
+  rows: Table.BodyRow<R>[],
 ): number => {
   if (tabling.rows.isDataRow(row) || tabling.rows.isMarkupRow(row)) {
     return row.data.actual;
   } else {
     const childrenRows: Table.DataRow<R>[] = filter(
       rows,
-      (r: Table.BodyRow<R>) => tabling.rows.isDataRow(r) && includes(row.children, r.id)
+      (r: Table.BodyRow<R>) => tabling.rows.isDataRow(r) && includes(row.children, r.id),
     ) as Table.DataRow<R>[];
     return reduce(childrenRows, (curr: number, r: Table.DataRow<R>) => curr + r.data.actual, 0.0);
   }
@@ -60,5 +64,5 @@ export const actualValueGetter = <R extends Tables.BudgetRowData>(
 
 export const varianceValueGetter = <R extends Tables.BudgetRowData>(
   row: Table.BodyRow<R>,
-  rows: Table.BodyRow<R>[]
+  rows: Table.BodyRow<R>[],
 ): number => estimatedValueGetter(row, rows) - actualValueGetter(row, rows);

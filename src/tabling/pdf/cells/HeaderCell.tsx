@@ -5,9 +5,9 @@ import Cell, { CellProps } from "./Cell";
 const HeaderCell = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  V extends Table.RawRowValue = Table.RawRowValue
+  V extends Table.RawRowValue = Table.RawRowValue,
 >(
-  props: Omit<CellProps<R, M, V>, "rawValue" | "value">
+  props: Omit<CellProps<R, M, V>, "rawValue" | "value">,
 ): JSX.Element => (
   <Cell<R, M, V>
     {...props}

@@ -8,11 +8,11 @@ type OrderingArrowIconProps = Omit<IconProps, "icon"> & {
 
 const OrderingArrowIcon = ({ order, ...props }: OrderingArrowIconProps): JSX.Element => {
   if (order === 1) {
-    return <Icon {...props} icon={"arrow-down"} />;
+    return <Icon {...props} icon="arrow-down" />;
   } else if (order === -1) {
-    return <Icon {...props} icon={"arrow-up"} />;
+    return <Icon {...props} icon="arrow-up" />;
   }
-  return <Icon {...props} style={{ ...props.style, opacity: 0 }} icon={"arrow-down"} />;
+  return <Icon {...props} style={{ ...props.style, opacity: 0 }} icon="arrow-down" />;
 };
 
 export default React.memo(OrderingArrowIcon);

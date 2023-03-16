@@ -1,6 +1,9 @@
 import { isNil } from "lodash";
 
-type ActionCreatorConfig<P extends Redux.ActionPayload, C extends Redux.ActionContext = Redux.ActionContext> = {
+type ActionCreatorConfig<
+  P extends Redux.ActionPayload,
+  C extends Redux.ActionContext = Redux.ActionContext,
+> = {
   readonly ctx?: Pick<C, "errorMessage">;
   readonly label?: string;
   readonly prefix?: string;
@@ -12,9 +15,12 @@ type ActionCreatorConfig<P extends Redux.ActionPayload, C extends Redux.ActionCo
  * action creator that attaches custom context to the action object and an
  * optionally provided label.
  */
-export const createAction = <P extends Redux.ActionPayload, C extends Redux.ActionContext = Redux.ActionContext>(
+export const createAction = <
+  P extends Redux.ActionPayload,
+  C extends Redux.ActionContext = Redux.ActionContext,
+>(
   type: string,
-  config?: ActionCreatorConfig<P, C>
+  config?: ActionCreatorConfig<P, C>,
 ): Redux.ActionCreator<P, C> => {
   const actionType = !isNil(config?.prefix)
     ? `${config?.prefix as string}.${type}`
@@ -40,7 +46,7 @@ export const createAction = <P extends Redux.ActionPayload, C extends Redux.Acti
       type: actionType,
       payload: pyload,
       label: config?.label || null,
-      context: { ...config?.ctx, ...dynamicContext }
+      context: { ...config?.ctx, ...dynamicContext },
     };
   }
   actionCreator.label = config?.label || null;
@@ -56,16 +62,16 @@ export const createAction = <P extends Redux.ActionPayload, C extends Redux.Acti
  */
 export const createActionCreator =
   <C extends Redux.ActionContext = Redux.ActionContext>(
-    config?: ActionCreatorConfig<Redux.ActionPayload, C>
+    config?: ActionCreatorConfig<Redux.ActionPayload, C>,
   ): {
     <PR extends Redux.ActionPayload, CR extends Redux.ActionContext = Redux.ActionContext>(
       type: string,
-      config?: ActionCreatorConfig<PR, CR>
+      config?: ActionCreatorConfig<PR, CR>,
     ): Redux.ActionCreator<PR, CR>;
   } =>
   <PR extends Redux.ActionPayload, CR extends Redux.ActionContext = Redux.ActionContext>(
     type: string,
-    c?: ActionCreatorConfig<PR, CR>
+    c?: ActionCreatorConfig<PR, CR>,
   ) =>
     // Dynamic configuration should override static configuration.
     createAction<PR, CR>(type, { ...config, ...c });

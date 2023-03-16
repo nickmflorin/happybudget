@@ -40,7 +40,7 @@
       position: absolute;
       top: 0;
       left: 0;
-			@include size(100%);
+      @include size(100%);
       background-color: rgba(15, 15, 15, 0.04);
     }
 
@@ -96,7 +96,7 @@
 
 .img-overlay {
   @include size(100%);
-	@include vertical-flex-c();
+  @include vertical-flex-c();
   position: absolute;
   top: 0;
   left: 0;
@@ -117,13 +117,13 @@
     svg {
       &.icon.plus,
       &.icon.edit {
-				@include size(24px !important);
+        @include size(24px !important);
       }
     }
 
     .icon-wrapper--plus,
     .icon-wrapper--edit {
-			@include size($standard-size);
+      @include size($standard-size);
       padding: 5px;
     }
 
@@ -135,7 +135,7 @@
 
 .user-initials {
   @include vertical-flex-c();
-	@include size(100%);
+  @include size(100%);
   background-color: #eee;
   border-radius: 100%;
 

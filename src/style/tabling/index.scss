@@ -1,6 +1,6 @@
-@import './ag_theme';
-@import './cells';
-@import './menus';
+@import "./ag_theme";
+@import "./cells";
+@import "./menus";
 
 .cell-dropdown {
   border-radius: 0px;
@@ -412,7 +412,7 @@
             // Note: We cannot simply do &:first-child because the first child
             // will be different between the pinned cols container and the
             // center cols container.
-            &[aria-colindex='1'] {
+            &[aria-colindex="1"] {
               border-bottom-left-radius: 8px;
               border-top-left-radius: 8px;
             }
@@ -466,7 +466,7 @@
         > .cell {
           border: none !important;
 
-          &[aria-colindex='1'] {
+          &[aria-colindex="1"] {
             border-bottom-left-radius: 8px;
           }
           &.ag-cell-range-right {
@@ -511,7 +511,7 @@
           border: none !important;
           line-height: 28px;
 
-          &[aria-colindex='1'] {
+          &[aria-colindex="1"] {
             border-bottom-left-radius: 8px;
             border-top-left-radius: 8px;
           }

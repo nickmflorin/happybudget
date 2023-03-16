@@ -1,4 +1,5 @@
 import React from "react";
+
 import Notifications from "./Notifications";
 
 type BannerNotificationsProps = {
@@ -6,7 +7,7 @@ type BannerNotificationsProps = {
 };
 
 const BannerNotifications = (props: BannerNotificationsProps) => (
-  <Notifications {...props} className={"banner-notifications"} />
+  <Notifications {...props} className="banner-notifications" />
 );
 
 export default React.memo(BannerNotifications);

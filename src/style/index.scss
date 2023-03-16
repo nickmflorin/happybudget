@@ -12,8 +12,8 @@
 
 body {
   margin: 0;
-  font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
-    "Droid Sans", "Helvetica Neue", sans-serif;
+  font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", "Oxygen", "Ubuntu",
+    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -34,7 +34,7 @@ code {
   }
 
   .ant-empty-description {
-    font-size: $standard-text-size;;
+    font-size: $standard-text-size;
     color: $text-secondary;
     font-family: $avenir;
     font-weight: 400;
@@ -42,7 +42,7 @@ code {
 }
 
 .full-size {
-	@include size(100% !important);
+  @include size(100% !important);
 }
 
 .disabled {

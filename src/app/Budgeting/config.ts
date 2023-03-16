@@ -4,14 +4,14 @@ export const TemplateReduxConfig: Application.ModuleConfig<Modules.Template.Stor
   rootReducer: reducers.templateRootReducer,
   rootSaga: sagas.templateRootSaga,
   initialState: initialState.initialTemplateState,
-  label: "template"
+  label: "template",
 };
 
 export const BudgetReduxConfig: Application.ModuleConfig<Modules.Budget.Store> = {
   rootReducer: reducers.budgetRootReducer,
   rootSaga: sagas.budgetRootSaga,
   initialState: initialState.initialBudgetState,
-  label: "budget"
+  label: "budget",
 };
 
 export const PublicBudgetReduxConfig: Application.ModuleConfig<Modules.PublicBudget.Store> = {
@@ -19,5 +19,5 @@ export const PublicBudgetReduxConfig: Application.ModuleConfig<Modules.PublicBud
   rootSaga: sagas.publicRootSaga,
   initialState: initialState.initialPublicBudgetState,
   label: "budget",
-  isPublic: true
+  isPublic: true,
 };

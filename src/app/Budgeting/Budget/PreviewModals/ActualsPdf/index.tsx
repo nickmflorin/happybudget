@@ -1,10 +1,10 @@
 import { useMemo } from "react";
+
 import { isNil, filter, find, includes } from "lodash";
 
 import { tabling, model } from "lib";
-import { Colors } from "style/constants";
-
 import { Document, Page, Tag, Text } from "components/pdf";
+import { Colors } from "style/constants";
 import { ActualsTable as GenericActualsTable } from "tabling";
 import { ActualsTable } from "tabling/pdf";
 
@@ -25,14 +25,15 @@ const ActualColumns = filter(
   GenericActualsTable.Columns,
   (c: Table.Column<R, M>) =>
     tabling.columns.isModelColumn(c) &&
-    ((!tabling.columns.isFakeColumn(c) && c.includeInPdf !== false) || tabling.columns.isFakeColumn(c))
+    ((!tabling.columns.isFakeColumn(c) && c.includeInPdf !== false) ||
+      tabling.columns.isFakeColumn(c)),
 ) as Table.ModelColumn<R, M>[];
 
 const ActualsPdf = ({ budget, actuals, contacts, options }: ActualsPdfProps): JSX.Element => {
   const actualColumns: Table.ModelColumn<R, M>[] = useMemo(() => {
     const columns = tabling.columns.normalizeColumns(ActualColumns, {
       description: {
-        pdfFooterValueGetter: `${budget.name} Total`
+        pdfFooterValueGetter: `${budget.name} Total`,
       },
       contact: {
         pdfCellRenderer: (params: Table.PdfCellCallbackParams<R, M, number>) => {
@@ -42,23 +43,23 @@ const ActualsPdf = ({ budget, actuals, contacts, options }: ActualsPdfProps): JS
               return (
                 <Tag
                   fillWidth={false}
-                  className={"tag tag--contact"}
-                  color={"#EFEFEF"}
-                  textColor={"#2182e4"}
+                  className="tag tag--contact"
+                  color="#EFEFEF"
+                  textColor="#2182e4"
                   text={model.contact.contactName(contact)}
                 />
               );
             }
           }
           return <Text></Text>;
-        }
+        },
       },
       owner: {
         pdfCellRenderer: (params: Table.PdfCellCallbackParams<R, M, Model.ActualOwner>) => {
           if (params.rawValue !== null) {
             return (
               <Tag
-                className={"tag--account"}
+                className="tag--account"
                 textColor={Colors.TEXT_SECONDARY}
                 color={null}
                 fillWidth={false}
@@ -67,21 +68,32 @@ const ActualsPdf = ({ budget, actuals, contacts, options }: ActualsPdfProps): JS
             );
           }
           return <Text></Text>;
-        }
+        },
       },
       actual_type: {
         pdfCellRenderer: (params: Table.PdfCellCallbackParams<R, M, Model.Tag | null>) =>
-          params.rawValue !== null ? <Tag fillWidth={false} model={params.rawValue} /> : <Text></Text>
-      }
+          params.rawValue !== null ? (
+            <Tag fillWidth={false} model={params.rawValue} />
+          ) : (
+            <Text></Text>
+          ),
+      },
     });
     return tabling.columns.orderColumns(
-      tabling.columns.normalizePdfColumnWidths(columns, (c: C) => includes(options.columns, c.field))
+      tabling.columns.normalizePdfColumnWidths(columns, (c: C) =>
+        includes(options.columns, c.field),
+      ),
     );
   }, [contacts]);
 
-  const filteredActuals = useMemo<Model.Actual[]>(() => {
-    return filter(actuals, (actual: Model.Actual) => !(options.excludeZeroTotals === true) || actual.value !== 0);
-  }, [budget, actuals, options]);
+  const filteredActuals = useMemo<Model.Actual[]>(
+    () =>
+      filter(
+        actuals,
+        (actual: Model.Actual) => !(options.excludeZeroTotals === true) || actual.value !== 0,
+      ),
+    [budget, actuals, options],
+  );
 
   return (
     <Document>

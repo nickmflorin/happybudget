@@ -1,7 +1,7 @@
-import * as Sentry from "@sentry/react";
-import { Integrations } from "@sentry/tracing";
 import { ExtraErrorData } from "@sentry/integrations";
+import * as Sentry from "@sentry/react";
 import SentryRRWeb from "@sentry/rrweb";
+import { Integrations } from "@sentry/tracing";
 
 import { logger } from "internal";
 import { parsers } from "lib";
@@ -20,7 +20,7 @@ export const configure = () => {
   const SENTRY_ERROR_DATA_DEPTH: number | null =
     SENTRY_ERROR_DATA_DEPTH_STRING === undefined
       ? null
-      : parsers.stringToInt(SENTRY_ERROR_DATA_DEPTH_STRING);
+      : parsers.parseInteger(SENTRY_ERROR_DATA_DEPTH_STRING);
   if (SENTRY_ERROR_DATA_DEPTH === null) {
     throw new TypeError(
       `Invalid value ${SENTRY_ERROR_DATA_DEPTH_STRING} detected for 'NEXT_PUBLIC_SENTRY_ERROR_DATA_DEPTH' in environment.`,
@@ -30,7 +30,7 @@ export const configure = () => {
   const SENTRY_NORMALIZE_DEPTH: number | null =
     SENTRY_NORMALIZE_DEPTH_STRING === undefined
       ? null
-      : parsers.stringToInt(SENTRY_NORMALIZE_DEPTH_STRING);
+      : parsers.parseInteger(SENTRY_NORMALIZE_DEPTH_STRING);
   if (SENTRY_NORMALIZE_DEPTH === null) {
     throw new TypeError(
       `Invalid value ${SENTRY_NORMALIZE_DEPTH_STRING} detected for 'NEXT_PUBLIC_SENTRY_NORMALIZE_DEPTH' in environment.`,

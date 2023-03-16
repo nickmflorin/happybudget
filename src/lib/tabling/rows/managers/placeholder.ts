@@ -10,14 +10,14 @@ type CreatePlaceholderRowConfig<R extends Table.RowData> = {
 type PlaceholderRowConfig<
   RW extends Table.PlaceholderRow<R>,
   R extends Table.RowData,
-  M extends Model.RowHttpModel
+  M extends Model.RowHttpModel,
 > = Omit<BodyRowManagerConfig<RW, R, M>, "rowType"> & {
   readonly defaultData?: Table.DefaultDataOnCreate<R>;
 };
 
 class PlaceholderRowManager<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel,
 > extends BodyRowManager<Table.PlaceholderRow<R>, R, M, [Partial<R> | undefined]> {
   public getRowChildren: ((m: M) => number[]) | undefined;
   public defaultData?: Table.DefaultDataOnCreate<R>;
@@ -29,7 +29,7 @@ class PlaceholderRowManager<
 
   getValueForRow<V extends Table.RawRowValue, C extends Table.ModelColumn<R, M, V>>(
     col: C,
-    data?: Partial<R>
+    data?: Partial<R>,
   ): V | undefined {
     if (col.isApplicableForRowType?.(this.rowType) === false) {
       throw new FieldNotApplicableForRow();
@@ -37,8 +37,13 @@ class PlaceholderRowManager<
     const defaultData =
       this.defaultData === undefined
         ? undefined
-        : tabling.rows.applyDefaultsOnCreate(tabling.columns.filterModelColumns(this.columns), data, this.defaultData);
-    const defaultValue = defaultData === undefined ? undefined : (defaultData[col.field] as V | undefined);
+        : tabling.rows.applyDefaultsOnCreate(
+            tabling.columns.filterModelColumns(this.columns),
+            data,
+            this.defaultData,
+          );
+    const defaultValue =
+      defaultData === undefined ? undefined : (defaultData[col.field] as V | undefined);
 
     if (data === undefined || data[col.field] === undefined) {
       return defaultValue === undefined ? col.nullValue : defaultValue;
@@ -49,7 +54,7 @@ class PlaceholderRowManager<
   create(config: CreatePlaceholderRowConfig<R>): Table.PlaceholderRow<R> {
     return {
       children: [],
-      ...this.createBasic({ id: config.id }, config.data)
+      ...this.createBasic({ id: config.id }, config.data),
     };
   }
 }

@@ -1,6 +1,7 @@
 import { isNil, reduce, filter, includes, intersection } from "lodash";
 
 import { tabling, util } from "lib";
+
 import { reorderRows, updateRowGroup } from "./util";
 
 /**
@@ -15,15 +16,15 @@ const createModelsAddedEventReducer = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C extends Redux.ActionContext = Redux.ActionContext
+  C extends Redux.ActionContext = Redux.ActionContext,
 >(
-  config: Table.AuthenticatedReducerConfig<R, M, S, C>
+  config: Table.AuthenticatedReducerConfig<R, M, S, C>,
 ): Redux.BasicReducer<S, Table.ModelsAddedEvent<M>> => {
   const groupRowManager = new tabling.rows.GroupRowManager<R, M>({ columns: config.columns });
   const markupRowManager = new tabling.rows.MarkupRowManager({ columns: config.columns });
   const modelRowManager = new tabling.rows.ModelRowManager<R, M>({
     getRowChildren: config.getModelRowChildren,
-    columns: config.columns
+    columns: config.columns,
   });
   /**
 	* Updates the table store by inserting a Group that was previously not in the
@@ -47,29 +48,31 @@ const createModelsAddedEventReducer = <
     const newGroupRow: Table.GroupRow<R> = groupRowManager.create({ model: group });
     const groupsWithChild: Table.GroupRow<R>[] = filter(
       s.data,
-      (r: Table.Row<R>) => tabling.rows.isGroupRow(r) && intersection(r.children, newGroupRow.children).length !== 0
+      (r: Table.Row<R>) =>
+        tabling.rows.isGroupRow(r) && intersection(r.children, newGroupRow.children).length !== 0,
     ) as Table.GroupRow<R>[];
     const newState = reduce(
       groupsWithChild,
-      (st: S, groupRow: Table.GroupRow<R>) => {
-        return {
-          ...st,
-          data: util.replaceInArray<Table.BodyRow<R>>(
-            st.data,
-            { id: groupRow.id },
-            {
-              ...groupRow,
-              children: filter(groupRow.children, (id: number) => !includes(newGroupRow.children, id))
-            }
-          )
-        };
-      },
-      s
+      (st: S, groupRow: Table.GroupRow<R>) => ({
+        ...st,
+        data: util.replaceInArray<Table.BodyRow<R>>(
+          st.data,
+          { id: groupRow.id },
+          {
+            ...groupRow,
+            children: filter(
+              groupRow.children,
+              (id: number) => !includes(newGroupRow.children, id),
+            ),
+          },
+        ),
+      }),
+      s,
     );
     return reorder
       ? reorderRows({
           ...newState,
-          data: [...newState.data, newGroupRow]
+          data: [...newState.data, newGroupRow],
         })
       : { ...newState, data: [...newState.data, newGroupRow] };
   };
@@ -87,7 +90,7 @@ const createModelsAddedEventReducer = <
     return reorder
       ? reorderRows({
           ...s,
-          data: [...s.data, markupRow]
+          data: [...s.data, markupRow],
         })
       : { ...s, data: [...s.data, markupRow] };
   };
@@ -118,16 +121,17 @@ const createModelsAddedEventReducer = <
     return reorder ? reorderRows(s) : s;
   };
 
-  const isMarkup = (p: Table.ModelTableEventPayload<M> | Model.Group | Model.Markup): p is Model.Markup =>
-    (p as Model.Markup).type === "markup";
+  const isMarkup = (
+    p: Table.ModelTableEventPayload<M> | Model.Group | Model.Markup,
+  ): p is Model.Markup => (p as Model.Markup).type === "markup";
 
-  const isGroup = (p: Table.ModelTableEventPayload<M> | Model.Group | Model.Markup): p is Model.Group =>
-    (p as Model.Group).type === "group";
+  const isGroup = (
+    p: Table.ModelTableEventPayload<M> | Model.Group | Model.Markup,
+  ): p is Model.Group => (p as Model.Group).type === "group";
 
   return (state: S = config.initialState, e: Table.ModelsAddedEvent<M>): S => {
-    const payloads: (Table.ModelTableEventPayload<M> | Model.Group | Model.Markup)[] = Array.isArray(e.payload)
-      ? e.payload
-      : [e.payload];
+    const payloads: (Table.ModelTableEventPayload<M> | Model.Group | Model.Markup)[] =
+      Array.isArray(e.payload) ? e.payload : [e.payload];
     return reorderRows(
       reduce(
         payloads,
@@ -140,8 +144,8 @@ const createModelsAddedEventReducer = <
             return addModelToState(p.model, p.group, s, false);
           }
         },
-        state
-      )
+        state,
+      ),
     );
   };
 };

@@ -1,6 +1,6 @@
+import { isNil, find } from "lodash";
 import moment from "moment-timezone";
 import Cookies from "universal-cookie";
-import { isNil, find } from "lodash";
 
 import * as config from "config";
 import { util } from "lib";
@@ -12,7 +12,11 @@ type PluginId = "segment" | "canny" | "intercom";
 
 type PluginKeys<K extends string> = { [key in KeyType]: K };
 
-type Plugin<ID extends PluginId, K extends string> = { id: ID; keys: PluginKeys<K>; delayTime: number };
+type Plugin<ID extends PluginId, K extends string> = {
+  id: ID;
+  keys: PluginKeys<K>;
+  delayTime: number;
+};
 
 const Plugins: Plugin<PluginId, string>[] = [
   {
@@ -20,25 +24,25 @@ const Plugins: Plugin<PluginId, string>[] = [
     delayTime: 15,
     keys: {
       time: "lastIdentifiedSegmentTime",
-      user: "lastIdentifiedSegmentUser"
-    }
+      user: "lastIdentifiedSegmentUser",
+    },
   },
   {
     id: "canny",
     delayTime: 6,
     keys: {
       time: "lastIdentifiedCannyTime",
-      user: "lastIdentifiedCannyUser"
-    }
+      user: "lastIdentifiedCannyUser",
+    },
   },
   {
     id: "intercom",
     delayTime: 0,
     keys: {
       time: "lastIdentifiedIntercomTime",
-      user: "lastIdentifiedIntercomUser"
-    }
-  }
+      user: "lastIdentifiedIntercomUser",
+    },
+  },
 ];
 
 const getPlugin = <ID extends PluginId, K extends string>(id: ID): Plugin<ID, K> =>
@@ -65,7 +69,7 @@ const parseDurationSinceLastIdentify = (id: PluginId, user: Model.User): number 
      it can be anything. */
   const lastIdentifiedMmt = util.dates.toLocalizedMoment(lastIdentifiedTime, {
     warnOnInvalid: false,
-    tz: user.timezone
+    tz: user.timezone,
   });
   if (!isNil(lastIdentifiedMmt)) {
     return moment.duration(now.diff(lastIdentifiedMmt)).minutes();
@@ -76,7 +80,12 @@ const parseDurationSinceLastIdentify = (id: PluginId, user: Model.User): number 
 const identifyRequired = (id: PluginId, user: Model.User): boolean => {
   const userId = parseLastIdentifiedUser(id);
   const delta = parseDurationSinceLastIdentify(id, user);
-  return isNil(userId) || isNil(delta) || (!isNil(delta) && delta > 6) || (!isNil(userId) && userId !== user.id);
+  return (
+    isNil(userId) ||
+    isNil(delta) ||
+    (!isNil(delta) && delta > 6) ||
+    (!isNil(userId) && userId !== user.id)
+  );
 };
 
 const postIdentify = (id: PluginId, user: Model.User) => {
@@ -90,7 +99,7 @@ export const identifySegment = (user: Model.User) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     window.analytics.identify(user.id, {
       name: user.full_name,
-      email: user.email
+      email: user.email,
     });
     postIdentify("segment", user);
   }
@@ -113,13 +122,13 @@ export const identifyCanny = (user: Model.User) => {
     if (!isNil(config.env.CANNY_APP_ID)) {
       const userJoined = util.dates.toLocalizedMoment(user.date_joined, {
         warnOnInvalid: false,
-        tz: user.timezone
+        tz: user.timezone,
       });
       if (userJoined === undefined) {
         console.warn(
           `Cannot perform canny identification process for user ${user.id} as ` +
             `'date_joined' field (value = '${user.date_joined}') cannot be parsed ` +
-            "to a date."
+            "to a date.",
         );
       } else {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call
@@ -130,8 +139,8 @@ export const identifyCanny = (user: Model.User) => {
             email: user.email,
             name: user.full_name,
             avatarURL: user.profile_image?.url,
-            created: userJoined.toISOString()
-          }
+            created: userJoined.toISOString(),
+          },
         });
       }
       /* Perform the post identification process regardless of whether or not
@@ -147,13 +156,13 @@ export const identifyIntercom = (user: Model.User) => {
     if (!isNil(config.env.INTERCOM_APP_ID)) {
       const userJoined = util.dates.toLocalizedMoment(user.date_joined, {
         warnOnInvalid: false,
-        tz: user.timezone
+        tz: user.timezone,
       });
       if (userJoined === undefined) {
         console.warn(
           `Cannot perform intercom identification process for user ${user.id} as ` +
             `'date_joined' field (value = '${user.date_joined}') cannot be parsed ` +
-            "to a date."
+            "to a date.",
         );
       } else {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call
@@ -163,7 +172,7 @@ export const identifyIntercom = (user: Model.User) => {
           email: user.email,
           name: user.full_name,
           created_at: userJoined,
-          custom_launcher_selector: "#support-menu-item-intercom-chat"
+          custom_launcher_selector: "#support-menu-item-intercom-chat",
         });
       }
     }

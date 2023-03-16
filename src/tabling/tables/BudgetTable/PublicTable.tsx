@@ -1,6 +1,8 @@
 import React from "react";
+
 import { tabling } from "lib";
 import { PublicTable, PublicTableProps } from "tabling/generic";
+
 import { Framework } from "./framework";
 
 export type PublicBudgetTableProps<
@@ -8,7 +10,7 @@ export type PublicBudgetTableProps<
   M extends Model.RowHttpModel,
   B extends Model.Budget | Model.Template,
   C extends BudgetContext<B, true> = BudgetContext<B, true>,
-  S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>
+  S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>,
 > = PublicTableProps<R, M, C, S> & {
   readonly onRowExpand?: (row: Table.ModelRow<R>) => void;
 };
@@ -18,7 +20,7 @@ const PublicBudgetTable = <
   M extends Model.RowHttpModel,
   B extends Model.Budget | Model.Template,
   C extends BudgetContext<B, true> = BudgetContext<B, true>,
-  S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>
+  S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>,
 >({
   onRowExpand,
   ...props
@@ -31,8 +33,8 @@ const PublicBudgetTable = <
           typeguard: tabling.rows.isModelRow,
           action: (r: Table.ModelRow<R>) => onRowExpand?.(r),
           behavior: "expand",
-          conditional: (r: Table.ModelRow<R>) => r.children.length !== 0
-        }
+          conditional: (r: Table.ModelRow<R>) => r.children.length !== 0,
+        },
       ] as [Table.EditColumnRowConfig<R, Table.ModelRow<R>>]
     }
     framework={tabling.aggrid.combineFrameworks(Framework, props.framework)}

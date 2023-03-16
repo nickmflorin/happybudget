@@ -1,11 +1,12 @@
+import { filter } from "lodash";
 import { SagaIterator } from "redux-saga";
 import { CallEffect, put, call, fork, select, all } from "redux-saga/effects";
-import { filter } from "lodash";
 
 import * as api from "api";
 import { tabling, http, notifications, redux } from "lib";
-import * as actions from "../actions";
+
 import * as contacts from "./contacts";
+import * as actions from "../actions";
 
 type R = Tables.ActualRowData;
 type M = Model.Actual;
@@ -17,11 +18,20 @@ type ActualsTableActionMap = Redux.ActionCreatorMap<
   TC
 > & {
   readonly loadingActualOwners: Redux.ActionCreator<boolean, TC>;
-  readonly responseActualOwners: Redux.ActionCreator<Http.RenderedListResponse<Model.ActualOwner>, TC>;
+  readonly responseActualOwners: Redux.ActionCreator<
+    Http.RenderedListResponse<Model.ActualOwner>,
+    TC
+  >;
   readonly updateBudgetInState: Redux.ActionCreator<Redux.UpdateModelPayload<Model.Budget>>;
 };
 
-type ActualsTableTaskConfig = Table.TaskConfig<R, M, Tables.ActualTableStore, TC, ActualsTableActionMap> & {
+type ActualsTableTaskConfig = Table.TaskConfig<
+  R,
+  M,
+  Tables.ActualTableStore,
+  TC,
+  ActualsTableActionMap
+> & {
   readonly selectOwnersSearch: (state: Application.Store) => string;
 };
 
@@ -38,7 +48,7 @@ const requestActualOwners = (config: ActualsTableTaskConfig) =>
         api.getBudgetActualOwners,
         action.context,
         action.context.budgetId,
-        { search, page_size: 10 }
+        { search, page_size: 10 },
       );
       const rs = yield call(() => response);
       return rs as Http.ListResponse<Model.ActualOwner>;
@@ -52,23 +62,24 @@ const requestSupplementaryTableData = (config: ActualsTableTaskConfig) =>
     const search = yield select(config.selectOwnersSearch);
     const effects: [
       CallEffect<Redux.ListRequestEffectRTWithError<Model.ActualOwner>>,
-      CallEffect<Redux.ListRequestEffectRTWithError<Model.Tag>>
+      CallEffect<Redux.ListRequestEffectRTWithError<Model.Tag>>,
     ] = [
       redux.wrapListRequestEffect(call(requestActualOwners(config), action), action, {
         query: { search },
-        selectStore: (s: Application.Store) => config.selectStore(s, action.context).owners
+        selectStore: (s: Application.Store) => config.selectStore(s, action.context).owners,
       }),
       redux.wrapListRequestEffect(http.request(api.getActualTypes, action.context), action, {
-        selectStore: (s: Application.Store) => s.actualTypes
-      })
+        selectStore: (s: Application.Store) => s.actualTypes,
+      }),
     ];
     const [owners, actualTypes]: [
       Http.RenderedListResponse<Model.ActualOwner> | null,
-      Http.RenderedListResponse<Model.Tag> | null
+      Http.RenderedListResponse<Model.Tag> | null,
     ] = yield redux.wrapListRequestEffects(effects, {
-      errorMessage: action.context.errorMessage || "There was an error retrieving supplementary table data.",
+      errorMessage:
+        action.context.errorMessage || "There was an error retrieving supplementary table data.",
       table: config.table,
-      errorDetail: "The table may not behave as expected."
+      errorDetail: "The table may not behave as expected.",
     });
     if (owners !== null) {
       yield put(config.actions.responseActualOwners(owners, action.context));
@@ -80,7 +91,7 @@ const requestSupplementaryTableData = (config: ActualsTableTaskConfig) =>
 
 const getRequestEffects = (
   config: ActualsTableTaskConfig,
-  action: Redux.Action<Redux.TableRequestPayload, TC>
+  action: Redux.Action<Redux.TableRequestPayload, TC>,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 ): [CallEffect<Http.ListResponse<Model.Actual>>, CallEffect<any>] => [
   /*
@@ -111,15 +122,17 @@ const getRequestEffects = (
   call(requestSupplementaryTableData(config), {
     payload: null,
     type: action.type,
-    context: action.context
-  } as Redux.Action<null, TC>)
+    context: action.context,
+  } as Redux.Action<null, TC>),
 ];
 
-export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsAuthenticatedTableTaskMap => {
+export const createTableTaskSet = (
+  config: ActualsTableTaskConfig,
+): ActualsAuthenticatedTableTaskMap => {
   function* request(action: Redux.Action<Redux.TableRequestPayload, TC>): SagaIterator {
     // Only perform the request if the data is not already in the store.
     const canUseCachedResponse = yield select((s: Application.Store) =>
-      redux.canUseCachedListResponse(config.selectStore(s, action.context))
+      redux.canUseCachedListResponse(config.selectStore(s, action.context)),
     );
     if (!canUseCachedResponse || redux.requestActionIsForced(action)) {
       yield put(config.actions.loading(true, { budgetId: action.context.budgetId }));
@@ -131,54 +144,74 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsAuthe
         const [actuals]: [Http.ListResponse<Model.Actual>] = yield all(effects);
         if (actuals.data.length === 0) {
           // If there is no table data, we want to default create two rows.
-          const createResponse: Http.ServiceResponse<typeof api.bulkCreateActuals> = yield http.request(
-            api.bulkCreateActuals,
-            action.context,
-            action.context.budgetId,
-            { data: [{}, {}] }
-          );
+          const createResponse: Http.ServiceResponse<typeof api.bulkCreateActuals> =
+            yield http.request(api.bulkCreateActuals, action.context, action.context.budgetId, {
+              data: [{}, {}],
+            });
           yield put(
-            config.actions.response({ models: createResponse.children }, { budgetId: action.context.budgetId })
+            config.actions.response(
+              { models: createResponse.children },
+              { budgetId: action.context.budgetId },
+            ),
           );
         } else {
-          yield put(config.actions.response({ models: actuals.data }, { budgetId: action.context.budgetId }));
+          yield put(
+            config.actions.response(
+              { models: actuals.data },
+              { budgetId: action.context.budgetId },
+            ),
+          );
         }
       } catch (e: unknown) {
         const err = e as Error;
-        if (err instanceof api.PermissionError && err.code === api.ErrorCodes.permission.PRODUCT_PERMISSION_ERROR) {
+        if (
+          err instanceof api.PermissionError &&
+          err.code === api.ErrorCodes.permission.PRODUCT_PERMISSION_ERROR
+        ) {
           notifications.ui.banner.lookupAndNotify("budgetSubscriptionPermissionError");
         } else {
           config.table.handleRequestError(e as Error, {
             message: action.context.errorMessage || "There was an error retrieving the table data.",
-            dispatchClientErrorToSentry: true
+            dispatchClientErrorToSentry: true,
           });
         }
-        yield put(config.actions.response({ error: e as api.RequestError }, { budgetId: action.context.budgetId }));
+        yield put(
+          config.actions.response(
+            { error: e as api.RequestError },
+            { budgetId: action.context.budgetId },
+          ),
+        );
       } finally {
         yield put(config.actions.loading(false, { budgetId: action.context.budgetId }));
       }
     }
   }
 
-  const bulkCreateTask: (e: Table.RowAddEvent<R>, ctx: TC) => SagaIterator = tabling.createBulkTask({
-    table: config.table,
-    service: () => api.bulkCreateActuals,
-    selectStore: config.selectStore,
-    responseActions: (ctx: TC, r: Http.ParentChildListResponse<Model.Budget, M>, e: Table.RowAddEvent<R>) => [
-      config.actions.handleEvent(
-        {
-          type: "placeholdersActivated",
-          payload: { placeholderIds: e.placeholderIds, models: r.children }
-        },
-        ctx
-      ),
-      config.actions.updateBudgetInState({ id: r.parent.id, data: r.parent }, {})
-    ],
-    performCreate: (
-      ctx: TC,
-      p: Http.BulkCreatePayload<Http.ActualPayload>
-    ): [number, Http.BulkCreatePayload<Http.ActualPayload>] => [ctx.budgetId, p]
-  });
+  const bulkCreateTask: (e: Table.RowAddEvent<R>, ctx: TC) => SagaIterator = tabling.createBulkTask(
+    {
+      table: config.table,
+      service: () => api.bulkCreateActuals,
+      selectStore: config.selectStore,
+      responseActions: (
+        ctx: TC,
+        r: Http.ParentChildListResponse<Model.Budget, M>,
+        e: Table.RowAddEvent<R>,
+      ) => [
+        config.actions.handleEvent(
+          {
+            type: "placeholdersActivated",
+            payload: { placeholderIds: e.placeholderIds, models: r.children },
+          },
+          ctx,
+        ),
+        config.actions.updateBudgetInState({ id: r.parent.id, data: r.parent }, {}),
+      ],
+      performCreate: (
+        ctx: TC,
+        p: Http.BulkCreatePayload<Http.ActualPayload>,
+      ): [number, Http.BulkCreatePayload<Http.ActualPayload>] => [ctx.budgetId, p],
+    },
+  );
 
   function* bulkUpdateTask(ctx: TC, requestPayload: Http.BulkUpdatePayload<P>): SagaIterator {
     config.table.saving(true);
@@ -187,13 +220,13 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsAuthe
         api.bulkUpdateActuals,
         ctx,
         ctx.budgetId,
-        requestPayload
+        requestPayload,
       );
       yield put(config.actions.updateBudgetInState({ id: r.parent.id, data: r.parent }, {}));
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, {
         message: ctx.errorMessage || "There was an error updating the rows.",
-        dispatchClientErrorToSentry: true
+        dispatchClientErrorToSentry: true,
       });
     } finally {
       config.table.saving(false);
@@ -207,13 +240,13 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsAuthe
         api.bulkDeleteActuals,
         ctx,
         ctx.budgetId,
-        { ids }
+        { ids },
       );
       yield put(config.actions.updateBudgetInState({ id: r.parent.id, data: r.parent }, {}));
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, {
         message: ctx.errorMessage || "There was an error deleting the rows.",
-        dispatchClientErrorToSentry: true
+        dispatchClientErrorToSentry: true,
       });
     } finally {
       config.table.saving(false);
@@ -222,32 +255,32 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsAuthe
 
   function* handleRowPositionChangedEvent(e: Table.RowPositionChangedEvent, ctx: TC): SagaIterator {
     const response: M = yield http.request(api.updateActual, ctx, e.payload.id, {
-      previous: e.payload.previous
+      previous: e.payload.previous,
     });
     yield put(
       config.actions.handleEvent(
         {
           type: "modelsUpdated",
-          payload: { model: response }
+          payload: { model: response },
         },
-        ctx
-      )
+        ctx,
+      ),
     );
   }
 
   function* handleRowInsertEvent(e: Table.RowInsertEvent<R>, ctx: TC): SagaIterator {
     const response: M = yield http.request(api.createActual, ctx, ctx.budgetId, {
       previous: e.payload.previous,
-      ...tabling.rows.postPayload<R, M, P>(e.payload.data, config.table.getColumns())
+      ...tabling.rows.postPayload<R, M, P>(e.payload.data, config.table.getColumns()),
     });
     yield put(
       config.actions.handleEvent(
         {
           type: "modelsAdded",
-          payload: { model: response }
+          payload: { model: response },
         },
-        ctx
-      )
+        ctx,
+      ),
     );
   }
 
@@ -266,7 +299,10 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsAuthe
   function* handleDataChangeEvent(e: Table.DataChangeEvent<R>, ctx: TC): SagaIterator {
     const merged = tabling.events.consolidateRowChanges(e.payload);
     if (merged.length !== 0) {
-      const requestPayload = tabling.rows.createBulkUpdatePayload<R, M, P>(merged, config.table.getColumns());
+      const requestPayload = tabling.rows.createBulkUpdatePayload<R, M, P>(
+        merged,
+        config.table.getColumns(),
+      );
       if (requestPayload.data.length !== 0) {
         yield fork(bulkUpdateTask, ctx, requestPayload);
       }
@@ -280,12 +316,16 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): ActualsAuthe
       rowAdd: handleRowAddEvent,
       rowDelete: handleRowDeleteEvent,
       dataChange: handleDataChangeEvent,
-      rowInsert: tabling.task(handleRowInsertEvent, config.table, "There was an error adding the table rows."),
+      rowInsert: tabling.task(
+        handleRowInsertEvent,
+        config.table,
+        "There was an error adding the table rows.",
+      ),
       rowPositionChanged: tabling.task(
         handleRowPositionChangedEvent,
         config.table,
-        "There was an error moving the table rows."
-      )
-    })
+        "There was an error moving the table rows.",
+      ),
+    }),
   };
 };

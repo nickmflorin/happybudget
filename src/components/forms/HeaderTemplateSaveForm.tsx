@@ -1,4 +1,5 @@
 import { useState, useEffect, useImperativeHandle, forwardRef, ForwardedRef } from "react";
+
 import classNames from "classnames";
 import { isNil } from "lodash";
 
@@ -22,8 +23,17 @@ interface HeaderTemplateSaveFormProps extends StandardComponentProps {
 }
 
 const HeaderTemplateSaveForm = (
-  { value, disabled, saving, select, onSave, onChange, onDeleted, ...props }: HeaderTemplateSaveFormProps,
-  ref: ForwardedRef<IHeaderTemplateSaveFormRef>
+  {
+    value,
+    disabled,
+    saving,
+    select,
+    onSave,
+    onChange,
+    onDeleted,
+    ...props
+  }: HeaderTemplateSaveFormProps,
+  ref: ForwardedRef<IHeaderTemplateSaveFormRef>,
 ): JSX.Element => {
   const [error, setError] = useState<string | null>(null);
   const [saveAsMode, setSaveAsMode] = useState(false);
@@ -32,7 +42,7 @@ const HeaderTemplateSaveForm = (
 
   useImperativeHandle(ref, () => ({
     setRequestNameInput,
-    setError
+    setError,
   }));
 
   useEffect(() => {
@@ -43,8 +53,8 @@ const HeaderTemplateSaveForm = (
 
   return (
     <div {...props} className={classNames("header-template-save-form", props.className)}>
-      <Form.Item label={"Header Template"}>
-        <div className={"header-template-save-form-content"}>
+      <Form.Item label="Header Template">
+        <div className="header-template-save-form-content">
           <HeaderTemplateSelect
             wrapperStyle={{ width: 200, marginRight: 6 }}
             value={isNil(value) ? value : value.id}
@@ -73,9 +83,8 @@ const HeaderTemplateSaveForm = (
               }
             }}
           >
-            {"Save"}
+            Save
           </DefaultButton>
-
           <ShowHide show={!isNil(value) && saveAsMode === false}>
             <DefaultButton
               style={{ marginRight: requestNameInput ? 6 : 0, fontSize: "11px" }}
@@ -85,20 +94,19 @@ const HeaderTemplateSaveForm = (
                 setSaveAsMode(true);
               }}
             >
-              {"Save As..."}
+              Save As...
             </DefaultButton>
           </ShowHide>
-
           <ShowHide show={requestNameInput}>
             <div style={{ display: "flex" }}>
               <Input
-                placeholder={"Name"}
+                placeholder="Name"
                 className={classNames({ "with-error": !isNil(error) })}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
               />
               <ClearButton
-                size={"small"}
-                iconSize={"small"}
+                size="small"
+                iconSize="small"
                 onClick={() => {
                   setError(null);
                   setRequestNameInput(false);

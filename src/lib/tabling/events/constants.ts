@@ -8,14 +8,14 @@ export const CHANGE_EVENT_IDS: Table.ChangeEventId[] = [
   "rowPositionChanged",
   "rowDelete",
   "rowRemoveFromGroup",
-  "rowAddToGroup"
+  "rowAddToGroup",
 ];
 
 export const CONTROL_EVENT_IDS: Table.ControlEventId[] = [
   "modelsUpdated",
   "updateRows",
   "modelsAdded",
-  "placeholdersActivated"
+  "placeholdersActivated",
 ];
 
 export const TRAVERSIBLE_EVENT_IDS: Table.TraversibleEventId[] = ["dataChange"];

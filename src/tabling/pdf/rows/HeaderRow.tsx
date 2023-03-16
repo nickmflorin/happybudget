@@ -1,13 +1,13 @@
 import classNames from "classnames";
 
+import Row, { RowProps } from "./Row";
 import { RowExplicitCellProps } from "../cells/Cell";
 import HeaderCell from "../cells/HeaderCell";
-import Row, { RowProps } from "./Row";
 
 interface HeaderRowProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  V extends Table.RawRowValue = Table.RawRowValue
+  V extends Table.RawRowValue = Table.RawRowValue,
 > extends RowProps<R, M, V> {
   readonly cellProps?: RowExplicitCellProps<R, M, V>;
 }
@@ -15,7 +15,7 @@ interface HeaderRowProps<
 const HeaderRow = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  V extends Table.RawRowValue = Table.RawRowValue
+  V extends Table.RawRowValue = Table.RawRowValue,
 >({
   cellProps,
   ...props
@@ -28,9 +28,7 @@ const HeaderRow = <
       firstChild: boolean;
       column: Table.DataColumn<R, M, V>;
       colIndex: number;
-    }) => {
-      return <HeaderCell<R, M, V> {...params} {...cellProps} />;
-    }}
+    }) => <HeaderCell<R, M, V> {...params} {...cellProps} />}
   />
 );
 

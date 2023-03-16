@@ -1,7 +1,8 @@
 import React, { forwardRef } from "react";
+
+import classNames from "classnames";
 import { InputRef, Input as AntDInput } from "antd";
 import { InputProps as AntDInputProps } from "antd/lib/input";
-import classNames from "classnames";
 
 import { withSize } from "components/hocs";
 
@@ -17,7 +18,7 @@ const Input = (props: PrivateInputProps, ref: React.ForwardedRef<InputRef>): JSX
 );
 
 export default withSize<InputProps, StandardSize, "size", InputRef>({
-  hasRef: true
+  hasRef: true,
 })(forwardRef(Input)) as React.ForwardRefRenderFunction<
   InputRef,
   InputProps & { readonly ref?: React.ForwardedRef<InputRef> }

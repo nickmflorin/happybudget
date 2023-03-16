@@ -1,12 +1,15 @@
 import React, { useEffect, useState, useRef } from "react";
+
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import { EditPublicTokenForm } from "components/forms";
-import { EditPublicTokenFormValues, IEditPublicTokenFormRef } from "components/forms/EditPublicTokenForm";
-
 import * as api from "api";
 import { ui, http } from "lib";
+import { EditPublicTokenForm } from "components/forms";
+import {
+  EditPublicTokenFormValues,
+  IEditPublicTokenFormRef,
+} from "components/forms/EditPublicTokenForm";
 
 import ContentMenu from "./ContentMenu";
 
@@ -38,7 +41,7 @@ const EditPublicTokenMenu = ({
         formRef.current?.setAutoExpire(!isNil(token.expires_at));
         form.setFields([
           { name: "public_id", value: token.public_id },
-          { name: "expires_at", value: token.expires_at }
+          { name: "expires_at", value: token.expires_at },
         ]);
       })
       .catch((e: Error) => form.handleRequestError(e))
@@ -52,8 +55,8 @@ const EditPublicTokenMenu = ({
       style={{ ...props.style, minWidth: 400, padding: 10 }}
     >
       <div style={{ marginBottom: 12 }}>
-        <h5 style={{ marginBottom: 6 }}>{"Share your budget with a private link."}</h5>
-        <p>{"People with the private link can only see a read-only version of your budget."}</p>
+        <h5 style={{ marginBottom: 6 }}>Share your budget with a private link.</h5>
+        <p>People with the private link can only see a read-only version of your budget.</p>
       </div>
       <EditPublicTokenForm
         form={form}

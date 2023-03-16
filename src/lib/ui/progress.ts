@@ -1,4 +1,5 @@
 import { useReducer, useEffect, useMemo, useRef } from "react";
+
 import { isNil, includes } from "lodash";
 
 type ProgressState = {
@@ -12,7 +13,7 @@ const InitialProgressState: ProgressState = {
   dampened: 0.0,
   actual: 0.0,
   progress: 0.0,
-  active: false
+  active: false,
 };
 
 type ProgressActionType = "INCREMENT_ACTUAL" | "INCREMENT_DAMPENED" | "CANCEL";
@@ -30,7 +31,10 @@ type ProgressIncrementAction = IProgressAction<
   }
 >;
 
-type ProgressAction = ProgressIncrementAction | IProgressAction<"CANCEL"> | IProgressAction<"INCREMENT_DAMPENED">;
+type ProgressAction =
+  | ProgressIncrementAction
+  | IProgressAction<"CANCEL">
+  | IProgressAction<"INCREMENT_DAMPENED">;
 
 type ProgressReducerConfig = {
   readonly rate: number;
@@ -40,7 +44,10 @@ const createProgressReducer = (config: ProgressReducerConfig) => {
   if (config.rate >= 1.0 || config.rate < 0.0) {
     throw new Error("Dampened progress rate must be a positive number < 1.0.");
   }
-  const progressReducer = (state: ProgressState = InitialProgressState, action: ProgressAction): ProgressState => {
+  const progressReducer = (
+    state: ProgressState = InitialProgressState,
+    action: ProgressAction,
+  ): ProgressState => {
     if (includes(["INCREMENT_ACTUAL", "INCREMENT_DAMPENED"], action.type)) {
       let { actual, progress, dampened }: ProgressState = { ...state };
       if (action.type === "INCREMENT_ACTUAL") {
@@ -63,9 +70,16 @@ type UseDampenedProgressConfig = {
   readonly perMilliseconds?: number;
 };
 
-type UseDampenedProgressReturnType = [number, boolean, (value: number, total: number) => void, () => void];
+type UseDampenedProgressReturnType = [
+  number,
+  boolean,
+  (value: number, total: number) => void,
+  () => void,
+];
 
-export const useDampenedProgress = (config?: UseDampenedProgressConfig): UseDampenedProgressReturnType => {
+export const useDampenedProgress = (
+  config?: UseDampenedProgressConfig,
+): UseDampenedProgressReturnType => {
   const progressReducer = createProgressReducer({ rate: config?.dampenedRate || 0.05 });
   const [state, dispatch] = useReducer(progressReducer, InitialProgressState);
   const interval = useRef<number | undefined>(undefined);
@@ -77,7 +91,7 @@ export const useDampenedProgress = (config?: UseDampenedProgressConfig): UseDamp
       }
       dispatch({ type: "INCREMENT_ACTUAL", payload: { value, total } });
     },
-    [state.active]
+    [state.active],
   );
 
   const cancel = useMemo(
@@ -86,7 +100,7 @@ export const useDampenedProgress = (config?: UseDampenedProgressConfig): UseDamp
         clearInterval(interval.current);
       }
     },
-    [interval.current]
+    [interval.current],
   );
 
   useEffect(() => {

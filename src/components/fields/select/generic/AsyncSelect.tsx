@@ -1,21 +1,22 @@
 import React, { useMemo, useRef } from "react";
-import { OnChangeValue, SelectComponentsConfig, ActionMeta } from "react-select";
-import Select from "react-select/dist/declarations/src/Select";
-import RCAsyncSelect, { AsyncProps } from "react-select/async";
+
 import classNames from "classnames";
 import { isNil } from "lodash";
+import { OnChangeValue, SelectComponentsConfig, ActionMeta } from "react-select";
+import RCAsyncSelect, { AsyncProps } from "react-select/async";
+import Select from "react-select/dist/declarations/src/Select";
 
 import { ConditionalWrapper } from "components";
 import { InputFieldNotifications } from "components/notifications";
 
-import { useSelectRef } from "./Select";
 import { Option } from "./options";
+import { useSelectRef } from "./Select";
 
 export type AsyncSelectProps<
   O extends SelectOption,
   M extends boolean = false,
   RSP extends Http.ListResponse<unknown> = Http.ListResponse<unknown>,
-  G extends SelectGroupBase<O> = SelectGroupBase<O>
+  G extends SelectGroupBase<O> = SelectGroupBase<O>,
 > = Omit<
   AsyncProps<O, M, G>,
   "getOptionLabel" | "getOptionValue" | "onChange" | "components" | "loadOptions" | "options"
@@ -38,7 +39,7 @@ const AsyncSelect = <
   O extends SelectOption,
   M extends boolean = false,
   RSP extends Http.ListResponse<unknown> = Http.ListResponse<unknown>,
-  G extends SelectGroupBase<O> = SelectGroupBase<O>
+  G extends SelectGroupBase<O> = SelectGroupBase<O>,
 >({
   borderless,
   wrapperStyle,
@@ -57,7 +58,7 @@ const AsyncSelect = <
       onError?.(e);
       notificationsManager.handleRequestError(e);
     },
-    [notificationsManager.handleRequestError, onError]
+    [notificationsManager.handleRequestError, onError],
   );
 
   const _loadOptions = useMemo(
@@ -77,7 +78,7 @@ const AsyncSelect = <
                   resolve(processResponse(response));
                 } else {
                   console.error(
-                    "The options were loaded asynchronusly, but the process response method was not provided."
+                    "The options were loaded asynchronusly, but the process response method was not provided.",
                   );
                   resolve([]);
                 }
@@ -86,7 +87,7 @@ const AsyncSelect = <
           }
         }
       }),
-    [loadOptions, onError, processResponse, loadOptionsWithoutValue]
+    [loadOptions, onError, processResponse, loadOptionsWithoutValue],
   );
 
   return (
@@ -97,8 +98,8 @@ const AsyncSelect = <
         components={{ Option, ...props.components }}
         loadOptions={_loadOptions}
         className={classNames("react-select-container", props.className, { borderless })}
-        classNamePrefix={"react-select"}
-        menuPosition={"fixed"}
+        classNamePrefix="react-select"
+        menuPosition="fixed"
         ref={selectRef}
       />
       <InputFieldNotifications notifications={notificationsManager.notifications} />

@@ -1,27 +1,33 @@
 import React from "react";
+
 import { map, isNil } from "lodash";
 
 import { budgeting } from "lib";
-
-import { Portal, BreadCrumbs } from "components/layout";
 import { EntityTextButton } from "components/buttons";
+import { Portal, BreadCrumbs } from "components/layout";
 import { EntityText } from "components/typography";
 
-interface BudgetPageProps<B extends Model.Budget | Model.Template, P extends Model.Account | Model.SubAccount> {
+interface BudgetPageProps<
+  B extends Model.Budget | Model.Template,
+  P extends Model.Account | Model.SubAccount,
+> {
   readonly budget: B | null;
   readonly tokenId?: string;
   readonly parent?: P | null;
   readonly children: React.ReactChild | React.ReactChild[];
 }
 
-const BudgetPage = <B extends Model.Budget | Model.Template, P extends Model.Account | Model.SubAccount>({
+const BudgetPage = <
+  B extends Model.Budget | Model.Template,
+  P extends Model.Account | Model.SubAccount,
+>({
   budget,
   parent,
   children,
-  tokenId
+  tokenId,
 }: BudgetPageProps<B, P>): JSX.Element => (
   <React.Fragment>
-    <Portal id={"breadcrumbs"}>
+    <Portal id="breadcrumbs">
       <BreadCrumbs<{ b: B; p: P }>
         params={{ b: budget, p: parent || null }}
         items={[
@@ -32,8 +38,8 @@ const BudgetPage = <B extends Model.Budget | Model.Template, P extends Model.Acc
               primary: true,
               label: b.name,
               tooltip: { content: "Top Sheet", placement: "bottom" },
-              url: budgeting.urls.getUrl(b, undefined, tokenId)
-            })
+              url: budgeting.urls.getUrl(b, undefined, tokenId),
+            }),
           },
           {
             requiredParams: ["b", "p"],
@@ -61,32 +67,30 @@ const BudgetPage = <B extends Model.Budget | Model.Template, P extends Model.Acc
 
               const table = (p.table || []) as (Model.SimpleAccount | Model.SimpleSubAccount)[];
               return [
-                ...map(ancestors, (ancestor: Model.SimpleAccount | Model.SimpleSubAccount) => {
-                  return {
-                    id: ancestor.id,
-                    renderContent: () => <EntityText fillEmpty={"---------"}>{ancestor}</EntityText>,
-                    url: budgeting.urls.getUrl(b, ancestor, tokenId)
-                  };
-                }),
+                ...map(ancestors, (ancestor: Model.SimpleAccount | Model.SimpleSubAccount) => ({
+                  id: ancestor.id,
+                  renderContent: () => <EntityText fillEmpty="---------">{ancestor}</EntityText>,
+                  url: budgeting.urls.getUrl(b, ancestor, tokenId),
+                })),
                 {
                   id: p.id,
                   url: budgeting.urls.getUrl(b, p, tokenId),
                   renderContent: () => {
                     if (!isNil(p.table) && p.table.length !== 0) {
-                      return <EntityTextButton fillEmpty={"---------"}>{p}</EntityTextButton>;
+                      return <EntityTextButton fillEmpty="---------">{p}</EntityTextButton>;
                     }
-                    return <EntityText fillEmpty={"---------"}>{p}</EntityText>;
+                    return <EntityText fillEmpty="---------">{p}</EntityText>;
                   },
                   options: map(table, (option: Model.SimpleAccount | Model.SimpleSubAccount) => ({
                     id: option.id,
                     url: budgeting.urls.getUrl(b, option, tokenId),
                     defaultFocused: option.id === p.id,
-                    renderContent: () => <EntityText fillEmpty={"---------"}>{option}</EntityText>
-                  }))
-                }
+                    renderContent: () => <EntityText fillEmpty="---------">{option}</EntityText>,
+                  })),
+                },
               ];
-            }
-          }
+            },
+          },
         ]}
       />
     </Portal>

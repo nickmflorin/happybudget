@@ -1,10 +1,10 @@
 import { SagaIterator } from "redux-saga";
 import { spawn, takeLatest } from "redux-saga/effects";
 
-import * as actions from "../../actions/public";
-import * as tasks from "../tasks";
 import accountSaga from "./account";
 import subAccountSaga from "./subAccount";
+import * as actions from "../../actions/public";
+import * as tasks from "../tasks";
 
 export * as accounts from "./accounts";
 export * as account from "./account";

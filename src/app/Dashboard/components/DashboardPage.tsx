@@ -1,7 +1,8 @@
 import React, { useMemo } from "react";
-import { useHistory } from "react-router-dom";
-import { useSelector } from "react-redux";
+
 import { isNil, map } from "lodash";
+import { useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 
 import { Icon, Pagination, NoData, NoDataProps } from "components";
 import { OrderingButtonIconToggle } from "components/buttons";
@@ -9,63 +10,82 @@ import { OrderingDropdownMenu } from "components/dropdowns";
 import { Input } from "components/fields";
 import { Page } from "components/layout";
 
-const selectBudgets = <B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate>(
-  state: Redux.AuthenticatedModelListStore<B>
+const selectBudgets = <
+  B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate,
+>(
+  state: Redux.AuthenticatedModelListStore<B>,
 ) => state.data;
 
-const selectLoading = <B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate>(
-  state: Redux.AuthenticatedModelListStore<B>
+const selectLoading = <
+  B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate,
+>(
+  state: Redux.AuthenticatedModelListStore<B>,
 ) => state.loading;
 
-const selectSearch = <B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate>(
-  state: Redux.AuthenticatedModelListStore<B>
+const selectSearch = <
+  B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate,
+>(
+  state: Redux.AuthenticatedModelListStore<B>,
 ) => state.search;
 
-const selectOrdering = <B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate>(
-  state: Redux.AuthenticatedModelListStore<B>
+const selectOrdering = <
+  B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate,
+>(
+  state: Redux.AuthenticatedModelListStore<B>,
 ) => state.ordering;
 
-const selectPageSize = <B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate>(
-  state: Redux.AuthenticatedModelListStore<B>
+const selectPageSize = <
+  B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate,
+>(
+  state: Redux.AuthenticatedModelListStore<B>,
 ) => state.pageSize;
 
-const selectPage = <B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate>(
-  state: Redux.AuthenticatedModelListStore<B>
+const selectPage = <
+  B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate,
+>(
+  state: Redux.AuthenticatedModelListStore<B>,
 ) => state.page;
 
-const selectCount = <B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate>(
-  state: Redux.AuthenticatedModelListStore<B>
+const selectCount = <
+  B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate,
+>(
+  state: Redux.AuthenticatedModelListStore<B>,
 ) => state.count;
 
 const selectResponseWasReceived = <
-  B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate
+  B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate,
 >(
-  state: Redux.AuthenticatedModelListStore<B>
+  state: Redux.AuthenticatedModelListStore<B>,
 ) => state.responseWasReceived;
 
 export type RenderDashboardPageCardParams<
-  B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate
+  B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate,
 > = {
   readonly budget: B;
   readonly onClick: () => void;
 };
 
-export type DashboardPageProps<B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate> =
-  {
-    readonly title: string;
-    readonly noDataProps?: Omit<NoDataProps, "icon"> & { readonly child: JSX.Element };
-    readonly searchPlaceholder?: string;
-    readonly createMenuElement?: JSX.Element;
-    readonly lastCard?: (b: B[]) => JSX.Element;
-    readonly selector: (state: Application.Store) => Redux.AuthenticatedModelListStore<B>;
-    readonly onUpdateOrdering: (o: Redux.UpdateOrderingPayload) => void;
-    readonly renderCard: (p: RenderDashboardPageCardParams<B>) => JSX.Element;
-    readonly onSearch: (v: string) => void;
-    readonly onUpdatePagination: (p: Pagination) => void;
-  };
+export type DashboardPageProps<
+  B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate,
+> = {
+  readonly title: string;
+  readonly noDataProps?: Omit<NoDataProps, "icon"> & { readonly child: JSX.Element };
+  readonly searchPlaceholder?: string;
+  readonly createMenuElement?: JSX.Element;
+  readonly lastCard?: (b: B[]) => JSX.Element;
+  readonly selector: (state: Application.Store) => Redux.AuthenticatedModelListStore<B>;
+  readonly onUpdateOrdering: (o: Redux.UpdateOrderingPayload) => void;
+  readonly renderCard: (p: RenderDashboardPageCardParams<B>) => JSX.Element;
+  readonly onSearch: (v: string) => void;
+  readonly onUpdatePagination: (p: Pagination) => void;
+};
 
-const OrderingMenu = <B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate>(
-  props: Pick<DashboardPageProps<B>, "onUpdateOrdering"> & { readonly ordering: Http.Ordering<string> }
+const OrderingMenu = <
+  B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate,
+>(
+  props: Pick<DashboardPageProps<B>, "onUpdateOrdering"> & {
+    readonly ordering: Http.Ordering<string>;
+  },
 ): JSX.Element => (
   <OrderingDropdownMenu
     ordering={props.ordering}
@@ -73,35 +93,41 @@ const OrderingMenu = <B extends Model.SimpleBudget | Model.SimpleCollaboratingBu
     models={[
       { id: "created_at", icon: "bars-sort", label: "Created" },
       { id: "updated_at", icon: "timer", label: "Last Updated" },
-      { id: "name", icon: "sort-alpha-down", label: "Name" }
+      { id: "name", icon: "sort-alpha-down", label: "Name" },
     ]}
   >
     <OrderingButtonIconToggle
-      breakpoint={"medium"}
+      breakpoint="medium"
       ordering={props.ordering}
       labelMap={{
         created_at: "Created",
         updated_at: "Last Updated",
-        name: "Name"
+        name: "Name",
       }}
     />
   </OrderingDropdownMenu>
 );
 
-const SearchInput = <B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate>(
-  props: Pick<DashboardPageProps<B>, "searchPlaceholder" | "onSearch"> & { readonly search: string }
+const SearchInput = <
+  B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate,
+>(
+  props: Pick<DashboardPageProps<B>, "searchPlaceholder" | "onSearch"> & {
+    readonly search: string;
+  },
 ): JSX.Element => (
   <Input
     placeholder={props.searchPlaceholder || "Search Projects..."}
     value={props.search}
     allowClear={true}
-    prefix={<Icon icon={"search"} weight={"light"} />}
+    prefix={<Icon icon="search" weight="light" />}
     onChange={(event: React.ChangeEvent<HTMLInputElement>) => props.onSearch(event.target.value)}
   />
 );
 
-const DashboardPage = <B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate>(
-  props: DashboardPageProps<B>
+const DashboardPage = <
+  B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate,
+>(
+  props: DashboardPageProps<B>,
 ): JSX.Element => {
   const history = useHistory();
 
@@ -112,15 +138,29 @@ const DashboardPage = <B extends Model.SimpleBudget | Model.SimpleCollaboratingB
   const count = useSelector((s: Application.Store) => selectCount(props.selector(s)));
   const pageSize = useSelector((s: Application.Store) => selectPageSize(props.selector(s)));
   const page = useSelector((s: Application.Store) => selectPage(props.selector(s)));
-  const responseWasReceived = useSelector((s: Application.Store) => selectResponseWasReceived(props.selector(s)));
+  const responseWasReceived = useSelector((s: Application.Store) =>
+    selectResponseWasReceived(props.selector(s)),
+  );
 
   const subMenu = useMemo(
     () => [
-      <SearchInput key={0} search={search} searchPlaceholder={props.searchPlaceholder} onSearch={props.onSearch} />,
+      <SearchInput
+        key={0}
+        search={search}
+        searchPlaceholder={props.searchPlaceholder}
+        onSearch={props.onSearch}
+      />,
       <React.Fragment key={1}>{props.createMenuElement}</React.Fragment>,
-      <OrderingMenu key={2} ordering={ordering} onUpdateOrdering={props.onUpdateOrdering} />
+      <OrderingMenu key={2} ordering={ordering} onUpdateOrdering={props.onUpdateOrdering} />,
     ],
-    [search, props.searchPlaceholder, props.onSearch, props.createMenuElement, props.onUpdateOrdering, ordering]
+    [
+      search,
+      props.searchPlaceholder,
+      props.onSearch,
+      props.createMenuElement,
+      props.onUpdateOrdering,
+      ordering,
+    ],
   );
 
   return (
@@ -132,16 +172,16 @@ const DashboardPage = <B extends Model.SimpleBudget | Model.SimpleCollaboratingB
       subMenu={subMenu}
     >
       {budgets.length === 0 && responseWasReceived && !isNil(props.noDataProps) ? (
-        <NoData {...props.noDataProps} icon={<Icon icon={"plus"} weight={"light"} />}>
+        <NoData {...props.noDataProps} icon={<Icon icon="plus" weight="light" />}>
           {props.noDataProps.child}
         </NoData>
       ) : (
-        <div className={"dashboard-card-grid"}>
+        <div className="dashboard-card-grid">
           {map(budgets, (budget: B, index: number) => (
             <React.Fragment key={index}>
               {props.renderCard({
                 budget,
-                onClick: () => history.push(`/${budget.domain}s/${budget.id}`)
+                onClick: () => history.push(`/${budget.domain}s/${budget.id}`),
               })}
             </React.Fragment>
           ))}

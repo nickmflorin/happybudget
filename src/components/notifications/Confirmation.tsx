@@ -1,11 +1,10 @@
 import React from "react";
-import classNames from "classnames";
 
+import classNames from "classnames";
 import { Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
 import { cookies } from "lib";
-
 import { Notification } from "components/notifications";
 
 export type ConfirmationProps = StandardComponentProps & {
@@ -32,7 +31,7 @@ const Confirmation = ({
         cookies.setConfirmationSuppressed(suppressionKey, e.target.checked);
       }}
     >
-      {"Don't show this message again"}
+      Don't show this message again
     </Checkbox>
   </div>
 );

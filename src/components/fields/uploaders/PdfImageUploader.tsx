@@ -1,9 +1,9 @@
 import React from "react";
+
 import classNames from "classnames";
 import { isNil } from "lodash";
 
 import { model, util } from "lib";
-
 import { Icon } from "components";
 import { ClearButton } from "components/buttons";
 
@@ -21,8 +21,8 @@ const PdfImageUploader = (props: UploaderProps): JSX.Element => (
       if (!isNil(params.error)) {
         return (
           <React.Fragment>
-            <Icon icon={"exclamation-circle"} weight={"solid"} style={{ marginLeft: 6 }} />
-            <div className={"upload-text error-text"}>
+            <Icon icon="exclamation-circle" weight="solid" style={{ marginLeft: 6 }} />
+            <div className="upload-text error-text">
               {typeof params.error === "string" ? params.error : params.error.message}
             </div>
           </React.Fragment>
@@ -30,8 +30,8 @@ const PdfImageUploader = (props: UploaderProps): JSX.Element => (
       } else if (model.isUploadParamsWithImage(params)) {
         return (
           <React.Fragment>
-            <Icon icon={"check-circle"} weight={"solid"} style={{ marginLeft: 6 }} />
-            <div className={"upload-text file-text"}>
+            <Icon icon="check-circle" weight="solid" style={{ marginLeft: 6 }} />
+            <div className="upload-text file-text">
               {model.isUploadedImage(params.image)
                 ? util.files.truncateFileName(params.image.fileName || params.image.name, 18)
                 : !isNil(params.image.extension)
@@ -39,8 +39,8 @@ const PdfImageUploader = (props: UploaderProps): JSX.Element => (
                 : "Saved Image"}
             </div>
             <ClearButton
-              size={"small"}
-              iconSize={"small"}
+              size="small"
+              iconSize="small"
               onClick={(e: React.MouseEvent<HTMLInputElement>) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -52,8 +52,8 @@ const PdfImageUploader = (props: UploaderProps): JSX.Element => (
       }
       return (
         <React.Fragment>
-          <Icon icon={"images"} weight={"solid"} style={{ marginLeft: 6 }} />
-          <div className={"upload-text no-file-text"}>{"Upload File"}</div>
+          <Icon icon="images" weight="solid" style={{ marginLeft: 6 }} />
+          <div className="upload-text no-file-text">Upload File</div>
         </React.Fragment>
       );
     }}

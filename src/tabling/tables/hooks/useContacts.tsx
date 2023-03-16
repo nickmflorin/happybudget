@@ -1,16 +1,20 @@
 import React, { useMemo } from "react";
-import { Dispatch } from "redux";
-import { useDispatch } from "react-redux";
+
 import { isNil, find } from "lodash";
+import { useDispatch } from "react-redux";
+import { Dispatch } from "redux";
 
 import { model, tabling, hooks } from "lib";
 import * as store from "store";
-
-import { useContacts as useContactsComponents, EditContactParams, CreateContactParams } from "components/model/hooks";
+import {
+  useContacts as useContactsComponents,
+  EditContactParams,
+  CreateContactParams,
+} from "components/model/hooks";
 
 type UseContactsReturnType<
   R extends Tables.ActualRowData | Tables.SubAccountRowData | Tables.ContactRowData,
-  M extends Model.Actual | Model.SubAccount
+  M extends Model.Actual | Model.SubAccount,
 > = {
   readonly data: Model.Contact[];
   readonly modals: JSX.Element;
@@ -20,7 +24,7 @@ type UseContactsReturnType<
 
 type UseContactsProps<
   R extends Tables.ActualRowData | Tables.SubAccountRowData,
-  M extends Model.Actual | Model.SubAccount
+  M extends Model.Actual | Model.SubAccount,
 > = {
   readonly table: NonNullRef<Table.TableInstance<R, M>>;
   readonly columns: Table.Column<R, M>[];
@@ -32,9 +36,9 @@ type UseContactsProps<
 
 const useContacts = <
   R extends Tables.ActualRowData | Tables.SubAccountRowData,
-  M extends Model.Actual | Model.SubAccount
+  M extends Model.Actual | Model.SubAccount,
 >(
-  props: UseContactsProps<R, M>
+  props: UseContactsProps<R, M>,
 ): UseContactsReturnType<R, M> => {
   const cs = store.hooks.useContacts();
   const dispatch: Dispatch = useDispatch();
@@ -63,13 +67,14 @@ const useContacts = <
       const names = model.parseFirstAndLastName(name);
       const contact: Model.Contact | undefined = find(cs, {
         first_name: names[0],
-        last_name: names[1]
+        last_name: names[1],
       });
       return contact?.id || null;
     }
   });
 
-  const [createContactModal, editContactModal, editContact, createContact] = useContactsComponents(props);
+  const [createContactModal, editContactModal, editContact, createContact] =
+    useContactsComponents(props);
 
   const columns = useMemo(
     () =>
@@ -79,45 +84,51 @@ const useContacts = <
           processCellForCSV,
           cellRendererParams: {
             onEditContact: (params: { contact: number; rowId: Table.ModelRowId }) =>
-              editContact({ id: params.contact, rowId: params.rowId })
+              editContact({ id: params.contact, rowId: params.rowId }),
           },
           cellEditorParams: {
-            onNewContact: (params: { name?: string; rowId: Table.ModelRowId }) => createContact(params),
-            setSearch: (v: string) => dispatch(store.actions.setContactsSearchAction(v, {}))
+            onNewContact: (params: { name?: string; rowId: Table.ModelRowId }) =>
+              createContact(params),
+            setSearch: (v: string) => dispatch(store.actions.setContactsSearchAction(v, {})),
           },
-          processCellFromClipboard
-        }
+          processCellFromClipboard,
+        },
       }),
-    [hooks.useDeepEqualMemo(cs), editContact]
+    [hooks.useDeepEqualMemo(cs), editContact],
   );
 
-  const onCellFocusChanged = hooks.useDynamicCallback((params: Table.CellFocusChangedParams<R, M>) => {
-    /*
+  const onCellFocusChanged = hooks.useDynamicCallback(
+    (params: Table.CellFocusChangedParams<R, M>) => {
+      /*
 			For the ContactCell, we want the contact tag in the cell to be
 			clickable only when the cell is focused.  This means we have to
 			rerender the cell when it becomes focused or unfocused so that the
 			tag becomes clickable (in the focused case) or unclickable (in the
 			unfocused case).
 			*/
-    const rowNodes: Table.RowNode[] = [];
-    if (tabling.columns.isBodyColumn(params.cell.column) && params.cell.column.field === "contact") {
-      rowNodes.push(params.cell.rowNode);
-    }
-    if (
-      !isNil(params.previousCell) &&
-      tabling.columns.isBodyColumn(params.previousCell.column) &&
-      params.previousCell.column.field === "contact"
-    ) {
-      rowNodes.push(params.previousCell.rowNode);
-    }
-    if (rowNodes.length !== 0) {
-      params.apis.grid.refreshCells({
-        force: true,
-        rowNodes,
-        columns: ["contact"]
-      });
-    }
-  });
+      const rowNodes: Table.RowNode[] = [];
+      if (
+        tabling.columns.isBodyColumn(params.cell.column) &&
+        params.cell.column.field === "contact"
+      ) {
+        rowNodes.push(params.cell.rowNode);
+      }
+      if (
+        !isNil(params.previousCell) &&
+        tabling.columns.isBodyColumn(params.previousCell.column) &&
+        params.previousCell.column.field === "contact"
+      ) {
+        rowNodes.push(params.previousCell.rowNode);
+      }
+      if (rowNodes.length !== 0) {
+        params.apis.grid.refreshCells({
+          force: true,
+          rowNodes,
+          columns: ["contact"],
+        });
+      }
+    },
+  );
 
   return {
     modals: (
@@ -128,7 +139,7 @@ const useContacts = <
     ),
     data: cs,
     onCellFocusChanged,
-    columns
+    columns,
   };
 };
 

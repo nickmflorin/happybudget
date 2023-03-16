@@ -1,16 +1,17 @@
 import { useMemo } from "react";
-import { isNil } from "lodash";
+
 import classNames from "classnames";
+import { isNil } from "lodash";
 
 import { model } from "lib";
 
-import { RowExplicitCellProps } from "../cells/Cell";
 import BodyRow, { BodyRowProps } from "./BodyRow";
+import { RowExplicitCellProps } from "../cells/Cell";
 
 interface GroupRowProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  V extends Table.RawRowValue = Table.RawRowValue
+  V extends Table.RawRowValue = Table.RawRowValue,
 > extends BodyRowProps<R, M, V, Table.GroupRow<R>> {
   readonly cellProps?: RowExplicitCellProps<R, M, V>;
 }
@@ -18,15 +19,15 @@ interface GroupRowProps<
 const GroupRow = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  V extends Table.RawRowValue = Table.RawRowValue
+  V extends Table.RawRowValue = Table.RawRowValue,
 >(
-  props: GroupRowProps<R, M, V>
+  props: GroupRowProps<R, M, V>,
 ): JSX.Element => {
   const cellStyle = useMemo(() => {
     if (!isNil(props.row)) {
       const colorDef = model.budgeting.getGroupColorDefinition(props.row);
       return {
-        backgroundColor: !isNil(colorDef.backgroundColor) ? colorDef.backgroundColor : "#EFEFEF"
+        backgroundColor: !isNil(colorDef.backgroundColor) ? colorDef.backgroundColor : "#EFEFEF",
       };
     }
     return {};
@@ -36,7 +37,7 @@ const GroupRow = <
     if (!isNil(props.row)) {
       const colorDef = model.budgeting.getGroupColorDefinition(props.row);
       return {
-        color: !isNil(colorDef.color) ? colorDef.color : "#424242"
+        color: !isNil(colorDef.color) ? colorDef.color : "#424242",
       };
     }
     return {};
@@ -52,17 +53,20 @@ const GroupRow = <
         ...props.cellProps,
         className: [
           props.cellProps?.className,
-          (params: Table.PdfCellCallbackParams<R, M, V>) => {
+          (params: Table.PdfCellCallbackParams<R, M, V>) =>
             /* We have to add a borderLeft to the first indented column for the
 						   Group Row because the Row itself will not have a borderLeft
 							 attribute on it and the Row starts one column to the right. */
 
-            return params.indented === false ? "group-tr-td" : params.colIndex === 0 ? "td-border-left" : "";
-          }
+            params.indented === false
+              ? "group-tr-td"
+              : params.colIndex === 0
+              ? "td-border-left"
+              : "",
         ],
         // style: [props.cellProps?.style, cellStyle],
         textClassName: ["group-tr-td-text", props.cellProps?.textClassName],
-        textStyle: [cellTextStyle, props.cellProps?.textStyle]
+        textStyle: [cellTextStyle, props.cellProps?.textStyle],
       }}
     />
   );

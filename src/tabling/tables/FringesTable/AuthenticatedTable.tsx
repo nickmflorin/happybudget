@@ -1,9 +1,11 @@
 import React from "react";
+
 import classNames from "classnames";
 import { isNil } from "lodash";
 
 import { framework } from "tabling/generic";
 import { AuthenticatedTable, AuthenticatedTableProps } from "tabling/generic/tables";
+
 import Columns from "./Columns";
 import Framework from "./framework";
 
@@ -30,12 +32,15 @@ type OmitProps =
 
 export type AuthenticatedFringesTableProps<
   B extends Model.BaseBudget,
-  P extends Model.Account | Model.SubAccount
+  P extends Model.Account | Model.SubAccount,
 > = Omit<AuthenticatedTableProps<R, M, FringesTableContext<B, P, false>, S>, OmitProps> & {
   readonly budget: B | null;
 };
 
-const AuthenticatedFringesTable = <B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount>({
+const AuthenticatedFringesTable = <
+  B extends Model.BaseBudget,
+  P extends Model.Account | Model.SubAccount,
+>({
   budget,
   ...props
 }: AuthenticatedFringesTableProps<B, P>): JSX.Element => (
@@ -44,7 +49,7 @@ const AuthenticatedFringesTable = <B extends Model.BaseBudget, P extends Model.A
     tableId={`${props.tableContext.domain}-fringes`}
     className={classNames("fringes-table", props.className)}
     getModelRowName={(r: Table.DataRow<R>) => r.data.name}
-    getModelRowLabel={"Fringe"}
+    getModelRowLabel="Fringe"
     showPageFooter={false}
     framework={Framework}
     columns={Columns}
@@ -54,8 +59,8 @@ const AuthenticatedFringesTable = <B extends Model.BaseBudget, P extends Model.A
       framework.actions.ExportCSVAction<R, M>(
         props.table.current,
         params,
-        !isNil(budget) ? `${budget.name}_fringes` : "fringes"
-      )
+        !isNil(budget) ? `${budget.name}_fringes` : "fringes",
+      ),
     ]}
   />
 );

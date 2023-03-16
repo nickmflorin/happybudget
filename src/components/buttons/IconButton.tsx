@@ -1,7 +1,9 @@
 import React from "react";
+
 import classNames from "classnames";
 
 import { withSize } from "components/hocs";
+
 import Button, { ButtonProps } from "./Button";
 
 /* With the IconButton, the "IconButtonIconSize" does not determine the size
@@ -25,5 +27,5 @@ const IconButton = ({ fill, ...props }: PrivateIconButtonProps): JSX.Element => 
 
 export default withSize<IconButtonProps, IconButtonIconSize, "iconSize">({
   classNamePrefix: "icon-",
-  sizeProp: "iconSize"
+  sizeProp: "iconSize",
 })(React.memo(IconButton));

@@ -1,4 +1,5 @@
 import React from "react";
+
 import classNames from "classnames";
 
 const PageFooter: React.FC<StandardComponentWithChildrenProps> = (props): JSX.Element => (

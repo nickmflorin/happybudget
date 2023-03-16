@@ -1,6 +1,7 @@
 import React from "react";
-import { FringesTable, connectTableToPublicStore } from "tabling";
+
 import GenericFringesModal from "components/modals/FringesModal";
+import { FringesTable, connectTableToPublicStore } from "tabling";
 
 import { actions, selectors } from "../store";
 
@@ -18,10 +19,10 @@ const ConnectedFringesTable = connectTableToPublicStore<
   actions: {
     loading: actions.pub.loadingFringesAction,
     response: actions.pub.responseFringesAction,
-    setSearch: actions.pub.setFringesSearchAction
+    setSearch: actions.pub.setFringesSearchAction,
   },
   selector: (c: TC) => (si: Application.Store) => selectors.selectFringesStore(si, c),
-  tableId: (c: TC) => `pub-${c.domain}-fringes`
+  tableId: (c: TC) => `pub-${c.domain}-fringes`,
 })(FringesTable.PublicTable);
 
 interface FringesModalProps extends Pick<ModalProps, "open" | "onCancel"> {
@@ -32,7 +33,15 @@ interface FringesModalProps extends Pick<ModalProps, "open" | "onCancel"> {
   readonly table: NonNullRef<Table.TableInstance<R, M>>;
 }
 
-const FringesModal: React.FC<FringesModalProps> = ({ id, budget, budgetId, open, parentType, table, onCancel }) => (
+const FringesModal: React.FC<FringesModalProps> = ({
+  id,
+  budget,
+  budgetId,
+  open,
+  parentType,
+  table,
+  onCancel,
+}) => (
   <GenericFringesModal open={open} onCancel={onCancel}>
     <ConnectedFringesTable
       budget={budget}

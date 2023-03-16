@@ -5,26 +5,26 @@ export const initialAnalysisState: Modules.Budget.AnalysisStore = {
   responseWasReceived: false,
   accounts: {
     data: [],
-    count: 0
+    count: 0,
   },
   actuals: {
     data: [],
-    count: 0
+    count: 0,
   },
   groups: {
     data: [],
-    count: 0
-  }
+    count: 0,
+  },
 };
 
 export const initialSubAccountState: Modules.SubAccountStore = {
   detail: redux.initialDetailResponseState,
-  table: redux.initialTableState
+  table: redux.initialTableState,
 };
 
 export const initialAccountState: Modules.AccountStore = {
   detail: redux.initialDetailResponseState,
-  table: redux.initialTableState
+  table: redux.initialTableState,
 };
 
 export const initialBudgetState: Modules.Budget.Store = {
@@ -36,8 +36,8 @@ export const initialBudgetState: Modules.Budget.Store = {
   analysis: initialAnalysisState,
   actuals: {
     ...redux.initialTableState,
-    owners: redux.initialAuthenticatedModelListResponseState
-  }
+    owners: redux.initialAuthenticatedModelListResponseState,
+  },
 };
 
 export const initialTemplateState: Modules.Template.Store = {
@@ -45,7 +45,7 @@ export const initialTemplateState: Modules.Template.Store = {
   account: {},
   subaccount: {},
   accounts: redux.initialTableState,
-  fringes: redux.initialTableState
+  fringes: redux.initialTableState,
 };
 
 export const initialPublicBudgetState: Modules.PublicBudget.Store = {
@@ -53,5 +53,5 @@ export const initialPublicBudgetState: Modules.PublicBudget.Store = {
   account: {},
   accounts: redux.initialTableState,
   subaccount: {},
-  fringes: redux.initialTableState
+  fringes: redux.initialTableState,
 };

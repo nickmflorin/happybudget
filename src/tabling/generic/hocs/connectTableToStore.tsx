@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
+
+import hoistNonReactStatics from "hoist-non-react-statics";
+import { isNil } from "lodash";
 import { useStore, useSelector } from "react-redux";
 import { createSelector } from "reselect";
 import { Subtract } from "utility-types";
-import hoistNonReactStatics from "hoist-non-react-statics";
-import { isNil } from "lodash";
+
 import { redux } from "lib";
 
 export type ConnectedTableInjectedProps<R extends Table.RowData, S extends Redux.TableStore<R>> = {
@@ -23,7 +25,7 @@ export type ConnectTableProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel,
   C extends Table.Context = Table.Context,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = {
   readonly tableContext: C;
   readonly table: NonNullRef<Table.TableInstance<R, M>>;
@@ -37,10 +39,13 @@ export type StoreConfig<
   R extends Table.RowData,
   M extends Model.RowHttpModel,
   C extends Table.Context = Table.Context,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = {
   readonly tableId: TOrFn<string, [C]>;
-  readonly footerRowSelectors?: ContextOptionalCallable<Partial<Table.FooterGridSet<Table.RowDataSelector<R>>>, C>;
+  readonly footerRowSelectors?: ContextOptionalCallable<
+    Partial<Table.FooterGridSet<Table.RowDataSelector<R>>>,
+    C
+  >;
   readonly reducer?: Redux.Reducer<S>;
   /*
 	The table store selector can either be passed in as a configuration or
@@ -63,7 +68,7 @@ type HOCProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel,
   C extends Table.Context = Table.Context,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = Subtract<T, ConnectedTableInjectedProps<R, S>> & ConnectTableProps<R, M, C, S>;
 
 type SelectorArg<
@@ -71,7 +76,7 @@ type SelectorArg<
   R extends Table.RowData,
   M extends Model.RowHttpModel,
   C extends Table.Context = Table.Context,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = {
   readonly props: HOCProps<T, R, M, C, S>;
   readonly config: StoreConfig<R, M, C, S>;
@@ -82,9 +87,9 @@ const createAgnosticConfiguredSelector = <
   R extends Table.RowData,
   M extends Model.RowHttpModel,
   S extends Redux.TableStore<R>,
-  C extends Table.Context = Table.Context
+  C extends Table.Context = Table.Context,
 >(
-  d: SelectorArg<T, R, M, C, S>
+  d: SelectorArg<T, R, M, C, S>,
 ): ((s: Application.Store) => S) => {
   if (!isNil(d.props.selector)) {
     return d.props.selector;
@@ -100,13 +105,14 @@ const createConfiguredSelector = <
   R extends Table.RowData,
   M extends Model.RowHttpModel,
   C extends Table.Context = Table.Context,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 >(
-  sel: (s: S) => RS
+  sel: (s: S) => RS,
 ) =>
   createSelector(
     [(s: Application.Store) => s, (s: Application.Store, d: SelectorArg<T, R, M, C, S>) => d],
-    (s: Application.Store, d: SelectorArg<T, R, M, C, S>) => sel(createAgnosticConfiguredSelector(d)(s))
+    (s: Application.Store, d: SelectorArg<T, R, M, C, S>) =>
+      sel(createAgnosticConfiguredSelector(d)(s)),
   );
 
 const connectTableToStore =
@@ -115,13 +121,15 @@ const connectTableToStore =
     R extends Table.RowData,
     M extends Model.RowHttpModel,
     C extends Table.Context = Table.Context,
-    S extends Redux.TableStore<R> = Redux.TableStore<R>
+    S extends Redux.TableStore<R> = Redux.TableStore<R>,
   >(
-    config: StoreConfig<R, M, C, S>
+    config: StoreConfig<R, M, C, S>,
   ) =>
   (Component: React.FunctionComponent<T>): React.FunctionComponent<HOCProps<T, R, M, C, S>> => {
     const selectSearch = createConfiguredSelector<string, T, R, M, C, S>((s: S) => s.search);
-    const selectData = createConfiguredSelector<Table.BodyRow<R>[], T, R, M, C, S>((s: S) => s.data);
+    const selectData = createConfiguredSelector<Table.BodyRow<R>[], T, R, M, C, S>(
+      (s: S) => s.data,
+    );
     const selectLoading = createConfiguredSelector<boolean, T, R, M, C, S>((s: S) => s.loading);
 
     const WithStoreConfigured = (props: HOCProps<T, R, M, C, S>) => {
@@ -133,11 +141,15 @@ const connectTableToStore =
       const [ready, setReady] = useState(false);
       const sagaInjected = useRef<boolean>(false);
 
-      const agnosticSelector = useMemo(() => createAgnosticConfiguredSelector({ props, config }), [props.selector]);
+      const agnosticSelector = useMemo(
+        () => createAgnosticConfiguredSelector({ props, config }),
+        [props.selector],
+      );
 
       const tableId = useMemo(
-        () => (typeof config.tableId === "string" ? config.tableId : config.tableId(props.tableContext)),
-        [props.tableContext]
+        () =>
+          typeof config.tableId === "string" ? config.tableId : config.tableId(props.tableContext),
+        [props.tableContext],
       );
 
       /*

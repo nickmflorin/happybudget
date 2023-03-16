@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useImperativeHandle } from "react";
+
 import classNames from "classnames";
 import { isNil } from "lodash";
 
@@ -24,7 +25,7 @@ const GenericLayout = (props: GenericLayoutProps): JSX.Element => {
   const NotificationsHandler = notifications.ui.useNotificationsEventListener({
     destinationId: "banner",
     defaultBehavior: "append",
-    defaultClosable: true
+    defaultClosable: true,
   });
 
   useEffect(() => {
@@ -38,28 +39,32 @@ const GenericLayout = (props: GenericLayoutProps): JSX.Element => {
     () => ({
       setSidebarVisible,
       sidebarVisible,
-      toggleSidebar: () => setSidebarVisible(!sidebarVisible)
+      toggleSidebar: () => setSidebarVisible(!sidebarVisible),
     }),
-    [sidebarVisible, setSidebarVisible]
+    [sidebarVisible, setSidebarVisible],
   );
 
   return (
     <div
       className={classNames("layout", props.className, {
         "without-sidebar": isNil(props.sidebar),
-        "sidebar-visible": sidebarVisible
+        "sidebar-visible": sidebarVisible,
       })}
       style={props.style}
     >
-      {!isNil(props.sidebar) && <div className={classNames("sidebar-container")}>{props.sidebar}</div>}
-      <div className={"layout-content"}>
+      {!isNil(props.sidebar) && (
+        <div className={classNames("sidebar-container")}>{props.sidebar}</div>
+      )}
+      <div className="layout-content">
         <BannerNotifications notifications={NotificationsHandler.notifications} />
         <Header
           {...props.headerProps}
           showLeafLogo={props.showHeaderLeafLogo}
           showTextLogo={props.showHeaderTextLogo}
           showSidebarToggle={
-            props.showHeaderSidebarToggle === undefined ? !sidebarVisible : props.showHeaderSidebarToggle
+            props.showHeaderSidebarToggle === undefined
+              ? !sidebarVisible
+              : props.showHeaderSidebarToggle
           }
           className={classNames(props.headerProps?.className)}
           sidebarVisible={sidebarVisible}

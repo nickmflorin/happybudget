@@ -1,15 +1,16 @@
 import React, { ReactNode, useEffect, useState, useMemo } from "react";
-import { Store } from "redux";
-import { Provider } from "react-redux";
-import { Redirect, useParams, useLocation, useHistory } from "react-router-dom";
+
 import * as Sentry from "@sentry/browser";
 import axios, { CancelToken } from "axios";
 import { isNil } from "lodash";
+import { Provider } from "react-redux";
+import { Redirect, useParams, useLocation, useHistory } from "react-router-dom";
+import { Store } from "redux";
 
 import * as api from "api";
 import { notifications, model, http } from "lib";
-import { ApplicationSpinner, ConnectedApplicationSpinner } from "components";
 import { configure } from "store";
+import { ApplicationSpinner, ConnectedApplicationSpinner } from "components";
 
 type UrlParams = Record<string, string> & { tokenId: string };
 
@@ -26,7 +27,10 @@ const parseIdParam = (param: keyof UrlParams, params: UrlParams): number | null 
 
 /* Wrap the validateAuthToken service such that failed token validation simply
    results in a null User. */
-const validateAuthToken = (forceReloadFromStripe: boolean, cancelToken: CancelToken): Promise<Model.User | null> =>
+const validateAuthToken = (
+  forceReloadFromStripe: boolean,
+  cancelToken: CancelToken,
+): Promise<Model.User | null> =>
   new Promise<Model.User | null>((resolve, reject) => {
     api
       .validateAuthToken({ force_reload_from_stripe: forceReloadFromStripe }, { cancelToken })
@@ -46,7 +50,7 @@ const validatePublicToken = (
   token: string,
   id: number,
   type: Model.HttpModelType,
-  cancelToken: CancelToken
+  cancelToken: CancelToken,
 ): Promise<string | null> =>
   new Promise<string | null>((resolve, reject) => {
     api
@@ -93,17 +97,24 @@ type RedirectPath = "/login" | "/404";
 
 const WrapInStore = (props: WrapInStoreProps & { readonly children: ReactNode }): JSX.Element => {
   const [redirect, setRedirect] = useState<RedirectPath | null>(null);
-  const [reduxStore, setReduxStore] = useState<Store<Application.Store, Redux.Action> | undefined>(undefined);
+  const [reduxStore, setReduxStore] = useState<Store<Application.Store, Redux.Action> | undefined>(
+    undefined,
+  );
   const [newCancelToken] = http.useCancelToken();
   const urlParams = useParams<UrlParams>();
 
   /* There are cases, mostly login cases, where we do not need to revalidate
      the user because we already have access to the validated user before we
      redirect into the app */
-  const location = useLocation<{ readonly validatedUser?: Model.User | undefined | null } | undefined>();
+  const location = useLocation<
+    { readonly validatedUser?: Model.User | undefined | null } | undefined
+  >();
   const history = useHistory();
 
-  const validatedUser = useMemo(() => location.state?.validatedUser || null, [location.state?.validatedUser]);
+  const validatedUser = useMemo(
+    () => location.state?.validatedUser || null,
+    [location.state?.validatedUser],
+  );
 
   const removeValidatedUser = useMemo(
     () => () => {
@@ -111,7 +122,7 @@ const WrapInStore = (props: WrapInStoreProps & { readonly children: ReactNode })
       const { state, ...statelessLocation } = location;
       history.replace(statelessLocation);
     },
-    []
+    [],
   );
 
   const handleError = useMemo(
@@ -124,35 +135,40 @@ const WrapInStore = (props: WrapInStoreProps & { readonly children: ReactNode })
       }
       setRedirect("/login");
     },
-    []
+    [],
   );
 
   const setupUserStore = useMemo(
-    () => (forceReloadFromStripe: boolean, cancelToken?: CancelToken, redirectOnSuccess?: RedirectPath) => {
-      if (validatedUser === null) {
-        validateAuthToken(forceReloadFromStripe, cancelToken || newCancelToken())
-          .then((user: Model.User | null) => {
-            if (user !== null) {
-              if (!isNil(redirectOnSuccess)) {
-                setRedirect(redirectOnSuccess);
+    () =>
+      (
+        forceReloadFromStripe: boolean,
+        cancelToken?: CancelToken,
+        redirectOnSuccess?: RedirectPath,
+      ) => {
+        if (validatedUser === null) {
+          validateAuthToken(forceReloadFromStripe, cancelToken || newCancelToken())
+            .then((user: Model.User | null) => {
+              if (user !== null) {
+                if (!isNil(redirectOnSuccess)) {
+                  setRedirect(redirectOnSuccess);
+                } else {
+                  const store = configure({ user, tokenId: null });
+                  handleUser(user);
+                  setReduxStore(store);
+                }
               } else {
-                const store = configure({ user, tokenId: null });
-                handleUser(user);
-                setReduxStore(store);
+                setRedirect("/login");
               }
-            } else {
-              setRedirect("/login");
-            }
-          })
-          .catch(handleError);
-      } else {
-        const store = configure({ user: validatedUser, tokenId: null });
-        handleUser(validatedUser);
-        setReduxStore(store);
-        removeValidatedUser();
-      }
-    },
-    [handleError, validatedUser]
+            })
+            .catch(handleError);
+        } else {
+          const store = configure({ user: validatedUser, tokenId: null });
+          handleUser(validatedUser);
+          setReduxStore(store);
+          removeValidatedUser();
+        }
+      },
+    [handleError, validatedUser],
   );
 
   useEffect(() => {
@@ -168,7 +184,8 @@ const WrapInStore = (props: WrapInStoreProps & { readonly children: ReactNode })
       if (isNil(props.instanceIdParam) && isNil(props.instanceId)) {
         throw new Error("Either the 'instanceId' or 'instanceIdParam' props must be provied.");
       }
-      const instanceId = props.instanceId || parseIdParam(props.instanceIdParam as string, urlParams);
+      const instanceId =
+        props.instanceId || parseIdParam(props.instanceIdParam as string, urlParams);
 
       if (isNil(tokenId) || isNil(instanceId)) {
         /* In the case that the user has an active session but visited an invalid
@@ -184,7 +201,7 @@ const WrapInStore = (props: WrapInStoreProps & { readonly children: ReactNode })
 					 */
         const promises: [Promise<string | null>, Promise<Model.User | null>] = [
           validatePublicToken(tokenId, instanceId, props.instanceType, cancelToken),
-          validateAuthToken(true, cancelToken)
+          validateAuthToken(true, cancelToken),
         ];
         Promise.all(promises)
           .then(([privateToken, user]: [string | null, Model.User | null]) => {
@@ -211,7 +228,7 @@ const WrapInStore = (props: WrapInStoreProps & { readonly children: ReactNode })
     (props as WrapInPublicStoreProps).instanceId,
     (props as WrapInPublicStoreProps).instanceIdParam,
     (props as WrapInPublicStoreProps).instanceType,
-    (props as WrapInPublicStoreProps).publicTokenId
+    (props as WrapInPublicStoreProps).publicTokenId,
   ]);
 
   if (redirect !== null) {

@@ -11,7 +11,7 @@ type CreateMarkupRowConfig = {
 
 class MarkupRowManager<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel,
 > extends EditableRowManager<Table.MarkupRow<R>, R, M, [Model.Markup]> {
   constructor(config: Omit<BodyRowManagerConfig<Table.MarkupRow<R>, R, M>, "rowType">) {
     super({ ...config, rowType: "markup" });
@@ -19,7 +19,7 @@ class MarkupRowManager<
 
   getValueForRow<V extends Table.RawRowValue, C extends Table.ModelColumn<R, M, V>>(
     col: C,
-    markup: Model.Markup
+    markup: Model.Markup,
   ): V | undefined {
     // The FakeColumn(s) are not applicable for Markups.
     if (tabling.columns.isDataColumn<R, M>(col) && !isNil(col.markupField)) {
@@ -35,7 +35,7 @@ class MarkupRowManager<
     const IDs: number[] = Array.isArray(Ids) ? Ids : [Ids];
     return {
       ...row,
-      children: filter(row.children, (child: number) => !includes(IDs, child))
+      children: filter(row.children, (child: number) => !includes(IDs, child)),
     };
   }
 
@@ -44,15 +44,15 @@ class MarkupRowManager<
       ...this.createBasic(
         {
           ...config,
-          id: tabling.rows.markupRowId(config.model.id)
+          id: tabling.rows.markupRowId(config.model.id),
         },
-        config.model
+        config.model,
       ),
       children: model.budgeting.isPercentMarkup(config.model) ? config.model.children : [],
       markupData: {
         unit: config.model.unit,
-        rate: config.model.rate
-      }
+        rate: config.model.rate,
+      },
     };
   }
 }

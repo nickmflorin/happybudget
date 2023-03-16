@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+
 import { isNil, find } from "lodash";
 
 import { model } from "lib";
@@ -13,14 +14,14 @@ type ImportSourceIconMap = {
 const IMPORT_SOURCE_MAPPING: ImportSourceIconMap[] = [
   {
     icon: "bank",
-    sourceId: model.budgeting.ActualImportSources.bank_account.id
-  }
+    sourceId: model.budgeting.ActualImportSources.bank_account.id,
+  },
 ];
 
 const getImportSourceIcon = (id: Model.ActualImportSource["id"]): IconProp => {
   const mapping: ImportSourceIconMap | undefined = find(
     IMPORT_SOURCE_MAPPING,
-    (mp: ImportSourceIconMap) => mp.sourceId === id
+    (mp: ImportSourceIconMap) => mp.sourceId === id,
   );
   if (isNil(mapping)) {
     console.warn(`No icon is configured for import source ${id}.`);
@@ -33,7 +34,10 @@ type ActualImportSourceIconProps = Omit<IconProps, "icon"> & {
 };
 
 const ActualImportSourceIcon = ({ source, ...props }: ActualImportSourceIconProps) => {
-  const icon = useMemo(() => getImportSourceIcon(typeof source === "number" ? source : source.id), [source]);
+  const icon = useMemo(
+    () => getImportSourceIcon(typeof source === "number" ? source : source.id),
+    [source],
+  );
   return <Icon {...props} icon={icon} />;
 };
 

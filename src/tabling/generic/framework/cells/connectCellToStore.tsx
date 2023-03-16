@@ -1,7 +1,8 @@
 import React from "react";
+
+import { isNil } from "lodash";
 import { useSelector } from "react-redux";
 import { createSelector } from "reselect";
-import { isNil } from "lodash";
 
 const connectCellToStore = <
   T extends Table.ValueCellProps<R, M, C, S, V, CL>,
@@ -10,12 +11,14 @@ const connectCellToStore = <
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   V extends string | number | null = string | number | null,
-  CL extends Table.DataColumn<R, M, V> = Table.BodyColumn<R, M, V>
+  CL extends Table.DataColumn<R, M, V> = Table.BodyColumn<R, M, V>,
 >(
-  Component: React.FunctionComponent<T>
+  Component: React.FunctionComponent<T>,
 ) => {
   const WithConnectedCell = (
-    props: T & { readonly footerRowSelectors?: Partial<Table.FooterGridSet<Table.RowDataSelector<R>>> }
+    props: T & {
+      readonly footerRowSelectors?: Partial<Table.FooterGridSet<Table.RowDataSelector<R>>>;
+    },
   ): JSX.Element => {
     let selectorFn: Table.RowDataSelector<R> | ((state: Application.Store) => null) = () => null;
     if (props.gridId !== "data" && !isNil(props.footerRowSelectors)) {
@@ -25,7 +28,7 @@ const connectCellToStore = <
       }
     }
     const valueSelector = createSelector([selectorFn], (v: Partial<R> | null) =>
-      !isNil(v) && !isNil(props.customCol) ? v[props.customCol.field] : null
+      !isNil(v) && !isNil(props.customCol) ? v[props.customCol.field] : null,
     );
     const value = useSelector(valueSelector);
     if (props.gridId === "data" || isNil(props.footerRowSelectors)) {

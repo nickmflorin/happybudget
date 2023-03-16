@@ -2,20 +2,26 @@ import { isNil } from "lodash";
 
 import { util } from "lib";
 import { DefaultButton } from "components/buttons";
-
-import { ExportCSVDropdownMenu, ToggleColumnsDropdownMenu, ShareDropdownMenu } from "components/dropdowns";
+import {
+  ExportCSVDropdownMenu,
+  ToggleColumnsDropdownMenu,
+  ShareDropdownMenu,
+} from "components/dropdowns";
 import { ShareDropdownMenuProps } from "components/dropdowns/ShareDropdownMenu";
 
 export const ExportPdfAction = (onExport: () => void): Table.MenuActionObj => ({
   icon: "print",
   label: "Export PDF",
-  onClick: () => onExport()
+  onClick: () => onExport(),
 });
 
-export const ExportCSVAction = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
+export const ExportCSVAction = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+>(
   table: Table.TableInstance<R, M>,
   params: Table.PublicMenuActionParams<R, M>,
-  exportFileName: string
+  exportFileName: string,
 ): Table.MenuActionObj => ({
   label: "Export CSV",
   icon: "file-csv",
@@ -32,12 +38,15 @@ export const ExportCSVAction = <R extends Table.RowData, M extends Model.RowHttp
     >
       {children}
     </ExportCSVDropdownMenu>
-  )
+  ),
 });
 
-export const ToggleColumnAction = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
+export const ToggleColumnAction = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+>(
   table: Table.TableInstance<R, M>,
-  params: Table.PublicMenuActionParams<R, M>
+  params: Table.PublicMenuActionParams<R, M>,
 ): Table.MenuActionObj => ({
   label: "Columns",
   icon: "line-columns",
@@ -48,28 +57,32 @@ export const ToggleColumnAction = <R extends Table.RowData, M extends Model.RowH
       onChange={(field: string, visible: boolean) => {
         table.changeColumnVisibility({
           field,
-          visible
+          visible,
         });
       }}
     >
       {children}
     </ToggleColumnsDropdownMenu>
-  )
+  ),
 });
 
-export const CollaboratorsAction = (action: Omit<Partial<Table.MenuActionObj>, "render">): Table.MenuActionObj => ({
+export const CollaboratorsAction = (
+  action: Omit<Partial<Table.MenuActionObj>, "render">,
+): Table.MenuActionObj => ({
   ...action,
-  render: () => {
-    return (
-      <DefaultButton medium icon={"user-group"} onClick={action.onClick}>
-        {"Collaborators"}
-      </DefaultButton>
-    );
-  }
+  render: () => (
+    <DefaultButton medium icon="user-group" onClick={action.onClick}>
+      Collaborators
+    </DefaultButton>
+  ),
 });
 
-export const ShareAction = <B extends Model.PublicHttpModel, R extends Table.RowData, M extends Model.RowHttpModel>(
-  config: Table.ShareConfig<B, R, M>
+export const ShareAction = <
+  B extends Model.PublicHttpModel,
+  R extends Table.RowData,
+  M extends Model.RowHttpModel,
+>(
+  config: Table.ShareConfig<B, R, M>,
 ): Table.MenuActionObj => {
   const instance: B = config.instance;
 
@@ -81,7 +94,7 @@ export const ShareAction = <B extends Model.PublicHttpModel, R extends Table.Row
     onTokenDeleted: config.onDeleted,
     table: config.table,
     placement: "bottomRight",
-    services: { create: config.create }
+    services: { create: config.create },
   };
 
   const publicToken = instance.public_token;
@@ -94,6 +107,6 @@ export const ShareAction = <B extends Model.PublicHttpModel, R extends Table.Row
     active: !isNil(publicToken) && !publicToken.is_expired,
     wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => (
       <ShareDropdownMenu {...props}>{children}</ShareDropdownMenu>
-    )
+    ),
   };
 };

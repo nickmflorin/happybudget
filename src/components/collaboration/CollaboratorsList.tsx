@@ -1,12 +1,16 @@
 import React from "react";
-import { map } from "lodash";
+
 import classNames from "classnames";
+import { map } from "lodash";
 
 import CollaboratorListItem from "./CollaboratorListItem";
 
 type CollaboratorsListProps = StandardComponentProps & {
   readonly collaborators: Model.Collaborator[];
-  readonly onChangeAccessType: (c: Model.Collaborator, ac: Model.CollaboratorAccessType["id"]) => void;
+  readonly onChangeAccessType: (
+    c: Model.Collaborator,
+    ac: Model.CollaboratorAccessType["id"],
+  ) => void;
   readonly onRemoveCollaborator: (c: Model.Collaborator) => void;
   readonly isDeleting: (id: number) => boolean;
   readonly isUpdating: (id: number) => boolean;

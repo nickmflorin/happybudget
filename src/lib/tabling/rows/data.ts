@@ -11,13 +11,14 @@ type InjectMarkupsAndGroupsConfig<R extends Table.RowData> = {
 };
 
 export const injectMarkupsAndGroups = <R extends Table.RowData>(
-  config: InjectMarkupsAndGroupsConfig<R>
+  config: InjectMarkupsAndGroupsConfig<R>,
 ): (Table.DataRow<R> | Table.MarkupRow<R> | Table.GroupRow<R>)[] => {
   let modelsWithoutGroups: Table.ModelRow<R>[] = [];
 
   const modelGroup = (obj: Table.ModelRow<R>): Table.GroupRow<R> | null => {
-    const groupsForModel: Table.GroupRow<R>[] | undefined = filter(config.groups, (g: Table.GroupRow<R>) =>
-      includes(g.children, obj.id)
+    const groupsForModel: Table.GroupRow<R>[] | undefined = filter(
+      config.groups,
+      (g: Table.GroupRow<R>) => includes(g.children, obj.id),
     );
     if (groupsForModel.length > 1) {
       console.error(`Corrupted Data: Model ${obj.id} is associated with multiple groups!`);
@@ -39,14 +40,17 @@ export const injectMarkupsAndGroups = <R extends Table.RowData>(
       if (typeguards.isModelRow(m)) {
         const group = modelGroup(m);
         if (!isNil(group)) {
-          const index = findIndex(curr, (mg: ModelsAndGroup) => ids.groupId(mg.group.id) === ids.groupId(group.id));
+          const index = findIndex(
+            curr,
+            (mg: ModelsAndGroup) => ids.groupId(mg.group.id) === ids.groupId(group.id),
+          );
           if (index === -1) {
             return [...curr, { models: [m], group }];
           } else {
             return [
               ...curr.slice(0, index),
               { ...curr[index], models: orderBy([...curr[index].models, m], "order") },
-              ...curr.slice(index + 1)
+              ...curr.slice(index + 1),
             ];
           }
         } else {
@@ -58,43 +62,53 @@ export const injectMarkupsAndGroups = <R extends Table.RowData>(
         return curr;
       }
     },
-    []
+    [],
   );
   return [
     ...reduce(
       /* We want to order the groups by the model in it's set that occurs
 				 earliest in the original data. */
       orderBy(grouped, (mg: ModelsAndGroup) => mg.models[0].order),
-      (curr: (Table.ModelRow<R> | Table.GroupRow<R>)[], mg: ModelsAndGroup) => {
-        return [...curr, ...mg.models, mg.group];
-      },
-      []
+      (curr: (Table.ModelRow<R> | Table.GroupRow<R>)[], mg: ModelsAndGroup) => [
+        ...curr,
+        ...mg.models,
+        mg.group,
+      ],
+      [],
     ),
     ...orderBy(modelsWithoutGroups, "order"),
     ...placeholders,
-    ...(config.markups || [])
+    ...(config.markups || []),
   ];
 };
 
-export const orderTableData = <R extends Table.RowData>(data: Table.BodyRow<R>[]): Table.BodyRow<R>[] => {
+export const orderTableData = <R extends Table.RowData>(
+  data: Table.BodyRow<R>[],
+): Table.BodyRow<R>[] => {
   /* The order of the actual data rows of the table dictate the order of
      everything else. */
-  const dataRows = filter(data, (r: Table.BodyRow<R>) => typeguards.isDataRow(r)) as Table.DataRow<R>[];
-  const markupRows = filter(data, (r: Table.BodyRow<R>) => typeguards.isMarkupRow(r)) as Table.MarkupRow<R>[];
-  const groupRows = filter(data, (r: Table.BodyRow<R>) => typeguards.isGroupRow(r)) as Table.GroupRow<R>[];
+  const dataRows = filter(data, (r: Table.BodyRow<R>) =>
+    typeguards.isDataRow(r),
+  ) as Table.DataRow<R>[];
+  const markupRows = filter(data, (r: Table.BodyRow<R>) =>
+    typeguards.isMarkupRow(r),
+  ) as Table.MarkupRow<R>[];
+  const groupRows = filter(data, (r: Table.BodyRow<R>) =>
+    typeguards.isGroupRow(r),
+  ) as Table.GroupRow<R>[];
   return injectMarkupsAndGroups<R>({
     groups: groupRows,
     current: dataRows,
-    markups: markupRows
+    markups: markupRows,
   });
 };
 
 export const generateTableData = <R extends Table.RowData, M extends Model.RowHttpModel>(
-  config: Table.CreateTableDataConfig<R, M>
+  config: Table.CreateTableDataConfig<R, M>,
 ): Table.BodyRow<R>[] => {
   const modelRowManager = new managers.ModelRowManager<R, M>({
     getRowChildren: config.getModelRowChildren,
-    columns: config.columns
+    columns: config.columns,
   });
   const groupRowManager = new managers.GroupRowManager<R, M>({ columns: config.columns });
   const markupRowManager = new managers.MarkupRowManager<R, M>({ columns: config.columns });
@@ -102,17 +116,23 @@ export const generateTableData = <R extends Table.RowData, M extends Model.RowHt
     ...reduce(
       config.response.models,
       (curr: Table.ModelRow<R>[], m: M) => [...curr, modelRowManager.create({ model: m })],
-      []
+      [],
     ),
     ...reduce(
       config.response.groups === undefined ? [] : config.response.groups,
-      (curr: Table.GroupRow<R>[], g: Model.Group) => [...curr, groupRowManager.create({ model: g })],
-      []
+      (curr: Table.GroupRow<R>[], g: Model.Group) => [
+        ...curr,
+        groupRowManager.create({ model: g }),
+      ],
+      [],
     ),
     ...reduce(
       config.response.markups === undefined ? [] : config.response.markups,
-      (curr: Table.MarkupRow<R>[], mk: Model.Markup) => [...curr, markupRowManager.create({ model: mk })],
-      []
-    )
+      (curr: Table.MarkupRow<R>[], mk: Model.Markup) => [
+        ...curr,
+        markupRowManager.create({ model: mk }),
+      ],
+      [],
+    ),
   ]);
 };

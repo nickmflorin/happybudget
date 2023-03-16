@@ -36,7 +36,10 @@ declare type IExpandedSingleSidebarItem = ISidebarItem & {
   readonly default?: boolean;
 };
 
-declare type IExpandedParentSidebarItem = Omit<ISidebarItem, "to" | "active" | "activePathRegexes" | "tooltip"> & {
+declare type IExpandedParentSidebarItem = Omit<
+  ISidebarItem,
+  "to" | "active" | "activePathRegexes" | "tooltip"
+> & {
   readonly submenu: IExpandedSingleSidebarItem[];
   readonly label: string;
 };

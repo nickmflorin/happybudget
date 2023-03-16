@@ -1,7 +1,7 @@
 import React from "react";
 
-import SingleSelect, { SingleSelectProps } from "./SingleSelect";
 import * as hocs from "./hocs";
+import SingleSelect, { SingleSelectProps } from "./SingleSelect";
 
 type BaseProps<M extends Model.Model = Model.Model> = Omit<
   SingleSelectProps<ModelSelectOption<M>>,
@@ -20,4 +20,6 @@ export type SingleModelSelectProps<M extends Model.Model = Model.Model> = BasePr
 const WithSingle = hocs.withSingleModelSelect<any, any, _SingleModelSelectProps<any>>(SingleSelect);
 const WithAsync = hocs.withSingleModelAsyncSelect(WithSingle);
 
-export default React.memo(WithAsync) as <M extends Model.Model>(props: SingleModelSelectProps<M>) => JSX.Element;
+export default React.memo(WithAsync) as <M extends Model.Model>(
+  props: SingleModelSelectProps<M>,
+) => JSX.Element;

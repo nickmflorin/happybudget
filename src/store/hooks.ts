@@ -9,9 +9,11 @@ export const useContactsLoaded = (): boolean => useSelector(selectors.selectCont
 
 export const useContactsLoading = (): boolean => useSelector(selectors.selectContactsLoading);
 
-export const useFilteredContacts = (): Model.Contact[] => useSelector(selectors.selectFilteredContacts);
+export const useFilteredContacts = (): Model.Contact[] =>
+  useSelector(selectors.selectFilteredContacts);
 
-export const useFilteredContactsLoading = (): boolean => useSelector(selectors.selectFilteredContactsLoading);
+export const useFilteredContactsLoading = (): boolean =>
+  useSelector(selectors.selectFilteredContactsLoading);
 
 export const useUser = (): Model.User | null => useSelector(selectors.selectUser);
 

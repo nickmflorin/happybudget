@@ -1,13 +1,14 @@
 import { useMemo } from "react";
-import { useSelector } from "react-redux";
+
 import { map } from "lodash";
+import { useSelector } from "react-redux";
 
 import { model, tabling, hooks, formatters } from "lib";
-
 import { selectors } from "app/Budgeting/store";
-import { PublicBudgetTable, PublicBudgetTableProps } from "../BudgetTable";
-import useKeyboardNavigation, { UseKeyboardNavigationReturnType } from "./useKeyboardNavigation";
+
 import { Framework } from "./framework";
+import useKeyboardNavigation, { UseKeyboardNavigationReturnType } from "./useKeyboardNavigation";
+import { PublicBudgetTable, PublicBudgetTableProps } from "../BudgetTable";
 
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
@@ -21,7 +22,10 @@ type OmitProps =
   | "menuPortalId"
   | "framework";
 
-export type PublicTableProps<B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount> = Omit<
+export type PublicTableProps<
+  B extends Model.BaseBudget,
+  P extends Model.Account | Model.SubAccount,
+> = Omit<
   PublicBudgetTableProps<R, M, B, SubAccountsTableActionContext<B, P, true>, S>,
   OmitProps
 > & {
@@ -31,11 +35,13 @@ export type PublicTableProps<B extends Model.BaseBudget, P extends Model.Account
 };
 
 const PublicTable = <B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount>(
-  props: PublicTableProps<B, P>
+  props: PublicTableProps<B, P>,
 ): JSX.Element => {
   const { onBack, onLeft, onRight, onRowExpand } = useKeyboardNavigation<B, P, R, true>(props);
 
-  const fringes = useSelector((s: Application.Store) => selectors.selectFringes(s, props.tableContext));
+  const fringes = useSelector((s: Application.Store) =>
+    selectors.selectFringes(s, props.tableContext),
+  );
 
   const processFringesCellForClipboard = hooks.useDynamicCallback((row: R) => {
     const fs = model.getModels<Tables.FringeRow>(fringes, row.fringes, { modelName: "fringe" });
@@ -47,26 +53,30 @@ const PublicTable = <B extends Model.BaseBudget, P extends Model.Account | Model
       tabling.columns.normalizeColumns(props.columns, {
         fringes: {
           headerComponentParams: { onEdit: () => props.onViewFringes() },
-          processCellForClipboard: processFringesCellForClipboard
+          processCellForClipboard: processFringesCellForClipboard,
         },
-        identifier: { headerName: props.tableContext.parentType === "account" ? "Account" : "Line" },
+        identifier: {
+          headerName: props.tableContext.parentType === "account" ? "Account" : "Line",
+        },
         description: {
-          headerName: `${props.tableContext.parentType === "account" ? "SubAccount" : "Detail"} Description`
-        }
+          headerName: `${
+            props.tableContext.parentType === "account" ? "SubAccount" : "Detail"
+          } Description`,
+        },
       }),
     [
       props.onViewFringes,
       props.tableContext.parentType,
       hooks.useDeepEqualMemo(props.columns),
-      processFringesCellForClipboard
-    ]
+      processFringesCellForClipboard,
+    ],
   );
 
   return (
     <PublicBudgetTable
       {...props}
       columns={columns}
-      menuPortalId={"supplementary-header"}
+      menuPortalId="supplementary-header"
       showPageFooter={true}
       pinFirstColumn={true}
       tableId={`public-${props.tableContext.domain}-${props.tableContext.parentType}-subaccounts`}
@@ -75,7 +85,9 @@ const PublicTable = <B extends Model.BaseBudget, P extends Model.Account | Model
       onRowExpand={onRowExpand}
       onLeft={onLeft}
       onRight={onRight}
-      calculatedCellInfoTooltip={(cell: Table.CellConstruct<Table.ModelRow<R>, Table.CalculatedColumn<R, M>>) =>
+      calculatedCellInfoTooltip={(
+        cell: Table.CellConstruct<Table.ModelRow<R>, Table.CalculatedColumn<R, M>>,
+      ) =>
         cell.row.children.length === 0 &&
         cell.col.field === "estimated" &&
         model.budgeting.estimatedValue(cell.row) !== 0
@@ -83,18 +95,18 @@ const PublicTable = <B extends Model.BaseBudget, P extends Model.Account | Model
               {
                 label: "Nominal Value",
                 value: cell.row.data.nominal_value,
-                formatter: formatters.currencyFormatter
+                formatter: formatters.currencyFormatter,
               },
               {
                 label: "Fringe Contribution",
                 value: cell.row.data.fringe_contribution,
-                formatter: formatters.currencyFormatter
+                formatter: formatters.currencyFormatter,
               },
               {
                 label: "Markup Contribution",
                 value: cell.row.data.markup_contribution,
-                formatter: formatters.currencyFormatter
-              }
+                formatter: formatters.currencyFormatter,
+              },
             ]
           : null
       }

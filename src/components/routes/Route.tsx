@@ -1,5 +1,7 @@
 import React from "react";
+
 import { Route as ReactRoute } from "react-router-dom";
+
 import PrivateRoute, { PrivateRouteProps } from "./PrivateRoute";
 
 export type RouteProps = PrivateRouteProps & {
@@ -11,7 +13,11 @@ const Route = ({ pub, forceReloadFromStripe, revalidate, redux, ...props }: Rout
   pub === true || redux === false ? (
     <ReactRoute {...props} />
   ) : (
-    <PrivateRoute {...props} forceReloadFromStripe={forceReloadFromStripe} revalidate={revalidate} />
+    <PrivateRoute
+      {...props}
+      forceReloadFromStripe={forceReloadFromStripe}
+      revalidate={revalidate}
+    />
   );
 
 export default React.memo(Route);

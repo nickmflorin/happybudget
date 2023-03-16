@@ -1,8 +1,8 @@
 const componentLoader = (
   lazyComponent: () => Promise<{ default: React.ComponentType<Record<string, unknown>> }>,
-  attemptsLeft = 3
-): Promise<{ default: React.ComponentType<Record<string, unknown>> }> => {
-  return new Promise((resolve, reject) => {
+  attemptsLeft = 3,
+): Promise<{ default: React.ComponentType<Record<string, unknown>> }> =>
+  new Promise((resolve, reject) => {
     lazyComponent()
       .then(resolve)
       .catch((error: Error) => {
@@ -15,6 +15,5 @@ const componentLoader = (
         }, 1500);
       });
   });
-};
 
 export default componentLoader;

@@ -1,7 +1,8 @@
 import { isNil } from "lodash";
 
-import { DEFAULT_COLOR_SCHEME, Colors } from "style/constants";
 import { tabling, util } from "lib";
+import { DEFAULT_COLOR_SCHEME, Colors } from "style/constants";
+
 import * as typeguards from "./typeguards";
 
 export const validatedColor = (color: Style.HexColor | null | undefined): Style.HexColor | null => {
@@ -30,7 +31,10 @@ type GetModelColorOptions<M extends Model.Model> = {
   readonly scheme?: Style.HexColor[];
 };
 
-export const getModelColor = <M extends Model.Model>(m: M, opts?: GetModelColorOptions<M>): Style.HexColor | null => {
+export const getModelColor = <M extends Model.Model>(
+  m: M,
+  opts?: GetModelColorOptions<M>,
+): Style.HexColor | null => {
   const modelColorField = opts?.modelColorField;
   const colorScheme = opts?.scheme || DEFAULT_COLOR_SCHEME;
   if (!isNil(modelColorField)) {
@@ -83,7 +87,10 @@ type GetModelNameOptions<M extends Model.Model> = {
   readonly isPlural?: boolean;
 };
 
-export const getModelName = <M extends Model.Model>(m: M, opts?: GetModelNameOptions<M>): string => {
+export const getModelName = <M extends Model.Model>(
+  m: M,
+  opts?: GetModelNameOptions<M>,
+): string => {
   const modelNameField = opts?.modelNameField;
   const getModelNameCb = opts?.getModelName;
 

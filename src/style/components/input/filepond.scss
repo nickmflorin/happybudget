@@ -1,26 +1,26 @@
 .filepond--panel-root {
-	background-color: $gray-light;
+  background-color: $gray-light;
 }
 
 .filepond--drop-label {
-	cursor: pointer;
+  cursor: pointer;
 
-	label {
-		cursor: pointer;
-	}
+  label {
+    cursor: pointer;
+  }
 }
 
 .filepond--drop-label.filepond--drop-label {
-	font-size: $large-text-size;;
-	label {
-		padding: 0 !important;
-	}
+  font-size: $large-text-size;
+  label {
+    padding: 0 !important;
+  }
 }
 
 .filepond--credits {
-	display: none;
+  display: none;
 }
 
 .filepond--hopper {
-	margin-bottom: 0px !important;
+  margin-bottom: 0px !important;
 }

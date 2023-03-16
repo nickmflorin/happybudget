@@ -1,11 +1,15 @@
 import React, { ReactNode } from "react";
-import { RouteComponentProps } from "react-router-dom";
+
 import { isNil, reduce, includes } from "lodash";
+import { RouteComponentProps } from "react-router-dom";
 
-import Route, { RouteProps } from "./Route";
 import NotFoundPage from "./NotFoundPage";
+import Route, { RouteProps } from "./Route";
 
-type PathParamsRouteProps<P extends Record<string, string | number>> = Omit<RouteProps, "component" | "render"> & {
+type PathParamsRouteProps<P extends Record<string, string | number>> = Omit<
+  RouteProps,
+  "component" | "render"
+> & {
   readonly params: (keyof P)[];
   readonly numericIdParams?: (keyof P)[] | "__all__";
   readonly component?: React.FunctionComponent<P>;
@@ -58,7 +62,7 @@ const PathParamsRoute = <P extends Record<string, string | number>>({
           validIdMissing = true;
           return curr;
         },
-        {} as P
+        {} as P,
       );
       if (validIdMissing) {
         return <NotFoundPage />;

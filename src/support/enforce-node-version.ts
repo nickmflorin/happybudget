@@ -3,8 +3,9 @@ This script is intended to ensure that the node version that is running the appl
 before allowing execution to continue.
 */
 import semver from "semver";
-import { engines } from "../../package.json";
+
 import * as terminal from "./terminal";
+import { engines } from "../../package.json";
 
 const version = engines.node;
 if (version === undefined) {

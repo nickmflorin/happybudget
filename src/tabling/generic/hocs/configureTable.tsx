@@ -7,10 +7,9 @@ import { Subtract } from "utility-types";
 import * as config from "config";
 import { tabling, hooks, util } from "lib";
 
+import * as test from "./publicizeDataGrid";
 import * as genericColumns from "../columns";
 import { useHiddenColumns } from "../hooks";
-
-import * as test from "./publicizeDataGrid";
 
 export const DefaultDataGridOptions: Table.GridOptions = {
   defaultColDef: {

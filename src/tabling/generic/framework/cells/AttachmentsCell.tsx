@@ -1,20 +1,26 @@
 import React, { useEffect, useMemo, useRef, useReducer } from "react";
+
 import { isNil, map } from "lodash";
 import { Progress } from "antd";
 
 import * as api from "api";
 import { ui } from "lib";
-
 import { Icon } from "components";
 import { AttachmentText } from "components/typography";
 
 import { Cell } from "./generic";
 
-type DragCountAction = { type: "INCREMENT_COUNT" | "DECREMENT_COUNT" | "SET_DRAG" | "CLEAR"; payload?: boolean };
+type DragCountAction = {
+  type: "INCREMENT_COUNT" | "DECREMENT_COUNT" | "SET_DRAG" | "CLEAR";
+  payload?: boolean;
+};
 type DragState = { count: number; drag: boolean };
 const InitialDragState: DragState = { count: 0, drag: false };
 
-const DragCountReducer = (state: DragState = InitialDragState, action: DragCountAction): DragState => {
+const DragCountReducer = (
+  state: DragState = InitialDragState,
+  action: DragCountAction,
+): DragState => {
   let newState = { ...state };
   if (action.type === "INCREMENT_COUNT") {
     return { ...newState, count: newState.count + 1 };
@@ -38,7 +44,7 @@ interface AttachmentsCellProps<
   R extends Tables.ActualRowData | Tables.SubAccountRowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Table.Context = Table.Context,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > extends Table.CellProps<R, M, C, S, Model.SimpleAttachment[]> {
   readonly uploadAttachmentsPath: (id: number) => string;
   readonly onAttachmentAdded: (row: Table.ModelRow<R>, attachment: Model.Attachment) => void;
@@ -48,16 +54,17 @@ const AttachmentsCell = <
   R extends Tables.ActualRowData | Tables.SubAccountRowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Table.Context = Table.Context,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 >({
   value,
   ...props
 }: AttachmentsCellProps<R, M, C, S>): JSX.Element => {
   const divRef = useRef<HTMLDivElement>(null);
-  const [progressValue, progressActive, progressUpdate, progressCancel] = ui.progress.useDampenedProgress({
-    dampenedRate: 0.1,
-    perMilliseconds: 80
-  });
+  const [progressValue, progressActive, progressUpdate, progressCancel] =
+    ui.progress.useDampenedProgress({
+      dampenedRate: 0.1,
+      perMilliseconds: 80,
+    });
 
   const [dragState, dispatchDragState] = useReducer(DragCountReducer, InitialDragState);
   const row: Table.ModelRow<R> = props.node.data;
@@ -98,12 +105,14 @@ const AttachmentsCell = <
         api.xhr.uploadAttachmentFile(e.dataTransfer.files, props.uploadAttachmentsPath(row.id), {
           error: (err: Http.ApiError) => {
             props.table.handleRequestError(err, {
-              message: "There was an error uploading the attachment."
+              message: "There was an error uploading the attachment.",
             });
             progressCancel();
           },
-          progress: (computable: boolean, percent: number, total: number) => progressUpdate(percent, total),
-          success: (ms: Model.Attachment[]) => map(ms, (m: Model.Attachment) => props.onAttachmentAdded(row, m))
+          progress: (computable: boolean, percent: number, total: number) =>
+            progressUpdate(percent, total),
+          success: (ms: Model.Attachment[]) =>
+            map(ms, (m: Model.Attachment) => props.onAttachmentAdded(row, m)),
         });
         e.dataTransfer.clearData();
         dispatchDragState({ type: "CLEAR" });
@@ -126,22 +135,22 @@ const AttachmentsCell = <
 
   const content = useMemo(() => {
     if (progressActive) {
-      return <Progress className={"progress-bar"} percent={Math.floor(progressValue * 100.0)} />;
+      return <Progress className="progress-bar" percent={Math.floor(progressValue * 100.0)} />;
     } else {
       if (dragState.drag) {
         return (
-          <div className={"drag"}>
-            <Icon weight={"regular"} icon={"arrow-circle-down"} />
-            {"Drop files here"}
+          <div className="drag">
+            <Icon weight="regular" icon="arrow-circle-down" />
+            Drop files here
           </div>
         );
       } else if (!isNil(attachment)) {
         return <AttachmentText additionalCount={additionalCount}>{attachment}</AttachmentText>;
       } else {
         return (
-          <div className={"selected"}>
-            <Icon weight={"regular"} icon={"arrow-circle-down"} />
-            {"Double click or drop files here"}
+          <div className="selected">
+            <Icon weight="regular" icon="arrow-circle-down" />
+            Double click or drop files here
           </div>
         );
       }
@@ -149,7 +158,7 @@ const AttachmentsCell = <
   }, [attachment, progressActive, dragState.drag, progressValue]);
 
   return (
-    <Cell {...props} ref={divRef} className={"cell--attachments"}>
+    <Cell {...props} ref={divRef} className="cell--attachments">
       {content}
     </Cell>
   );

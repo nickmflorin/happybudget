@@ -1,9 +1,11 @@
 import { useMemo } from "react";
+
 import { includes, reduce, filter } from "lodash";
 
 import { tabling, hooks } from "lib";
-import { BodyRow, GroupRow, HeaderRow, FooterRow } from "../rows";
+
 import Table from "./Table";
+import { BodyRow, GroupRow, HeaderRow, FooterRow } from "../rows";
 
 type M = Model.PdfAccount;
 type R = Tables.AccountRowData;
@@ -18,13 +20,22 @@ type AccountsTableProps = {
   readonly options: PdfBudgetTable.Options;
 };
 
-const AccountsTable = ({ columns, markups, data, groups, options }: AccountsTableProps): JSX.Element => {
-  const accountColumnIsVisible = useMemo(() => (c: DC) => includes(options.columns, c.field), [options.columns]);
+const AccountsTable = ({
+  columns,
+  markups,
+  data,
+  groups,
+  options,
+}: AccountsTableProps): JSX.Element => {
+  const accountColumnIsVisible = useMemo(
+    () => (c: DC) => includes(options.columns, c.field),
+    [options.columns],
+  );
 
   const generateRows = hooks.useDynamicCallback((): JSX.Element[] => {
     const rowData = tabling.rows.generateTableData<R, M>({
       response: { models: data, groups, markups },
-      columns
+      columns,
     });
     return [
       ...reduce(
@@ -39,7 +50,7 @@ const AccountsTable = ({ columns, markups, data, groups, options }: AccountsTabl
                 columns={filter(columns, (c: C) => tabling.columns.isDataColumn(c)) as DC[]}
                 row={row}
                 data={rowData}
-              />
+              />,
             ];
           } else if (tabling.rows.isGroupRow(row)) {
             return [
@@ -50,25 +61,25 @@ const AccountsTable = ({ columns, markups, data, groups, options }: AccountsTabl
                 columnIsVisible={accountColumnIsVisible}
                 columns={filter(columns, (c: C) => tabling.columns.isDataColumn(c)) as DC[]}
                 data={rowData}
-              />
+              />,
             ];
           }
           return rws;
         },
         [
           <HeaderRow<R, M>
-            key={"header-row"}
+            key="header-row"
             columnIsVisible={accountColumnIsVisible}
             columns={filter(columns, (c: C) => tabling.columns.isDataColumn(c)) as DC[]}
-          />
-        ]
+          />,
+        ],
       ),
       <FooterRow<R, M>
-        key={"footer-row"}
+        key="footer-row"
         columnIsVisible={accountColumnIsVisible}
         columns={filter(columns, (c: C) => tabling.columns.isDataColumn(c)) as DC[]}
         data={rowData}
-      />
+      />,
     ];
   });
 

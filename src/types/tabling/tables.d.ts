@@ -11,12 +11,22 @@ declare namespace Tables {
   type SubAccountRowData = BudgetRowData &
     Pick<
       Model.SubAccount,
-      "quantity" | "unit" | "multiplier" | "rate" | "fringes" | "fringe_contribution" | "attachments" | "contact"
+      | "quantity"
+      | "unit"
+      | "multiplier"
+      | "rate"
+      | "fringes"
+      | "fringe_contribution"
+      | "attachments"
+      | "contact"
     >;
   type SubAccountRow = Table.ModelRow<SubAccountRowData>;
   type SubAccountTableStore = Redux.BudgetTableStore<SubAccountRowData>;
 
-  type FringeRowData = Pick<Model.Fringe, "color" | "name" | "description" | "cutoff" | "rate" | "unit">;
+  type FringeRowData = Pick<
+    Model.Fringe,
+    "color" | "name" | "description" | "cutoff" | "rate" | "unit"
+  >;
   type FringeRow = Table.ModelRow<FringeRowData>;
   type FringeTableStore = Redux.TableStore<FringeRowData>;
 

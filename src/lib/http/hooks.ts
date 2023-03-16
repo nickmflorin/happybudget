@@ -1,4 +1,5 @@
 import { useRef, useEffect, useCallback, useState, useMemo } from "react";
+
 import axios, { CancelTokenSource, CancelToken, Canceler } from "axios";
 import { isNil } from "lodash";
 
@@ -42,7 +43,9 @@ export type ApiHookOptions<RSP> = {
   readonly request: (token: CancelToken | undefined) => Promise<RSP>;
 };
 
-export const useApiHook = <RSP>(options: ApiHookOptions<RSP>): [RSP | null, boolean, Error | null] => {
+export const useApiHook = <RSP>(
+  options: ApiHookOptions<RSP>,
+): [RSP | null, boolean, Error | null] => {
   const [error, _setError] = useState<Error | null>(null);
   const [loading, _setLoading] = useState(false);
   const [response, _setResponse] = useState<RSP | null>(null);
@@ -52,7 +55,7 @@ export const useApiHook = <RSP>(options: ApiHookOptions<RSP>): [RSP | null, bool
       _setLoading(v);
       options.onLoading?.(v);
     },
-    []
+    [],
   );
 
   const setError = useMemo(
@@ -60,7 +63,7 @@ export const useApiHook = <RSP>(options: ApiHookOptions<RSP>): [RSP | null, bool
       _setError(e);
       options.onError?.(e);
     },
-    []
+    [],
   );
 
   const setResponse = useMemo(
@@ -68,7 +71,7 @@ export const useApiHook = <RSP>(options: ApiHookOptions<RSP>): [RSP | null, bool
       _setResponse(r);
       options.onResponse?.(r);
     },
-    []
+    [],
   );
 
   useEffect(() => {

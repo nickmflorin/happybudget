@@ -1,4 +1,5 @@
 import { useRef, useMemo } from "react";
+
 import { isNil } from "lodash";
 
 export const InitialLayoutRef: ILayoutRef = {
@@ -6,12 +7,10 @@ export const InitialLayoutRef: ILayoutRef = {
   setSidebarVisible: () => {},
   /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   toggleSidebar: () => {},
-  sidebarVisible: true
+  sidebarVisible: true,
 };
 
-export const useLayout = (): NonNullRef<ILayoutRef> => {
-  return useRef<ILayoutRef>(InitialLayoutRef);
-};
+export const useLayout = (): NonNullRef<ILayoutRef> => useRef<ILayoutRef>(InitialLayoutRef);
 
 export const useLayoutIfNotDefined = (layout?: NonNullRef<ILayoutRef>): NonNullRef<ILayoutRef> => {
   const ref = useRef<ILayoutRef>(InitialLayoutRef);

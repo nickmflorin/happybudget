@@ -23,4 +23,6 @@ declare type TooltipProps = Omit<
 
 declare type DeterministicTooltip = string | Omit<TooltipProps, "children">;
 
-declare type Tooltip = DeterministicTooltip | RenderPropChild<{ children: import("react").ReactNode }>;
+declare type Tooltip =
+  | DeterministicTooltip
+  | RenderPropChild<{ children: import("react").ReactNode }>;

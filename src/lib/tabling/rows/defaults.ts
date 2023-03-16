@@ -8,14 +8,14 @@ function insertDefaults<R extends Table.RowData, M extends Model.RowHttpModel>(
   cs: Table.ModelColumn<R, M>[],
   data: R,
   defaults: Partial<R>,
-  context: "update"
+  context: "update",
 ): R;
 
 function insertDefaults<R extends Table.RowData, M extends Model.RowHttpModel>(
   cs: Table.ModelColumn<R, M>[],
   data: Partial<R>,
   defaults: Partial<R>,
-  context: "create"
+  context: "create",
 ): Partial<R>;
 
 /**
@@ -50,12 +50,11 @@ function insertDefaults<R extends Table.RowData, M extends Model.RowHttpModel>(
  * @returns The original RowData object (either Partial<R> or R, depending on
  *          the context) with the defaults inserted.
  */
-function insertDefaults<R extends Table.RowData, M extends Model.RowHttpModel, D extends Partial<R> | R>(
-  cs: Table.ModelColumn<R, M>[],
-  data: D,
-  defaults: Partial<R>,
-  context: Context
-): D {
+function insertDefaults<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel,
+  D extends Partial<R> | R,
+>(cs: Table.ModelColumn<R, M>[], data: D, defaults: Partial<R>, context: Context): D {
   let key: keyof R;
   for (key in defaults) {
     // A warning will be issued if the column is null.
@@ -64,7 +63,9 @@ function insertDefaults<R extends Table.RowData, M extends Model.RowHttpModel, D
       if (data[key] === undefined) {
         if (context === "update") {
           console.warn(
-            `Encountered an undefined value for column ${String(key)} when attempting to set default values on the row.`
+            `Encountered an undefined value for column ${String(
+              key,
+            )} when attempting to set default values on the row.`,
           );
         } else {
           data = { ...data, [key]: defaults[key] };
@@ -80,7 +81,7 @@ function insertDefaults<R extends Table.RowData, M extends Model.RowHttpModel, D
 export const applyDefaultsOnCreate = <R extends Table.RowData, M extends Model.RowHttpModel>(
   cs: Table.ModelColumn<R, M>[],
   data?: Partial<R> | undefined,
-  defaults?: Table.DefaultDataOnCreate<R>
+  defaults?: Table.DefaultDataOnCreate<R>,
 ): Partial<R> | undefined => {
   const definedData: Partial<R> = data || {};
 
@@ -96,12 +97,14 @@ export const applyDefaultsOnCreate = <R extends Table.RowData, M extends Model.R
 					 of the callback would depend on the order in which the callbacks for
 					 each possible default are applied. */
         const defaultValue =
-          typeof c.defaultValueOnCreate === "function" ? c.defaultValueOnCreate(definedData) : c.defaultValueOnCreate;
+          typeof c.defaultValueOnCreate === "function"
+            ? c.defaultValueOnCreate(definedData)
+            : c.defaultValueOnCreate;
         return { ...curr, [c.field]: defaultValue };
       }
       return curr;
     },
-    definedData
+    definedData,
   );
 
   if (defaults !== undefined) {
@@ -116,7 +119,7 @@ export const applyDefaultsOnUpdate = <R extends Table.RowData, M extends Model.R
   cs: Table.ModelColumn<R, M>[],
   row: Table.ModelRow<R>,
   change: Table.RowChangeData<R, Table.ModelRow<R>>,
-  defaults?: Table.DefaultDataOnUpdate<R>
+  defaults?: Table.DefaultDataOnUpdate<R>,
 ): Table.ModelRow<R> => {
   /* Apply defaults defined on the columns themselves before defaults are
      are applied from the explicitly passed in default data. */
@@ -132,13 +135,15 @@ export const applyDefaultsOnUpdate = <R extends Table.RowData, M extends Model.R
 						 the result of the callback would depend on the order in which the
 						 callbacks for each possible default are applied. */
           const defaultValue =
-            typeof c.defaultValueOnUpdate === "function" ? c.defaultValueOnUpdate(row) : c.defaultValueOnUpdate;
+            typeof c.defaultValueOnUpdate === "function"
+              ? c.defaultValueOnUpdate(row)
+              : c.defaultValueOnUpdate;
           return { ...curr, [c.field]: defaultValue };
         }
         return curr;
       },
-      row.data
-    )
+      row.data,
+    ),
   };
   if (defaults !== undefined) {
     return typeof defaults === "function"

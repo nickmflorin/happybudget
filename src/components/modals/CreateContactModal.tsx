@@ -1,11 +1,12 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
+
 import { isNil } from "lodash";
 
 import * as api from "api";
 import { ui } from "lib";
-import { ContactForm } from "components/forms";
 import { ImageAndName } from "components/fields";
 import { IImageAndNameRef } from "components/fields/ImageAndName";
+import { ContactForm } from "components/forms";
 
 import { CreateModelModal, CreateModelModalProps } from "./generic";
 
@@ -52,20 +53,22 @@ const CreateContactModal = ({ initialValues, ...props }: CreateContactModalProps
         headerRef.current?.setLastName(changedValues.last_name);
       }
     },
-    []
+    [],
   );
 
   return (
     <CreateModelModal<Model.Contact>
       {...props}
-      className={"contact-modal"}
+      className="contact-modal"
       form={form}
       title={
         <ImageAndName
           value={image}
           ref={headerRef}
           onChange={(f: UploadedImage | null) => setImage(f)}
-          onError={(error: Error | string) => form.notify(typeof error === "string" ? error : error.message)}
+          onError={(error: Error | string) =>
+            form.notify(typeof error === "string" ? error : error.message)
+          }
         />
       }
       interceptPayload={(p: Http.ContactPayload) => {
@@ -76,7 +79,13 @@ const CreateContactModal = ({ initialValues, ...props }: CreateContactModalProps
       }}
       create={api.createContact}
     >
-      {() => <MemoizedContactForm form={form} initialValues={initialValues} onValuesChange={onValuesChange} />}
+      {() => (
+        <MemoizedContactForm
+          form={form}
+          initialValues={initialValues}
+          onValuesChange={onValuesChange}
+        />
+      )}
     </CreateModelModal>
   );
 };

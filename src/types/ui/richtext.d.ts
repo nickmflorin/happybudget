@@ -1,1 +1,4 @@
-declare type IEditor = Pick<import("@ckeditor/ckeditor5-react").EditorInstance, "setData" | "getData">;
+declare type IEditor = Pick<
+  import("@ckeditor/ckeditor5-react").EditorInstance,
+  "setData" | "getData"
+>;

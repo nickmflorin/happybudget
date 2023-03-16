@@ -1,6 +1,5 @@
 import { http } from "lib";
 import { AppProps } from "lib/compat";
-
 import { AppConfig } from "components/config";
 import "styles/globals/index.scss";
 

@@ -1,17 +1,18 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+
 import hoistNonReactStatics from "hoist-non-react-statics";
+import { useDispatch } from "react-redux";
 import { Subtract } from "utility-types";
 
 import connectTableToStore, {
   StoreConfig,
   ConnectTableProps,
-  ConnectedTableInjectedProps
+  ConnectedTableInjectedProps,
 } from "./connectTableToStore";
 
 export type ConnectedPublicTableInjectedProps<
   R extends Table.RowData,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = ConnectedTableInjectedProps<R, S> & {
   readonly onSearch: (v: string) => void;
 };
@@ -20,7 +21,7 @@ export type ConnectPublicTableProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Table.Context = Table.Context,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = ConnectTableProps<R, M, C, S>;
 
 type PublicStoreConfig<
@@ -28,7 +29,7 @@ type PublicStoreConfig<
   M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  A extends Redux.TableActionPayloadMap<M> = Redux.TableActionPayloadMap<M>
+  A extends Redux.TableActionPayloadMap<M> = Redux.TableActionPayloadMap<M>,
 > = StoreConfig<R, M, C, S> & {
   readonly actions: Omit<Redux.ActionCreatorMap<A, C>, "request" | "invalidate">;
 };
@@ -38,7 +39,7 @@ type HOCProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel,
   C extends Table.Context = Table.Context,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = Subtract<T, ConnectedPublicTableInjectedProps<R, S>> & ConnectPublicTableProps<R, M, C, S>;
 
 const connectTableToPublicStore =
@@ -48,9 +49,9 @@ const connectTableToPublicStore =
     M extends Model.RowHttpModel = Model.RowHttpModel,
     C extends Table.Context = Table.Context,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
-    A extends Redux.TableActionPayloadMap<M> = Redux.TableActionPayloadMap<M>
+    A extends Redux.TableActionPayloadMap<M> = Redux.TableActionPayloadMap<M>,
   >(
-    config: PublicStoreConfig<R, M, C, S, A>
+    config: PublicStoreConfig<R, M, C, S, A>,
   ) =>
   (Component: React.FunctionComponent<T>): React.FunctionComponent<HOCProps<T, R, M, C, S>> => {
     const ConnectedComponent = connectTableToStore<T, R, M, C, S>(config)(Component);

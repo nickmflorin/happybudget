@@ -1,11 +1,13 @@
 import React, { useImperativeHandle, useMemo } from "react";
+
 import { map, isNil, filter, includes } from "lodash";
 import { Subtract } from "utility-types";
 
 import { hooks, tabling } from "lib";
 
+import { BaseTableProps } from "./AuthenticatedTable";
+import TableWrapper from "./TableWrapper";
 import { PublicGrid, PublicGridProps, PublicDataGrid } from "../grids";
-import { PublicMenu } from "../menus";
 import {
   FooterGrid,
   PublicFooterGridProps,
@@ -14,21 +16,20 @@ import {
   DataGridProps,
   PublicizeDataGridProps,
   ConnectPublicTableProps,
-  configureTable
+  configureTable,
 } from "../hocs";
-import TableWrapper from "./TableWrapper";
-import { BaseTableProps } from "./AuthenticatedTable";
+import { PublicMenu } from "../menus";
 
 export type PublicTableDataGridProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel,
 > = PublicizeDataGridProps<R, M> & DataGridProps<R, M> & Omit<PublicGridProps<R, M>, "id">;
 
 export type PublicTableProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Table.Context = Table.Context,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = BaseTableProps<R, M> &
   ConnectedPublicTableInjectedProps<R, S> &
   ConnectPublicTableProps<R, M, C, S> & {
@@ -39,7 +40,7 @@ type _PublicTableProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Table.Context = Table.Context,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = PublicTableProps<R, M, C, S> & ConfiguredTableInjectedProps;
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -48,10 +49,10 @@ const TableFooterGrid = FooterGrid<any, any, PublicFooterGridProps<any>>({
   className: "grid--table-footer",
   rowClass: "row--table-footer",
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  getFooterColumn: (col: Table.DataColumn<any, any, any>) => col.footer || null
+  getFooterColumn: (col: Table.DataColumn<any, any, any>) => col.footer || null,
 })(PublicGrid) as {
   <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-    props: Omit<PublicFooterGridProps<R, M>, "id">
+    props: Omit<PublicFooterGridProps<R, M>, "id">,
   ): JSX.Element;
 };
 
@@ -62,10 +63,10 @@ const PageFooterGrid = FooterGrid<any, any, PublicFooterGridProps<any>>({
   rowClass: "row--page-footer",
   rowHeight: 28,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  getFooterColumn: (col: Table.DataColumn<any, any, any>) => col.page || null
+  getFooterColumn: (col: Table.DataColumn<any, any, any>) => col.page || null,
 })(PublicGrid) as {
   <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-    props: Omit<PublicFooterGridProps<R, M>, "id" | "grid">
+    props: Omit<PublicFooterGridProps<R, M>, "id" | "grid">,
   ): JSX.Element;
 };
 
@@ -73,9 +74,9 @@ const PublicTable = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Table.Context = Table.Context,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 >(
-  props: _PublicTableProps<R, M, C, S>
+  props: _PublicTableProps<R, M, C, S>,
 ): JSX.Element => {
   const grid = tabling.hooks.useDataGrid();
   /**
@@ -95,7 +96,10 @@ const PublicTable = <
         if (typeof props.excludeColumns === "function") {
           return props.excludeColumns(c);
         }
-        return includes(Array.isArray(props.excludeColumns) ? props.excludeColumns : [props.excludeColumns], c.field);
+        return includes(
+          Array.isArray(props.excludeColumns) ? props.excludeColumns : [props.excludeColumns],
+          c.field,
+        );
       }
       return false;
     };
@@ -104,27 +108,43 @@ const PublicTable = <
         filter(
           props.columns,
           (c: Table.Column<R, M>) =>
-            tabling.columns.isActionColumn(c) || tabling.columns.isFakeColumn(c) || c.requiresAuthentication !== true
+            tabling.columns.isActionColumn(c) ||
+            tabling.columns.isFakeColumn(c) ||
+            c.requiresAuthentication !== true,
         ),
         (c: Table.Column<R, M>) =>
-          (tabling.columns.isDataColumn(c) && !evaluateColumnExclusionProp(c)) || tabling.columns.isActionColumn(c)
+          (tabling.columns.isDataColumn(c) && !evaluateColumnExclusionProp(c)) ||
+          tabling.columns.isActionColumn(c),
       ) as Table.RealColumn<R, M>[],
       (c: Table.RealColumn<R, M>) => ({
         ...c,
         cellRendererParams: {
           ...c.cellRendererParams,
           selector: props.selector,
-          footerRowSelectors: props.footerRowSelectors
+          footerRowSelectors: props.footerRowSelectors,
         },
-        cellEditorParams: { ...c.cellEditorParams, selector: props.selector }
-      })
+        cellEditorParams: { ...c.cellEditorParams, selector: props.selector },
+      }),
     );
     return map(cs, (c: Table.Column<R, M>) => ({
       ...c,
-      cellRendererParams: { ...c.cellRendererParams, table: props.table.current, tableContext: props.tableContext },
-      cellEditorParams: { ...c.cellEditorParams, table: props.table.current, tableContext: props.tableContext }
+      cellRendererParams: {
+        ...c.cellRendererParams,
+        table: props.table.current,
+        tableContext: props.tableContext,
+      },
+      cellEditorParams: {
+        ...c.cellEditorParams,
+        table: props.table.current,
+        tableContext: props.tableContext,
+      },
     }));
-  }, [hooks.useDeepEqualMemo(props.columns), props.selector, props.excludeColumns, props.table.current]);
+  }, [
+    hooks.useDeepEqualMemo(props.columns),
+    props.selector,
+    props.excludeColumns,
+    props.table.current,
+  ]);
 
   useImperativeHandle(
     props.table,
@@ -185,7 +205,9 @@ const PublicTable = <
         if (!isNil(apis)) {
           const position: Table.CellPosition | null = apis.grid.getFocusedCell();
           if (!isNil(position)) {
-            const node: Table.RowNode | undefined = apis.grid.getDisplayedRowAtIndex(position.rowIndex);
+            const node: Table.RowNode | undefined = apis.grid.getDisplayedRowAtIndex(
+              position.rowIndex,
+            );
             if (!isNil(node)) {
               const row: Table.BodyRow<R> = node.data;
               return row;
@@ -193,9 +215,9 @@ const PublicTable = <
           }
         }
         return null;
-      }
+      },
     }),
-    [hooks.useDeepEqualMemo(columns)]
+    [hooks.useDeepEqualMemo(columns)],
   );
 
   return (
@@ -258,8 +280,8 @@ export default configureTable<_PublicTableProps<any, any, any>, any, any>(Public
     R extends Table.RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     C extends Table.Context = Table.Context,
-    S extends Redux.TableStore<R> = Redux.TableStore<R>
+    S extends Redux.TableStore<R> = Redux.TableStore<R>,
   >(
-    props: Subtract<_PublicTableProps<R, M, C, S>, ConfiguredTableInjectedProps>
+    props: Subtract<_PublicTableProps<R, M, C, S>, ConfiguredTableInjectedProps>,
   ): JSX.Element;
 };

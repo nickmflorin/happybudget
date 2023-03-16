@@ -1,14 +1,14 @@
 import { Moment } from "moment";
-import { toDisplayDate } from "./dates";
 
 import { logger } from "internal";
 
+import { toDisplayDate } from "./dates";
 import { RequireOne } from "./types";
 import { removeObjAttributes } from "./util";
 import * as validators from "./validators";
 
 const PUNCTUATION = [".", ",", "!", "?"] as const;
-type Punctuation = (typeof PUNCTUATION)[number];
+type Punctuation = typeof PUNCTUATION[number];
 
 export const reverseString = (data: string) => data.split("").reverse().join("");
 
@@ -56,15 +56,19 @@ export const toSentence = (data: string) =>
     }),
   );
 
-/* Removes punctuation at the end of the string based on the provided options.
-   The provided options specify whether or not a single type of punctuation should be removed, a
-   set of specific punctuations should be removed, or all punctuations should be removed - where
-   each punctuation character removed is only removed if it is at the end of the string.
-   Punctuation at the end of the string that is not included in the options (unless the options
-   specify { remove: true } which communicates 'all punctuation' ) will be left in tact.
-   This function is privately scoped and should not be used outside of this module.  Instead, the
-   'manageSuffixPunctuation' should be used.
-   */
+/*
+Removes punctuation at the end of the string based on the provided options.
+
+The provided options specify whether or not a single type of punctuation should be removed, a set of
+specific punctuations should be removed, or all punctuations should be removed - where each
+punctuation character removed is only removed if it is at the end of the string.
+
+Punctuation at the end of the string that is not included in the options (unless the options specify
+{ remove: true } which communicates 'all punctuation' ) will be left in tact.
+
+This function is privately scoped and should not be used outside of this module.  Instead, the
+'manageSuffixPunctuation' should be used.
+*/
 const _removeSuffixPunctuation = (
   data: string,
   opts?: Pick<SuffixPunctuationOptions, "remove">,

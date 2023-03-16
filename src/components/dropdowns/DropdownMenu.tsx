@@ -1,14 +1,15 @@
 import React, { useEffect, useMemo, useState } from "react";
+
 import { isNil, uniqueId } from "lodash";
 
-import { Menu } from "components/menus";
 import { ui } from "lib";
+import { Menu } from "components/menus";
 
 import Dropdown, { DropdownProps } from "./Dropdown";
 
 export type DropdownMenuProps<
   S extends Record<string, unknown> = MenuItemSelectedState,
-  M extends MenuItemModel<S> = MenuItemModel<S>
+  M extends MenuItemModel<S> = MenuItemModel<S>,
 > = Omit<IMenu<S, M>, "className" | "style"> &
   Pick<StandardComponentProps, "className"> &
   Pick<DropdownProps, "children" | "dropdown" | "placement"> & {
@@ -19,7 +20,7 @@ export type DropdownMenuProps<
 
 const DropdownMenu = <
   S extends Record<string, unknown> = MenuItemSelectedState,
-  M extends MenuItemModel<S> = MenuItemModel<S>
+  M extends MenuItemModel<S> = MenuItemModel<S>,
 >({
   menuClassName,
   menuStyle,

@@ -1,5 +1,6 @@
 import { Font, StyleSheet } from "@react-pdf/renderer";
 import { forEach, isNil, map, reduce, filter } from "lodash";
+
 import {
   SupportedFontFaces,
   FontWeightMap,
@@ -7,7 +8,7 @@ import {
   TABLE_BORDER_RADIUS,
   fontsFromFontFace,
   fontToString,
-  getFontSourceModuleName
+  getFontSourceModuleName,
 } from "./constants";
 
 type Modules = Record<string, unknown>;
@@ -17,18 +18,22 @@ export const importFontModules = (): Promise<Modules> => import("./fonts");
 export const getPdfFont = (font: Style.Font, modules: Modules): Pdf.Font | null => {
   const moduleName = getFontSourceModuleName(font);
   if (isNil(modules[moduleName])) {
-    console.warn(`Module ${moduleName} is not on fonts path for ${fontToString(font)}.  It will not be registered.`);
+    console.warn(
+      `Module ${moduleName} is not on fonts path for ${fontToString(
+        font,
+      )}.  It will not be registered.`,
+    );
     return null;
   } else if (font.italic === true) {
     return {
       src: modules[moduleName] as string,
       fontWeight: FontWeightMap[font.weight],
-      fontStyle: "italic"
+      fontStyle: "italic",
     };
   } else {
     return {
       src: modules[moduleName] as string,
-      fontWeight: FontWeightMap[font.weight]
+      fontWeight: FontWeightMap[font.weight],
     };
   }
 };
@@ -38,7 +43,7 @@ export const registerFontFace = (fontFace: Style.FontFace, modules: Record<strin
   const pdfFonts = map(fontFaceFonts, (font: Style.Font) => getPdfFont(font, modules));
   Font.register({
     family: fontFace.family,
-    fonts: filter(pdfFonts, (font: Pdf.Font | null) => !isNil(font)) as Pdf.Font[]
+    fonts: filter(pdfFonts, (font: Pdf.Font | null) => !isNil(font)) as Pdf.Font[],
   });
 };
 
@@ -88,9 +93,9 @@ const hyphenationCallback = (word: string): string[] => {
             return curr;
           }
         },
-        [] as string[][]
+        [] as string[][],
       ),
-      (a: string[]) => a.join("")
+      (a: string[]) => a.join(""),
     );
   }
   /* Return just the word so that @react-pdf can use the default hyphenation
@@ -118,92 +123,92 @@ const TextStyles: Pdf.ExtensionStyles = {
     fontWeight: 600,
     fontSize: 16,
     lineHeight: "1.5pt",
-    marginBottom: 2
+    marginBottom: 2,
   },
   h2: {
     ext: ["header"],
     fontWeight: 600,
     fontSize: 14,
     lineHeight: "1.5pt",
-    marginBottom: 2
+    marginBottom: 2,
   },
   h3: {
     ext: ["header"],
     fontWeight: 600,
     fontSize: 14,
     lineHeight: "1.5pt",
-    marginBottom: 2
+    marginBottom: 2,
   },
   h4: {
     ext: ["header"],
     fontWeight: 600,
     fontSize: 12,
     lineHeight: "1.5pt",
-    marginBottom: 2
+    marginBottom: 2,
   },
   h5: {
     ext: ["header"],
     fontWeight: 600,
     fontSize: 12,
     lineHeight: "1.5pt",
-    marginBottom: 2
+    marginBottom: 2,
   },
   h6: {
     ext: ["header"],
     fontWeight: 600,
     fontSize: 10,
     lineHeight: "1.5pt",
-    marginBottom: 2
+    marginBottom: 2,
   },
   label: {
     fontFamily: "AvenirNext",
     fontSize: 12,
     fontWeight: 600,
     lineHeight: "1.5pt",
-    marginBottom: 4
-  }
+    marginBottom: 4,
+  },
 };
 
 const LayoutStyles: Pdf.ExtensionStyles = {
   page: {
     flexDirection: "column",
     backgroundColor: "white",
-    padding: 25
+    padding: 25,
   },
   "page-date": {
-    marginBottom: 20
+    marginBottom: 20,
   },
   "page-header": {
-    marginBottom: 20
+    marginBottom: 20,
   },
   "page-content": {
-    flexGrow: 100
+    flexGrow: 100,
   },
   // Used to display a blank page when the PDF has no valid pages to render.
   "page-no-data-content": {
     display: "flex",
     justifyContent: "center",
     flexDirection: "column",
-    height: "100%"
+    height: "100%",
   },
   "page-no-data-text": {
     textAlign: "center",
     fontFamily: "AvenirNext",
     color: "#404152",
     fontWeight: 700,
-    fontSize: 20
+    fontSize: 20,
   },
   "page-footer": {
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 15
+    marginTop: 15,
   },
   "page-number": {
     fontSize: 10,
-    marginTop: 4
-  }
+    marginTop: 4,
+  },
 };
 
 const TableStyles: Pdf.ExtensionStyles = {
@@ -214,7 +219,7 @@ const TableStyles: Pdf.ExtensionStyles = {
     display: "table",
     width: "auto",
     backgroundColor: "white",
-    fontFamily: "AvenirNext"
+    fontFamily: "AvenirNext",
   },
   tr: {
     flexDirection: "row",
@@ -224,7 +229,7 @@ const TableStyles: Pdf.ExtensionStyles = {
     borderRightWidth: 1,
     borderTopWidth: 0,
     borderBottomWidth: 0,
-    borderColor: Colors.TABLE_BORDER
+    borderColor: Colors.TABLE_BORDER,
   },
   "body-tr": { height: "20pt", backgroundColor: "white" },
   "header-tr": {
@@ -232,11 +237,11 @@ const TableStyles: Pdf.ExtensionStyles = {
     backgroundColor: Colors.TABLE_BORDER,
     borderTopLeftRadius: TABLE_BORDER_RADIUS,
     borderTopRightRadius: TABLE_BORDER_RADIUS,
-    border: "none"
+    border: "none",
   },
   "group-tr": {
     borderLeftWidth: 0,
-    borderRightWidth: 0
+    borderRightWidth: 0,
   },
   "subaccount-tr": {},
   "detail-tr": {},
@@ -247,26 +252,26 @@ const TableStyles: Pdf.ExtensionStyles = {
     backgroundColor: Colors.TABLE_BORDER,
     borderBottomRightRadius: TABLE_BORDER_RADIUS,
     borderBottomLeftRadius: TABLE_BORDER_RADIUS,
-    border: "none"
+    border: "none",
   },
   "account-header-tr": {
-    backgroundColor: "#EAEAEA"
+    backgroundColor: "#EAEAEA",
   },
   "account-sub-header-tr": {
     height: "22pt",
     backgroundColor: Colors.TABLE_BORDER,
-    border: "none"
+    border: "none",
   },
   th: {
     paddingLeft: 4,
     paddingRight: 4,
-    border: "none"
+    border: "none",
   },
   "th-first-child": {
-    paddingLeft: 8
+    paddingLeft: 8,
   },
   "th-last-child": {
-    paddingRight: 8
+    paddingRight: 8,
   },
   td: {
     paddingLeft: 4,
@@ -280,25 +285,25 @@ const TableStyles: Pdf.ExtensionStyles = {
     borderTopWidth: 0,
     borderBottomWidth: 0,
     borderRightWidth: 0,
-    borderColor: Colors.TABLE_BORDER
+    borderColor: Colors.TABLE_BORDER,
   },
   "td-first-child": {
-    paddingLeft: 8
+    paddingLeft: 8,
   },
   "td-last-child": {
-    paddingRight: 8
+    paddingRight: 8,
   },
   "td-border-right": {
-    borderRightWidth: 1
+    borderRightWidth: 1,
   },
   "td-border-left": {
-    borderLeftWidth: 1
+    borderLeftWidth: 1,
   },
   "group-tr-td": {
     borderLeftWidth: 0,
     borderRightWidth: 0,
     border: "none !important",
-    borderColor: "none"
+    borderColor: "none",
   },
   indented: {
     backgroundColor: "white",
@@ -311,16 +316,16 @@ const TableStyles: Pdf.ExtensionStyles = {
 			 border and moving the cell up slightly. */
     borderTopWidth: 3,
     borderTopColor: "white",
-    marginTop: -2
+    marginTop: -2,
   },
   "indent-td": {
-    paddingLeft: 18
+    paddingLeft: 18,
   },
   "detail-td": {},
   "subaccount-td": {},
   "subaccount-footer-td": {},
   "detail-group-indent-td": {
-    paddingLeft: 14
+    paddingLeft: 14,
   },
   "cell-text": { width: "100%" },
   "th-text": { marginTop: 6, fontSize: 8, color: "#595959", fontWeight: 700 },
@@ -332,20 +337,20 @@ const TableStyles: Pdf.ExtensionStyles = {
     paddingTop: 1,
     paddingBottom: 1,
     borderRadius: 20,
-    marginTop: 2
+    marginTop: 2,
   },
   "tag--contact": { borderRadius: 4 },
   "tag--account": {
     fontWeight: 500,
     borderWidth: 0.5,
     borderColor: Colors.TEXT_SECONDARY,
-    borderRadius: 3
+    borderRadius: 3,
   },
   "tag-text": {
     fontSize: 8,
     fontWeight: 400,
     textAlign: "center",
-    marginTop: 0.5
+    marginTop: 0.5,
   },
   "fill-width": { textAlign: "center", width: "100%" },
   "group-tr-td-text": { color: "#595959", fontWeight: 700 },
@@ -353,60 +358,65 @@ const TableStyles: Pdf.ExtensionStyles = {
   "detail-tr-td-text": { fontWeight: 300, color: "#000000" },
   "account-sub-header-tr-td-text": { color: "#595959", fontWeight: 700, marginTop: 6 },
   "subaccount-tr-td-text": {},
-  "subaccount-footer-tr-td-text": {}
+  "subaccount-footer-tr-td-text": {},
 };
 
 const ExportStyles: Pdf.ExtensionStyles = {
   "budget-page-primary-header": {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
   "budget-page-date": {
-    fontSize: 10
+    fontSize: 10,
   },
   "budget-page-sub-header": {
     display: "flex",
     minHeight: 70,
     marginTop: 20,
-    flexDirection: "row"
+    flexDirection: "row",
   },
   "budget-page-sub-header-left": {
     width: "50%",
     display: "flex",
-    flexDirection: "row"
+    flexDirection: "row",
   },
   "budget-page-sub-header-right": {
     width: "50%",
     display: "flex",
-    flexDirection: "row"
+    flexDirection: "row",
   },
   "budget-page-sub-header-image": {
     width: 70,
     height: 70,
     objectFit: "contain",
     marginRight: 15,
-    borderRadius: 10
+    borderRadius: 10,
   },
   "footer-logo": {
     width: 100,
     height: 30,
-    objectFit: "contain"
+    objectFit: "contain",
   },
   "budget-page-sub-header-rich-text": {
-    flexGrow: 100
+    flexGrow: 100,
   },
   notes: {},
   "notes-container": {
     border: `1px solid ${Colors.TABLE_BORDER}`,
     borderRadius: 10,
     padding: 15,
-    minHeight: "50pt"
+    minHeight: "50pt",
   },
-  "notes-text": {}
+  "notes-text": {},
 };
 
-const Styles: Pdf.ExtensionStyles = { ...TextStyles, ...LayoutStyles, ...ExportStyles, ...TableStyles };
+const Styles: Pdf.ExtensionStyles = {
+  ...TextStyles,
+  ...LayoutStyles,
+  ...ExportStyles,
+  ...TableStyles,
+};
 
 export const styleForClassName = (className: string): Pdf.Style => {
   let style: Pdf.ExtensionStyle = {};
@@ -422,10 +432,11 @@ export const styleForClassName = (className: string): Pdf.Style => {
     coreStyle = !isNil(coreStyle) ? coreStyle : {};
     return reduce(
       extensions,
-      (currentStyle: Pdf.Style, extension: string) => {
-        return { ...styleForClassName(extension), ...currentStyle };
-      },
-      coreStyle
+      (currentStyle: Pdf.Style, extension: string) => ({
+        ...styleForClassName(extension),
+        ...currentStyle,
+      }),
+      coreStyle,
     );
   }
   return style;

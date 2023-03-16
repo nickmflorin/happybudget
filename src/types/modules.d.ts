@@ -69,7 +69,7 @@ declare namespace Modules {
 
   type BudgetStoreLookup<
     B extends Model.Budget | Model.Template = Model.Budget | Model.Template,
-    PUBLIC extends boolean = boolean
+    PUBLIC extends boolean = boolean,
   > = [B, PUBLIC] extends [Model.Budget, true]
     ? Modules.PublicBudget.Store
     : [B, PUBLIC] extends [Model.Budget, false]

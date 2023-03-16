@@ -1,6 +1,6 @@
-import moment from "moment-timezone";
-import { Moment } from "moment";
 import { isNil } from "lodash";
+import { Moment } from "moment";
+import moment from "moment-timezone";
 
 import * as config from "config";
 
@@ -21,7 +21,10 @@ type IDateOptions = {
  *   there is none.
  * @returns {(Moment | undefined)}
  */
-export const toMoment = (value?: string | Moment | Date, options?: IDateOptions): Moment | undefined => {
+export const toMoment = (
+  value?: string | Moment | Date,
+  options?: IDateOptions,
+): Moment | undefined => {
   if (value === undefined) {
     value = moment();
   }
@@ -49,7 +52,10 @@ export const toMoment = (value?: string | Moment | Date, options?: IDateOptions)
  *   there is none.
  * @returns {(Moment | undefined)}
  */
-export const toLocalizedMoment = (value?: string | Moment, options?: IDateOptions): Moment | undefined => {
+export const toLocalizedMoment = (
+  value?: string | Moment,
+  options?: IDateOptions,
+): Moment | undefined => {
   if (value === undefined) {
     value = moment();
   }
@@ -74,16 +80,17 @@ export const toLocalizedMoment = (value?: string | Moment, options?: IDateOption
  *
  * @param {string} formatter  Formatter string used to dictate the convertion
  */
-const LocalizedConverter = (formatter: string) => (value?: string | null | Moment, options?: IDateOptions) => {
-  if (value === null) {
-    return "";
-  }
-  const mmt = toLocalizedMoment(value, options);
-  if (isNil(mmt)) {
-    return !isNil(options?.onError) ? options?.onError : undefined;
-  }
-  return mmt.format(formatter);
-};
+const LocalizedConverter =
+  (formatter: string) => (value?: string | null | Moment, options?: IDateOptions) => {
+    if (value === null) {
+      return "";
+    }
+    const mmt = toLocalizedMoment(value, options);
+    if (isNil(mmt)) {
+      return !isNil(options?.onError) ? options?.onError : undefined;
+    }
+    return mmt.format(formatter);
+  };
 
 /**
  * Converts the moment from one formatting type into another specified moment
@@ -91,16 +98,17 @@ const LocalizedConverter = (formatter: string) => (value?: string | null | Momen
  *
  * @param {string} formatter  Formatter string used to dictate the convertion
  */
-const Converter = (formatter: string) => (value?: string | null | Moment, options?: Omit<IDateOptions, "tz">) => {
-  if (value === null) {
-    return "";
-  }
-  const mmt = toMoment(value, options);
-  if (isNil(mmt)) {
-    return !isNil(options?.onError) ? options?.onError : undefined;
-  }
-  return mmt.format(formatter);
-};
+const Converter =
+  (formatter: string) => (value?: string | null | Moment, options?: Omit<IDateOptions, "tz">) => {
+    if (value === null) {
+      return "";
+    }
+    const mmt = toMoment(value, options);
+    if (isNil(mmt)) {
+      return !isNil(options?.onError) ? options?.onError : undefined;
+    }
+    return mmt.format(formatter);
+  };
 
 export const toLocalizedDate = LocalizedConverter(config.localization.MOMENT_DATE_FORMAT);
 export const toDate = Converter(config.localization.MOMENT_DATE_FORMAT);
@@ -108,7 +116,9 @@ export const toLocalizedDateTime = LocalizedConverter(config.localization.MOMENT
 export const toDateTime = Converter(config.localization.MOMENT_DATETIME_FORMAT);
 export const toLocalizedApiDate = LocalizedConverter(config.localization.MOMENT_API_DATE_FORMAT);
 export const toApiDate = Converter(config.localization.MOMENT_API_DATE_FORMAT);
-export const toLocalizedApiDateTime = LocalizedConverter(config.localization.MOMENT_API_DATETIME_FORMAT);
+export const toLocalizedApiDateTime = LocalizedConverter(
+  config.localization.MOMENT_API_DATETIME_FORMAT,
+);
 export const toApiDateTime = Converter(config.localization.MOMENT_API_DATETIME_FORMAT);
 /**
  * Converts a provided string or Moment instance to a standardized
@@ -117,7 +127,9 @@ export const toApiDateTime = Converter(config.localization.MOMENT_API_DATETIME_F
  * @param value:   Either a string date/time or a Moment instance that will
  *                 be converted to a datetime display format.
  */
-export const toLocalizedDisplayDateTime = LocalizedConverter(config.localization.DATETIME_DISPLAY_FORMAT);
+export const toLocalizedDisplayDateTime = LocalizedConverter(
+  config.localization.DATETIME_DISPLAY_FORMAT,
+);
 export const toDisplayDateTime = Converter(config.localization.DATETIME_DISPLAY_FORMAT);
 
 /**
@@ -128,7 +140,9 @@ export const toDisplayDateTime = Converter(config.localization.DATETIME_DISPLAY_
  * @param value:   Either a string date/time or a Moment instance that will
  *                 be converted to a datetime display format.
  */
-export const toLocalizedAbbvDisplayDateTime = LocalizedConverter(config.localization.DATETIME_ABBV_DISPLAY_FORMAT);
+export const toLocalizedAbbvDisplayDateTime = LocalizedConverter(
+  config.localization.DATETIME_ABBV_DISPLAY_FORMAT,
+);
 export const toAbbvDisplayDateTime = Converter(config.localization.DATETIME_ABBV_DISPLAY_FORMAT);
 
 /**

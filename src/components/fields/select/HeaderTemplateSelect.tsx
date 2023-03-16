@@ -1,4 +1,5 @@
 import { useEffect, useState, useImperativeHandle, useMemo } from "react";
+
 import { filter } from "lodash";
 
 import * as api from "api";
@@ -8,7 +9,14 @@ import { SingleModelSyncSelect, SingleModelSyncSelectProps } from "./generic";
 
 export type HeaderTemplateSelectProps = Omit<
   SingleModelSyncSelectProps<Model.SimpleHeaderTemplate>,
-  "loadOptions" | "getOptionLabel" | "noOptionsMessage" | "components" | "onChange" | "options" | "select" | "onChange"
+  | "loadOptions"
+  | "getOptionLabel"
+  | "noOptionsMessage"
+  | "components"
+  | "onChange"
+  | "options"
+  | "select"
+  | "onChange"
 > & {
   readonly select?: NonNullRef<HeaderTemplateSelectInstance>;
   readonly onDeleted?: (id: number) => void;
@@ -25,7 +33,7 @@ const HeaderTemplateSelect = ({ onDeleted, ...props }: HeaderTemplateSelectProps
     ...select.current,
     addOption: (m: Model.HeaderTemplate | Model.SimpleHeaderTemplate) => {
       setOptions([...options, m]);
-    }
+    },
   }));
 
   useEffect(() => {
@@ -59,7 +67,7 @@ const HeaderTemplateSelect = ({ onDeleted, ...props }: HeaderTemplateSelectProps
           });
       }
     },
-    [props.onChange]
+    [props.onChange],
   );
 
   return (
@@ -70,7 +78,7 @@ const HeaderTemplateSelect = ({ onDeleted, ...props }: HeaderTemplateSelectProps
       isSearchable={false}
       isClearable={true}
       isLoading={loading}
-      placeholder={"Select header template..."}
+      placeholder="Select header template..."
       getOptionLabel={(m: Model.SimpleHeaderTemplate) => m.name}
       onChange={_onChange}
       onDelete={(m: Model.SimpleHeaderTemplate, setDeleting: (v: boolean) => void) => {

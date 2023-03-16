@@ -1,4 +1,5 @@
 import React from "react";
+
 import { ui } from "lib";
 
 import { ButtonProps } from "./Button";
@@ -20,7 +21,13 @@ const DefaultButtonIconToggle = ({
 }: DefaultButtonIconToggleProps): JSX.Element => {
   const isLessThan = ui.useLessThanBreakpoint(breakpoint);
   if (isLessThan) {
-    return <DefaultIconButton {...props} icon={breakpointIcon || props.icon} style={breakpointStyle || props.style} />;
+    return (
+      <DefaultIconButton
+        {...props}
+        icon={breakpointIcon || props.icon}
+        style={breakpointStyle || props.style}
+      />
+    );
   }
   return <DefaultButton {...props}>{children}</DefaultButton>;
 };

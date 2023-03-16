@@ -1,8 +1,12 @@
 import { find, isNil } from "lodash";
+
 import { inferModelFromName } from "./lookup";
 
-export class ChoiceClass<I extends number = number, N extends string = string, S extends string = string>
-  implements Model.Choice<I, N, S>
+export class ChoiceClass<
+  I extends number = number,
+  N extends string = string,
+  S extends string = string,
+> implements Model.Choice<I, N, S>
 {
   public readonly id: I;
   public readonly name: N;
@@ -19,7 +23,7 @@ class ChoicesClass<
   CH extends ChoiceClass<I, N, S>,
   I extends number = number,
   N extends string = string,
-  S extends string = string
+  S extends string = string,
 > {
   public readonly choices: CH[];
 
@@ -44,19 +48,23 @@ class ChoicesClass<
     inferModelFromName(this.choices, name, { caseInsensitive: false, ...options });
 }
 
-export const Choice = <I extends number = number, N extends string = string, S extends string = string>(
+export const Choice = <
+  I extends number = number,
+  N extends string = string,
+  S extends string = string,
+>(
   id: I,
   name: N,
-  slug: S
+  slug: S,
 ): ChoiceClass<I, N, S> => new ChoiceClass<I, N, S>(id, name, slug);
 
 export const Choices = <
   CH extends ChoiceClass<I, N, S>,
   I extends number = number,
   N extends string = string,
-  S extends string = string
+  S extends string = string,
 >(
-  choices: CH[]
+  choices: CH[],
 ): Model.Choices<CH, I, N, S> => {
   const chClass = new ChoicesClass<CH, I, N, S>(choices);
 

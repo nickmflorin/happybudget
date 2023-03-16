@@ -9,12 +9,12 @@ export type ImportActualsPlaidFormValues = {
 export type ImportActualsPlaidFormProps = FormProps<ImportActualsPlaidFormValues>;
 
 const ImportActualsPlaidForm = (props: ImportActualsPlaidFormProps) => (
-  <Form.Form layout={"vertical"} {...props}>
-    <Form.Item required={true} label={"Start Date"} name={"start_date"}>
-      <DatePicker popperProps={{ strategy: "fixed" }} dateFormat={"dd/MM/yyyy"} />
+  <Form.Form layout="vertical" {...props}>
+    <Form.Item required={true} label="Start Date" name="start_date">
+      <DatePicker popperProps={{ strategy: "fixed" }} dateFormat="dd/MM/yyyy" />
     </Form.Item>
-    <Form.Item label={"End Date"} name={"end_date"}>
-      <DatePicker popperProps={{ strategy: "fixed" }} dateFormat={"dd/MM/yyyy"} />
+    <Form.Item label="End Date" name="end_date">
+      <DatePicker popperProps={{ strategy: "fixed" }} dateFormat="dd/MM/yyyy" />
     </Form.Item>
   </Form.Form>
 );

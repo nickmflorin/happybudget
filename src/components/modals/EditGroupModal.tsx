@@ -1,6 +1,5 @@
 import * as api from "api";
 import { ui } from "lib";
-
 import { GroupForm } from "components/forms";
 
 import { EditModelModal, EditModelModalProps, UpdateModelCallbacks } from "./generic";
@@ -15,7 +14,7 @@ interface EditGroupModalProps<R extends Table.RowData, M extends Model.RowHttpMo
 const EditGroupModal = <
   MM extends Model.SimpleAccount | Model.SimpleSubAccount,
   R extends Table.RowData,
-  M extends Model.RowHttpModel
+  M extends Model.RowHttpModel,
 >({
   parentId,
   parentType,
@@ -27,18 +26,25 @@ const EditGroupModal = <
     <EditModelModal<Model.Group, Http.GroupPayload>
       {...props}
       form={form}
-      title={"Subtotal"}
-      titleIcon={"folder"}
+      title="Subtotal"
+      titleIcon="folder"
       request={api.getGroup}
       update={api.updateGroup}
-      updateSync={(payload: Partial<Http.GroupPayload>, callbacks: UpdateModelCallbacks<Model.Group>) =>
-        table.dispatchEvent({ type: "groupUpdate", payload: { id: props.modelId, data: payload }, ...callbacks })
+      updateSync={(
+        payload: Partial<Http.GroupPayload>,
+        callbacks: UpdateModelCallbacks<Model.Group>,
+      ) =>
+        table.dispatchEvent({
+          type: "groupUpdate",
+          payload: { id: props.modelId, data: payload },
+          ...callbacks,
+        })
       }
       setFormData={(group: Model.Group) => {
         form.setFields([
           { name: "name", value: group.name },
           { name: "color", value: group.color },
-          { name: "children", value: group.children }
+          { name: "children", value: group.children },
         ]);
       }}
     >

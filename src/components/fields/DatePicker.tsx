@@ -1,11 +1,15 @@
 import React from "react";
-import ReactDatePicker, { ReactDatePickerProps } from "react-datepicker";
+
 import classNames from "classnames";
 import { isNil } from "lodash";
+import ReactDatePicker, { ReactDatePickerProps } from "react-datepicker";
 
 type RawV = Date | null;
 
-type DatePickerProps<V extends RawV | [RawV, RawV] = RawV> = Omit<ReactDatePickerProps, "onChange" | "value"> & {
+type DatePickerProps<V extends RawV | [RawV, RawV] = RawV> = Omit<
+  ReactDatePickerProps,
+  "onChange" | "value"
+> & {
   readonly disabled?: boolean;
   readonly value?: string | Date;
   readonly valueFormatting?: string;
@@ -33,7 +37,11 @@ const DatePicker = ({
 		ReactDatePicker component without redefining it) - it is not. */}
     <ReactDatePicker
       {...props}
-      value={isNil(value) || typeof value === "string" ? value : value.toLocaleDateString(valueFormatting)}
+      value={
+        isNil(value) || typeof value === "string"
+          ? value
+          : value.toLocaleDateString(valueFormatting)
+      }
       onChange={(date: RawV) => onChange?.(date)}
     />
   </div>

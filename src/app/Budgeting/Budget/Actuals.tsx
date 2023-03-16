@@ -1,26 +1,33 @@
 import React, { useState, useEffect } from "react";
+
+import { isNil, map, reduce } from "lodash";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
-import { isNil, map, reduce } from "lodash";
 
 import { redux, tabling } from "lib";
 import * as store from "store";
 import { ActualsTable, connectTableToAuthenticatedStore } from "tabling";
 
+import { ActualsPreviewModal } from "./PreviewModals";
 import { ActualsPage } from "../Pages";
 import { actions, sagas } from "../store";
-import { ActualsPreviewModal } from "./PreviewModals";
 
 type R = Tables.ActualRowData;
 type M = Model.Actual;
 type TC = ActualsTableActionContext;
 
-const ConnectedActualsTable = connectTableToAuthenticatedStore<ActualsTable.Props, R, M, TC, Tables.ActualTableStore>({
+const ConnectedActualsTable = connectTableToAuthenticatedStore<
+  ActualsTable.Props,
+  R,
+  M,
+  TC,
+  Tables.ActualTableStore
+>({
   actions: {
     handleEvent: actions.budget.actuals.handleTableEventAction,
     loading: actions.budget.actuals.loadingAction,
     response: actions.budget.actuals.responseAction,
-    setSearch: actions.budget.actuals.setSearchAction
+    setSearch: actions.budget.actuals.setSearchAction,
   },
   tableId: () => "budget-actuals",
   createSaga: (table: Table.TableInstance<R, M>) => sagas.budget.actuals.createTableSaga(table),
@@ -28,18 +35,16 @@ const ConnectedActualsTable = connectTableToAuthenticatedStore<ActualsTable.Prop
   footerRowSelectors: {
     footer: createSelector(
       (state: Application.Store) => state.budget.actuals.data,
-      (rows: Table.BodyRow<Tables.ActualRowData>[]) => {
-        return {
-          value: reduce(
-            rows,
-            (sum: number, s: Table.BodyRow<Tables.ActualRowData>) =>
-              tabling.rows.isModelRow(s) ? sum + (s.data.value || 0) : sum,
-            0
-          )
-        };
-      }
-    )
-  }
+      (rows: Table.BodyRow<Tables.ActualRowData>[]) => ({
+        value: reduce(
+          rows,
+          (sum: number, s: Table.BodyRow<Tables.ActualRowData>) =>
+            tabling.rows.isModelRow(s) ? sum + (s.data.value || 0) : sum,
+          0,
+        ),
+      }),
+    ),
+  },
 })(ActualsTable.Table);
 
 interface ActualsProps {
@@ -70,7 +75,7 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
             dispatch(actions.budget.updateBudgetInStateAction({ id: b.id, data: b }, {}));
             table.current.dispatchEvent({
               type: "modelsAdded",
-              payload: map(ms, (m: Model.Actual) => ({ model: m }))
+              payload: map(ms, (m: Model.Actual) => ({ model: m })),
             });
           }}
           onOwnersSearch={(value: string) =>

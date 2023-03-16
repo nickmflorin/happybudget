@@ -1,7 +1,7 @@
 import { useRef, useMemo, forwardRef, ForwardedRef, useImperativeHandle } from "react";
+
 import classNames from "classnames";
 import { isNil } from "lodash";
-
 import { Switch } from "antd";
 
 import { Form } from "components";
@@ -17,34 +17,37 @@ interface ExportActualsPdfFormProps extends FormProps<ExportActualsPdfFormOption
 
 const ExportActualsPdfForm = (
   { columns, ...props }: ExportActualsPdfFormProps,
-  ref: ForwardedRef<IExportFormRef>
+  ref: ForwardedRef<IExportFormRef>,
 ): JSX.Element => {
   const headerEditor = useRef<IEditor>(null);
 
-  const formData = useMemo(() => {
-    return (values: Omit<ExportActualsPdfFormOptions, NonFormFields>): ExportActualsPdfFormOptions => {
-      return { ...values, header: headerEditor.current?.getData() || null };
-    };
-  }, [headerEditor.current]);
+  const formData = useMemo(
+    () =>
+      (values: Omit<ExportActualsPdfFormOptions, NonFormFields>): ExportActualsPdfFormOptions => ({
+        ...values,
+        header: headerEditor.current?.getData() || null,
+      }),
+    [headerEditor.current],
+  );
 
   const setHeader = useMemo(
     () => (html: string) => {
       const values: ExportActualsPdfFormOptions = props.form.getFieldsValue();
       props.onValuesChange?.({ header: html }, { ...values, header: html });
     },
-    []
+    [],
   );
 
   useImperativeHandle(ref, () => ({
     getFormData: () => {
       const values: ExportActualsPdfFormOptions = props.form.getFieldsValue();
       return formData(values);
-    }
+    },
   }));
 
-  const rawFormInitialValues = useMemo<Omit<ExportActualsPdfFormOptions, RichTextFields> | undefined>(():
-    | Omit<ExportActualsPdfFormOptions, RichTextFields>
-    | undefined => {
+  const rawFormInitialValues = useMemo<
+    Omit<ExportActualsPdfFormOptions, RichTextFields> | undefined
+  >((): Omit<ExportActualsPdfFormOptions, RichTextFields> | undefined => {
     if (!isNil(props.initialValues)) {
       const { ...rest } = props.initialValues as ExportActualsPdfFormOptions;
       return rest;
@@ -59,22 +62,20 @@ const ExportActualsPdfForm = (
       initialValues={rawFormInitialValues}
       condensed={true}
       className={classNames("export-form", props.className)}
-      layout={"vertical"}
+      layout="vertical"
     >
-      <Form.Item label={"Header"}>
+      <Form.Item label="Header">
         <CKEditor
           ref={headerEditor}
           initialValue={props.initialValues?.header || ""}
           onChange={(html: string) => setHeader(html)}
         />
       </Form.Item>
-
-      <Form.ItemSection label={"Table Options"}>
-        <Form.Item name={"date"} label={"Budget Date"}>
+      <Form.ItemSection label="Table Options">
+        <Form.Item name="date" label="Budget Date">
           <Input />
         </Form.Item>
-
-        <Form.Item label={"Columns"} name={"columns"}>
+        <Form.Item label="Columns" name="columns">
           <ColumnSelect<Tables.ActualRowData, Model.Actual>
             getOptionLabel={(c: Table.DataColumn<Tables.ActualRowData, Model.Actual>) =>
               c.pdfHeaderName || c.headerName || ""
@@ -82,11 +83,14 @@ const ExportActualsPdfForm = (
             options={columns}
           />
         </Form.Item>
-
-        <Form.Item valuePropName={"checked"} name={"excludeZeroTotals"} label={"Exclude Accounts Totalling Zero"}>
+        <Form.Item
+          valuePropName="checked"
+          name="excludeZeroTotals"
+          label="Exclude Accounts Totalling Zero"
+        >
           <Switch
-            checkedChildren={"ON"}
-            unCheckedChildren={"OFF"}
+            checkedChildren="ON"
+            unCheckedChildren="OFF"
             defaultChecked={props.initialValues?.excludeZeroTotals === true}
           />
         </Form.Item>

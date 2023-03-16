@@ -1,14 +1,18 @@
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+
 import { isNil } from "lodash";
+import { useDispatch, useSelector } from "react-redux";
 
 import { tabling, budgeting } from "lib";
-import { connectTableToAuthenticatedStore, SubAccountsTable as GenericSubAccountsTable } from "tabling";
+import {
+  connectTableToAuthenticatedStore,
+  SubAccountsTable as GenericSubAccountsTable,
+} from "tabling";
 
-import { BudgetPage } from "../Pages";
-import { useFringesModalControl } from "../hooks";
-import { actions, selectors, sagas } from "../store";
 import FringesModal from "./FringesModal";
+import { useFringesModalControl } from "../hooks";
+import { BudgetPage } from "../Pages";
+import { actions, selectors, sagas } from "../store";
 
 type M = Model.SubAccount;
 type R = Tables.SubAccountRowData;
@@ -25,15 +29,16 @@ const ConnectedTable = connectTableToAuthenticatedStore<
     handleEvent: actions.template.subAccount.handleTableEventAction,
     loading: actions.template.subAccount.loadingAction,
     response: actions.template.subAccount.responseAction,
-    setSearch: actions.template.subAccount.setSearchAction
+    setSearch: actions.template.subAccount.setSearchAction,
   },
   tableId: (c: TC) => `${c.domain}-${c.parentType}-subaccounts`,
   selector: (c: TC) => selectors.createSubAccountsTableStoreSelector(c),
-  createSaga: (table: Table.TableInstance<R, M>) => sagas.template.subAccount.createTableSaga(table),
+  createSaga: (table: Table.TableInstance<R, M>) =>
+    sagas.template.subAccount.createTableSaga(table),
   footerRowSelectors: (c: TC) => ({
     page: selectors.createBudgetFooterSelector(c),
-    footer: selectors.createSubAccountFooterSelector({ ...c, id: c.parentId })
-  })
+    footer: selectors.createSubAccountFooterSelector({ ...c, id: c.parentId }),
+  }),
 })(GenericSubAccountsTable.AuthenticatedTemplate);
 
 interface SubAccountProps {
@@ -58,15 +63,15 @@ const SubAccount = (props: SubAccountProps): JSX.Element => {
     public: false,
     table: table.current,
     tableEventAction: actions.template.subAccount.handleTableEventAction,
-    fringesTableEventAction: actions.template.handleFringesTableEventAction
+    fringesTableEventAction: actions.template.handleFringesTableEventAction,
   });
 
   const subaccount = useSelector((s: Application.Store) =>
     selectors.selectSubAccountDetail(s, {
       id: props.id,
       domain: "template",
-      public: false
-    })
+      public: false,
+    }),
   );
 
   useEffect(() => {
@@ -75,8 +80,8 @@ const SubAccount = (props: SubAccountProps): JSX.Element => {
         id: props.id,
         domain: "template",
         public: false,
-        budgetId: props.budgetId
-      })
+        budgetId: props.budgetId,
+      }),
     );
   }, [props.id, props.budgetId]);
 
@@ -93,8 +98,8 @@ const SubAccount = (props: SubAccountProps): JSX.Element => {
         parentType: "subaccount",
         budgetId: props.budgetId,
         public: false,
-        parentId: props.id
-      })
+        parentId: props.id,
+      }),
     );
   }, [props.id, props.budgetId]);
 
@@ -108,7 +113,7 @@ const SubAccount = (props: SubAccountProps): JSX.Element => {
           budgetId: props.budgetId,
           parentType: "subaccount",
           domain: "template",
-          public: false
+          public: false,
         }}
         onViewFringes={openFringesModal}
         table={table}
@@ -117,7 +122,7 @@ const SubAccount = (props: SubAccountProps): JSX.Element => {
         {...props}
         table={fringesTable}
         open={fringesModalVisible}
-        parentType={"subaccount"}
+        parentType="subaccount"
         onCancel={() => closeFringesModal()}
       />
     </BudgetPage>

@@ -2,8 +2,8 @@ import React, { useState, useMemo } from "react";
 
 import * as api from "api";
 import { http, notifications } from "lib";
-
 import { Icon } from "components";
+
 import GenericOwnedBudgetCard, { GenericOwnedBudgetCardProps } from "./GenericOwnedBudgetCard";
 
 type ArchivedBudgetCardProps = Omit<GenericOwnedBudgetCardProps, "dropdown"> & {
@@ -18,7 +18,11 @@ const ArchivedBudgetCard = ({ onActivated, ...props }: ArchivedBudgetCardProps):
     () => (e: MenuItemModelClickEvent) => {
       setActivating(true);
       api
-        .updateBudget<Model.UserBudget>(props.budget.id, { archived: false }, { cancelToken: cancelToken() })
+        .updateBudget<Model.UserBudget>(
+          props.budget.id,
+          { archived: false },
+          { cancelToken: cancelToken() },
+        )
         .then((response: Model.UserBudget) => {
           e.item.closeParentDropdown?.();
           setActivating(false);
@@ -30,7 +34,7 @@ const ArchivedBudgetCard = ({ onActivated, ...props }: ArchivedBudgetCardProps):
           notifications.ui.banner.handleRequestError(err);
         });
     },
-    [onActivated, props.budget.id]
+    [onActivated, props.budget.id],
   );
 
   return (
@@ -41,12 +45,12 @@ const ArchivedBudgetCard = ({ onActivated, ...props }: ArchivedBudgetCardProps):
         {
           id: "activate",
           label: "Activate",
-          icon: <Icon icon={"books"} weight={"light"} />,
+          icon: <Icon icon="books" weight="light" />,
           onClick: (e: MenuItemModelClickEvent) => activate(e),
           keepDropdownOpenOnClick: true,
           loading: activating,
-          disabled: activating
-        }
+          disabled: activating,
+        },
       ]}
     />
   );

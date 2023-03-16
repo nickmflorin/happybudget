@@ -1,15 +1,18 @@
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+
 import { isNil } from "lodash";
+import { useDispatch, useSelector } from "react-redux";
 
 import { tabling, budgeting } from "lib";
+import {
+  connectTableToAuthenticatedStore,
+  SubAccountsTable as GenericSubAccountsTable,
+} from "tabling";
 
-import { connectTableToAuthenticatedStore, SubAccountsTable as GenericSubAccountsTable } from "tabling";
-
-import { BudgetPage } from "../Pages";
-import { useFringesModalControl } from "../hooks";
-import { actions, selectors, sagas } from "../store";
 import FringesModal from "./FringesModal";
+import { useFringesModalControl } from "../hooks";
+import { BudgetPage } from "../Pages";
+import { actions, selectors, sagas } from "../store";
 
 type M = Model.SubAccount;
 type R = Tables.SubAccountRowData;
@@ -26,15 +29,15 @@ const ConnectedTable = connectTableToAuthenticatedStore<
     handleEvent: actions.budget.subAccount.handleTableEventAction,
     loading: actions.budget.subAccount.loadingAction,
     response: actions.budget.subAccount.responseAction,
-    setSearch: actions.budget.subAccount.setSearchAction
+    setSearch: actions.budget.subAccount.setSearchAction,
   },
   tableId: (c: TC) => `${c.domain}-${c.parentType}-subaccounts`,
   selector: (c: TC) => selectors.createSubAccountsTableStoreSelector(c),
   createSaga: (table: Table.TableInstance<R, M>) => sagas.budget.subAccount.createTableSaga(table),
   footerRowSelectors: (c: TC) => ({
     page: selectors.createBudgetFooterSelector(c),
-    footer: selectors.createSubAccountFooterSelector({ ...c, id: c.parentId })
-  })
+    footer: selectors.createSubAccountFooterSelector({ ...c, id: c.parentId }),
+  }),
 })(GenericSubAccountsTable.AuthenticatedBudget);
 
 interface SubAccountProps {
@@ -60,15 +63,15 @@ const SubAccount = ({ setPreviewModalVisible, ...props }: SubAccountProps): JSX.
     public: false,
     table: table.current,
     tableEventAction: actions.budget.subAccount.handleTableEventAction,
-    fringesTableEventAction: actions.budget.handleFringesTableEventAction
+    fringesTableEventAction: actions.budget.handleFringesTableEventAction,
   });
 
   const subaccount = useSelector((s: Application.Store) =>
     selectors.selectSubAccountDetail(s, {
       id: props.id,
       domain: "budget",
-      public: false
-    })
+      public: false,
+    }),
   );
 
   useEffect(() => {
@@ -77,8 +80,8 @@ const SubAccount = ({ setPreviewModalVisible, ...props }: SubAccountProps): JSX.
         id: props.id,
         domain: "budget",
         public: false,
-        budgetId: props.budgetId
-      })
+        budgetId: props.budgetId,
+      }),
     );
   }, [props.id, props.budgetId]);
 
@@ -95,8 +98,8 @@ const SubAccount = ({ setPreviewModalVisible, ...props }: SubAccountProps): JSX.
         parentType: "subaccount",
         budgetId: props.budgetId,
         public: false,
-        parentId: props.id
-      })
+        parentId: props.id,
+      }),
     );
   }, [props.id, props.budgetId]);
 
@@ -110,30 +113,41 @@ const SubAccount = ({ setPreviewModalVisible, ...props }: SubAccountProps): JSX.
           budgetId: props.budgetId,
           parentType: "subaccount",
           domain: "budget",
-          public: false
+          public: false,
         }}
         onExportPdf={() => setPreviewModalVisible(true)}
         onViewFringes={openFringesModal}
         table={table}
         onShared={(publicToken: Model.PublicToken) =>
           dispatch(
-            actions.budget.updateBudgetInStateAction({ id: props.budgetId, data: { public_token: publicToken } }, {})
+            actions.budget.updateBudgetInStateAction(
+              { id: props.budgetId, data: { public_token: publicToken } },
+              {},
+            ),
           )
         }
         onShareUpdated={(publicToken: Model.PublicToken) =>
           dispatch(
-            actions.budget.updateBudgetInStateAction({ id: props.budgetId, data: { public_token: publicToken } }, {})
+            actions.budget.updateBudgetInStateAction(
+              { id: props.budgetId, data: { public_token: publicToken } },
+              {},
+            ),
           )
         }
         onUnshared={() =>
-          dispatch(actions.budget.updateBudgetInStateAction({ id: props.budgetId, data: { public_token: null } }, {}))
+          dispatch(
+            actions.budget.updateBudgetInStateAction(
+              { id: props.budgetId, data: { public_token: null } },
+              {},
+            ),
+          )
         }
       />
       <FringesModal
         {...props}
         table={fringesTable}
         open={fringesModalVisible}
-        parentType={"subaccount"}
+        parentType="subaccount"
         onCancel={() => closeFringesModal()}
       />
     </BudgetPage>

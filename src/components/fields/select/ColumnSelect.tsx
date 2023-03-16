@@ -1,4 +1,5 @@
 import React from "react";
+
 import { map, find, isNil } from "lodash";
 
 import { tabling } from "lib";
@@ -8,7 +9,7 @@ import { MultiModelSyncSelect, MultiModelSyncSelectProps } from "./generic";
 type ColumnModel<
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  C extends Table.DataColumn<R, M> = Table.DataColumn<R, M>
+  C extends Table.DataColumn<R, M> = Table.DataColumn<R, M>,
 > = C & {
   readonly id: C["field"];
   readonly icon?: IconOrElement;
@@ -17,7 +18,7 @@ type ColumnModel<
 type ColumnSelectProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  C extends Table.DataColumn<R, M> = Table.DataColumn<R, M>
+  C extends Table.DataColumn<R, M> = Table.DataColumn<R, M>,
 > = Omit<MultiModelSyncSelectProps<ColumnModel<R, M, C>>, "getOptionLabel" | "options"> & {
   readonly options: C[];
   readonly getOptionLabel?: (c: C) => string;
@@ -26,9 +27,9 @@ type ColumnSelectProps<
 const toModel = <
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  C extends Table.DataColumn<R, M> = Table.DataColumn<R, M>
+  C extends Table.DataColumn<R, M> = Table.DataColumn<R, M>,
 >(
-  c: C
+  c: C,
 ): ColumnModel<R, M, C> => {
   const colType: Table.ColumnDataType | undefined = !isNil(c.dataType)
     ? find(tabling.columns.ColumnTypes, { id: c.dataType })
@@ -39,12 +40,12 @@ const toModel = <
 const ColumnSelect = <
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  C extends Table.DataColumn<R, M> = Table.DataColumn<R, M>
+  C extends Table.DataColumn<R, M> = Table.DataColumn<R, M>,
 >(
-  props: ColumnSelectProps<R, M, C>
+  props: ColumnSelectProps<R, M, C>,
 ) => (
   <MultiModelSyncSelect
-    placeholder={"Select columns..."}
+    placeholder="Select columns..."
     getOptionLabel={(m: ColumnModel<R, M, C>) =>
       !isNil(props.getOptionLabel) ? props.getOptionLabel(m) : m.headerName || ""
     }

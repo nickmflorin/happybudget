@@ -1,9 +1,13 @@
 import { useEffect, useMemo, useReducer } from "react";
+
 import { isNil, filter, map, reduce, find } from "lodash";
 
 import { tabling } from "lib";
 
-type UseHiddenColumnsParams<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
+type UseHiddenColumnsParams<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+> = {
   readonly tableId: string;
   readonly columns: Table.DataColumn<R, M>[];
   readonly apis: tabling.TableApis;
@@ -11,7 +15,7 @@ type UseHiddenColumnsParams<R extends Table.RowData, M extends Model.RowHttpMode
 
 type UseHiddenColumnsReturnType = [
   Table.HiddenColumns,
-  (changes: SingleOrArray<Table.ColumnVisibilityChange>, sizeToFit?: boolean) => void
+  (changes: SingleOrArray<Table.ColumnVisibilityChange>, sizeToFit?: boolean) => void,
 ];
 
 type SetHiddenColumnsAction = Omit<Redux.BasicAction<Table.HiddenColumns>, "context"> & {
@@ -19,14 +23,20 @@ type SetHiddenColumnsAction = Omit<Redux.BasicAction<Table.HiddenColumns>, "cont
   readonly cookie?: string | undefined;
 };
 
-type ChangeHiddenColumnsAction = Omit<Redux.BasicAction<SingleOrArray<Table.ColumnVisibilityChange>>, "context"> & {
+type ChangeHiddenColumnsAction = Omit<
+  Redux.BasicAction<SingleOrArray<Table.ColumnVisibilityChange>>,
+  "context"
+> & {
   readonly type: "TOGGLE";
   readonly tableId: string;
 };
 
 type HiddenColumnsAction = SetHiddenColumnsAction | ChangeHiddenColumnsAction;
 
-const hiddenColumnsReducer = (state: Table.HiddenColumns = {}, action: HiddenColumnsAction): Table.HiddenColumns => {
+const hiddenColumnsReducer = (
+  state: Table.HiddenColumns = {},
+  action: HiddenColumnsAction,
+): Table.HiddenColumns => {
   if (action.type === "SET") {
     if (!isNil(action.cookie)) {
       tabling.cookies.setHiddenColumns(action.cookie, action.payload);
@@ -36,18 +46,22 @@ const hiddenColumnsReducer = (state: Table.HiddenColumns = {}, action: HiddenCol
     const arrayOfChanges = Array.isArray(action.payload) ? action.payload : [action.payload];
     const newState: Table.HiddenColumns = reduce(
       arrayOfChanges,
-      (curr: Table.HiddenColumns, ch: Table.ColumnVisibilityChange) => {
-        return { ...curr, [ch.field]: !ch.visible };
-      },
-      state
+      (curr: Table.HiddenColumns, ch: Table.ColumnVisibilityChange) => ({
+        ...curr,
+        [ch.field]: !ch.visible,
+      }),
+      state,
     );
     tabling.cookies.setHiddenColumns(action.tableId, newState);
     return newState;
   }
 };
 
-const useHiddenColumns = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  params: UseHiddenColumnsParams<R, M>
+const useHiddenColumns = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+>(
+  params: UseHiddenColumnsParams<R, M>,
 ): UseHiddenColumnsReturnType => {
   const [hiddenColumns, dispatch] = useReducer(hiddenColumnsReducer, {});
 
@@ -58,10 +72,10 @@ const useHiddenColumns = <R extends Table.RowData, M extends Model.RowHttpModel 
       filter(
         map(
           filter(params.columns, (c: Table.DataColumn<R, M>) => c.canBeHidden !== false),
-          (c: Table.DataColumn<R, M>) => c.field
+          (c: Table.DataColumn<R, M>) => c.field,
         ),
-        (f: string | undefined) => !isNil(f)
-      )
+        (f: string | undefined) => !isNil(f),
+      ),
     );
     const hidden: Table.HiddenColumns = reduce(
       params.columns,
@@ -71,12 +85,15 @@ const useHiddenColumns = <R extends Table.RowData, M extends Model.RowHttpModel 
           if (!isNil(field)) {
             const defaultHidden = c.defaultHidden === undefined ? false : c.defaultHidden;
             const cookiesVisibility = hiddenColumnsInCookies[field];
-            return { ...curr, [field]: cookiesVisibility !== undefined ? cookiesVisibility : defaultHidden };
+            return {
+              ...curr,
+              [field]: cookiesVisibility !== undefined ? cookiesVisibility : defaultHidden,
+            };
           }
         }
         return curr;
       },
-      {}
+      {},
     );
     dispatch({ type: "SET", cookie: params.tableId, payload: hidden });
   }, [params.tableId]);
@@ -91,7 +108,10 @@ const useHiddenColumns = <R extends Table.RowData, M extends Model.RowHttpModel 
 
         const cs: Table.AgColumn[] | null = api.column.getAllColumns();
         if (!isNil(cs)) {
-          const c: Table.AgColumn | undefined = find(cs, (ci: Table.AgColumn) => ci.getColId() === field);
+          const c: Table.AgColumn | undefined = find(
+            cs,
+            (ci: Table.AgColumn) => ci.getColId() === field,
+          );
           if (!isNil(c) && c.isVisible() === hidden) {
             params.apis.columnMap((a: Table.ColumnApi) => a.setColumnVisible(field, !hidden));
           }
@@ -105,7 +125,7 @@ const useHiddenColumns = <R extends Table.RowData, M extends Model.RowHttpModel 
     () => (changes: SingleOrArray<Table.ColumnVisibilityChange>) => {
       dispatch({ type: "TOGGLE", tableId: params.tableId, payload: changes });
     },
-    [params.tableId]
+    [params.tableId],
   );
 
   return [hiddenColumns, changeColumnVisibility];

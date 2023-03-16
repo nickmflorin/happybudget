@@ -19,12 +19,17 @@ export const getModelGeneralReference = <M extends Model.Model>(m: M): string =>
 const getModelReferenceFn = <M extends Model.Model>(
   ms: M[],
   options?: Pick<Model.GetModelOptions<M>, "modelName">,
-  m?: M | string | number
+  m?: M | string | number,
 ): string => {
-  const mIsModel = (mi: M | string | number): mi is M => typeof m !== "string" && typeof m !== "number";
+  const mIsModel = (mi: M | string | number): mi is M =>
+    typeof m !== "string" && typeof m !== "number";
 
   const optionName =
-    options?.modelName !== undefined ? options?.modelName : ms.length !== 0 ? getModelGeneralReference(ms[0]) : "model";
+    options?.modelName !== undefined
+      ? options?.modelName
+      : ms.length !== 0
+      ? getModelGeneralReference(ms[0])
+      : "model";
 
   return !isNil(m) ? `${optionName} ${mIsModel(m) ? m.id : m}` : optionName;
 };
@@ -48,7 +53,7 @@ const getModelReferenceFn = <M extends Model.Model>(
 export const inferModelFromName = <M extends Model.Model>(
   ms: M[],
   value: string,
-  options?: Model.InferModelFromNameParams<M>
+  options?: Model.InferModelFromNameParams<M>,
 ): M | null => {
   let undefinedNameWarningIssued = false;
 
@@ -66,7 +71,7 @@ export const inferModelFromName = <M extends Model.Model>(
       if (name === undefined) {
         warn(
           `Cannot infer model ${getModelReferenceFn(ms, options, m)} from name ` +
-            "because the callback 'getName' returned an undefined value."
+            "because the callback 'getName' returned an undefined value.",
         );
         return null;
       } else if (name === null || typeof name === "string") {
@@ -75,7 +80,7 @@ export const inferModelFromName = <M extends Model.Model>(
         warn(
           `Cannot infer model ${getModelReferenceFn(ms, options, m)} from name ` +
             "because the callback 'getName' returned a value of type " +
-            `${typeof name} value, not string.`
+            `${typeof name} value, not string.`,
         );
         return null;
       }
@@ -84,7 +89,7 @@ export const inferModelFromName = <M extends Model.Model>(
       if (name === undefined) {
         warn(
           `Cannot infer model ${getModelReferenceFn(ms, options, m)} from name ` +
-            "because the 'name' attribute returned an undefined value."
+            "because the 'name' attribute returned an undefined value.",
         );
         return null;
       } else if (name === null || typeof name === "string") {
@@ -93,28 +98,31 @@ export const inferModelFromName = <M extends Model.Model>(
         warn(
           `Cannot infer model ${getModelReferenceFn(ms, options, m)} from name ` +
             "because the 'name' attribute returned a value of type " +
-            `${typeof name} value, not string.`
+            `${typeof name} value, not string.`,
         );
         return null;
       }
     }
   };
 
-  const performFilter = (caseSensitive: boolean): M[] => {
-    return filter(ms, (m: M) => {
+  const performFilter = (caseSensitive: boolean): M[] =>
+    filter(ms, (m: M) => {
       const nameValue = getName(m);
       if (!isNil(nameValue)) {
         return caseSensitive === false
-          ? String(nameValue).trim().toLocaleLowerCase() === String(value).trim().toLocaleLowerCase()
+          ? String(nameValue).trim().toLocaleLowerCase() ===
+              String(value).trim().toLocaleLowerCase()
           : String(nameValue).trim() === String(value).trim().toLocaleLowerCase();
       }
       return false;
     });
-  };
 
   const returnAndWarn = (m: M | null): M | null => {
     if (options?.warnOnMissing !== false && m === null) {
-      console.warn(`Cannot infer ${getModelReferenceFn(ms, options)} from name ${value} in ` + "provided models!");
+      console.warn(
+        `Cannot infer ${getModelReferenceFn(ms, options)} from name ${value} in ` +
+          "provided models!",
+      );
       return null;
     }
     return m;
@@ -128,7 +136,9 @@ export const inferModelFromName = <M extends Model.Model>(
   } else if (filtered.length === 1) {
     return returnAndWarn(filtered[0]);
   } else if (options?.caseInsensitive === false) {
-    console.warn(`Multiple ${getModelReferenceFn(ms, options)}s exist for name - assuming the first.`);
+    console.warn(
+      `Multiple ${getModelReferenceFn(ms, options)}s exist for name - assuming the first.`,
+    );
     return returnAndWarn(filtered[0]);
   } else {
     /* If there are multiple matches, we need to restrict base on case
@@ -139,7 +149,9 @@ export const inferModelFromName = <M extends Model.Model>(
     } else if (msCaseSensitive.length === 1) {
       return returnAndWarn(msCaseSensitive[0]);
     } else {
-      console.warn(`Multiple ${getModelReferenceFn(ms, options)}s exist for name - assuming the first.`);
+      console.warn(
+        `Multiple ${getModelReferenceFn(ms, options)}s exist for name - assuming the first.`,
+      );
       return returnAndWarn(msCaseSensitive[0]);
     }
   }
@@ -183,14 +195,14 @@ export const parseIdsFromDeliminatedString = (value: string, delimiter = ","): n
       }
       return curr;
     },
-    []
+    [],
   );
 };
 
 export const getModel = <M extends Model.Model>(
   ms: M[],
   id: Model.ModelLookup<M>,
-  options?: Model.GetModelOptions<M>
+  options?: Model.GetModelOptions<M>,
 ): M | null => {
   const predicate = typeof id === "function" ? id : (m: M) => m.id === id;
   const model: M | undefined = find(ms, predicate);
@@ -198,11 +210,15 @@ export const getModel = <M extends Model.Model>(
     if (!isNil(options?.onMissing) && options?.warnOnMissing !== false) {
       options?.onMissing({
         ref: getModelReferenceFn(ms, options, typeof id === "function" ? undefined : id),
-        lookup: id
+        lookup: id,
       });
     } else if (options?.warnOnMissing !== false) {
       console.warn(
-        `Cannot find ${getModelReferenceFn(ms, options, typeof id === "function" ? undefined : id)} in provided models!`
+        `Cannot find ${getModelReferenceFn(
+          ms,
+          options,
+          typeof id === "function" ? undefined : id,
+        )} in provided models!`,
       );
     }
     return null;
@@ -214,10 +230,9 @@ export const getModel = <M extends Model.Model>(
 export const getModels = <M extends Model.Model>(
   ms: M[],
   ids: Model.ModelLookup<M>[],
-  options?: Model.GetModelOptions<M>
-): M[] => {
-  return filter(
+  options?: Model.GetModelOptions<M>,
+): M[] =>
+  filter(
     map(ids, (id: Model.ModelLookup<M>) => getModel(ms, id, options)),
-    (m: M | null) => !isNil(m)
+    (m: M | null) => !isNil(m),
   ) as M[];
-};

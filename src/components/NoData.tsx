@@ -1,6 +1,7 @@
 import React, { ReactNode } from "react";
-import { isNil } from "lodash";
+
 import classNames from "classnames";
+import { isNil } from "lodash";
 
 import { PrimaryButton } from "components/buttons";
 
@@ -15,9 +16,16 @@ type PrivateNoDataProps = NoDataProps & {
   readonly children?: ReactNode;
 };
 
-const NoData = ({ title, subTitle, button, icon, children, ...props }: PrivateNoDataProps): JSX.Element => (
+const NoData = ({
+  title,
+  subTitle,
+  button,
+  icon,
+  children,
+  ...props
+}: PrivateNoDataProps): JSX.Element => (
   <div {...props} className={classNames("no-data", props.className)}>
-    <div className={"no-data-content"}>
+    <div className="no-data-content">
       {children}
       {!isNil(title) && <h1>{title}</h1>}
       {!isNil(subTitle) && <p>{subTitle}</p>}

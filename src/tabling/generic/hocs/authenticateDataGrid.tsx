@@ -1,8 +1,20 @@
 import React, { useMemo, useRef, useState, useImperativeHandle } from "react";
-import hoistNonReactStatics from "hoist-non-react-statics";
-import { Subtract } from "utility-types";
-import { map, isNil, includes, find, filter, flatten, reduce, uniq, isEqual, difference, findIndex } from "lodash";
 
+import hoistNonReactStatics from "hoist-non-react-statics";
+import {
+  map,
+  isNil,
+  includes,
+  find,
+  filter,
+  flatten,
+  reduce,
+  uniq,
+  isEqual,
+  difference,
+  findIndex,
+} from "lodash";
+import { Subtract } from "utility-types";
 import {
   CellKeyDownEvent,
   ProcessCellForExportParams,
@@ -21,13 +33,23 @@ import {
   RangeSelectionChangedEvent,
   CheckboxSelectionCallbackParams,
   RowDragEvent,
-  RowDataUpdatedEvent
+  RowDataUpdatedEvent,
 } from "@ag-grid-community/core";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
 import { tabling, hooks, util } from "lib";
-import { useCellNavigation, useAuthenticatedClipboard, useContextMenu, UseContextMenuParams } from "../hooks";
-import makeDataGrid, { InjectedDataGridProps, DataGridProps, InternalDataGridProps } from "./makeDataGrid";
+
+import makeDataGrid, {
+  InjectedDataGridProps,
+  DataGridProps,
+  InternalDataGridProps,
+} from "./makeDataGrid";
+import {
+  useCellNavigation,
+  useAuthenticatedClipboard,
+  useContextMenu,
+  UseContextMenuParams,
+} from "../hooks";
 
 type InjectedAuthenticatedDataGridProps = InjectedDataGridProps & {
   readonly processCellForClipboard: (params: ProcessCellForExportParams) => string;
@@ -50,7 +72,7 @@ type InjectedAuthenticatedDataGridProps = InjectedDataGridProps & {
 
 export type AuthenticateDataGridProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel,
 > = UseContextMenuParams<R, M> &
   DataGridProps<R, M> & {
     readonly pinFirstColumn?: boolean;
@@ -59,24 +81,27 @@ export type AuthenticateDataGridProps<
 
 export type InternalAuthenticateDataGridProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel,
 > = AuthenticateDataGridProps<R, M> &
   InternalDataGridProps<R, M> & {
     readonly grid: NonNullRef<Table.DataGridInstance>;
     readonly columns: Table.Column<R, M>[];
     readonly onGroupRowsAdded?: (ids: Table.GroupRowId[], rows: Table.BodyRow<R>[]) => void;
     readonly onMarkupRowsAdded?: (ids: Table.MarkupRowId[], rows: Table.BodyRow<R>[]) => void;
-    readonly onModelRowsAdded?: (ids: (Table.ModelRowId | Table.PlaceholderRowId)[], rows: Table.BodyRow<R>[]) => void;
+    readonly onModelRowsAdded?: (
+      ids: (Table.ModelRowId | Table.PlaceholderRowId)[],
+      rows: Table.BodyRow<R>[],
+    ) => void;
     readonly rowHasCheckboxSelection?: ((row: Table.EditableRow<R>) => boolean) | undefined;
   };
 
 const getCellChangeForClear = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  RW extends Table.EditableRow<R> = Table.EditableRow<R>
+  RW extends Table.EditableRow<R> = Table.EditableRow<R>,
 >(
   row: RW,
-  col: Table.BodyColumn<R, M>
+  col: Table.BodyColumn<R, M>,
 ): Table.SoloCellChange<R, RW> | null => {
   if (tabling.rows.isMarkupRow(row)) {
     if (!isNil(col.markupField)) {
@@ -88,7 +113,7 @@ const getCellChangeForClear = <
         oldValue: v,
         newValue: col.nullValue,
         id: row.id,
-        field: col.markupField
+        field: col.markupField,
       };
     }
     return null;
@@ -101,7 +126,7 @@ const getCellChangeForClear = <
         oldValue: row.data[col.field],
         newValue: col.nullValue,
         id: row.id,
-        field: col.field as keyof RW["data"]
+        field: col.field as keyof RW["data"],
       };
     } else {
       return null;
@@ -109,10 +134,13 @@ const getCellChangeForClear = <
   }
 };
 
-const getTableChangesFromRangeClear = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
+const getTableChangesFromRangeClear = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+>(
   api: Table.GridApi,
   columns: Table.RealColumn<R, M>[],
-  range: CellRange
+  range: CellRange,
 ): Table.SoloCellChange<R>[] => {
   const changes: Table.SoloCellChange<R>[] = [];
   if (!isNil(range.startRow) && !isNil(range.endRow)) {
@@ -145,10 +173,10 @@ const getTableChangesFromRangeClear = <R extends Table.RowData, M extends Model.
 const getCellChangesFromEvent = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  RW extends Table.EditableRow<R> = Table.EditableRow<R>
+  RW extends Table.EditableRow<R> = Table.EditableRow<R>,
 >(
   columns: Table.RealColumn<R, M>[],
-  event: CellEditingStoppedEvent | CellValueChangedEvent
+  event: CellEditingStoppedEvent | CellValueChangedEvent,
 ): Table.SoloCellChange<R, RW>[] => {
   const row: RW = event.node.data;
   if (tabling.rows.isEditableRow(row)) {
@@ -172,16 +200,16 @@ const getCellChangesFromEvent = <
         // The fields for the parsed values of each value should be the same.
         const fields: string[] = uniq([
           ...map(oldParsed, (p: Table.ParsedColumnField) => p.field),
-          ...map(parsed, (p: Table.ParsedColumnField) => p.field)
+          ...map(parsed, (p: Table.ParsedColumnField) => p.field),
         ]);
         changes = reduce(
           fields,
           (chs: Table.SoloCellChange<R, Table.ModelRow<R>>[], fld: keyof R) => {
             const oldParsedForField: Table.ParsedColumnField | undefined = find(oldParsed, {
-              field: fld
+              field: fld,
             }) as Table.ParsedColumnField;
             const parsedForField: Table.ParsedColumnField | undefined = find(parsed, {
-              field: fld
+              field: fld,
             }) as Table.ParsedColumnField;
             /* Since the fields for each set of parsed field-value pairs will
 						   be the same, the null check here is mostly just a check to
@@ -193,13 +221,13 @@ const getCellChangesFromEvent = <
                   id: row.id,
                   field: fld,
                   oldValue: oldParsedForField.value,
-                  newValue: parsedForField.value
-                }
+                  newValue: parsedForField.value,
+                },
               ];
             }
             return chs;
           },
-          []
+          [],
         ) as Table.SoloCellChange<R, RW>[];
       } else {
         /*
@@ -221,11 +249,14 @@ const getCellChangesFromEvent = <
             oldValue,
             newValue,
             field: event.column.getColId() as keyof RW["data"],
-            id: event.data.id
-          }
+            id: event.data.id,
+          },
         ];
       }
-      return filter(changes, (ch: Table.SoloCellChange<R, RW>) => !isEqual(ch.oldValue, ch.newValue));
+      return filter(
+        changes,
+        (ch: Table.SoloCellChange<R, RW>) => !isEqual(ch.oldValue, ch.newValue),
+      );
     }
   }
   return [];
@@ -240,7 +271,7 @@ type RowState = {
 type RowStateCallback<R extends Table.RowData, ID extends Table.BodyRowId = Table.BodyRowId> = (
   api: Table.GridApi,
   diff: ID[],
-  rows: Table.BodyRow<R>[]
+  rows: Table.BodyRow<R>[],
 ) => void;
 
 type RowMap<R extends Table.RowData, ID extends Table.BodyRowId = Table.BodyRowId> = {
@@ -258,26 +289,33 @@ type HOCProps = Partial<Omit<InjectedAuthenticatedDataGridProps, "id">> &
 const authenticateDataGrid = <
   T extends HOCProps,
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel,
 >(
-  Component: React.FunctionComponent<T>
+  Component: React.FunctionComponent<T>,
 ): React.FunctionComponent<Subtract<T, HOCProps> & InternalAuthenticateDataGridProps<R, M>> => {
   const DG = makeDataGrid<T, R, M>(Component);
 
-  function WithAuthenticatedDataGrid(props: Subtract<T, HOCProps> & InternalAuthenticateDataGridProps<R, M>) {
-    const [processCellForClipboard, getCSVData, processCellFromClipboard, processDataFromClipboard, setCellCutChange] =
-      useAuthenticatedClipboard<R, M>({
-        columns: props.columns,
-        apis: props.apis,
-        onEvent: props.onEvent
-      });
+  function WithAuthenticatedDataGrid(
+    props: Subtract<T, HOCProps> & InternalAuthenticateDataGridProps<R, M>,
+  ) {
+    const [
+      processCellForClipboard,
+      getCSVData,
+      processCellFromClipboard,
+      processDataFromClipboard,
+      setCellCutChange,
+    ] = useAuthenticatedClipboard<R, M>({
+      columns: props.columns,
+      apis: props.apis,
+      onEvent: props.onEvent,
+    });
     const [cellChangeEvents, setCellChangeEvents] = useState<CellValueChangedEvent[]>([]);
     const oldRow = useRef<Table.ModelRow<R> | null>(null); // TODO: Figure out a better way to do this.
     const lastSelectionFromRange = useRef<boolean>(false);
     const rowState = useRef<RowState>({
       markupRow: [],
       groupRow: [],
-      modelRow: []
+      modelRow: [],
     });
 
     /*
@@ -285,8 +323,9 @@ const authenticateDataGrid = <
 			memorization relies on the column transformations applied here - so they
 			cannot be applied together as it would lead to a recursion.
       */
-    const unsuppressedColumns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
-      /*
+    const unsuppressedColumns = useMemo<Table.Column<R, M>[]>(
+      (): Table.Column<R, M>[] =>
+        /*
         When the cell editor finishes editing, the AG Grid callback
 				(onCellDoneEditing) does not have any context about what event triggered
 				the completion.  This is problematic because we need to focus either the
@@ -294,129 +333,143 @@ const authenticateDataGrid = <
 				completion).  To accomplish this, we use a custom hook to the Editor(s)
 				that is manually called inside the Editor.
         */
-      return tabling.columns.normalizeColumns(
-        props.columns,
-        {
-          checkbox: {
-            checkboxSelection: (params: CheckboxSelectionCallbackParams) => {
-              const row: Table.BodyRow<R> = params.data;
-              if (tabling.rows.isEditableRow(row)) {
-                return isNil(props.rowHasCheckboxSelection) || props.rowHasCheckboxSelection(row);
-              }
-              return false;
-            }
-          }
-        },
-        {
-          body: (col: Table.BodyColumn<R, M>) => ({
-            editable: (params: Table.ColumnCallbackParams<R>) => {
-              if (!tabling.rows.isEditableRow(params.row)) {
+        tabling.columns.normalizeColumns(
+          props.columns,
+          {
+            checkbox: {
+              checkboxSelection: (params: CheckboxSelectionCallbackParams) => {
+                const row: Table.BodyRow<R> = params.data;
+                if (tabling.rows.isEditableRow(row)) {
+                  return isNil(props.rowHasCheckboxSelection) || props.rowHasCheckboxSelection(row);
+                }
                 return false;
-              }
-              return col.editable === undefined ? true : tabling.columns.isEditable<R, M>(col, params.row);
+              },
             },
-            valueSetter: (params: ValueSetterParams) => {
-              /* By default, AG Grid treats clearing the cell via the Backspace
+          },
+          {
+            body: (col: Table.BodyColumn<R, M>) => ({
+              editable: (params: Table.ColumnCallbackParams<R>) => {
+                if (!tabling.rows.isEditableRow(params.row)) {
+                  return false;
+                }
+                return col.editable === undefined
+                  ? true
+                  : tabling.columns.isEditable<R, M>(col, params.row);
+              },
+              valueSetter: (params: ValueSetterParams) => {
+                /* By default, AG Grid treats clearing the cell via the Backspace
 								   key as setting the value to undefined - for god knows what
 									 reason.  Since we do not allow values to take on undefined,
 									 we need to set it to the nullValue of the column. */
-              if (params.newValue === undefined || params.newValue === "") {
-                params.newValue = col.nullValue;
-              }
-              if (!isNil(col.valueSetter) && typeof col.valueSetter === "function") {
-                return col.valueSetter(params);
-              }
-              /* We can apply this mutation to the immutable data from the store
+                if (params.newValue === undefined || params.newValue === "") {
+                  params.newValue = col.nullValue;
+                }
+                if (!isNil(col.valueSetter) && typeof col.valueSetter === "function") {
+                  return col.valueSetter(params);
+                }
+                /* We can apply this mutation to the immutable data from the store
 							   because we deep clone each row before feeding it into the AG
 								 Grid tables. */
-              params.data.data[params.column.getColId()] = params.newValue;
-              return true;
-            }
-          })
-        }
-      );
-    }, []);
-
-    const partialColumns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
-      return tabling.columns.normalizeColumns(
-        unsuppressedColumns,
-        {},
-        {
-          body: (col: Table.BodyColumn<R, M>) => ({
-            suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
-              if (!isNil(col.suppressKeyboardEvent) && col.suppressKeyboardEvent(params) === true) {
+                params.data.data[params.column.getColId()] = params.newValue;
                 return true;
-              } else if (params.editing && includes(["Tab"], params.event.code)) {
-                /* Our custom cell editors have built in functionality that
+              },
+            }),
+          },
+        ),
+      [],
+    );
+
+    const partialColumns = useMemo<Table.Column<R, M>[]>(
+      (): Table.Column<R, M>[] =>
+        tabling.columns.normalizeColumns(
+          unsuppressedColumns,
+          {},
+          {
+            body: (col: Table.BodyColumn<R, M>) => ({
+              suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
+                if (
+                  !isNil(col.suppressKeyboardEvent) &&
+                  col.suppressKeyboardEvent(params) === true
+                ) {
+                  return true;
+                } else if (params.editing && includes(["Tab"], params.event.code)) {
+                  /* Our custom cell editors have built in functionality that
 									   when editing is terminated via a TAB key, we move one cell
 										 to the right without continuing in edit mode.  This however
 										 does not work for the bland text cells, where we do not
 										 have cell editors controlling the edit behavior.  So we need
 										 to suppress the TAB behavior when editing, and manually move
 										 the cell over. */
-                return true;
-              } else if (!params.editing && includes(["Backspace", "Delete"], params.event.code)) {
-                /* Suppress Backspace/Delete events when multiple cells are
-                     selected in a range. */
-                const ranges = params.api.getCellRanges();
-                if (
-                  !isNil(ranges) &&
-                  ranges.length !== 0 &&
-                  (ranges.length !== 1 || !tabling.aggrid.rangeSelectionIsSingleCell(ranges[0]))
-                ) {
-                  const changes: Table.SoloCellChange<R>[] = flatten(
-                    map(ranges, (rng: CellRange) =>
-                      getTableChangesFromRangeClear(
-                        params.api,
-                        tabling.columns.filterRealColumns(unsuppressedColumns),
-                        rng
-                      )
-                    )
-                  );
-                  if (changes.length !== 0) {
-                    props.onEvent({
-                      type: "dataChange",
-                      payload: tabling.events.consolidateCellChanges(changes)
-                    });
-                  }
                   return true;
-                } else {
-                  /*
+                } else if (
+                  !params.editing &&
+                  includes(["Backspace", "Delete"], params.event.code)
+                ) {
+                  /* Suppress Backspace/Delete events when multiple cells are
+                     selected in a range. */
+                  const ranges = params.api.getCellRanges();
+                  if (
+                    !isNil(ranges) &&
+                    ranges.length !== 0 &&
+                    (ranges.length !== 1 || !tabling.aggrid.rangeSelectionIsSingleCell(ranges[0]))
+                  ) {
+                    const changes: Table.SoloCellChange<R>[] = flatten(
+                      map(ranges, (rng: CellRange) =>
+                        getTableChangesFromRangeClear(
+                          params.api,
+                          tabling.columns.filterRealColumns(unsuppressedColumns),
+                          rng,
+                        ),
+                      ),
+                    );
+                    if (changes.length !== 0) {
+                      props.onEvent({
+                        type: "dataChange",
+                        payload: tabling.events.consolidateCellChanges(changes),
+                      });
+                    }
+                    return true;
+                  } else {
+                    /*
 										For custom Cell Editor(s) with a Pop-Up, we do not want
 									  Backspace/Delete to go into edit mode but instead want to
 										clear the values of the cells - so we prevent those key
 										presses from triggering edit mode in the Cell Editor and
 										clear the value at this level. */
-                  const row: Table.BodyRow<R> = params.node.data;
-                  if (tabling.rows.isEditableRow(row) && col.cellEditorPopup === true) {
-                    const change = getCellChangeForClear(row, col);
-                    if (!isNil(change)) {
-                      props.onEvent({
-                        type: "dataChange",
-                        payload: tabling.events.cellChangeToRowChange(change)
-                      });
+                    const row: Table.BodyRow<R> = params.node.data;
+                    if (tabling.rows.isEditableRow(row) && col.cellEditorPopup === true) {
+                      const change = getCellChangeForClear(row, col);
+                      if (!isNil(change)) {
+                        props.onEvent({
+                          type: "dataChange",
+                          payload: tabling.events.cellChangeToRowChange(change),
+                        });
+                      }
+                      return true;
                     }
-                    return true;
+                    return false;
                   }
-                  return false;
-                }
-              } else if (
-                /* We need to suppress CMD + Arrow KeyboardEvent(s) because this
+                } else if (
+                  /* We need to suppress CMD + Arrow KeyboardEvent(s) because this
                    is how we navigate through the nested/sibling tables in the
                    BudgetTable case. */
-                includes(["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight"], params.event.key) &&
-                (params.event.ctrlKey || params.event.metaKey)
-              ) {
-                return true;
-              }
-              return false;
-            }
-          })
-        }
-      );
-    }, []);
+                  includes(["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight"], params.event.key) &&
+                  (params.event.ctrlKey || params.event.metaKey)
+                ) {
+                  return true;
+                }
+                return false;
+              },
+            }),
+          },
+        ),
+      [],
+    );
 
-    const [navigateToNextCell, tabToNextCell, moveToNextColumn, moveToNextRow] = useCellNavigation<R, M>({
+    const [navigateToNextCell, tabToNextCell, moveToNextColumn, moveToNextRow] = useCellNavigation<
+      R,
+      M
+    >({
       apis: props.apis,
       columns: partialColumns,
       onNewRowRequired: (newRowIndex: number) => {
@@ -425,10 +478,10 @@ const authenticateDataGrid = <
           props.onEvent({
             type: "rowAdd",
             placeholderIds: [tabling.rows.placeholderRowId()],
-            payload: { newIndex: newRowIndex }
+            payload: { newIndex: newRowIndex },
           });
         }
-      }
+      },
     });
 
     const onDoneEditing = hooks.useDynamicCallback((e: Table.CellDoneEditingEvent) => {
@@ -444,17 +497,19 @@ const authenticateDataGrid = <
       }
     });
 
-    const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
-      return tabling.columns.normalizeColumns(
-        partialColumns,
-        {},
-        {
-          body: (col: Table.BodyColumn<R, M>) => ({
-            cellEditorParams: { ...col.cellEditorParams, onDoneEditing }
-          })
-        }
-      );
-    }, []);
+    const columns = useMemo<Table.Column<R, M>[]>(
+      (): Table.Column<R, M>[] =>
+        tabling.columns.normalizeColumns(
+          partialColumns,
+          {},
+          {
+            body: (col: Table.BodyColumn<R, M>) => ({
+              cellEditorParams: { ...col.cellEditorParams, onDoneEditing },
+            }),
+          },
+        ),
+      [],
+    );
 
     const [getContextMenuItems] = useContextMenu<R, M>(props);
 
@@ -464,11 +519,11 @@ const authenticateDataGrid = <
           event.api.startEditingCell({
             rowIndex: event.rowIndex,
             colKey: event.column.getColId(),
-            charPress: " "
+            charPress: " ",
           });
         }
       },
-      []
+      [],
     );
 
     const onCellCut: (e: CellKeyDownEvent, local: Table.GridApi) => void = hooks.useDynamicCallback(
@@ -490,30 +545,32 @@ const authenticateDataGrid = <
             }
           }
         }
-      }
+      },
     );
 
-    const onCellKeyDown: (event: CellKeyDownEvent) => void = hooks.useDynamicCallback((event: CellKeyDownEvent) => {
-      if (!isNil(event.event)) {
-        /* AG Grid only enters Edit mode in a cell when a character is pressed,
+    const onCellKeyDown: (event: CellKeyDownEvent) => void = hooks.useDynamicCallback(
+      (event: CellKeyDownEvent) => {
+        if (!isNil(event.event)) {
+          /* AG Grid only enters Edit mode in a cell when a character is pressed,
 						 not the Space key - so we have to do that manually here. */
-        const ev = event.event as KeyboardEvent; // AG Grid's Event Object is Wrong
-        if (ev.code === "Space") {
-          onCellSpaceKey(event);
-        } else if (ev.key === "x" && (ev.ctrlKey || ev.metaKey)) {
-          onCellCut(event, event.api);
-        } else if (ev.code === "Enter" && !isNil(event.rowIndex)) {
-          /* If Enter is clicked inside the cell popout, this doesn't get
+          const ev = event.event as KeyboardEvent; // AG Grid's Event Object is Wrong
+          if (ev.code === "Space") {
+            onCellSpaceKey(event);
+          } else if (ev.key === "x" && (ev.ctrlKey || ev.metaKey)) {
+            onCellCut(event, event.api);
+          } else if (ev.code === "Enter" && !isNil(event.rowIndex)) {
+            /* If Enter is clicked inside the cell popout, this doesn't get
                triggered. */
-          const editing = event.api.getEditingCells();
-          if (editing.length === 0) {
-            moveToNextRow({ rowIndex: event.rowIndex, column: event.column });
+            const editing = event.api.getEditingCells();
+            if (editing.length === 0) {
+              moveToNextRow({ rowIndex: event.rowIndex, column: event.column });
+            }
+          } else if (ev.code === "Tab" && !isNil(event.rowIndex)) {
+            moveToNextColumn({ rowIndex: event.rowIndex, column: event.column });
           }
-        } else if (ev.code === "Tab" && !isNil(event.rowIndex)) {
-          moveToNextColumn({ rowIndex: event.rowIndex, column: event.column });
         }
-      }
-    });
+      },
+    );
 
     const onPasteStart: (event: PasteStartEvent) => void = hooks.useDynamicCallback(() => {
       setCellChangeEvents([]);
@@ -524,14 +581,14 @@ const authenticateDataGrid = <
         cellChangeEvents,
         (curr: Table.SoloCellChange<R>[], e: CellValueChangedEvent) => [
           ...curr,
-          ...getCellChangesFromEvent(tabling.columns.filterRealColumns(columns), e)
+          ...getCellChangesFromEvent(tabling.columns.filterRealColumns(columns), e),
         ],
-        []
+        [],
       );
       if (changes.length !== 0) {
         props.onEvent({
           type: "dataChange",
-          payload: tabling.events.consolidateCellChanges(changes)
+          payload: tabling.events.consolidateCellChanges(changes),
         });
       }
     });
@@ -550,20 +607,27 @@ const authenticateDataGrid = <
           } else {
             const changes = getCellChangesFromEvent(tabling.columns.filterRealColumns(columns), e);
             if (changes.length !== 0) {
-              props.onEvent({ type: "dataChange", payload: tabling.events.consolidateCellChanges(changes) });
+              props.onEvent({
+                type: "dataChange",
+                payload: tabling.events.consolidateCellChanges(changes),
+              });
               const expandConfig = !isNil(props.editColumnConfig)
                 ? tabling.columns.getEditColumnRowConfig(props.editColumnConfig, row, "expand")
                 : null;
               if (!isNil(expandConfig)) {
                 const col = props.apis?.column.getColumn("edit");
                 if (!isNil(col) && isNil(oldRow.current)) {
-                  props.apis?.grid.refreshCells({ force: true, rowNodes: [e.node], columns: [col] });
+                  props.apis?.grid.refreshCells({
+                    force: true,
+                    rowNodes: [e.node],
+                    columns: [col],
+                  });
                 }
               }
             }
           }
         }
-      }
+      },
     );
 
     const onCellEditingStarted = hooks.useDynamicCallback((event: CellEditingStartedEvent) => {
@@ -586,7 +650,8 @@ const authenticateDataGrid = <
     const onRangeSelectionChanged = hooks.useDynamicCallback((e: RangeSelectionChangedEvent) => {
       const ranges = e.api.getCellRanges();
 
-      const indices: [number | null, number | null] = tabling.aggrid.collapseRangeSelectionVertically(ranges || []);
+      const indices: [number | null, number | null] =
+        tabling.aggrid.collapseRangeSelectionVertically(ranges || []);
       if (indices[0] !== null && indices[1] !== null && indices[0] !== indices[1]) {
         e.api.forEachNode((node: Table.RowNode) => {
           const row: Table.Row<R> = node.data;
@@ -596,7 +661,10 @@ const authenticateDataGrid = <
             (isNil(props.rowHasCheckboxSelection) || props.rowHasCheckboxSelection(row))
           ) {
             lastSelectionFromRange.current = true;
-            if (node.rowIndex >= (indices[0] as number) && node.rowIndex <= (indices[1] as number)) {
+            if (
+              node.rowIndex >= (indices[0] as number) &&
+              node.rowIndex <= (indices[1] as number)
+            ) {
               node.setSelected(true);
             } else {
               node.setSelected(false);
@@ -642,8 +710,8 @@ const authenticateDataGrid = <
         payload: {
           previous: !isNil(previous) ? previous.id : null,
           id: row.id,
-          newGroup: !isNil(groupRow) ? groupRow.id : null
-        }
+          newGroup: !isNil(groupRow) ? groupRow.id : null,
+        },
       });
     });
 
@@ -694,62 +762,81 @@ const authenticateDataGrid = <
               overRow.id !== movingRow.id &&
               (tabling.rows.isModelRow(overRow) || tabling.rows.isGroupRow(overRow))
             ) {
-              const store: Table.BodyRow<R>[] = moveInArray(rows, movingRow, e.overIndex + numHiddenRows);
+              const store: Table.BodyRow<R>[] = moveInArray(
+                rows,
+                movingRow,
+                e.overIndex + numHiddenRows,
+              );
               e.api.setRowData(store);
               e.api.clearFocusedCell();
             }
           } else {
-            console.warn("Could not determine row height from DOM, reordering rows will not function properly.");
+            console.warn(
+              "Could not determine row height from DOM, reordering rows will not function properly.",
+            );
           }
         }
       }
     });
 
     useImperativeHandle(props.grid, () => ({
-      getCSVData
+      getCSVData,
     }));
 
     const fillOperation = hooks.useDynamicCallback((params: FillOperationParams) => {
-      const inferredValue = tabling.rows.inferFillCellValue(params, tabling.columns.filterBodyColumns(columns));
+      const inferredValue = tabling.rows.inferFillCellValue(
+        params,
+        tabling.columns.filterBodyColumns(columns),
+      );
       if (!isNil(inferredValue)) {
         return inferredValue;
       }
       if (params.initialValues.length === 1) {
         return false;
       }
-      /* eslint-disable-next-line  @typescript-eslint/no-unsafe-return */
-      return params.initialValues[(params.values.length - params.initialValues.length) % params.initialValues.length];
+      /* eslint-disable-next-line */
+      return params.initialValues[
+        (params.values.length - params.initialValues.length) % params.initialValues.length
+      ];
     });
 
     const onMarkupRowsAdded = useMemo(
       () => (api: Table.GridApi, diff: Table.MarkupRowId[], rows: Table.BodyRow<R>[]) => {
         props.onMarkupRowsAdded?.(diff, rows);
       },
-      [props.onMarkupRowsAdded]
+      [props.onMarkupRowsAdded],
     );
 
     const onGroupRowsAdded = useMemo(
       () => (api: Table.GridApi, diff: Table.GroupRowId[], rows: Table.BodyRow<R>[]) => {
         props.onGroupRowsAdded?.(diff, rows);
       },
-      [props.onGroupRowsAdded]
+      [props.onGroupRowsAdded],
     );
 
     const onModelRowsAdded = useMemo(
-      () => (api: Table.GridApi, diff: (Table.ModelRowId | Table.PlaceholderRowId)[], rows: Table.BodyRow<R>[]) => {
-        /* Find the row index of the newly added ModelRow in the set of
+      () =>
+        (
+          api: Table.GridApi,
+          diff: (Table.ModelRowId | Table.PlaceholderRowId)[],
+          rows: Table.BodyRow<R>[],
+        ) => {
+          /* Find the row index of the newly added ModelRow in the set of
 						 only the existing ModelRow(s) and PlaceholderRow(s) in the table. */
-        const modelAndPlaceholderRows: Table.DataRow<R>[] = filter(rows, (r: Table.BodyRow<R>) =>
-          tabling.rows.isDataRow(r)
-        ) as Table.DataRow<R>[];
-        const modelRowModelIndex = findIndex(modelAndPlaceholderRows, (r: Table.DataRow<R>) => r.id === diff[0]);
+          const modelAndPlaceholderRows: Table.DataRow<R>[] = filter(rows, (r: Table.BodyRow<R>) =>
+            tabling.rows.isDataRow(r),
+          ) as Table.DataRow<R>[];
+          const modelRowModelIndex = findIndex(
+            modelAndPlaceholderRows,
+            (r: Table.DataRow<R>) => r.id === diff[0],
+          );
 
-        /* Scroll the table to the bottom in the case that rows have been
+          /* Scroll the table to the bottom in the case that rows have been
              added to the end of the table. */
-        if (modelRowModelIndex === modelAndPlaceholderRows.length - 1) {
-          api.ensureIndexVisible(modelAndPlaceholderRows.length - 1, "bottom");
-        }
-        /*
+          if (modelRowModelIndex === modelAndPlaceholderRows.length - 1) {
+            api.ensureIndexVisible(modelAndPlaceholderRows.length - 1, "bottom");
+          }
+          /*
 					The diff will always be one, even if adding new rows one-by-one at an
 					extremely quick rate, unless we are bulk pasting information
 					into the table and the bulk paste operation requires the addition of
@@ -757,16 +844,23 @@ const authenticateDataGrid = <
 					paste operation, we do not want to refocus the index of the table to
 					the row at the bottom.
 					*/
-        if (diff.length === 1) {
-          /* Find the row index of the newly added ModelRow in the set of all
+          if (diff.length === 1) {
+            /* Find the row index of the newly added ModelRow in the set of all
                rows in the table. */
-          const modelRowIndex = findIndex(rows, (r: Table.BodyRow<R>) => tabling.rows.isDataRow(r) && r.id === diff[0]);
-          if (modelRowIndex !== -1) {
-            const focusedCell = api.getFocusedCell();
-            /* Only refocus the row to the newly created row if there is already
+            const modelRowIndex = findIndex(
+              rows,
+              (r: Table.BodyRow<R>) => tabling.rows.isDataRow(r) && r.id === diff[0],
+            );
+            if (modelRowIndex !== -1) {
+              const focusedCell = api.getFocusedCell();
+              /* Only refocus the row to the newly created row if there is already
                  a focused cell in the table. */
-            if (!isNil(focusedCell) && !isNil(focusedCell.rowIndex) && rows[focusedCell.rowIndex + 1] !== undefined) {
-              /*
+              if (
+                !isNil(focusedCell) &&
+                !isNil(focusedCell.rowIndex) &&
+                rows[focusedCell.rowIndex + 1] !== undefined
+              ) {
+                /*
 								The intended logic here is to refocus the cell to the newly added
 								ModelRow if we were previously on the last ModelRow in the table
 								(i.e. at the bottom of the table, before the MarkupRow(s)). This
@@ -789,24 +883,24 @@ const authenticateDataGrid = <
 								for the fact that the `focusedCell`'s `rowIndex` is relative to
 								the new row not being in the table yet.
 								*/
-              if (modelRowIndex > focusedCell.rowIndex) {
-                api.setFocusedCell(modelRowIndex, focusedCell.column);
-                api.clearRangeSelection();
-              } else {
-                api.setFocusedCell(focusedCell.rowIndex + 1, focusedCell.column);
-                api.clearRangeSelection();
+                if (modelRowIndex > focusedCell.rowIndex) {
+                  api.setFocusedCell(modelRowIndex, focusedCell.column);
+                  api.clearRangeSelection();
+                } else {
+                  api.setFocusedCell(focusedCell.rowIndex + 1, focusedCell.column);
+                  api.clearRangeSelection();
+                }
               }
+            } else {
+              console.warn(
+                `Model row ${diff[0]} was added to the table, but it does not
+								appear to be in the set of rows returned from the Grid Api.`,
+              );
             }
-          } else {
-            console.warn(
-              `Model row ${diff[0]} was added to the table, but it does not
-								appear to be in the set of rows returned from the Grid Api.`
-            );
           }
-        }
-        props.onModelRowsAdded?.(diff, rows);
-      },
-      [props.onModelRowsAdded]
+          props.onModelRowsAdded?.(diff, rows);
+        },
+      [props.onModelRowsAdded],
     );
 
     const onRowDataUpdated = hooks.useDynamicCallback((e: RowDataUpdatedEvent) => {
@@ -814,29 +908,31 @@ const authenticateDataGrid = <
       const newRowState: RowState = {
         groupRow: map(
           filter(rows, (r: Table.BodyRow<R>) => tabling.rows.isGroupRow(r)) as Table.GroupRow<R>[],
-          (g: Table.GroupRow<R>) => g.id
+          (g: Table.GroupRow<R>) => g.id,
         ),
         modelRow: map(
-          filter(rows, (r: Table.BodyRow<R>) => tabling.rows.isModelRow(r) || tabling.rows.isPlaceholderRow(r)) as (
-            | Table.ModelRow<R>
-            | Table.PlaceholderRow<R>
-          )[],
-          (g: Table.ModelRow<R> | Table.PlaceholderRow<R>) => g.id
+          filter(
+            rows,
+            (r: Table.BodyRow<R>) => tabling.rows.isModelRow(r) || tabling.rows.isPlaceholderRow(r),
+          ) as (Table.ModelRow<R> | Table.PlaceholderRow<R>)[],
+          (g: Table.ModelRow<R> | Table.PlaceholderRow<R>) => g.id,
         ),
         markupRow: map(
-          filter(rows, (r: Table.BodyRow<R>) => tabling.rows.isMarkupRow(r)) as Table.MarkupRow<R>[],
-          (g: Table.MarkupRow<R>) => g.id
-        )
+          filter(rows, (r: Table.BodyRow<R>) =>
+            tabling.rows.isMarkupRow(r),
+          ) as Table.MarkupRow<R>[],
+          (g: Table.MarkupRow<R>) => g.id,
+        ),
       };
 
       const Mapping: [
         RowMap<R, Table.GroupRowId>,
         RowMap<R, Table.ModelRowId | Table.PlaceholderRowId>,
-        RowMap<R, Table.MarkupRowId>
+        RowMap<R, Table.MarkupRowId>,
       ] = [
         { id: "groupRow", callback: onGroupRowsAdded },
         { id: "modelRow", callback: onModelRowsAdded },
-        { id: "markupRow", callback: onMarkupRowsAdded }
+        { id: "markupRow", callback: onMarkupRowsAdded },
       ];
 
       for (let i = 0; i < Mapping.length; i++) {
@@ -844,28 +940,35 @@ const authenticateDataGrid = <
         type IDType = InferRowMapId<typeof mp>;
         const cb = mp.callback as RowStateCallback<R, IDType>;
         if (newRowState[mp.id].length > rowState.current[mp.id].length) {
-          const diff = difference(newRowState[mp.id] as IDType[], rowState.current[mp.id] as IDType[]);
+          const diff = difference(
+            newRowState[mp.id] as IDType[],
+            rowState.current[mp.id] as IDType[],
+          );
           cb(e.api, diff, rows);
         }
       }
       rowState.current = newRowState;
     });
 
-    const undoKeyListeners = hooks.useDynamicCallback((localApi: Table.GridApi, e: KeyboardEvent) => {
-      const ctrlCmdPressed = e.ctrlKey || e.metaKey;
-      if (e.key === "z" && ctrlCmdPressed && !e.shiftKey) {
-        e.preventDefault();
-        props.onEvent({ type: "reverse", payload: null });
-      }
-    });
+    const undoKeyListeners = hooks.useDynamicCallback(
+      (localApi: Table.GridApi, e: KeyboardEvent) => {
+        const ctrlCmdPressed = e.ctrlKey || e.metaKey;
+        if (e.key === "z" && ctrlCmdPressed && !e.shiftKey) {
+          e.preventDefault();
+          props.onEvent({ type: "reverse", payload: null });
+        }
+      },
+    );
 
-    const redoKeyListeners = hooks.useDynamicCallback((localApi: Table.GridApi, e: KeyboardEvent) => {
-      const ctrlCmdPressed = e.ctrlKey || e.metaKey;
-      if (e.key === "z" && ctrlCmdPressed && e.shiftKey) {
-        e.preventDefault();
-        props.onEvent({ type: "forward", payload: null });
-      }
-    });
+    const redoKeyListeners = hooks.useDynamicCallback(
+      (localApi: Table.GridApi, e: KeyboardEvent) => {
+        const ctrlCmdPressed = e.ctrlKey || e.metaKey;
+        if (e.key === "z" && ctrlCmdPressed && e.shiftKey) {
+          e.preventDefault();
+          props.onEvent({ type: "forward", payload: null });
+        }
+      },
+    );
 
     return (
       <DG

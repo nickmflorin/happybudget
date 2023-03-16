@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+
 import { isNil } from "lodash";
 
 import { BasePage, View } from "./primitive";
@@ -13,10 +14,14 @@ const NoDataPage = (props: Pdf.NoDataDocumentProps): JSX.Element => {
   }, [props.text]);
   return (
     <BasePage {...props}>
-      <View className={"page-no-data-content"}>
+      <View className="page-no-data-content">
         {/* @react-pdf does not play well with boolean values for children (i.e.
 				in this case, `false` if we did props.withText !== false && ...) */}
-        {text !== null ? <Text className={"page-no-data-text"}>{text}</Text> : <React.Fragment></React.Fragment>}
+        {text !== null ? (
+          <Text className="page-no-data-text">{text}</Text>
+        ) : (
+          <React.Fragment></React.Fragment>
+        )}
       </View>
     </BasePage>
   );

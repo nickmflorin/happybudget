@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from "react";
+
 import { isNil } from "lodash";
 
 import { ui, http } from "lib";
-
 import { Icon } from "components";
 import { Menu } from "components/menus";
 import EditPublicTokenMenu from "components/menus/EditPublicTokenMenu";
@@ -12,7 +12,7 @@ import Dropdown, { DropdownProps } from "./Dropdown";
 export type ShareDropdownMenuProps<
   P extends Model.PublicHttpModel,
   R extends Table.RowData,
-  M extends Model.RowHttpModel
+  M extends Model.RowHttpModel,
 > = Pick<StandardComponentProps, "className"> &
   Omit<DropdownProps, "overlayId" | "overlay"> & {
     readonly instance: P;
@@ -24,7 +24,7 @@ export type ShareDropdownMenuProps<
       readonly create: (
         id: number,
         payload: Http.PublicTokenPayload,
-        options: Http.RequestOptions
+        options: Http.RequestOptions,
       ) => Promise<Model.PublicToken>;
     };
     readonly urlFormatter: (tokenId: string) => string;
@@ -33,7 +33,11 @@ export type ShareDropdownMenuProps<
     readonly onTokenDeleted?: (() => void) | undefined;
   };
 
-const ShareDropdownMenu = <P extends Model.PublicHttpModel, R extends Table.RowData, M extends Model.RowHttpModel>({
+const ShareDropdownMenu = <
+  P extends Model.PublicHttpModel,
+  R extends Table.RowData,
+  M extends Model.RowHttpModel,
+>({
   publicToken,
   menuProps,
   services,
@@ -64,10 +68,12 @@ const ShareDropdownMenu = <P extends Model.PublicHttpModel, R extends Table.RowD
         })
         .catch((e: Error) => {
           setLoading(false);
-          table.handleRequestError(e, { message: `There was an error sharing the ${instance.type}.` });
+          table.handleRequestError(e, {
+            message: `There was an error sharing the ${instance.type}.`,
+          });
         });
     },
-    [instance, table, services.create, onCreateTokenSuccess]
+    [instance, table, services.create, onCreateTokenSuccess],
   );
 
   const overlay = useMemo(() => {
@@ -83,9 +89,9 @@ const ShareDropdownMenu = <P extends Model.PublicHttpModel, R extends Table.RowD
               loading,
               label: "Create Sharable Link",
               onClick: () => performShare(),
-              icon: <Icon icon={"link"} weight={"solid"} />,
-              keepDropdownOpenOnClick: true
-            }
+              icon: <Icon icon="link" weight="solid" />,
+              keepDropdownOpenOnClick: true,
+            },
           ]}
         />
       );
@@ -111,7 +117,7 @@ const ShareDropdownMenu = <P extends Model.PublicHttpModel, R extends Table.RowD
     menu,
     menuProps,
     loading,
-    performShare
+    performShare,
   ]);
 
   return (

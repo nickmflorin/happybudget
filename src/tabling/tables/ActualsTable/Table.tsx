@@ -1,22 +1,21 @@
 import React, { useMemo, useState } from "react";
+
+import { map, filter, isNil } from "lodash";
 import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
-import { map, filter, isNil } from "lodash";
 
 import * as api from "api";
 import { model, tabling, hooks } from "lib";
 import * as store from "store";
-
-import { CreateContactParams } from "components/model/hooks";
-import { ImportActualsPlaidModal } from "components/modals";
 import { usePlaid, UsePlaidSuccessParams } from "components/integrations";
-
+import { ImportActualsPlaidModal } from "components/modals";
+import { CreateContactParams } from "components/model/hooks";
 import { framework as genericFramework } from "tabling/generic";
 import { AuthenticatedTable, AuthenticatedTableProps } from "tabling/generic/tables";
-import { useAttachments, useContacts } from "../hooks";
 
-import * as framework from "./framework";
 import Columns from "./Columns";
+import * as framework from "./framework";
+import { useAttachments, useContacts } from "../hooks";
 
 type OmitProps =
   | "showPageFooter"
@@ -50,7 +49,12 @@ export type Props = Omit<AuthenticatedTableProps<R, M, C, S>, OmitProps> & {
   readonly onImportSuccess: (b: Model.Budget, ms: Model.Actual[]) => void;
 };
 
-const ActualsTable = ({ parent, onOwnersSearch, onImportSuccess, ...props }: Props): JSX.Element => {
+const ActualsTable = ({
+  parent,
+  onOwnersSearch,
+  onImportSuccess,
+  ...props
+}: Props): JSX.Element => {
   const dispatch: Dispatch = useDispatch();
   const [plaidSuccessParams, setPlaidSuccessParams] = useState<UsePlaidSuccessParams | null>(null);
 
@@ -62,8 +66,8 @@ const ActualsTable = ({ parent, onOwnersSearch, onImportSuccess, ...props }: Pro
         detail: e,
         level: "error",
         duration: 3000,
-        closable: true
-      })
+        closable: true,
+      }),
   });
 
   const [
@@ -73,19 +77,20 @@ const ActualsTable = ({ parent, onOwnersSearch, onImportSuccess, ...props }: Pro
     modal,
     addAttachment,
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-    removeAttachment
+    removeAttachment,
   ] = useAttachments({
     table: props.table.current,
     listAttachments: api.getActualAttachments,
     deleteAttachment: api.deleteActualAttachment,
-    path: (id: number) => `/v1/actuals/${id}/attachments/`
+    path: (id: number) => `/v1/actuals/${id}/attachments/`,
   });
 
-  const processActualTypeCellFromClipboard = hooks.useDynamicCallback((name: string): Model.Tag | null =>
-    model.inferModelFromName<Model.Tag>(props.actualTypes, name, {
-      getName: (m: Model.Tag) => m.title,
-      warnOnMissing: false
-    })
+  const processActualTypeCellFromClipboard = hooks.useDynamicCallback(
+    (name: string): Model.Tag | null =>
+      model.inferModelFromName<Model.Tag>(props.actualTypes, name, {
+        getName: (m: Model.Tag) => m.title,
+        warnOnMissing: false,
+      }),
   );
 
   const processOwnerCellFromClipboard = hooks.useDynamicCallback((value: string) => {
@@ -94,10 +99,12 @@ const ActualsTable = ({ parent, onOwnersSearch, onImportSuccess, ...props }: Pro
     }
     let availableOwners: (Model.SimpleSubAccount | Model.SimpleMarkup)[] = filter(
       map(
-        filter(props.data, (r: Table.BodyRow<R>) => tabling.rows.isDataRow(r)) as Table.DataRow<R>[],
-        (row: Table.DataRow<R>) => row.data.owner
+        filter(props.data, (r: Table.BodyRow<R>) =>
+          tabling.rows.isDataRow(r),
+        ) as Table.DataRow<R>[],
+        (row: Table.DataRow<R>) => row.data.owner,
       ),
-      (owner: Model.SimpleSubAccount | Model.SimpleMarkup | null) => owner !== null
+      (owner: Model.SimpleSubAccount | Model.SimpleMarkup | null) => owner !== null,
     ) as (Model.SimpleSubAccount | Model.SimpleMarkup)[];
     /* If the user pastes the value after directly copying from an internal
 			 table, the value will be structured as internal-<type>-<id> - which allows
@@ -117,13 +124,15 @@ const ActualsTable = ({ parent, onOwnersSearch, onImportSuccess, ...props }: Pro
         }
         const owner = filter(
           availableOwners,
-          (o: Model.SimpleSubAccount | Model.SimpleMarkup) => o.id === id && o.type === type
+          (o: Model.SimpleSubAccount | Model.SimpleMarkup) => o.id === id && o.type === type,
         );
         if (owner.length === 0) {
           console.warn(`Could not parse Actual owner from clipboard value ${value}!`);
           return null;
         } else if (owner.length !== 1) {
-          console.warn(`Parsed multiple Actual owners from clipboard value ${value}... returning first.`);
+          console.warn(
+            `Parsed multiple Actual owners from clipboard value ${value}... returning first.`,
+          );
           return owner[0];
         }
         return owner[0];
@@ -134,13 +143,17 @@ const ActualsTable = ({ parent, onOwnersSearch, onImportSuccess, ...props }: Pro
 				 determine which owner that value for the identifier refers to. */
       availableOwners = filter(
         availableOwners,
-        (o: Model.SimpleSubAccount | Model.SimpleMarkup) => o.identifier !== null
+        (o: Model.SimpleSubAccount | Model.SimpleMarkup) => o.identifier !== null,
       );
       /* NOTE: If there are multiple owners with the same identifier, this will
          return the first and issue a warning. */
-      return model.inferModelFromName<Model.SimpleSubAccount | Model.SimpleMarkup>(availableOwners, value, {
-        getName: (m: Model.SimpleSubAccount | Model.SimpleMarkup) => m.identifier
-      });
+      return model.inferModelFromName<Model.SimpleSubAccount | Model.SimpleMarkup>(
+        availableOwners,
+        value,
+        {
+          getName: (m: Model.SimpleSubAccount | Model.SimpleMarkup) => m.identifier,
+        },
+      );
     }
   });
 
@@ -156,16 +169,16 @@ const ActualsTable = ({ parent, onOwnersSearch, onImportSuccess, ...props }: Pro
         if (!isNil(row) && tabling.rows.isModelRow(row)) {
           const rowChange: Table.RowChange<R> = {
             id: row.id,
-            data: { contact: { oldValue: row.data.contact, newValue: m.id } }
+            data: { contact: { oldValue: row.data.contact, newValue: m.id } },
           };
           props.table.current.dispatchEvent({
             type: "dataChange",
-            payload: rowChange
+            payload: rowChange,
           });
         }
       }
     },
-    [props.table.current]
+    [props.table.current],
   );
 
   const {
@@ -173,11 +186,11 @@ const ActualsTable = ({ parent, onOwnersSearch, onImportSuccess, ...props }: Pro
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
     data: cs,
     columns: columnsWithContacts,
-    onCellFocusChanged
+    onCellFocusChanged,
   } = useContacts({
     table: props.table,
     columns: Columns,
-    onCreated: onContactCreated
+    onCreated: onContactCreated,
   });
 
   const columns = useMemo(
@@ -187,8 +200,8 @@ const ActualsTable = ({ parent, onOwnersSearch, onImportSuccess, ...props }: Pro
           processCellFromClipboard: processOwnerCellFromClipboard,
           cellEditorParams: {
             ...col.cellEditorParams,
-            setSearch: (value: string) => onOwnersSearch(value)
-          }
+            setSearch: (value: string) => onOwnersSearch(value),
+          },
         }),
         attachments: (col: Table.Column<R, M>) => ({
           onCellDoubleClicked: (row: Table.ModelRow<R>) => setEditAttachments(row.id),
@@ -197,42 +210,42 @@ const ActualsTable = ({ parent, onOwnersSearch, onImportSuccess, ...props }: Pro
           cellRendererParams: {
             ...col.cellRendererParams,
             onAttachmentAdded: addAttachment,
-            uploadAttachmentsPath: (id: number) => `/v1/actuals/${id}/attachments/`
-          }
+            uploadAttachmentsPath: (id: number) => `/v1/actuals/${id}/attachments/`,
+          },
         }),
         actual_type: {
-          processCellFromClipboard: processActualTypeCellFromClipboard
-        }
+          processCellFromClipboard: processActualTypeCellFromClipboard,
+        },
       }),
     [
       hooks.useDeepEqualMemo(columnsWithContacts),
       processActualTypeCellFromClipboard,
       addAttachment,
       processAttachmentsCellForClipboard,
-      processActualTypeCellFromClipboard
-    ]
+      processActualTypeCellFromClipboard,
+    ],
   );
 
   return (
     <React.Fragment>
       <AuthenticatedTable
         {...props}
-        tableId={"budget-actuals"}
+        tableId="budget-actuals"
         columns={columns}
         onCellFocusChanged={onCellFocusChanged}
         showPageFooter={false}
-        menuPortalId={"supplementary-header"}
-        savingChangesPortalId={"saving-changes"}
+        menuPortalId="supplementary-header"
+        savingChangesPortalId="saving-changes"
         getModelRowName={(r: Table.DataRow<R>) => r.data.name}
-        getModelRowLabel={"Actual"}
+        getModelRowLabel="Actual"
         framework={framework.FrameworkComponents}
         actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
           genericFramework.actions.ToggleColumnAction(props.table.current, params),
           framework.actions.ImportActualsAction({
             table: props.table.current,
-            onLinkToken: (linkToken: string) => open(linkToken)
+            onLinkToken: (linkToken: string) => open(linkToken),
           }),
-          genericFramework.actions.ExportPdfAction(props.onExportPdf)
+          genericFramework.actions.ExportPdfAction(props.onExportPdf),
         ]}
       />
       {modal}

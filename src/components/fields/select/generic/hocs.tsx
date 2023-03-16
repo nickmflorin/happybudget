@@ -1,11 +1,13 @@
 import React from "react";
-import { SingleValue, MultiValue, ActionMeta, SelectComponentsConfig } from "react-select";
+
 import hoistNonReactStatics from "hoist-non-react-statics";
 import { map, isNil } from "lodash";
+import { SingleValue, MultiValue, ActionMeta, SelectComponentsConfig } from "react-select";
 import { Subtract } from "utility-types";
 
-import { ModelSelectOption } from "./options";
 import { ui, model } from "lib";
+
+import { ModelSelectOption } from "./options";
 
 export type ModelSelectInjectedProps<M extends Model.Model> = {
   readonly getOptionLabel: (m: ModelSelectOption<M>) => string;
@@ -17,7 +19,7 @@ type SetDelete = (v: boolean) => void;
 type WithModelSelectProps<
   M extends Model.Model,
   IsMulti extends boolean = false,
-  G extends SelectGroupBase<ModelSelectOption<M>> = SelectGroupBase<ModelSelectOption<M>>
+  G extends SelectGroupBase<ModelSelectOption<M>> = SelectGroupBase<ModelSelectOption<M>>,
 > = {
   readonly getOptionLabel?: (m: M) => string;
   readonly optionCanDelete?: (m: M) => boolean;
@@ -29,12 +31,14 @@ const withModelSelect = <
   M extends Model.Model,
   IsMulti extends boolean = false,
   G extends SelectGroupBase<ModelSelectOption<M>> = SelectGroupBase<ModelSelectOption<M>>,
-  T extends ModelSelectInjectedProps<M> = ModelSelectInjectedProps<M>
+  T extends ModelSelectInjectedProps<M> = ModelSelectInjectedProps<M>,
 >(
-  Component: React.FunctionComponent<T>
-): React.FunctionComponent<Subtract<T, ModelSelectInjectedProps<M>> & WithModelSelectProps<M, IsMulti, G>> => {
+  Component: React.FunctionComponent<T>,
+): React.FunctionComponent<
+  Subtract<T, ModelSelectInjectedProps<M>> & WithModelSelectProps<M, IsMulti, G>
+> => {
   const WithModelSelect = (
-    props: Subtract<T, ModelSelectInjectedProps<M>> & WithModelSelectProps<M, IsMulti, G>
+    props: Subtract<T, ModelSelectInjectedProps<M>> & WithModelSelectProps<M, IsMulti, G>,
   ): JSX.Element => (
     <Component
       {...(props as T)}
@@ -53,13 +57,13 @@ const withModelSelect = <
 export type SingleModelSelectInjectedProps<M extends Model.Model> = ModelSelectInjectedProps<M> & {
   readonly onChange?: (
     newValue: SingleValue<ModelSelectOption<M>>,
-    actionMeta: ActionMeta<ModelSelectOption<M>>
+    actionMeta: ActionMeta<ModelSelectOption<M>>,
   ) => void;
 };
 
 export type WithSingleModelSelectProps<
   M extends Model.Model,
-  G extends SelectGroupBase<ModelSelectOption<M>> = SelectGroupBase<ModelSelectOption<M>>
+  G extends SelectGroupBase<ModelSelectOption<M>> = SelectGroupBase<ModelSelectOption<M>>,
 > = WithModelSelectProps<M, false, G> & {
   readonly onChange?: (ms: M["id"] | null) => void;
 };
@@ -69,14 +73,16 @@ export const withSingleModelSelect = <
   G extends SelectGroupBase<ModelSelectOption<M>> = SelectGroupBase<ModelSelectOption<M>>,
   T extends SingleModelSelectInjectedProps<M> & {
     readonly getOptionLabel?: (m: M) => string;
-  } = SingleModelSelectInjectedProps<M> & { readonly getOptionLabel?: (m: M) => string }
+  } = SingleModelSelectInjectedProps<M> & { readonly getOptionLabel?: (m: M) => string },
 >(
-  Component: React.FunctionComponent<T>
-): React.FunctionComponent<Subtract<T, SingleModelSelectInjectedProps<M>> & WithSingleModelSelectProps<M, G>> => {
+  Component: React.FunctionComponent<T>,
+): React.FunctionComponent<
+  Subtract<T, SingleModelSelectInjectedProps<M>> & WithSingleModelSelectProps<M, G>
+> => {
   const C = withModelSelect<M, false, G, T>(Component);
 
   const WithSingleModelSelect = (
-    props: Subtract<T, SingleModelSelectInjectedProps<M>> & WithSingleModelSelectProps<M, G>
+    props: Subtract<T, SingleModelSelectInjectedProps<M>> & WithSingleModelSelectProps<M, G>,
   ): JSX.Element => (
     <C
       {...(props as T)}
@@ -89,12 +95,15 @@ export const withSingleModelSelect = <
 };
 
 export type MultiModelSelectInjectedProps<M extends Model.Model> = ModelSelectInjectedProps<M> & {
-  readonly onChange: (newValue: MultiValue<ModelSelectOption<M>>, actionMeta: ActionMeta<ModelSelectOption<M>>) => void;
+  readonly onChange: (
+    newValue: MultiValue<ModelSelectOption<M>>,
+    actionMeta: ActionMeta<ModelSelectOption<M>>,
+  ) => void;
 };
 
 export type WithMultiModelSelectProps<
   M extends Model.Model,
-  G extends SelectGroupBase<ModelSelectOption<M>> = SelectGroupBase<ModelSelectOption<M>>
+  G extends SelectGroupBase<ModelSelectOption<M>> = SelectGroupBase<ModelSelectOption<M>>,
 > = WithModelSelectProps<M, true, G> & {
   readonly onChange?: (ms: M["id"][]) => void;
 };
@@ -104,22 +113,26 @@ export const withMultiModelSelect = <
   G extends SelectGroupBase<ModelSelectOption<M>> = SelectGroupBase<ModelSelectOption<M>>,
   T extends MultiModelSelectInjectedProps<M> & {
     readonly getOptionLabel?: (m: M) => string;
-  } = MultiModelSelectInjectedProps<M> & { readonly getOptionLabel?: (m: M) => string }
+  } = MultiModelSelectInjectedProps<M> & { readonly getOptionLabel?: (m: M) => string },
 >(
-  Component: React.FunctionComponent<T>
-): React.FunctionComponent<Subtract<T, MultiModelSelectInjectedProps<M>> & WithMultiModelSelectProps<M, G>> => {
+  Component: React.FunctionComponent<T>,
+): React.FunctionComponent<
+  Subtract<T, MultiModelSelectInjectedProps<M>> & WithMultiModelSelectProps<M, G>
+> => {
   const C = withModelSelect<M, true, G, T>(Component);
 
   const convertMultiOptions = (options: MultiValue<ModelSelectOption<M>>): M["id"][] =>
     map(options, (o: ModelSelectOption<M>) => ui.select.toSelectModel(o).id);
 
   const WithMultiModelSelect = (
-    props: Subtract<T, MultiModelSelectInjectedProps<M>> & WithMultiModelSelectProps<M, G>
+    props: Subtract<T, MultiModelSelectInjectedProps<M>> & WithMultiModelSelectProps<M, G>,
   ): JSX.Element => (
     <C
       {...(props as T & { readonly onChange?: (ms: M["id"][]) => void })}
       isMulti={true}
-      onChange={(newValue: MultiValue<ModelSelectOption<M>>) => props.onChange?.(convertMultiOptions(newValue))}
+      onChange={(newValue: MultiValue<ModelSelectOption<M>>) =>
+        props.onChange?.(convertMultiOptions(newValue))
+      }
     />
   );
   return hoistNonReactStatics(WithMultiModelSelect, React.memo(Component));
@@ -131,15 +144,19 @@ export type ModelAsyncSelectInjectedProps<M extends Model.Model> = {
 
 export const withModelAsyncSelect = <
   M extends Model.Model,
-  T extends ModelAsyncSelectInjectedProps<M> = ModelAsyncSelectInjectedProps<M>
+  T extends ModelAsyncSelectInjectedProps<M> = ModelAsyncSelectInjectedProps<M>,
 >(
-  Component: React.FunctionComponent<T>
+  Component: React.FunctionComponent<T>,
 ): React.FunctionComponent<Subtract<T, ModelAsyncSelectInjectedProps<M>>> => {
-  const WithModelAsyncSelect = (props: Subtract<T, ModelAsyncSelectInjectedProps<M>>): JSX.Element => (
+  const WithModelAsyncSelect = (
+    props: Subtract<T, ModelAsyncSelectInjectedProps<M>>,
+  ): JSX.Element => (
     <Component
       defaultOptions={true}
       {...(props as T)}
-      processResponse={(rsp: Http.ListResponse<M>) => map(rsp.data, (d: M) => ui.select.toModelSelectOption(d))}
+      processResponse={(rsp: Http.ListResponse<M>) =>
+        map(rsp.data, (d: M) => ui.select.toModelSelectOption(d))
+      }
     />
   );
   return hoistNonReactStatics(WithModelAsyncSelect, React.memo(Component));
@@ -159,12 +176,14 @@ export type WithMultiModelSyncSelectProps<M extends Model.Model> = {
 
 export const withMultiModelSyncSelect = <
   M extends Model.Model,
-  T extends MultiModelSyncSelectInjectedProps<M> = MultiModelSyncSelectInjectedProps<M>
+  T extends MultiModelSyncSelectInjectedProps<M> = MultiModelSyncSelectInjectedProps<M>,
 >(
-  Component: React.FunctionComponent<T>
-): React.FunctionComponent<Subtract<T, MultiModelSyncSelectInjectedProps<M>> & WithMultiModelSyncSelectProps<M>> => {
+  Component: React.FunctionComponent<T>,
+): React.FunctionComponent<
+  Subtract<T, MultiModelSyncSelectInjectedProps<M>> & WithMultiModelSyncSelectProps<M>
+> => {
   const WithMultiModelSyncSelect = (
-    props: Subtract<T, MultiModelSyncSelectInjectedProps<M>> & WithMultiModelSyncSelectProps<M>
+    props: Subtract<T, MultiModelSyncSelectInjectedProps<M>> & WithMultiModelSyncSelectProps<M>,
   ): JSX.Element => {
     const { value, defaultValue, options, ...rest } = props;
 
@@ -176,7 +195,7 @@ export const withMultiModelSyncSelect = <
     const { value: convertedValue } = ui.select.useMultiModelSelect<M>({ value, options });
     const { value: convertedDefaultValue } = ui.select.useMultiModelSelect<M>({
       value: defaultValue,
-      options
+      options,
     });
     return (
       <Component
@@ -190,10 +209,11 @@ export const withMultiModelSyncSelect = <
   return hoistNonReactStatics(WithMultiModelSyncSelect, React.memo(Component));
 };
 
-export type MultiModelAsyncSelectInjectedProps<M extends Model.Model> = ModelAsyncSelectInjectedProps<M> & {
-  readonly value: MultiValue<ModelSelectOption<M>> | undefined;
-  readonly onResponse: (response: Http.ListResponse<M>) => void;
-};
+export type MultiModelAsyncSelectInjectedProps<M extends Model.Model> =
+  ModelAsyncSelectInjectedProps<M> & {
+    readonly value: MultiValue<ModelSelectOption<M>> | undefined;
+    readonly onResponse: (response: Http.ListResponse<M>) => void;
+  };
 
 export type WithMultiModelAsyncSelectProps<M extends Model.Model> = {
   readonly value?: M["id"][];
@@ -202,16 +222,21 @@ export type WithMultiModelAsyncSelectProps<M extends Model.Model> = {
 
 export const withMultiModelAsyncSelect = <
   M extends Model.Model,
-  T extends MultiModelAsyncSelectInjectedProps<M> = MultiModelAsyncSelectInjectedProps<M>
+  T extends MultiModelAsyncSelectInjectedProps<M> = MultiModelAsyncSelectInjectedProps<M>,
 >(
-  Component: React.FunctionComponent<T>
-): React.FunctionComponent<Subtract<T, MultiModelAsyncSelectInjectedProps<M>> & WithMultiModelAsyncSelectProps<M>> => {
+  Component: React.FunctionComponent<T>,
+): React.FunctionComponent<
+  Subtract<T, MultiModelAsyncSelectInjectedProps<M>> & WithMultiModelAsyncSelectProps<M>
+> => {
   const C = withModelAsyncSelect<M, T>(Component);
 
   const WithMultiModelAsyncSelect = (
-    props: Subtract<T, MultiModelAsyncSelectInjectedProps<M>> & WithMultiModelAsyncSelectProps<M>
+    props: Subtract<T, MultiModelAsyncSelectInjectedProps<M>> & WithMultiModelAsyncSelectProps<M>,
   ): JSX.Element => {
-    const { value, onResponse } = ui.select.useMultiModelSelect<M>({ value: props.value, isAsync: true });
+    const { value, onResponse } = ui.select.useMultiModelSelect<M>({
+      value: props.value,
+      isAsync: true,
+    });
     return (
       <C
         defaultOptions={true}
@@ -227,10 +252,11 @@ export const withMultiModelAsyncSelect = <
   return hoistNonReactStatics(WithMultiModelAsyncSelect, React.memo(Component));
 };
 
-export type SingleModelAsyncSelectInjectedProps<M extends Model.Model> = ModelAsyncSelectInjectedProps<M> & {
-  readonly value: SingleValue<ModelSelectOption<M>>;
-  readonly onResponse: (response: Http.ListResponse<M>) => void;
-};
+export type SingleModelAsyncSelectInjectedProps<M extends Model.Model> =
+  ModelAsyncSelectInjectedProps<M> & {
+    readonly value: SingleValue<ModelSelectOption<M>>;
+    readonly onResponse: (response: Http.ListResponse<M>) => void;
+  };
 
 export type WithSingleModelAsyncSelectProps<M extends Model.Model> = {
   readonly value?: M["id"] | null;
@@ -239,18 +265,21 @@ export type WithSingleModelAsyncSelectProps<M extends Model.Model> = {
 
 export const withSingleModelAsyncSelect = <
   M extends Model.Model,
-  T extends SingleModelAsyncSelectInjectedProps<M> = SingleModelAsyncSelectInjectedProps<M>
+  T extends SingleModelAsyncSelectInjectedProps<M> = SingleModelAsyncSelectInjectedProps<M>,
 >(
-  Component: React.FunctionComponent<T>
+  Component: React.FunctionComponent<T>,
 ): React.FunctionComponent<
   Subtract<T, SingleModelAsyncSelectInjectedProps<M>> & WithSingleModelAsyncSelectProps<M>
 > => {
   const C = withModelAsyncSelect<M, T>(Component);
 
   const WithSingleModelAsyncSelect = (
-    props: Subtract<T, SingleModelAsyncSelectInjectedProps<M>> & WithSingleModelAsyncSelectProps<M>
+    props: Subtract<T, SingleModelAsyncSelectInjectedProps<M>> & WithSingleModelAsyncSelectProps<M>,
   ): JSX.Element => {
-    const { value, onResponse } = ui.select.useSingleModelSelect<M>({ value: props.value, isAsync: true });
+    const { value, onResponse } = ui.select.useSingleModelSelect<M>({
+      value: props.value,
+      isAsync: true,
+    });
     return (
       <C
         defaultOptions={true}
@@ -280,17 +309,22 @@ export type WithSingleModelSyncSelectProps<M extends Model.Model> = {
 
 export const withSingleModelSyncSelect = <
   M extends Model.Model,
-  T extends SingleModelSyncSelectInjectedProps<M> = SingleModelSyncSelectInjectedProps<M>
+  T extends SingleModelSyncSelectInjectedProps<M> = SingleModelSyncSelectInjectedProps<M>,
 >(
-  Component: React.FunctionComponent<T>
-): React.FunctionComponent<Subtract<T, SingleModelSyncSelectInjectedProps<M>> & WithSingleModelSyncSelectProps<M>> => {
+  Component: React.FunctionComponent<T>,
+): React.FunctionComponent<
+  Subtract<T, SingleModelSyncSelectInjectedProps<M>> & WithSingleModelSyncSelectProps<M>
+> => {
   const WithSingleModelSyncSelect = (
-    props: Subtract<T, SingleModelSyncSelectInjectedProps<M>> & WithSingleModelSyncSelectProps<M>
+    props: Subtract<T, SingleModelSyncSelectInjectedProps<M>> & WithSingleModelSyncSelectProps<M>,
   ): JSX.Element => {
-    const { value } = ui.select.useSingleModelSelect<M>({ value: props.value, options: props.options });
+    const { value } = ui.select.useSingleModelSelect<M>({
+      value: props.value,
+      options: props.options,
+    });
     const { value: defaultValue } = ui.select.useSingleModelSelect<M>({
       value: props.defaultValue,
-      options: props.options
+      options: props.options,
     });
     return (
       <Component
@@ -298,7 +332,10 @@ export const withSingleModelSyncSelect = <
           ...props,
           value,
           defaultValue,
-          options: map(props.options, (o: M) => ({ ...o, id: String(o.id) })) as ModelSelectOption<M>[]
+          options: map(props.options, (o: M) => ({
+            ...o,
+            id: String(o.id),
+          })) as ModelSelectOption<M>[],
         } as T)}
       />
     );

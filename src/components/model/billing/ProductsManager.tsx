@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useMemo } from "react";
+
 import classNames from "classnames";
 import { isNil } from "lodash";
 
 import * as api from "api";
 import { notifications, model, util } from "lib";
 import * as store from "store";
-
 import { Separator, RenderOrSpinner } from "components";
 import { PrimaryButton } from "components/buttons";
 import { Tag } from "components/tagging";
 
-import ProductsList from "./ProductsList";
 import Product from "./Product";
+import ProductsList from "./ProductsList";
 
 type ProductsManagerProps = StandardComponentProps & {
   readonly onSubscribe: (p: Model.Product) => void;
@@ -44,15 +44,19 @@ const ProductsManager = ({
   useEffect(() => {
     api
       .getSubscription()
-      .then((response: { subscription: Model.Subscription | null }) => setSubscription(response.subscription))
+      .then((response: { subscription: Model.Subscription | null }) =>
+        setSubscription(response.subscription),
+      )
       .catch((e: Error) => notifications.ui.banner.handleRequestError(e));
   }, []);
 
-  const userProduct = useMemo(() => {
-    return user.product_id !== null && products.length !== 0
-      ? model.getModel(products, user.product_id, { modelName: "product" })
-      : null;
-  }, [products, user]);
+  const userProduct = useMemo(
+    () =>
+      user.product_id !== null && products.length !== 0
+        ? model.getModel(products, user.product_id, { modelName: "product" })
+        : null,
+    [products, user],
+  );
 
   const subscriptionDetail = useMemo(
     () => (sub: Model.Subscription) => {
@@ -62,33 +66,35 @@ const ProductsManager = ({
            seeing it occur in practice. */
         if (sub.stripe_status !== "canceled") {
           console.warn(
-            `Subscription ${sub.id} for user ${user.id} has a 'cancel_at' date, but does not have a 'canceled' status.`
+            `Subscription ${sub.id} for user ${user.id} has a 'cancel_at' date, but does not have a 'canceled' status.`,
           );
         } else if (sub.cancel_at === null) {
           console.warn(
-            `Subscription ${sub.id} for user ${user.id} has a 'canceled' status, but does not have a 'cancel_at' date.`
+            `Subscription ${sub.id} for user ${user.id} has a 'canceled' status, but does not have a 'cancel_at' date.`,
           );
         }
         const cancelAt = !isNil(sub.cancel_at) ? util.dates.toDisplayDate(sub.cancel_at) : null;
         return (
           <React.Fragment>
-            <Tag className={"tag--product"} text={"Canceled"} />
-            {!isNil(cancelAt) && <div className={"tag-text"}>{`Valid through ${cancelAt}.`}</div>}
+            <Tag className="tag--product" text="Canceled" />
+            {!isNil(cancelAt) && <div className="tag-text">{`Valid through ${cancelAt}.`}</div>}
           </React.Fragment>
         );
       } else if (sub.status === "expired") {
-        const expiredAt = !isNil(sub.current_period_end) ? util.dates.toDisplayDate(sub.current_period_end) : null;
+        const expiredAt = !isNil(sub.current_period_end)
+          ? util.dates.toDisplayDate(sub.current_period_end)
+          : null;
         return (
           <React.Fragment>
-            <Tag className={"tag--product"} text={"Expired"} />
-            {!isNil(expiredAt) && <div className={"tag-text"}>{`Expired on ${expiredAt}.`}</div>}
+            <Tag className="tag--product" text="Expired" />
+            {!isNil(expiredAt) && <div className="tag-text">{`Expired on ${expiredAt}.`}</div>}
           </React.Fragment>
         );
       } else {
-        return <Tag className={"tag--product"} text={"Active"} />;
+        return <Tag className="tag--product" text="Active" />;
       }
     },
-    []
+    [],
   );
 
   return (
@@ -100,8 +106,12 @@ const ProductsManager = ({
           <ProductsList
             products={products}
             extra={(p: Model.Product) => (
-              <PrimaryButton small={true} loading={subscribing === p.id} onClick={() => onSubscribe(p)}>
-                {"Subscribe"}
+              <PrimaryButton
+                small={true}
+                loading={subscribing === p.id}
+                onClick={() => onSubscribe(p)}
+              >
+                Subscribe
               </PrimaryButton>
             )}
           />
@@ -111,13 +121,20 @@ const ProductsManager = ({
               product={userProduct}
               hoverBehavior={false}
               extra={
-                <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", height: "100%" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    height: "100%",
+                  }}
+                >
                   {!isNil(subscription) && subscriptionDetail(subscription)}
                 </div>
               }
             />
             <PrimaryButton style={{ marginTop: 15 }} loading={managing} onClick={() => onManage()}>
-              {"Manage Subscriptions"}
+              Manage Subscriptions
             </PrimaryButton>
           </React.Fragment>
         )}

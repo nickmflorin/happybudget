@@ -1,13 +1,13 @@
 import React from "react";
+
 import classNames from "classnames";
 
 import * as config from "config";
-
-import { Form, ShowHide } from "components";
-import { PasswordInput, EmailInput } from "components/fields";
-import { PrimaryButton, SocialButton } from "components/buttons";
-import { RouterLink } from "components/links";
 import { util } from "lib";
+import { Form, ShowHide } from "components";
+import { PrimaryButton, SocialButton } from "components/buttons";
+import { PasswordInput, EmailInput } from "components/fields";
+import { RouterLink } from "components/links";
 
 export type ILoginFormValues = {
   readonly email?: string;
@@ -36,7 +36,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
     onFinish={(values: ILoginFormValues) => onSubmit(values)}
   >
     <Form.Item
-      name={"email"}
+      name="email"
       rules={[
         { required: true, message: "Please enter a valid email." },
         () => ({
@@ -46,45 +46,45 @@ const LoginForm: React.FC<LoginFormProps> = ({
               return Promise.reject("The email does not meet our requirements.");
             }
             return Promise.resolve();
-          }
-        })
+          },
+        }),
       ]}
     >
-      <EmailInput size={"large"} />
+      <EmailInput size="large" />
     </Form.Item>
     <Form.Item
       style={{ marginBottom: 0 }}
-      name={"password"}
+      name="password"
       rules={[{ required: true, message: "Please enter a valid password." }]}
     >
-      <PasswordInput size={"large"} />
+      <PasswordInput size="large" />
     </Form.Item>
     <ShowHide show={config.env.EMAIL_ENABLED}>
-      <div className={"forgot-password-text"}>
-        <RouterLink to={"/recover-password"} className={"forgot-link"}>
-          {"Forgot Password?"}
+      <div className="forgot-password-text">
+        <RouterLink to="/recover-password" className="forgot-link">
+          Forgot Password?
         </RouterLink>
       </div>
     </ShowHide>
     <Form.Footer>
-      <PrimaryButton loading={loading} xlarge={true} className={"btn--landing"} htmlType={"submit"}>
-        {"Login"}
+      <PrimaryButton loading={loading} xlarge={true} className="btn--landing" htmlType="submit">
+        Login
       </PrimaryButton>
       <ShowHide show={config.env.SOCIAL_AUTHENTICATION_ENABLED}>
         <SocialButton
-          className={"btn--landing"}
+          className="btn--landing"
           xlarge={true}
-          provider={"google"}
+          provider="google"
           onGoogleSuccess={onGoogleSuccess}
           onGoogleError={onGoogleError}
           onGoogleScriptLoadFailure={onGoogleScriptLoadFailure}
         >
-          {"Login with Google"}
+          Login with Google
         </SocialButton>
       </ShowHide>
-      <div className={"switch-text"}>
-        {"Don't have an account yet?"}
-        <RouterLink to={"/signup"}>{"Sign Up"}</RouterLink>
+      <div className="switch-text">
+        Don't have an account yet?
+        <RouterLink to="/signup">Sign Up</RouterLink>
       </div>
     </Form.Footer>
   </Form.Form>

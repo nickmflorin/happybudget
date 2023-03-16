@@ -10,6 +10,6 @@ const ContactTypeCell = (
     Table.Context,
     Tables.ContactTableStore,
     Model.ContactType
-  >
+  >,
 ): JSX.Element => <ModelTagCell {...props} />;
 export default React.memo(ContactTypeCell);

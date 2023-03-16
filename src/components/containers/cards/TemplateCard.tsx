@@ -1,9 +1,8 @@
 import React, { useMemo, useState } from "react";
 
 import * as api from "api";
-import * as store from "store";
 import { http, notifications } from "lib";
-
+import * as store from "store";
 import { Icon } from "components";
 
 import GenericTemplateCard, { GenericTemplateCardProps } from "./GenericTemplateCard";
@@ -22,7 +21,11 @@ const TemplateCard = ({ onMoved, ...props }: TemplateCardProps): JSX.Element => 
     () => (e: MenuItemModelClickEvent) => {
       setMoving(true);
       api
-        .updateBudget<Model.Template>(props.budget.id, { community: true }, { cancelToken: cancelToken() })
+        .updateBudget<Model.Template>(
+          props.budget.id,
+          { community: true },
+          { cancelToken: cancelToken() },
+        )
         .then((response: Model.Template) => {
           e.item.closeParentDropdown?.();
           setMoving(false);
@@ -33,7 +36,7 @@ const TemplateCard = ({ onMoved, ...props }: TemplateCardProps): JSX.Element => 
           notifications.internal.handleRequestError(err);
         });
     },
-    [onMoved, props.budget.id]
+    [onMoved, props.budget.id],
   );
 
   return (
@@ -46,13 +49,13 @@ const TemplateCard = ({ onMoved, ...props }: TemplateCardProps): JSX.Element => 
         {
           id: "move",
           label: "Move to Community",
-          icon: <Icon icon={"user-friends"} weight={"light"} />,
+          icon: <Icon icon="user-friends" weight="light" />,
           onClick: (e: MenuItemModelClickEvent) => move(e),
           keepDropdownOpenOnClick: true,
           visible: user.is_staff === true,
           loading: moving,
-          disabled: moving
-        }
+          disabled: moving,
+        },
       ]}
     />
   );

@@ -1,13 +1,14 @@
 import React, { useMemo, useState } from "react";
-import { Dispatch } from "redux";
+
 import { useDispatch } from "react-redux";
+import { Dispatch } from "redux";
 
 import * as api from "api";
 import * as config from "config";
-import * as store from "store";
 import { http, notifications, model } from "lib";
-
+import * as store from "store";
 import { Icon } from "components";
+
 import GenericOwnedBudgetCard, { GenericOwnedBudgetCardProps } from "./GenericOwnedBudgetCard";
 
 type BudgetCardProps = Omit<GenericOwnedBudgetCardProps, "dropdown"> & {
@@ -26,7 +27,11 @@ const BudgetCard = ({ onArchived, onDuplicated, ...props }: BudgetCardProps): JS
     () => (e: MenuItemModelClickEvent) => {
       setArchiving(true);
       api
-        .updateBudget<Model.UserBudget>(props.budget.id, { archived: true }, { cancelToken: cancelToken() })
+        .updateBudget<Model.UserBudget>(
+          props.budget.id,
+          { archived: true },
+          { cancelToken: cancelToken() },
+        )
         .then((response: Model.UserBudget) => {
           e.item.closeParentDropdown?.();
           setArchiving(false);
@@ -38,7 +43,7 @@ const BudgetCard = ({ onArchived, onDuplicated, ...props }: BudgetCardProps): JS
           notifications.ui.banner.handleRequestError(err);
         });
     },
-    [onArchived, props.budget.id]
+    [onArchived, props.budget.id],
   );
 
   const duplicate = useMemo(
@@ -56,7 +61,7 @@ const BudgetCard = ({ onArchived, onDuplicated, ...props }: BudgetCardProps): JS
 					   sometimes takes a very long time. */
           .duplicateBudget<Model.UserBudget>(props.budget.id, {
             timeout: 120 * 1000,
-            cancelToken: cancelToken()
+            cancelToken: cancelToken(),
           })
           .then((response: Model.UserBudget) => {
             e.item.closeParentDropdown?.();
@@ -65,7 +70,10 @@ const BudgetCard = ({ onArchived, onDuplicated, ...props }: BudgetCardProps): JS
           })
           .catch((err: Error) => {
             setDuplicating(false);
-            if (err instanceof api.PermissionError && err.code === api.ErrorCodes.permission.PRODUCT_PERMISSION_ERROR) {
+            if (
+              err instanceof api.PermissionError &&
+              err.code === api.ErrorCodes.permission.PRODUCT_PERMISSION_ERROR
+            ) {
               /* Edge case, since we would prevent this action if this were the
 							   case before submitting the request. */
               notifications.ui.banner.lookupAndNotify("budgetSubscriptionPermissionError");
@@ -75,7 +83,7 @@ const BudgetCard = ({ onArchived, onDuplicated, ...props }: BudgetCardProps): JS
           });
       }
     },
-    [onDuplicated, props.budget.id]
+    [onDuplicated, props.budget.id],
   );
 
   return (
@@ -86,21 +94,21 @@ const BudgetCard = ({ onArchived, onDuplicated, ...props }: BudgetCardProps): JS
         {
           id: "duplicate",
           label: "Duplicate",
-          icon: <Icon icon={"clone"} weight={"light"} />,
+          icon: <Icon icon="clone" weight="light" />,
           onClick: (e: MenuItemModelClickEvent) => duplicate(e),
           keepDropdownOpenOnClick: true,
           loading: duplicating,
-          disabled: duplicating
+          disabled: duplicating,
         },
         {
           id: "archive",
           label: "Archive",
-          icon: <Icon icon={"books"} weight={"light"} />,
+          icon: <Icon icon="books" weight="light" />,
           onClick: (e: MenuItemModelClickEvent) => archive(e),
           keepDropdownOpenOnClick: true,
           loading: archiving,
-          disabled: archiving
-        }
+          disabled: archiving,
+        },
       ]}
     />
   );

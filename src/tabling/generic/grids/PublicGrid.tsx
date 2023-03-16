@@ -1,12 +1,16 @@
 import React, { useMemo } from "react";
+
 import { reduce } from "lodash";
 
 import { tabling } from "lib";
 import { framework as generic } from "tabling/generic";
+
 import Grid, { GridProps } from "./Grid";
 
-export interface PublicGridProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>
-  extends GridProps<R, M> {
+export interface PublicGridProps<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+> extends GridProps<R, M> {
   readonly framework?: Table.Framework;
 }
 
@@ -18,11 +22,15 @@ const PublicGrid = <R extends Table.RowData, M extends Model.RowHttpModel = Mode
     const combinedFramework = tabling.aggrid.combineFrameworks(generic.Framework, framework);
     return reduce(
       combinedFramework.cells?.[props.id],
-      (prev: Table.FrameworkGroup, cell: React.ComponentType<Record<string, unknown>>, name: string) => ({
+      (
+        prev: Table.FrameworkGroup,
+        cell: React.ComponentType<Record<string, unknown>>,
+        name: string,
+      ) => ({
         ...prev,
-        [name]: cell
+        [name]: cell,
       }),
-      {}
+      {},
     );
   }, [framework, props.id]);
   return <Grid {...props} enableFillHandle={false} frameworkComponents={frameworkComponents} />;

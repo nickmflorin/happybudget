@@ -1,5 +1,7 @@
 import React from "react";
+
 import classNames from "classnames";
+
 import Button, { ButtonProps } from "./Button";
 
 export interface PrimaryIconButtonProps extends Omit<ButtonProps, "icon" | "children"> {
@@ -7,7 +9,11 @@ export interface PrimaryIconButtonProps extends Omit<ButtonProps, "icon" | "chil
 }
 
 const PrimaryIconButton = ({ icon, ...props }: PrimaryIconButtonProps): JSX.Element => (
-  <Button {...props} icon={icon} className={classNames("btn--primary-icon-only", props.className)} />
+  <Button
+    {...props}
+    icon={icon}
+    className={classNames("btn--primary-icon-only", props.className)}
+  />
 );
 
 export default React.memo(PrimaryIconButton);

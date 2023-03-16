@@ -1,4 +1,5 @@
 import React from "react";
+
 import { map } from "lodash";
 
 import ItemizedTooltipItem from "./ItemizedTooltipItem";
@@ -9,7 +10,7 @@ type ItemizedTooltipContentProps = {
 };
 
 const ItemizedTooltipContent = (props: ItemizedTooltipContentProps): JSX.Element => (
-  <div className={"itemized-tooltip-content"}>
+  <div className="itemized-tooltip-content">
     {map(props.items, (item: IItemizedTooltipItem, i: number) => (
       <ItemizedTooltipItem {...item} formatter={item.formatter || props.formatter} key={i} />
     ))}

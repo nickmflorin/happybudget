@@ -2,18 +2,24 @@ import { isNil, filter, includes, reduce, map, uniq } from "lodash";
 
 import { tabling, redux, util } from "lib";
 
-export const reorderRows = <R extends Table.RowData, S extends Redux.TableStore<R> = Redux.TableStore<R>>(st: S): S => {
-  return {
-    ...st,
-    data: tabling.rows.orderTableData<R>(st.data)
-  };
-};
+export const reorderRows = <
+  R extends Table.RowData,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
+>(
+  st: S,
+): S => ({
+  ...st,
+  data: tabling.rows.orderTableData<R>(st.data),
+});
 
-export const groupRowFromState = <R extends Table.RowData, S extends Redux.TableStore<R> = Redux.TableStore<R>>(
+export const groupRowFromState = <
+  R extends Table.RowData,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
+>(
   st: S,
   id: Table.GroupRowId,
   rowId?: Table.ModelRowId,
-  options?: Model.GetReduxModelOptions<Table.GroupRow<R>>
+  options?: Model.GetReduxModelOptions<Table.GroupRow<R>>,
 ): Table.GroupRow<R> | null => {
   let predicate: Model.ModelLookup<Table.GroupRow<R>> = id;
   if (!isNil(rowId)) {
@@ -22,15 +28,18 @@ export const groupRowFromState = <R extends Table.RowData, S extends Redux.Table
   return redux.modelFromState<Table.GroupRow<R>>(
     filter(st.data, (r: Table.BodyRow<R>) => tabling.rows.isGroupRow(r)) as Table.GroupRow<R>[],
     predicate,
-    options
+    options,
   );
 };
 
-export const markupRowFromState = <R extends Table.RowData, S extends Redux.TableStore<R> = Redux.TableStore<R>>(
+export const markupRowFromState = <
+  R extends Table.RowData,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
+>(
   st: S,
   id: Table.MarkupRowId,
   rowId?: Table.ModelRowId,
-  options?: Model.GetModelOptions<Table.MarkupRow<R>>
+  options?: Model.GetModelOptions<Table.MarkupRow<R>>,
 ): Table.MarkupRow<R> | null => {
   let predicate = (mrk: Table.MarkupRow<R>) => mrk.id === id;
   if (!isNil(rowId)) {
@@ -39,29 +48,32 @@ export const markupRowFromState = <R extends Table.RowData, S extends Redux.Tabl
   return redux.modelFromState<Table.MarkupRow<R>>(
     filter(st.data, (r: Table.BodyRow<R>) => tabling.rows.isMarkupRow(r)) as Table.MarkupRow<R>[],
     predicate,
-    options
+    options,
   );
 };
 
-export const rowGroupRowFromState = <R extends Table.RowData, S extends Redux.TableStore<R> = Redux.TableStore<R>>(
+export const rowGroupRowFromState = <
+  R extends Table.RowData,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
+>(
   st: S,
   rowId: Table.ModelRowId,
-  options?: Model.GetReduxModelOptions<Table.GroupRow<R>>
+  options?: Model.GetReduxModelOptions<Table.GroupRow<R>>,
 ): Table.GroupRow<R> | null => {
   const predicate = (g: Table.GroupRow<R>) => includes(g.children, rowId);
   return redux.modelFromState<Table.GroupRow<R>>(
     filter(st.data, (r: Table.BodyRow<R>) => tabling.rows.isGroupRow(r)) as Table.GroupRow<R>[],
     predicate,
-    options
+    options,
   );
 };
 
 export const removeRowsFromTheirGroupsIfTheyExist = <
   R extends Table.RowData,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 >(
   st: S,
-  rowIds: (Table.ModelRowId | Table.ModelRow<R>)[]
+  rowIds: (Table.ModelRowId | Table.ModelRow<R>)[],
 ): S => {
   /*
 	Keep track of which groups were altered and what their most recent children
@@ -80,8 +92,10 @@ export const removeRowsFromTheirGroupsIfTheyExist = <
       let r: Table.ModelRow<R> | null = null;
       if (typeof rowId === "number" || typeof rowId === "string") {
         r = redux.modelFromState<Table.ModelRow<R>>(
-          filter(st.data, (ri: Table.BodyRow<R>) => tabling.rows.isDataRow(ri)) as Table.ModelRow<R>[],
-          rowId
+          filter(st.data, (ri: Table.BodyRow<R>) =>
+            tabling.rows.isDataRow(ri),
+          ) as Table.ModelRow<R>[],
+          rowId,
         );
       } else {
         r = rowId;
@@ -98,37 +112,41 @@ export const removeRowsFromTheirGroupsIfTheyExist = <
           const modelId = r.id;
           return {
             ...alterations,
-            [groupRow.id]: { groupRow, children: filter(groupRow.children, (id: number) => id !== modelId) }
+            [groupRow.id]: {
+              groupRow,
+              children: filter(groupRow.children, (id: number) => id !== modelId),
+            },
           };
         }
       }
       return alterations;
     },
-    {}
+    {},
   );
   return reduce(
     alteredGroupsWithChildren,
-    (s: S, alteration: Alteration) => {
-      return {
-        ...s,
-        data: util.replaceInArray<Table.BodyRow<R>>(
-          st.data,
-          { id: alteration.groupRow.id },
-          {
-            ...alteration.groupRow,
-            children: alteration.children
-          }
-        )
-      };
-    },
-    st
+    (s: S, alteration: Alteration) => ({
+      ...s,
+      data: util.replaceInArray<Table.BodyRow<R>>(
+        st.data,
+        { id: alteration.groupRow.id },
+        {
+          ...alteration.groupRow,
+          children: alteration.children,
+        },
+      ),
+    }),
+    st,
   );
 };
 
-export const updateRowGroup = <R extends Table.RowData, S extends Redux.TableStore<R> = Redux.TableStore<R>>(
+export const updateRowGroup = <
+  R extends Table.RowData,
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
+>(
   st: S,
   rowIds: SingleOrArray<Table.ModelRowId>,
-  group: Table.GroupRowId
+  group: Table.GroupRowId,
 ): S => {
   const ids: Table.ModelRowId[] = Array.isArray(rowIds) ? rowIds : [rowIds];
 
@@ -148,8 +166,10 @@ export const updateRowGroup = <R extends Table.RowData, S extends Redux.TableSto
 		ModelRow(s) in state.
 		*/
     const rws = redux.findModelsInData<Table.ModelRow<R>>(
-      filter(newState.data, (r: Table.BodyRow<R>) => tabling.rows.isModelRow(r)) as Table.ModelRow<R>[],
-      uniq([...ids, ...g.children])
+      filter(newState.data, (r: Table.BodyRow<R>) =>
+        tabling.rows.isModelRow(r),
+      ) as Table.ModelRow<R>[],
+      uniq([...ids, ...g.children]),
     );
     return {
       ...newState,
@@ -158,9 +178,9 @@ export const updateRowGroup = <R extends Table.RowData, S extends Redux.TableSto
         { id: g.id },
         {
           ...g,
-          children: map(rws, (r: Table.ModelRow<R>) => r.id)
-        }
-      )
+          children: map(rws, (r: Table.ModelRow<R>) => r.id),
+        },
+      ),
     };
   }
   return st;

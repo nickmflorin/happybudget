@@ -1,9 +1,11 @@
 import { useMemo } from "react";
+
 import { includes, reduce, filter } from "lodash";
 
 import { tabling, hooks } from "lib";
-import { BodyRow, HeaderRow, FooterRow } from "../rows";
+
 import Table from "./Table";
+import { BodyRow, HeaderRow, FooterRow } from "../rows";
 
 type M = Model.Actual;
 type R = Tables.ActualRowData;
@@ -17,12 +19,15 @@ type ActualsTableProps = {
 };
 
 const ActualsTable = ({ columns, data, options }: ActualsTableProps): JSX.Element => {
-  const columnIsVisible = useMemo(() => (c: DC) => includes(options.columns, c.field), [options.columns]);
+  const columnIsVisible = useMemo(
+    () => (c: DC) => includes(options.columns, c.field),
+    [options.columns],
+  );
 
   const generateRows = hooks.useDynamicCallback((): JSX.Element[] => {
     const rowData = tabling.rows.generateTableData<R, M>({
       response: { models: data },
-      columns
+      columns,
     });
     return [
       ...reduce(
@@ -37,25 +42,25 @@ const ActualsTable = ({ columns, data, options }: ActualsTableProps): JSX.Elemen
                 columns={filter(columns, (c: C) => tabling.columns.isDataColumn(c)) as DC[]}
                 row={row}
                 data={rowData}
-              />
+              />,
             ];
           }
           return rws;
         },
         [
           <HeaderRow<R, M>
-            key={"header-row"}
+            key="header-row"
             columnIsVisible={columnIsVisible}
             columns={filter(columns, (c: C) => tabling.columns.isDataColumn(c)) as DC[]}
-          />
-        ]
+          />,
+        ],
       ),
       <FooterRow<R, M>
-        key={"footer-row"}
+        key="footer-row"
         columnIsVisible={columnIsVisible}
         columns={filter(columns, (c: C) => tabling.columns.isDataColumn(c)) as DC[]}
         data={rowData}
-      />
+      />,
     ];
   });
 

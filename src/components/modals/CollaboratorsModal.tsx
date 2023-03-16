@@ -1,10 +1,10 @@
 import { useEffect, useState, useMemo } from "react";
+
 import classNames from "classnames";
 import { map, filter } from "lodash";
 
 import * as api from "api";
 import { ui, http, model, redux, util } from "lib";
-
 import { PrimaryButton } from "components/buttons";
 import { CollaboratorsList } from "components/collaboration";
 import { CollaboratorSelect } from "components/fields";
@@ -18,8 +18,16 @@ type CollaboratorsModalProps = ModalProps & {
 const CollaboratorsModal = ({ budgetId, ...props }: CollaboratorsModalProps): JSX.Element => {
   const [collaborators, setCollaborators] = useState<Model.Collaborator[]>([]);
   const [newCollaboratorUsers, setNewCollaboratorUsers] = useState<number[]>([]);
-  const { isActive: isDeleting, removeFromState: setDeleted, addToState: setDeleting } = redux.useTrackModelActions([]);
-  const { isActive: isUpdating, removeFromState: setUpdated, addToState: setUpdating } = redux.useTrackModelActions([]);
+  const {
+    isActive: isDeleting,
+    removeFromState: setDeleted,
+    addToState: setDeleting,
+  } = redux.useTrackModelActions([]);
+  const {
+    isActive: isUpdating,
+    removeFromState: setUpdated,
+    addToState: setUpdating,
+  } = redux.useTrackModelActions([]);
 
   const modal = ui.useModal();
   const [cancelToken] = http.useCancelToken();
@@ -43,8 +51,8 @@ const CollaboratorsModal = ({ budgetId, ...props }: CollaboratorsModalProps): JS
       const promises: Promise<Model.Collaborator>[] = map(ids, (id: number) =>
         api.createCollaborator(budgetId, {
           user: id,
-          access_type: model.budgeting.CollaboratorAccessTypes.view_only.id
-        })
+          access_type: model.budgeting.CollaboratorAccessTypes.view_only.id,
+        }),
       );
       modal.current.setLoading(true);
       Promise.all(promises)
@@ -58,7 +66,7 @@ const CollaboratorsModal = ({ budgetId, ...props }: CollaboratorsModalProps): JS
           modal.current.handleRequestError(e);
         });
     },
-    [budgetId, collaborators, modal.current]
+    [budgetId, collaborators, modal.current],
   );
 
   return (
@@ -66,7 +74,7 @@ const CollaboratorsModal = ({ budgetId, ...props }: CollaboratorsModalProps): JS
       {...props}
       modal={modal}
       footer={null}
-      title={"Collaborators"}
+      title="Collaborators"
       className={classNames("collaborators-modal", props.className)}
     >
       <div style={{ display: "flex" }}>
@@ -79,7 +87,7 @@ const CollaboratorsModal = ({ budgetId, ...props }: CollaboratorsModalProps): JS
           disabled={newCollaboratorUsers.length === 0}
           onClick={() => addCollaborators(newCollaboratorUsers)}
         >
-          {"Add"}
+          Add
         </PrimaryButton>
       </div>
       <CollaboratorsList

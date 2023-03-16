@@ -1,20 +1,20 @@
 import React from "react";
+
 import { isNil } from "lodash";
 
 import * as config from "config";
-
 import { Icon } from "components";
 import { HelpLink } from "components/links";
 
 import DropdownMenu, { DropdownMenuProps } from "./DropdownMenu";
 
 const HelpDropdownMenu = (
-  props: Omit<DropdownMenuProps, "models" | "menuClassName" | "menuId" | "children">
+  props: Omit<DropdownMenuProps, "models" | "menuClassName" | "menuId" | "children">,
 ): JSX.Element => (
   <DropdownMenu
     {...props}
-    menuClassName={"header-dropdown-menu"}
-    menuId={"support-menu"}
+    menuClassName="header-dropdown-menu"
+    menuId="support-menu"
     models={[
       {
         id: "feedback",
@@ -25,16 +25,16 @@ const HelpDropdownMenu = (
           } else {
             console.warn(
               `Could not identify Canny feedback URL as ENV variable
-											'CANNY_FEEDBACK_URL; is not defined.`
+											'CANNY_FEEDBACK_URL; is not defined.`,
             );
           }
         },
-        icon: <Icon icon={"bullhorn"} weight={"light"} />
+        icon: <Icon icon="bullhorn" weight="light" />,
       },
       {
         id: "intercom-chat",
         label: "Chat with Support",
-        icon: <Icon icon={"comment-dots"} weight={"light"} />
+        icon: <Icon icon="comment-dots" weight="light" />,
       },
       {
         id: "faq",
@@ -45,12 +45,12 @@ const HelpDropdownMenu = (
           } else {
             console.warn(
               `Could not identify Intercom support URL as ENV variable
-											'INTERCOM_SUPPORT_URL; is not defined.`
+											'INTERCOM_SUPPORT_URL; is not defined.`,
             );
           }
         },
-        icon: <Icon icon={"question-circle"} weight={"light"} />
-      }
+        icon: <Icon icon="question-circle" weight="light" />,
+      },
     ]}
   >
     <HelpLink />

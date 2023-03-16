@@ -1,6 +1,7 @@
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+
 import { isNil } from "lodash";
+import { useDispatch } from "react-redux";
 
 import { budgeting, tabling } from "lib";
 import { AccountsTable as GenericAccountsTable, connectTableToPublicStore } from "tabling";
@@ -22,14 +23,14 @@ const ConnectedTable = connectTableToPublicStore<
   actions: {
     loading: actions.pub.loadingAction,
     response: actions.pub.responseAction,
-    setSearch: actions.pub.setSearchAction
+    setSearch: actions.pub.setSearchAction,
   },
   tableId: (c: TC) => `pub-${c.domain}-accounts`,
   selector: (c: TC) => selectors.createAccountsTableStoreSelector<Model.Budget, true>(c),
   createSaga: (table: Table.TableInstance<R, M>) => sagas.pub.accounts.createTableSaga(table),
   footerRowSelectors: (c: TC) => ({
-    footer: selectors.createBudgetFooterSelector(c)
-  })
+    footer: selectors.createBudgetFooterSelector(c),
+  }),
 })(GenericAccountsTable.PublicBudget);
 
 interface AccountsProps {
@@ -49,7 +50,9 @@ const Accounts = (props: AccountsProps): JSX.Element => {
   }, [props.budget]);
 
   useEffect(() => {
-    dispatch(actions.pub.requestAction(null, { budgetId: props.budgetId, domain: "budget", public: true }));
+    dispatch(
+      actions.pub.requestAction(null, { budgetId: props.budgetId, domain: "budget", public: true }),
+    );
   }, [props.budgetId]);
 
   return (

@@ -2,7 +2,6 @@ import React, { useMemo, useState } from "react";
 
 import * as api from "api";
 import { http, notifications } from "lib";
-
 import { Icon } from "components";
 
 import BaseBudgetCard, { BaseBudgetCardProps } from "./BaseBudgetCard";
@@ -34,7 +33,7 @@ const GenericTemplateCard = ({
 					 sometimes takes a very long time. */
         .duplicateBudget<Model.Template>(props.budget.id, {
           timeout: 120 * 1000,
-          cancelToken: cancelToken()
+          cancelToken: cancelToken(),
         })
         .then((response: Model.Template) => {
           e.item.closeParentDropdown?.();
@@ -46,7 +45,7 @@ const GenericTemplateCard = ({
           notifications.ui.banner.handleRequestError(err);
         });
     },
-    [onDuplicated, props.budget.id]
+    [onDuplicated, props.budget.id],
   );
 
   return (
@@ -57,34 +56,34 @@ const GenericTemplateCard = ({
         {
           id: "edit",
           label: "Edit",
-          icon: <Icon icon={"edit"} weight={"light"} />,
-          onClick: () => onEdit()
+          icon: <Icon icon="edit" weight="light" />,
+          onClick: () => onEdit(),
         },
         {
           id: "edit_name_image",
           label: "Edit Name/Image",
-          icon: <Icon icon={"image"} weight={"light"} />,
-          onClick: () => onEditNameImage()
+          icon: <Icon icon="image" weight="light" />,
+          onClick: () => onEditNameImage(),
         },
         {
           id: "duplicate",
           label: "Duplicate",
-          icon: <Icon icon={"clone"} weight={"light"} />,
+          icon: <Icon icon="clone" weight="light" />,
           onClick: (e: MenuItemModelClickEvent) => duplicate(e),
           keepDropdownOpenOnClick: true,
           loading: duplicating,
-          disabled: duplicating
+          disabled: duplicating,
         },
         {
           id: "delete",
           label: "Delete",
-          icon: <Icon icon={"trash"} weight={"light"} />,
+          icon: <Icon icon="trash" weight="light" />,
           onClick: (e: MenuItemModelClickEvent) => onDelete(e),
           keepDropdownOpenOnClick: true,
           loading: deleting,
-          disabled: deleting
+          disabled: deleting,
         },
-        ...(props.dropdown || [])
+        ...(props.dropdown || []),
       ]}
     />
   );

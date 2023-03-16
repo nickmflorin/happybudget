@@ -64,19 +64,19 @@ declare namespace Table {
 
   type BaseMetaEvent<T extends MetaEventId = MetaEventId> = BaseEvent<T, null>;
 
-  type BaseChangeEvent<T extends ChangeEventId = ChangeEventId, P extends EventPayload = EventPayload> = BaseEvent<
-    T,
-    P
-  > & {
+  type BaseChangeEvent<
+    T extends ChangeEventId = ChangeEventId,
+    P extends EventPayload = EventPayload,
+  > = BaseEvent<T, P> & {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     readonly onSuccess?: (v: any) => void;
     readonly onError?: (e: Error) => void;
   };
 
-  type BaseControlEvent<T extends ControlEventId = ControlEventId, P extends EventPayload = EventPayload> = BaseEvent<
-    T,
-    P
-  >;
+  type BaseControlEvent<
+    T extends ControlEventId = ControlEventId,
+    P extends EventPayload = EventPayload,
+  > = BaseEvent<T, P>;
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   type CellChange<V extends RawRowValue = any> = {
@@ -88,7 +88,7 @@ declare namespace Table {
     R extends RowData = RowData,
     RW extends EditableRow<R> = EditableRow<R>,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    V extends RawRowValue = any
+    V extends RawRowValue = any,
   > = CellChange<V> & {
     readonly field: keyof RW["data"];
     readonly id: RW["id"];
@@ -103,16 +103,20 @@ declare namespace Table {
     readonly data: RowChangeData<R, RW>;
   };
 
-  type DataChangePayload<R extends RowData = RowData, RW extends EditableRow<R> = EditableRow<R>> = SingleOrArray<
-    RowChange<R, RW>
-  >;
+  type DataChangePayload<
+    R extends RowData = RowData,
+    RW extends EditableRow<R> = EditableRow<R>,
+  > = SingleOrArray<RowChange<R, RW>>;
 
-  type ConsolidatedChange<R extends RowData = RowData, RW extends EditableRow<R> = EditableRow<R>> = RowChange<R, RW>[];
+  type ConsolidatedChange<
+    R extends RowData = RowData,
+    RW extends EditableRow<R> = EditableRow<R>,
+  > = RowChange<R, RW>[];
 
-  type DataChangeEvent<R extends RowData = RowData, RW extends EditableRow<R> = EditableRow<R>> = BaseChangeEvent<
-    "dataChange",
-    DataChangePayload<R, RW>
-  >;
+  type DataChangeEvent<
+    R extends RowData = RowData,
+    RW extends EditableRow<R> = EditableRow<R>,
+  > = BaseChangeEvent<"dataChange", DataChangePayload<R, RW>>;
 
   type RowInsertPayload<R extends RowData> = {
     readonly previous: number;
@@ -133,12 +137,15 @@ declare namespace Table {
   type RowAddCountPayload = { readonly count: number };
   type RowAddIndexPayload = { readonly newIndex: number; readonly count?: number };
   type RowAddDataPayload<R extends RowData> = Partial<R>[];
-  type RowAddPayload<R extends RowData> = RowAddCountPayload | RowAddIndexPayload | RowAddDataPayload<R>;
+  type RowAddPayload<R extends RowData> =
+    | RowAddCountPayload
+    | RowAddIndexPayload
+    | RowAddDataPayload<R>;
 
-  type RowAddEvent<R extends RowData = RowData, P extends RowAddPayload<R> = RowAddPayload<R>> = BaseChangeEvent<
-    "rowAdd",
-    P
-  > & {
+  type RowAddEvent<
+    R extends RowData = RowData,
+    P extends RowAddPayload<R> = RowAddPayload<R>,
+  > = BaseChangeEvent<"rowAdd", P> & {
     /*
 		Placeholder IDs must be provided ahead of time so that the IDs are
 		consistent between the sagas and the reducer.
@@ -149,7 +156,10 @@ declare namespace Table {
   type RowAddDataEvent<R extends RowData> = RowAddEvent<R, RowAddDataPayload<R>>;
 
   type GroupAddEvent = BaseChangeEvent<"groupAdd", Http.GroupPayload>;
-  type GroupUpdateEvent = BaseChangeEvent<"groupUpdate", Redux.HttpUpdateModelPayload<Model.Group, Http.GroupPayload>>;
+  type GroupUpdateEvent = BaseChangeEvent<
+    "groupUpdate",
+    Redux.HttpUpdateModelPayload<Model.Group, Http.GroupPayload>
+  >;
   type MarkupAddEvent = BaseChangeEvent<"markupAdd", Http.MarkupPayload>;
   type MarkupUpdateEvent = BaseChangeEvent<
     "markupUpdate",
@@ -204,10 +214,8 @@ declare namespace Table {
     readonly models: M[];
   };
 
-  type PlaceholdersActivatedEvent<M extends Model.RowHttpModel = Model.RowHttpModel> = BaseControlEvent<
-    "placeholdersActivated",
-    PlaceholdersActivatedPayload<M>
-  >;
+  type PlaceholdersActivatedEvent<M extends Model.RowHttpModel = Model.RowHttpModel> =
+    BaseControlEvent<"placeholdersActivated", PlaceholdersActivatedPayload<M>>;
 
   type UpdateRowPayload<R extends RowData = RowData> = {
     readonly data: Partial<R>;
@@ -216,14 +224,20 @@ declare namespace Table {
 
   type UpdateRowsEventPayload<R extends RowData = RowData> = SingleOrArray<UpdateRowPayload<R>>;
 
-  type UpdateRowsEvent<R extends RowData = RowData> = BaseControlEvent<"updateRows", UpdateRowsEventPayload<R>>;
+  type UpdateRowsEvent<R extends RowData = RowData> = BaseControlEvent<
+    "updateRows",
+    UpdateRowsEventPayload<R>
+  >;
 
   type ForwardEvent = BaseMetaEvent<"forward">;
   type ReverseEvent = BaseMetaEvent<"reverse">;
 
   /* Events that are used internally to manage the table state, but are not
      triggered as a direct result of a user interaction. */
-  type ControlEvents<R extends RowData = RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
+  type ControlEvents<
+    R extends RowData = RowData,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
+  > = {
     readonly modelsUpdated: ModelsUpdatedEvent<M>;
     readonly updateRows: UpdateRowsEvent<R>;
     readonly modelsAdded: ModelsAddedEvent<M>;
@@ -246,7 +260,10 @@ declare namespace Table {
   };
 
   // Events for which undo/redo is supported.  The events must be ChangeEvents.
-  type TraversibleEvents<R extends RowData = RowData, RW extends EditableRow<R> = EditableRow<R>> = {
+  type TraversibleEvents<
+    R extends RowData = RowData,
+    RW extends EditableRow<R> = EditableRow<R>,
+  > = {
     readonly dataChange: DataChangeEvent<R, RW>;
   };
 
@@ -258,49 +275,49 @@ declare namespace Table {
   type Events<
     R extends RowData = RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
-    RW extends EditableRow<R> = EditableRow<R>
+    RW extends EditableRow<R> = EditableRow<R>,
   > = ControlEvents<R, M> & ChangeEvents<R, RW> & MetaEvents;
 
   type MetaEvent = MetaEvents[keyof MetaEvents];
 
-  type ControlEvent<R extends RowData = RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = ControlEvents<
-    R,
-    M
-  >[keyof ControlEvents<R, M>];
+  type ControlEvent<
+    R extends RowData = RowData,
+    M extends Model.RowHttpModel = Model.RowHttpModel,
+  > = ControlEvents<R, M>[keyof ControlEvents<R, M>];
 
-  type ChangeEvent<R extends RowData = RowData, RW extends EditableRow<R> = EditableRow<R>> = ChangeEvents<
-    R,
-    RW
-  >[keyof ChangeEvents<R, RW>];
+  type ChangeEvent<
+    R extends RowData = RowData,
+    RW extends EditableRow<R> = EditableRow<R>,
+  > = ChangeEvents<R, RW>[keyof ChangeEvents<R, RW>];
 
   // Events for which undo/redo is supported.  The events must be ChangeEvents.
-  type TraversibleEvent<R extends RowData = RowData, RW extends EditableRow<R> = EditableRow<R>> = TraversibleEvents<
-    R,
-    RW
-  >[keyof TraversibleEvents<R, RW>];
+  type TraversibleEvent<
+    R extends RowData = RowData,
+    RW extends EditableRow<R> = EditableRow<R>,
+  > = TraversibleEvents<R, RW>[keyof TraversibleEvents<R, RW>];
 
-  type ChangeEventHistory<R extends RowData = RowData, RW extends EditableRow<R> = EditableRow<R>> = TraversibleEvent<
-    R,
-    RW
-  >[];
+  type ChangeEventHistory<
+    R extends RowData = RowData,
+    RW extends EditableRow<R> = EditableRow<R>,
+  > = TraversibleEvent<R, RW>[];
 
   type Event<
     R extends RowData = RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
-    RW extends EditableRow<R> = EditableRow<R>
+    RW extends EditableRow<R> = EditableRow<R>,
   > = ControlEvent<R, M> | ChangeEvent<R, RW> | Table.MetaEvent;
 
   type ChangeEventLookup<
     K extends ChangeEventId,
     R extends RowData = RowData,
-    RW extends EditableRow<R> = EditableRow<R>
+    RW extends EditableRow<R> = EditableRow<R>,
   > = ChangeEvents<R, RW>[K];
 
   type EventLookup<
     K extends EventId,
     R extends RowData = RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
-    RW extends EditableRow<R> = EditableRow<R>
+    RW extends EditableRow<R> = EditableRow<R>,
   > = Events<R, M, RW>[K];
 
   type CellDoneEditingEvent = import("react").SyntheticEvent | KeyboardEvent;

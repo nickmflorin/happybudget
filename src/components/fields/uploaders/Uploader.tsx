@@ -1,9 +1,9 @@
 import { useEffect, useState, forwardRef, useImperativeHandle, ForwardedRef } from "react";
-import classNames from "classnames";
+
 import { AxiosResponse } from "axios";
+import classNames from "classnames";
 import { isNil, includes } from "lodash";
 import { UploadRequestOption } from "rc-upload/lib/interface";
-
 import { Upload } from "antd";
 import { UploadChangeParam } from "antd/lib/upload";
 import { UploadFile } from "antd/lib/upload/interface";
@@ -11,7 +11,6 @@ import { UploadFile } from "antd/lib/upload/interface";
 import * as api from "api";
 import * as config from "config";
 import { util } from "lib";
-
 import { Icon, RenderWithSpinner, Image, ShowHide } from "components";
 import { ImageClearButton } from "components/buttons";
 
@@ -19,13 +18,15 @@ type UploaderImageProps = StandardComponentProps & {
   readonly image: UploadedImage | SavedImage;
 };
 
-const UploaderImage = (props: UploaderImageProps): JSX.Element => {
-  return (
-    <div className={"uploader-image-wrapper"}>
-      <Image className={props.className} src={props.image.url} style={{ width: "100%", ...props.style }} />
-    </div>
-  );
-};
+const UploaderImage = (props: UploaderImageProps): JSX.Element => (
+  <div className="uploader-image-wrapper">
+    <Image
+      className={props.className}
+      src={props.image.url}
+      style={{ width: "100%", ...props.style }}
+    />
+  </div>
+);
 
 type UploaderContentProps = Omit<StandardComponentProps, "id"> & {
   readonly imageStyle?: React.CSSProperties;
@@ -45,7 +46,7 @@ const UploaderContent = (props: UploaderContentProps): JSX.Element => {
   const params: UploadImageParamsNoImage = {
     loading: props.loading,
     onClear: props.onClear,
-    error: props.error
+    error: props.error,
   };
   if (!isNil(props.renderContent)) {
     if (!isNil(props.image)) {
@@ -57,7 +58,7 @@ const UploaderContent = (props: UploaderContentProps): JSX.Element => {
       props.renderError(params)
     ) : (
       <div className={classNames("upload-indicator", props.className)} style={props.style}>
-        <Icon icon={"exclamation-circle"} weight={"light"} />
+        <Icon icon="exclamation-circle" weight="light" />
       </div>
     );
   } else if (!isNil(props.renderContentNoError)) {
@@ -70,21 +71,26 @@ const UploaderContent = (props: UploaderContentProps): JSX.Element => {
       return !isNil(props.renderImage) ? (
         props.renderImage(params)
       ) : (
-        <UploaderImage className={props.imageClassName} image={props.image} style={props.imageStyle} />
+        <UploaderImage
+          className={props.imageClassName}
+          image={props.image}
+          style={props.imageStyle}
+        />
       );
     } else if (!isNil(props.renderNoImage)) {
       return props.renderNoImage(params);
     } else {
       return (
         <div className={classNames("upload-indicator", props.className)} style={props.style}>
-          <Icon icon={"upload"} weight={"light"} />
+          <Icon icon="upload" weight="light" />
         </div>
       );
     }
   }
 };
 
-export interface UploaderProps extends Omit<UploaderContentProps, "data" | "error" | "loading" | "image" | "onClear"> {
+export interface UploaderProps
+  extends Omit<UploaderContentProps, "data" | "error" | "loading" | "image" | "onClear"> {
   readonly contentStyle?: React.CSSProperties;
   readonly contentClassName?: string;
   readonly showLoadingIndicator?: boolean;
@@ -111,7 +117,7 @@ const Uploader = (
     onClear,
     ...props
   }: UploaderProps,
-  ref: ForwardedRef<IUploaderRef>
+  ref: ForwardedRef<IUploaderRef>,
 ): JSX.Element => {
   const [error, setError] = useState<Error | string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -139,7 +145,7 @@ const Uploader = (
       setError(null);
       setLoading(false);
       setImage(null);
-    }
+    },
   }));
 
   useEffect(() => {
@@ -152,15 +158,17 @@ const Uploader = (
     <div className={classNames("image-uploader", className)} style={style}>
       <Upload
         className={classNames("image-uploader-upload", { "with-image": !isNil(image) })}
-        name={"avatar"}
-        listType={"picture-card"}
+        name="avatar"
+        listType="picture-card"
         showUploadList={false}
         beforeUpload={(file: File) => {
           if (!includes(config.env.ACCCEPTED_IMAGE_TYPES, file.type)) {
             _onError(
-              `${file.type} is not an acceptable image type.  Must be one of ${config.env.ACCCEPTED_IMAGE_TYPES.join(
-                ", "
-              )}.`
+              `${
+                file.type
+              } is not an acceptable image type.  Must be one of ${config.env.ACCCEPTED_IMAGE_TYPES.join(
+                ", ",
+              )}.`,
             );
             return false;
           } else if (util.files.fileSizeInMB(file) > 2) {
@@ -190,7 +198,7 @@ const Uploader = (
                     name: info.file.name,
                     fileName: info.file.fileName,
                     size: info.file.size,
-                    data
+                    data,
                   });
                 })
                 .catch((e: Error) => {
@@ -206,16 +214,24 @@ const Uploader = (
           api
             .tempUploadImage(requestBody)
             .then((response: AxiosResponse<Http.FileUploadResponse>) =>
-              options.onSuccess?.(response.data, response.request)
+              options.onSuccess?.(response.data, response.request),
             )
             .catch((e: Error) => options.onError?.(e));
         }}
       >
-        <RenderWithSpinner spinnerProps={{ size: "medium" }} loading={loading && showLoadingIndicator}>
+        <RenderWithSpinner
+          spinnerProps={{ size: "medium" }}
+          loading={loading && showLoadingIndicator}
+        >
           <ShowHide show={!isNil(image) && showClear === true}>
             <ImageClearButton
               {...imageClearButtonProps}
-              style={{ position: "absolute", top: -17, right: -17, ...imageClearButtonProps?.style }}
+              style={{
+                position: "absolute",
+                top: -17,
+                right: -17,
+                ...imageClearButtonProps?.style,
+              }}
               onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                 e.stopPropagation();
                 e.preventDefault();

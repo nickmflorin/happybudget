@@ -1,4 +1,5 @@
 import React, { ReactNode } from "react";
+
 import Tooltip from "./Tooltip";
 
 type TooltipOrContentProps = Omit<TooltipProps, "content"> & {

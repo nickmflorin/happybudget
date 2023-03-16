@@ -12,7 +12,7 @@ export const Framework: Table.Framework = {
   editors: {
     ContactEditor: editors.ContactEditor,
     DateEditor: editors.DateEditor,
-    NullCellEditor: editors.NullCellEditor
+    NullCellEditor: editors.NullCellEditor,
   },
   cells: {
     data: {
@@ -28,18 +28,18 @@ export const Framework: Table.Framework = {
       LinkCell: cells.LinkCell,
       AttachmentsCell: cells.AttachmentsCell,
       DragCell: cells.DragCell,
-      agColumnHeader: cells.HeaderCell
+      agColumnHeader: cells.HeaderCell,
     },
     footer: {
       CalculatedCell: cells.CalculatedCell,
       BodyCell: cells.BodyCell,
       EmptyCell: cells.EmptyCell,
-      NewRowCell: cells.NewRowCell
+      NewRowCell: cells.NewRowCell,
     },
     page: {
       CalculatedCell: cells.CalculatedCell,
       BodyCell: cells.BodyCell,
-      EmptyCell: cells.EmptyCell
-    }
-  }
+      EmptyCell: cells.EmptyCell,
+    },
+  },
 };

@@ -1,7 +1,10 @@
 import { ReactNode } from "react";
+
 import classNames from "classnames";
+
 import { EntityText } from "components/typography";
 import { EntityTextProps } from "components/typography/EntityText";
+
 import RootTooltip from "./Tooltip";
 
 export type EntityTooltipProps = Omit<TooltipProps, "content"> & {

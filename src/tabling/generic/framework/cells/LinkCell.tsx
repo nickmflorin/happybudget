@@ -1,4 +1,5 @@
 import React from "react";
+
 import { isNil } from "lodash";
 
 import { Link } from "components/links";
@@ -11,7 +12,7 @@ export type LinkCellProps<
   M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  CL extends Table.DataColumn<R, M, string | null> = Table.DataColumn<R, M, string | null>
+  CL extends Table.DataColumn<R, M, string | null> = Table.DataColumn<R, M, string | null>,
 > = Table.ValueCellProps<R, M, C, S, string | null, CL> & {
   readonly href?: string | ((value: string | number | null) => string | undefined) | undefined;
   readonly target?: string | undefined;
@@ -23,7 +24,7 @@ const LinkCell = <
   M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  CL extends Table.DataColumn<R, M, string | null> = Table.DataColumn<R, M, string | null>
+  CL extends Table.DataColumn<R, M, string | null> = Table.DataColumn<R, M, string | null>,
 >({
   value,
   href,
@@ -35,7 +36,7 @@ const LinkCell = <
   return (
     <Cell<R, M, C, S, string | null, CL> {...props}>
       <Link
-        className={"link--table"}
+        className="link--table"
         href={!isNil(href) ? (typeof href === "string" ? href : href(formattedValue)) : undefined}
         target={target}
         rel={rel}

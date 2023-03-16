@@ -1,11 +1,12 @@
 import React, { useMemo, useState } from "react";
+
 import { isNil, map } from "lodash";
 
 import * as config from "config";
 import { tabling, hooks } from "lib";
+import { CollaboratorsModal } from "components/modals";
 import { AuthenticatedTable, AuthenticatedTableProps, framework } from "tabling/generic";
 
-import { CollaboratorsModal } from "components/modals";
 import { Framework } from "./framework";
 
 export type AuthenticatedBudgetTableProps<
@@ -13,7 +14,7 @@ export type AuthenticatedBudgetTableProps<
   M extends Model.RowHttpModel,
   B extends Model.Budget | Model.Template,
   C extends BudgetContext<B> = BudgetContext<B>,
-  S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>
+  S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>,
 > = AuthenticatedTableProps<R, M, C, S> & {
   readonly includeCollaborators: boolean;
   readonly onEditMarkup?: (row: Table.MarkupRow<R>) => void;
@@ -26,7 +27,7 @@ const AuthenticatedBudgetTable = <
   M extends Model.RowHttpModel,
   B extends Model.Budget | Model.Template,
   C extends BudgetContext<B> = BudgetContext<B>,
-  S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>
+  S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>,
 >({
   includeCollaborators,
   onEditMarkup,
@@ -43,15 +44,15 @@ const AuthenticatedBudgetTable = <
             () => [
               framework.actions.CollaboratorsAction({
                 location: "right",
-                onClick: () => setCollaboratorsModalOpen(true)
-              })
+                onClick: () => setCollaboratorsModalOpen(true),
+              }),
             ],
-            !isNil(props.actions) ? props.actions : []
+            !isNil(props.actions) ? props.actions : [],
           )
         : !isNil(props.actions)
         ? props.actions
         : [],
-    [props.actions]
+    [props.actions],
   );
 
   const editColumnConfig = useMemo(() => {
@@ -63,8 +64,8 @@ const AuthenticatedBudgetTable = <
         {
           typeguard: tabling.rows.isMarkupRow,
           action: (r: Table.MarkupRow<R>) => onEditMarkup(r),
-          behavior: "edit"
-        }
+          behavior: "edit",
+        },
       ];
     }
     if (!isNil(onEditGroup)) {
@@ -73,8 +74,8 @@ const AuthenticatedBudgetTable = <
         {
           typeguard: tabling.rows.isGroupRow,
           action: (r: Table.GroupRow<R>) => onEditGroup(r),
-          behavior: "edit"
-        }
+          behavior: "edit",
+        },
       ];
     }
     if (!isNil(onRowExpand)) {
@@ -83,8 +84,8 @@ const AuthenticatedBudgetTable = <
         {
           typeguard: tabling.rows.isModelRow,
           action: (r: Table.ModelRow<R>) => onRowExpand(r),
-          behavior: "expand"
-        }
+          behavior: "expand",
+        },
       ];
     }
     return c;
@@ -96,11 +97,11 @@ const AuthenticatedBudgetTable = <
         tabling.columns.isRealColumn(col)
           ? {
               ...col,
-              cellRendererParams: { ...col.cellRendererParams, context: props.tableContext }
+              cellRendererParams: { ...col.cellRendererParams, context: props.tableContext },
             }
-          : col
+          : col,
       ),
-    [hooks.useDeepEqualMemo(props.columns), props.tableContext]
+    [hooks.useDeepEqualMemo(props.columns), props.tableContext],
   );
 
   return (

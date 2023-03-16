@@ -13,7 +13,7 @@ const ActionMap = {
   handleEvent: actions.handleTableEventAction,
   loading: actions.loadingAction,
   response: actions.responseAction,
-  setSearch: actions.setSearchAction
+  setSearch: actions.setSearchAction,
 };
 
 export const createTableSaga = (table: Table.TableInstance<R, M>) =>
@@ -23,6 +23,6 @@ export const createTableSaga = (table: Table.TableInstance<R, M>) =>
     tasks: store.tasks.accounts.createAuthenticatedTableTaskSet<B>({
       table,
       selectStore: (state: Application.Store) => state.budget.accounts,
-      actions: { ...ActionMap, updateBudgetInState: actions.updateBudgetInStateAction }
-    })
+      actions: { ...ActionMap, updateBudgetInState: actions.updateBudgetInStateAction },
+    }),
   });

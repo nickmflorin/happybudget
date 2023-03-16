@@ -1,4 +1,5 @@
 import classNames from "classnames";
+
 import Text, { TextProps } from "./Text";
 
 export type HeadingProps = TextProps & {

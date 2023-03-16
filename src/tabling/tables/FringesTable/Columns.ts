@@ -2,6 +2,7 @@ import { isNil } from "lodash";
 import { ValueSetterParams } from "@ag-grid-community/core";
 
 import { model, tabling, formatters } from "lib";
+
 import { columns } from "../../generic";
 
 type R = Tables.FringeRowData;
@@ -13,7 +14,7 @@ const Columns: Table.Column<R, M>[] = [
     nullValue: null,
     dataType: "text",
     headerName: "Name",
-    width: 120
+    width: 120,
   }),
   columns.BodyColumn<R, M>({
     field: "color",
@@ -25,14 +26,14 @@ const Columns: Table.Column<R, M>[] = [
     width: 100,
     dataType: "singleSelect",
     cellEditorPopup: true,
-    cellEditorPopupPosition: "below"
+    cellEditorPopupPosition: "below",
   }),
   columns.BodyColumn<R, M>({
     field: "description",
     nullValue: null,
     headerName: "Description",
     dataType: "longText",
-    flex: 100
+    flex: 100,
   }),
   columns.BodyColumn<R, M>({
     field: "rate",
@@ -60,26 +61,26 @@ const Columns: Table.Column<R, M>[] = [
           const unit = row.data.unit === null ? model.budgeting.FringeUnits.percent : row.data.unit;
           return unit.id === model.budgeting.FringeUnits.flat.id
             ? formatters.currencyFormatter((v: string | number) =>
-                console.error(`Could not parse currency value ${String(v)} for field 'rate'.`)
+                console.error(`Could not parse currency value ${String(v)} for field 'rate'.`),
               )(params)
             : formatters.percentageFormatter((v: string | number) =>
-                console.error(`Could not parse percentage value ${String(v)} for field 'rate'.`)
+                console.error(`Could not parse percentage value ${String(v)} for field 'rate'.`),
               )(params);
         }
         /* Here, we have to assume that the value should be formatted as a
            percentage. */
         return formatters.percentageFormatter((v: string | number) =>
-          console.error(`Could not parse percentage value ${String(v)} for field 'rate'.`)
+          console.error(`Could not parse percentage value ${String(v)} for field 'rate'.`),
         )(params);
       } else {
         /* The only time the params would be native formatter params would be if
 				   this column was being used in a PDF - which it isn't, so this is safe
 				   for now. */
         return formatters.percentageFormatter((v: string | number) =>
-          console.error(`Could not parse percentage value ${String(v)} for field 'rate'.`)
+          console.error(`Could not parse percentage value ${String(v)} for field 'rate'.`),
         )(params);
       }
-    }
+    },
   }),
   columns.ChoiceSelectColumn<R, M, Model.FringeUnit | null>({
     field: "unit",
@@ -87,15 +88,15 @@ const Columns: Table.Column<R, M>[] = [
     headerName: "Unit",
     cellRenderer: { data: "FringeUnitCell" },
     cellEditor: "FringeUnitEditor",
-    processCellFromClipboard: (name: string) => model.budgeting.FringeUnits.infer(name)
+    processCellFromClipboard: (name: string) => model.budgeting.FringeUnits.infer(name),
   }),
   columns.BodyColumn<R, M>({
     nullValue: null,
     field: "cutoff",
     headerName: "Cutoff",
     dataType: "number",
-    width: 100
-  })
+    width: 100,
+  }),
 ];
 
 export default Columns;

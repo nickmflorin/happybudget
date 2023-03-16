@@ -1,6 +1,6 @@
+import { map, filter, intersection, reduce } from "lodash";
 import { SagaIterator } from "redux-saga";
 import { put, fork, select, call } from "redux-saga/effects";
-import { map, filter, intersection, reduce } from "lodash";
 import { createSelector } from "reselect";
 
 import * as api from "api";
@@ -24,13 +24,16 @@ type FringesTableActionMap<B extends Model.Template | Model.Budget> = Redux.Acti
     id: number,
     parentType: "account" | "subaccount",
     payload: Redux.RequestPayload,
-    ctx: Omit<TC<B>, "parentType" | "parentId">
-  ) => Redux.Action<Redux.RequestPayload, AccountActionContext<B, false> | SubAccountActionContext<B, false>>;
+    ctx: Omit<TC<B>, "parentType" | "parentId">,
+  ) => Redux.Action<
+    Redux.RequestPayload,
+    AccountActionContext<B, false> | SubAccountActionContext<B, false>
+  >;
   readonly requestParentTableData: (
     id: number,
     parentType: "account" | "subaccount",
     payload: Redux.TableRequestPayload,
-    ctx: Omit<TC<B>, "parentType" | "parentId">
+    ctx: Omit<TC<B>, "parentType" | "parentId">,
   ) => Redux.Action<
     Redux.TableRequestPayload,
     SubAccountsTableActionContext<B, Model.Account | Model.SubAccount, false>
@@ -39,7 +42,10 @@ type FringesTableActionMap<B extends Model.Template | Model.Budget> = Redux.Acti
   readonly invalidate: {
     readonly account: Redux.ActionCreator<null, AccountActionContext<B, false>>;
     readonly subaccount: Redux.ActionCreator<null, SubAccountActionContext<B, false>>;
-    readonly accountSubAccountsTable: Redux.ActionCreator<null, SubAccountsTableActionContext<B, Model.Account, false>>;
+    readonly accountSubAccountsTable: Redux.ActionCreator<
+      null,
+      SubAccountsTableActionContext<B, Model.Account, false>
+    >;
     readonly subaccountSubAccountsTable: Redux.ActionCreator<
       null,
       SubAccountsTableActionContext<B, Model.SubAccount, false>
@@ -52,15 +58,18 @@ export type FringesTableTaskConfig<B extends Model.Template | Model.Budget> = Om
   "selectStore"
 > & {
   readonly selectBaseStore: (state: Application.Store) => Modules.BudgetStoreLookup<B, false>;
-  readonly selectParentTableStore: (state: Application.Store, ctx: TC<B>) => Tables.SubAccountTableStore;
+  readonly selectParentTableStore: (
+    state: Application.Store,
+    ctx: TC<B>,
+  ) => Tables.SubAccountTableStore;
 };
 
 export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
-  config: FringesTableTaskConfig<B>
+  config: FringesTableTaskConfig<B>,
 ): Omit<Redux.AuthenticatedTableTaskMap<R, TC<B>>, "request"> => {
   const selectTableStore = createSelector(
     config.selectBaseStore,
-    (tableStore: Modules.BudgetStoreLookup<B, false>) => tableStore.fringes
+    (tableStore: Modules.BudgetStoreLookup<B, false>) => tableStore.fringes,
   );
 
   function* invalidateAccount(ctx: TC<B>, id: number): SagaIterator {
@@ -69,14 +78,14 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       config.actions.invalidate.accountSubAccountsTable(null, {
         ...passThroughCtx,
         parentType: "account",
-        parentId: id
-      })
+        parentId: id,
+      }),
     );
     yield put(
       config.actions.invalidate.account(null, {
         ...passThroughCtx,
-        id
-      })
+        id,
+      }),
     );
   }
 
@@ -86,41 +95,46 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       config.actions.invalidate.subaccountSubAccountsTable(null, {
         ...passThroughCtx,
         parentType: "subaccount",
-        parentId: id
-      })
+        parentId: id,
+      }),
     );
     yield put(
       config.actions.invalidate.subaccount(null, {
         ...passThroughCtx,
-        id
-      })
+        id,
+      }),
     );
   }
 
-  const bulkCreateTask: (e: Table.RowAddEvent<R>, ctx: TC<B>) => SagaIterator = tabling.createBulkTask({
-    table: config.table,
-    service: () => api.bulkCreateFringes,
-    selectStore: selectTableStore,
-    responseActions: (ctx: TC<B>, r: Http.ParentChildListResponse<Model.BaseBudget, M>, e: Table.RowAddEvent<R>) => [
-      config.actions.handleEvent(
-        {
-          type: "placeholdersActivated",
-          payload: { placeholderIds: e.placeholderIds, models: r.children }
-        },
-        ctx
-      ),
-      config.actions.updateBudgetInState({ id: r.parent.id, data: r.parent as B }, {})
-    ],
-    performCreate: (
-      ctx: TC<B>,
-      p: Http.BulkCreatePayload<Http.FringePayload>
-    ): [number, Http.BulkCreatePayload<Http.FringePayload>] => [ctx.budgetId, p]
-  });
+  const bulkCreateTask: (e: Table.RowAddEvent<R>, ctx: TC<B>) => SagaIterator =
+    tabling.createBulkTask({
+      table: config.table,
+      service: () => api.bulkCreateFringes,
+      selectStore: selectTableStore,
+      responseActions: (
+        ctx: TC<B>,
+        r: Http.ParentChildListResponse<Model.BaseBudget, M>,
+        e: Table.RowAddEvent<R>,
+      ) => [
+        config.actions.handleEvent(
+          {
+            type: "placeholdersActivated",
+            payload: { placeholderIds: e.placeholderIds, models: r.children },
+          },
+          ctx,
+        ),
+        config.actions.updateBudgetInState({ id: r.parent.id, data: r.parent as B }, {}),
+      ],
+      performCreate: (
+        ctx: TC<B>,
+        p: Http.BulkCreatePayload<Http.FringePayload>,
+      ): [number, Http.BulkCreatePayload<Http.FringePayload>] => [ctx.budgetId, p],
+    });
 
   function* bulkUpdateTask(
     ctx: TC<B>,
     e: Table.ChangeEvent<R>,
-    requestPayload: Http.BulkUpdatePayload<P>
+    requestPayload: Http.BulkUpdatePayload<P>,
   ): SagaIterator {
     config.table.saving(true);
     try {
@@ -128,20 +142,22 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         api.bulkUpdateFringes,
         ctx,
         ctx.budgetId,
-        requestPayload
+        requestPayload,
       );
-      yield put(config.actions.updateBudgetInState({ id: response.parent.id, data: response.parent as B }, {}));
+      yield put(
+        config.actions.updateBudgetInState(
+          { id: response.parent.id, data: response.parent as B },
+          {},
+        ),
+      );
 
       const FRINGE_QUANTITATIVE_FIELDS: (keyof Http.FringePayload)[] = ["cutoff", "rate", "unit"];
 
-      const payloadWarrantsRecalculation = (p: Http.ModelBulkUpdatePayload<Http.FringePayload>) => {
-        return (
-          filter(
-            map(FRINGE_QUANTITATIVE_FIELDS, (field: keyof Http.FringePayload) => p[field]),
-            (v: Http.FringePayload[keyof Http.FringePayload]) => v !== undefined
-          ).length !== 0
-        );
-      };
+      const payloadWarrantsRecalculation = (p: Http.ModelBulkUpdatePayload<Http.FringePayload>) =>
+        filter(
+          map(FRINGE_QUANTITATIVE_FIELDS, (field: keyof Http.FringePayload) => p[field]),
+          (v: Http.FringePayload[keyof Http.FringePayload]) => v !== undefined,
+        ).length !== 0;
       /*
 			If any changes to the Fringe(s) affect calculations of SubAccount(s) that
 			are associated with those Fringe(s), then the SubAccount(s) need to be
@@ -171,18 +187,20 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         requestPayload.data,
         (curr: number[], p: Http.ModelBulkUpdatePayload<Http.FringePayload>) =>
           payloadWarrantsRecalculation(p) ? [...curr, p.id] : curr,
-        []
+        [],
       );
 
-      const getSubAccounts = (s: Tables.SubAccountTableStore): Table.ModelRow<Tables.SubAccountRowData>[] =>
+      const getSubAccounts = (
+        s: Tables.SubAccountTableStore,
+      ): Table.ModelRow<Tables.SubAccountRowData>[] =>
         filter(
           filter(s.data, (r: Tables.SubAccountRow) => tabling.rows.isModelRow(r)),
-          (r: Tables.SubAccountRow) => intersection(r.data.fringes, fringeIds).length !== 0
+          (r: Tables.SubAccountRow) => intersection(r.data.fringes, fringeIds).length !== 0,
         ) as Table.ModelRow<Tables.SubAccountRowData>[];
 
       if (fringeIds.length !== 0) {
         const subaccounts: Tables.SubAccountTableStore = yield select((s: Application.Store) =>
-          config.selectParentTableStore(s, ctx)
+          config.selectParentTableStore(s, ctx),
         );
         // Determine what SubAccount(s) are related to the changed Fringe(s).
         const subaccountsWithFringesThatChanged = getSubAccounts(subaccounts);
@@ -194,14 +212,21 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
             config.actions.requestParentTableData(
               ctx.parentId,
               ctx.parentType,
-              { ids: map(subaccountsWithFringesThatChanged, (r: Table.ModelRow<Tables.SubAccountRowData>) => r.id) },
-              ctx
-            )
+              {
+                ids: map(
+                  subaccountsWithFringesThatChanged,
+                  (r: Table.ModelRow<Tables.SubAccountRowData>) => r.id,
+                ),
+              },
+              ctx,
+            ),
           );
-          yield put(config.actions.requestParent(ctx.parentId, ctx.parentType, { force: true }, ctx));
+          yield put(
+            config.actions.requestParent(ctx.parentId, ctx.parentType, { force: true }, ctx),
+          );
         }
         const store: Modules.BudgetStoreLookup<B, false> = yield select((s: Application.Store) =>
-          config.selectBaseStore(s)
+          config.selectBaseStore(s),
         );
         /* Determine what other Account(s) in the store need to have their caches
            invalidated. */
@@ -239,7 +264,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, {
         message: ctx.errorMessage || "There was an error updating the rows.",
-        dispatchClientErrorToSentry: true
+        dispatchClientErrorToSentry: true,
       });
     } finally {
       config.table.saving(false);
@@ -253,13 +278,18 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         api.bulkDeleteFringes,
         ctx,
         ctx.budgetId,
-        { ids }
+        { ids },
       );
-      yield put(config.actions.updateBudgetInState({ id: response.parent.id, data: response.parent as B }, {}));
+      yield put(
+        config.actions.updateBudgetInState(
+          { id: response.parent.id, data: response.parent as B },
+          {},
+        ),
+      );
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, {
         message: ctx.errorMessage || "There was an error deleting the rows.",
-        dispatchClientErrorToSentry: true
+        dispatchClientErrorToSentry: true,
       });
     } finally {
       config.table.saving(false);
@@ -269,16 +299,23 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   function* handleRowInsertEvent(e: Table.RowInsertEvent<R>, ctx: TC<B>): SagaIterator {
     const response: M = yield http.request(api.createFringe, ctx, ctx.budgetId, {
       previous: e.payload.previous,
-      ...tabling.rows.postPayload<R, M, P>(e.payload.data, config.table.getColumns())
+      ...tabling.rows.postPayload<R, M, P>(e.payload.data, config.table.getColumns()),
     });
-    yield put(config.actions.handleEvent({ type: "modelsAdded", payload: { model: response } }, ctx));
+    yield put(
+      config.actions.handleEvent({ type: "modelsAdded", payload: { model: response } }, ctx),
+    );
   }
 
-  function* handleRowPositionChangedEvent(e: Table.RowPositionChangedEvent, ctx: TC<B>): SagaIterator {
+  function* handleRowPositionChangedEvent(
+    e: Table.RowPositionChangedEvent,
+    ctx: TC<B>,
+  ): SagaIterator {
     const response: M = yield http.request(api.updateFringe, ctx, e.payload.id, {
-      previous: e.payload.previous
+      previous: e.payload.previous,
     });
-    yield put(config.actions.handleEvent({ type: "modelsUpdated", payload: { model: response } }, ctx));
+    yield put(
+      config.actions.handleEvent({ type: "modelsUpdated", payload: { model: response } }, ctx),
+    );
   }
 
   function* handleRowAddEvent(e: Table.RowAddEvent<R>, ctx: TC<B>): SagaIterator {
@@ -293,10 +330,16 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     }
   }
 
-  function* handleDataChangeEvent(e: Table.DataChangeEvent<R, Table.ModelRow<R>>, ctx: TC<B>): SagaIterator {
+  function* handleDataChangeEvent(
+    e: Table.DataChangeEvent<R, Table.ModelRow<R>>,
+    ctx: TC<B>,
+  ): SagaIterator {
     const merged = tabling.events.consolidateRowChanges<R, Table.ModelRow<R>>(e.payload);
     if (merged.length !== 0) {
-      const requestPayload = tabling.rows.createBulkUpdatePayload<R, M, P>(merged, config.table.getColumns());
+      const requestPayload = tabling.rows.createBulkUpdatePayload<R, M, P>(
+        merged,
+        config.table.getColumns(),
+      );
       if (requestPayload.data.length !== 0) {
         yield fork(bulkUpdateTask, ctx, e, requestPayload);
       }
@@ -307,18 +350,26 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     handleChangeEvent: tabling.createChangeEventHandler<R, TC<B>>({
       rowAdd: handleRowAddEvent,
       rowDelete: handleRowDeleteEvent,
-      rowInsert: tabling.task(handleRowInsertEvent, config.table, "There was an error adding the table rows."),
+      rowInsert: tabling.task(
+        handleRowInsertEvent,
+        config.table,
+        "There was an error adding the table rows.",
+      ),
       rowPositionChanged: tabling.task(
         handleRowPositionChangedEvent,
         config.table,
-        "There was an error moving the table rows."
+        "There was an error moving the table rows.",
       ),
       /*
 			It is safe to assume that the ID of the row for which data is being
 			changed will always be a ModelRowId - but we have to force coerce that
 			here.
 			*/
-      dataChange: handleDataChangeEvent as Redux.TableChangeEventTask<Table.DataChangeEvent<R>, R, TC<B>>
-    })
+      dataChange: handleDataChangeEvent as Redux.TableChangeEventTask<
+        Table.DataChangeEvent<R>,
+        R,
+        TC<B>
+      >,
+    }),
   };
 };

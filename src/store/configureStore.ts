@@ -1,14 +1,21 @@
-import { Middleware, StoreEnhancer, createStore, applyMiddleware, compose, PreloadedState } from "redux";
-import createSagaMiddleware, { SagaMiddlewareOptions } from "redux-saga";
 import * as Sentry from "@sentry/react";
+import {
+  Middleware,
+  StoreEnhancer,
+  createStore,
+  applyMiddleware,
+  compose,
+  PreloadedState,
+} from "redux";
+import createSagaMiddleware, { SagaMiddlewareOptions } from "redux-saga";
 
 import * as config from "config";
 
 import ModuleConfig from "./config";
 import createSagaManager from "./createSagaManager";
+import createApplicationInitialState from "./initialState";
 import createApplicationReducer from "./reducer";
 import createApplicationSaga from "./sagas";
-import createApplicationInitialState from "./initialState";
 
 type MD = Middleware<Record<string, unknown>, Application.Store>;
 
@@ -22,7 +29,9 @@ const userActionMiddleware: MD = api => next => (action: Redux.Action) => {
   return next({ ...action, user: state.user });
 };
 
-const configureStore = (c: Omit<Application.StoreConfig, "modules">): Redux.Store<Application.Store> => {
+const configureStore = (
+  c: Omit<Application.StoreConfig, "modules">,
+): Redux.Store<Application.Store> => {
   const initialState = createApplicationInitialState({ ...c, modules: ModuleConfig });
   const applicationReducer = createApplicationReducer({ ...c, modules: ModuleConfig });
   const applicationSaga = createApplicationSaga({ ...c, modules: ModuleConfig });
@@ -34,7 +43,10 @@ const configureStore = (c: Omit<Application.StoreConfig, "modules">): Redux.Stor
 	*/
   let sagaMiddlewareOptions: SagaMiddlewareOptions = {};
   if (config.env.environmentIsRemote()) {
-    sagaMiddlewareOptions = { ...sagaMiddlewareOptions, onError: (error: Error) => Sentry.captureException(error) };
+    sagaMiddlewareOptions = {
+      ...sagaMiddlewareOptions,
+      onError: (error: Error) => Sentry.captureException(error),
+    };
   }
   const sagaMiddleware = createSagaMiddleware(sagaMiddlewareOptions);
 
@@ -44,7 +56,8 @@ const configureStore = (c: Omit<Application.StoreConfig, "modules">): Redux.Stor
       [require("redux-immutable-state-invariant").default(), ...baseMiddleware]
     : baseMiddleware;
 
-  const composeEnhancers = (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ as typeof compose) || compose;
+  const composeEnhancers =
+    (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ as typeof compose) || compose;
   let enhancers = composeEnhancers(applyMiddleware(...baseMiddleware));
   if (config.env.environmentIsRemote()) {
     const sentryReduxEnhancer: StoreEnhancer<{
@@ -53,12 +66,14 @@ const configureStore = (c: Omit<Application.StoreConfig, "modules">): Redux.Stor
     enhancers = composeEnhancers(applyMiddleware(...baseMiddleware), sentryReduxEnhancer);
   }
 
-  const store: Omit<Redux.Store<Application.Store>, "injectSaga" | "ejectSaga" | "hasSaga"> = createStore<
-    Application.Store,
-    Redux.Action,
-    { dispatch: unknown },
-    never
-  >(applicationReducer, initialState as PreloadedState<Application.Store>, enhancers);
+  const store: Omit<
+    Redux.Store<Application.Store>,
+    "injectSaga" | "ejectSaga" | "hasSaga"
+  > = createStore<Application.Store, Redux.Action, { dispatch: unknown }, never>(
+    applicationReducer,
+    initialState as PreloadedState<Application.Store>,
+    enhancers,
+  );
 
   /*
 	Start the application saga and establish the saga injector.  We must do this
@@ -68,7 +83,7 @@ const configureStore = (c: Omit<Application.StoreConfig, "modules">): Redux.Stor
   const [injectSaga, ejectSaga, hasSaga] = createSagaManager(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (saga: any, ...args: Parameters<any>) => sagaMiddleware.run(saga, ...args),
-    applicationSaga
+    applicationSaga,
   );
   return { ...store, injectSaga, ejectSaga, hasSaga };
 };

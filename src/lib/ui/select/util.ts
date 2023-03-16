@@ -1,20 +1,23 @@
-import { MultiValue, SingleValue } from "react-select";
 import { find, map, filter } from "lodash";
+import { MultiValue, SingleValue } from "react-select";
 
 export const toSelectModel = <M extends Model.Model>(m: ModelSelectOption<M>): SelectModel<M> =>
   !isNaN(parseInt(m.id)) ? ({ ...m, id: parseInt(m.id) } as M) : ({ ...m, id: m.id } as M);
 
-export const toModelSelectOption = <M extends Model.Model>(m: SelectModel<M>): ModelSelectOption<M> => ({
+export const toModelSelectOption = <M extends Model.Model>(
+  m: SelectModel<M>,
+): ModelSelectOption<M> => ({
   ...m,
-  id: String(m.id)
+  id: String(m.id),
 });
 
 type PresentFetch<M extends Model.Model> = { id: M["id"]; model: M };
 type MissingFetch<M extends Model.Model> = { id: M["id"]; model: null };
 type FetchedValue<M extends Model.Model> = MissingFetch<M> | PresentFetch<M>;
 
-const isSelectOption = <M extends Model.Model>(m: M | ModelSelectOption<M>): m is ModelSelectOption<M> =>
-  typeof m.id === "string";
+const isSelectOption = <M extends Model.Model>(
+  m: M | ModelSelectOption<M>,
+): m is ModelSelectOption<M> => typeof m.id === "string";
 
 /**
  * Converts the provided select value array in it's model form (i.e. a list of
@@ -27,14 +30,16 @@ const isSelectOption = <M extends Model.Model>(m: M | ModelSelectOption<M>): m i
  */
 export const parseSingleModelSelectValues = <M extends Model.Model>(
   data: (M | ModelSelectOption<M>)[],
-  value?: M["id"] | null | undefined
+  value?: M["id"] | null | undefined,
 ): SingleValue<ModelSelectOption<M>> | undefined => {
   const retrieve = (id: M["id"], dat: M[]): FetchedValue<M> => {
     const m: M | undefined = find(dat, (d: M) => d.id === id);
     return m === undefined ? { id, model: null } : { id, model: m };
   };
 
-  const dataSource = map(data, (o: M | ModelSelectOption<M>) => (isSelectOption(o) ? toSelectModel(o) : o));
+  const dataSource = map(data, (o: M | ModelSelectOption<M>) =>
+    isSelectOption(o) ? toSelectModel(o) : o,
+  );
 
   if (value === undefined || value === null) {
     return value;
@@ -43,7 +48,7 @@ export const parseSingleModelSelectValues = <M extends Model.Model>(
   if (retrieved.model === null) {
     console.warn(
       `The value ${retrieved.id} provided to the select could not be found ` +
-        "in the options and thus must be excluded."
+        "in the options and thus must be excluded.",
     );
     return null;
   }
@@ -61,14 +66,16 @@ export const parseSingleModelSelectValues = <M extends Model.Model>(
  */
 export const parseMultiModelSelectValues = <M extends Model.Model>(
   data: (M | ModelSelectOption<M>)[],
-  value?: M["id"][] | undefined
+  value?: M["id"][] | undefined,
 ): MultiValue<ModelSelectOption<M>> | undefined => {
   const retrieve = (id: M["id"], dat: M[]): FetchedValue<M> => {
     const m: M | undefined = find(dat, (d: M) => d.id === id);
     return m === undefined ? { id, model: null } : { id, model: m };
   };
 
-  const dataSource = map(data, (o: M | ModelSelectOption<M>) => (isSelectOption(o) ? toSelectModel(o) : o));
+  const dataSource = map(data, (o: M | ModelSelectOption<M>) =>
+    isSelectOption(o) ? toSelectModel(o) : o,
+  );
 
   if (value === undefined) {
     /* It is important to return the undefined value instead of an empty array
@@ -91,7 +98,7 @@ export const parseMultiModelSelectValues = <M extends Model.Model>(
     const invalidString = map(invalids, (m: MissingFetch<M>) => m.id).join(", ");
     console.warn(
       `The value(s) ${invalidString} provided to the select ` +
-        "could not be found in the options and thus must be excluded."
+        "could not be found in the options and thus must be excluded.",
     );
   }
   /* Convert the models associated with the values provided to the select value

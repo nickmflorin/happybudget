@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+
 import { isNil } from "lodash";
+import { useHistory } from "react-router-dom";
 
 import ButtonLink from "./ButtonLink";
 
@@ -11,7 +12,8 @@ const IncludeButtonLink = ({
   const [loading, setLoading] = useState(false);
   const history = useHistory();
 
-  const linkObj: LinkObj = typeof includeLink === "function" ? includeLink({ setLoading, history }) : includeLink;
+  const linkObj: LinkObj =
+    typeof includeLink === "function" ? includeLink({ setLoading, history }) : includeLink;
   return (
     <ButtonLink
       {...props}

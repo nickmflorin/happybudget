@@ -1,6 +1,7 @@
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+
 import { isNil } from "lodash";
+import { useDispatch } from "react-redux";
 
 import { tabling, budgeting } from "lib";
 import { AccountsTable as GenericAccountsTable, connectTableToAuthenticatedStore } from "tabling";
@@ -23,14 +24,14 @@ const ConnectedTable = connectTableToAuthenticatedStore<
     handleEvent: actions.budget.handleTableEventAction,
     loading: actions.budget.loadingAction,
     response: actions.budget.responseAction,
-    setSearch: actions.budget.setSearchAction
+    setSearch: actions.budget.setSearchAction,
   },
   tableId: (c: TC) => `${c.domain}-accounts`,
   selector: (c: TC) => selectors.createAccountsTableStoreSelector<Model.Budget, false>(c),
   createSaga: (table: Table.TableInstance<R, M>) => sagas.budget.accounts.createTableSaga(table),
   footerRowSelectors: (c: TC) => ({
-    footer: selectors.createBudgetFooterSelector(c)
-  })
+    footer: selectors.createBudgetFooterSelector(c),
+  }),
 })(GenericAccountsTable.AuthenticatedBudget);
 
 interface AccountsProps {
@@ -50,7 +51,13 @@ const Accounts = ({ setPreviewModalVisible, ...props }: AccountsProps): JSX.Elem
   }, [props.budget]);
 
   useEffect(() => {
-    dispatch(actions.budget.requestAction(null, { budgetId: props.budgetId, domain: "budget", public: false }));
+    dispatch(
+      actions.budget.requestAction(null, {
+        budgetId: props.budgetId,
+        domain: "budget",
+        public: false,
+      }),
+    );
   }, [props.budgetId]);
 
   return (
@@ -62,16 +69,27 @@ const Accounts = ({ setPreviewModalVisible, ...props }: AccountsProps): JSX.Elem
         onExportPdf={() => setPreviewModalVisible(true)}
         onShared={(publicToken: Model.PublicToken) =>
           dispatch(
-            actions.budget.updateBudgetInStateAction({ id: props.budgetId, data: { public_token: publicToken } }, {})
+            actions.budget.updateBudgetInStateAction(
+              { id: props.budgetId, data: { public_token: publicToken } },
+              {},
+            ),
           )
         }
         onShareUpdated={(publicToken: Model.PublicToken) =>
           dispatch(
-            actions.budget.updateBudgetInStateAction({ id: props.budgetId, data: { public_token: publicToken } }, {})
+            actions.budget.updateBudgetInStateAction(
+              { id: props.budgetId, data: { public_token: publicToken } },
+              {},
+            ),
           )
         }
         onUnshared={() =>
-          dispatch(actions.budget.updateBudgetInStateAction({ id: props.budgetId, data: { public_token: null } }, {}))
+          dispatch(
+            actions.budget.updateBudgetInStateAction(
+              { id: props.budgetId, data: { public_token: null } },
+              {},
+            ),
+          )
         }
       />
     </BudgetPage>

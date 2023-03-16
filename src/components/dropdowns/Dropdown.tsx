@@ -1,8 +1,8 @@
 import React, { useMemo, useState, useImperativeHandle, useEffect } from "react";
-import classNames from "classnames";
-import ClickAwayListener from "react-click-away-listener";
-import { uniqueId, isNil } from "lodash";
 
+import classNames from "classnames";
+import { uniqueId, isNil } from "lodash";
+import ClickAwayListener from "react-click-away-listener";
 import { Dropdown as AntdDropdown } from "antd";
 import { DropDownProps as AntdDropdownProps } from "antd/lib/dropdown";
 
@@ -29,20 +29,26 @@ const Dropdown = ({
   ...props
 }: DropdownProps): JSX.Element => {
   const [_visible, _setVisible] = useState(false);
-  const _overlayId = useMemo(() => (!isNil(overlayId) ? overlayId : uniqueId("dropdown-overlay-")), [overlayId]);
+  const _overlayId = useMemo(
+    () => (!isNil(overlayId) ? overlayId : uniqueId("dropdown-overlay-")),
+    [overlayId],
+  );
   const buttonId = useMemo(() => uniqueId("dropdown-button-"), []);
 
-  const isVisible = useMemo(() => (visible !== undefined ? visible : _visible), [visible, _visible]);
+  const isVisible = useMemo(
+    () => (visible !== undefined ? visible : _visible),
+    [visible, _visible],
+  );
   const setIsVisible = useMemo(
     () => (v: boolean) => {
       _setVisible(v);
       setVisible?.(v);
     },
-    [setVisible]
+    [setVisible],
   );
 
   useImperativeHandle(dropdown, () => ({
-    setVisible: _setVisible
+    setVisible: _setVisible,
   }));
 
   useEffect(() => {
@@ -89,7 +95,9 @@ const Dropdown = ({
                button will also trigger the ClickAway, so we need to avoid it. */
             const button = document.getElementById(buttonId);
             if (isNil(button)) {
-              console.warn(`Could not find button with ID ${buttonId} so the dropdown cannot be closed.`);
+              console.warn(
+                `Could not find button with ID ${buttonId} so the dropdown cannot be closed.`,
+              );
               return;
             } else if (!util.html.isNodeDescendantOf(button, e.target as Element | HTMLElement)) {
               setIsVisible(false);

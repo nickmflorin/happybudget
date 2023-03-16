@@ -1,6 +1,7 @@
 import React from "react";
-import { isNil } from "lodash";
+
 import classNames from "classnames";
+import { isNil } from "lodash";
 
 import { ui } from "lib";
 import { Icon } from "components";
@@ -16,11 +17,16 @@ type IconOrSpinnerProps = UseSizeProps & {
   readonly className?: string;
 };
 
-const IconOrSpinner = ({ loading, icon, spinnerProps, ...props }: IconOrSpinnerProps): JSX.Element => {
+const IconOrSpinner = ({
+  loading,
+  icon,
+  spinnerProps,
+  ...props
+}: IconOrSpinnerProps): JSX.Element => {
   if (loading === true) {
     return (
       <div {...props} className={classNames("icon-or-spinner", props.className)}>
-        <div className={"spinner-wrapper"}>
+        <div className="spinner-wrapper">
           <Spinner {...spinnerProps} />
         </div>
       </div>
@@ -28,7 +34,7 @@ const IconOrSpinner = ({ loading, icon, spinnerProps, ...props }: IconOrSpinnerP
   } else if (!isNil(icon)) {
     return (
       <div {...props} className={classNames("icon-or-spinner", props.className)}>
-        <div className={"icon-wrapper"}>{ui.iconIsJSX(icon) ? icon : <Icon icon={icon} />}</div>
+        <div className="icon-wrapper">{ui.iconIsJSX(icon) ? icon : <Icon icon={icon} />}</div>
       </div>
     );
   } else {

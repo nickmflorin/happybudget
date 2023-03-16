@@ -1,6 +1,7 @@
 import { isNil } from "lodash";
 
 import { tabling, http } from "lib";
+
 import createEventReducer from "./createEventReducer";
 
 export const createPublicTableReducer =
@@ -8,9 +9,9 @@ export const createPublicTableReducer =
     R extends Table.RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
-    C extends Redux.ActionContext = Redux.ActionContext
+    C extends Redux.ActionContext = Redux.ActionContext,
   >(
-    config: Table.ReducerConfig<R, M, S, C, Redux.TableActionCreatorMap<M, C>>
+    config: Table.ReducerConfig<R, M, S, C, Redux.TableActionCreatorMap<M, C>>,
   ): Redux.Reducer<S, C> =>
   (state: S | undefined = config.initialState, action: Redux.AnyPayloadAction<C>): S => {
     let newState = { ...state };
@@ -24,7 +25,10 @@ export const createPublicTableReducer =
         return {
           ...newState,
           error: a.payload,
-          data: tabling.rows.generateTableData<R, M>({ ...config, response: { models: [], groups: [], markups: [] } })
+          data: tabling.rows.generateTableData<R, M>({
+            ...config,
+            response: { models: [], groups: [], markups: [] },
+          }),
         };
       } else {
         return {
@@ -32,14 +36,17 @@ export const createPublicTableReducer =
           error: null,
           data: tabling.rows.generateTableData<R, M>({
             ...config,
-            response: a.payload
-          })
+            response: a.payload,
+          }),
         };
       }
     } else if (action.type === config.actions.setSearch.toString()) {
       const a: Redux.InferAction<typeof config.actions.setSearch> = action;
       return { ...newState, search: a.payload };
-    } else if (!isNil(config.actions.invalidate) && action.type === config.actions.invalidate.toString()) {
+    } else if (
+      !isNil(config.actions.invalidate) &&
+      action.type === config.actions.invalidate.toString()
+    ) {
       return { ...newState, invalidated: true };
     }
     return newState;
@@ -49,11 +56,11 @@ export const createAuthenticatedTableReducer = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C extends Redux.ActionContext = Redux.ActionContext
+  C extends Redux.ActionContext = Redux.ActionContext,
 >(
   config: Table.AuthenticatedReducerConfig<R, M, S, C> & {
     readonly getModelRowChildren?: (m: M) => number[];
-  }
+  },
 ): Redux.DynamicReducer<S, Redux.RecalculateRowReducerCallback<S, R>, C> => {
   const tableEventReducer = createEventReducer<R, M, S, C>(config);
   const generic = createPublicTableReducer<R, M, S, C>(config);
@@ -61,7 +68,7 @@ export const createAuthenticatedTableReducer = <
   return (
     state: S | undefined = config.initialState,
     action: Redux.AnyPayloadAction<C>,
-    recalculateRow?: Redux.RecalculateRowReducerCallback<S, R>
+    recalculateRow?: Redux.RecalculateRowReducerCallback<S, R>,
   ): S => {
     const newState = generic(state, action);
     if (action.type === config.actions.handleEvent.toString()) {

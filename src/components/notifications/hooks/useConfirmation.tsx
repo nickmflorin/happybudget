@@ -1,12 +1,15 @@
 import { useState, useMemo } from "react";
 
-import { cookies } from "lib";
-
-import { ConfirmationModal } from "components/modals";
-import { ConfirmationProps } from "components/notifications";
 import { isNil } from "lodash";
 
-type UseConfirmationProps<ARGS extends Array<unknown>> = Pick<ConfirmationProps, "suppressionKey"> & {
+import { cookies } from "lib";
+import { ConfirmationModal } from "components/modals";
+import { ConfirmationProps } from "components/notifications";
+
+type UseConfirmationProps<ARGS extends Array<unknown>> = Pick<
+  ConfirmationProps,
+  "suppressionKey"
+> & {
   readonly detail: string;
   readonly message?: string;
   readonly okText?: string;
@@ -17,7 +20,7 @@ type UseConfirmationProps<ARGS extends Array<unknown>> = Pick<ConfirmationProps,
 };
 
 const useConfirmation = <ARGS extends Array<unknown>>(
-  props: UseConfirmationProps<ARGS>
+  props: UseConfirmationProps<ARGS>,
 ): [JSX.Element, (passThrough: ARGS, m?: string) => void] => {
   const [modal, setModal] = useState<JSX.Element | null>(null);
 
@@ -44,7 +47,14 @@ const useConfirmation = <ARGS extends Array<unknown>>(
       );
       setModal(mdl);
     },
-    [props.message, props.cancelText, props.okText, props.okButtonClass, props.suppressionKey, props.title]
+    [
+      props.message,
+      props.cancelText,
+      props.okText,
+      props.okButtonClass,
+      props.suppressionKey,
+      props.title,
+    ],
   );
 
   const confirm = useMemo(
@@ -55,7 +65,7 @@ const useConfirmation = <ARGS extends Array<unknown>>(
         _setModal(passThrough, m);
       }
     },
-    [props.onConfirmed, props.suppressionKey]
+    [props.onConfirmed, props.suppressionKey],
   );
 
   return [modal || <></>, confirm];

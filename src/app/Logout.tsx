@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+
 import { useDispatch } from "react-redux";
 import { Redirect } from "react-router-dom";
 
@@ -19,7 +20,7 @@ export const Logout = (): JSX.Element => {
   }, []);
 
   if (redirect === true) {
-    return <Redirect to={"/login"} />;
+    return <Redirect to="/login" />;
   }
   return <></>;
 };

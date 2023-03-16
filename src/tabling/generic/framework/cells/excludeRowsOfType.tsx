@@ -1,10 +1,11 @@
 import React from "react";
+
 import { includes } from "lodash";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const excludeRowsOfType =
   <T extends { node: Table.RowNode } = { node: Table.RowNode }, R extends Table.RowData = any>(
-    types: Table.RowType[] | Table.RowType
+    types: Table.RowType[] | Table.RowType,
   ) =>
   /* eslint-disable @typescript-eslint/no-explicit-any */
   (Component: React.FunctionComponent<any>) => {

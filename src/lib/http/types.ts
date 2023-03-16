@@ -56,4 +56,4 @@ export enum STATUS_CODES {
   HTTP_500_INTERNAL_SERVER_ERROR = 500,
 }
 
-export type StatusCode = (typeof STATUS_CODES)[keyof typeof STATUS_CODES];
+export type StatusCode = typeof STATUS_CODES[keyof typeof STATUS_CODES];

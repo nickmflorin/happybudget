@@ -31,10 +31,10 @@ export type LookupAndNotifyDetail<K extends UIExistingNotificationId> = {
 export const notify = (
   destinationId: string,
   notifications: SingleOrArray<UINotificationType>,
-  opts?: UINotificationOptions
+  opts?: UINotificationOptions,
 ) => {
   const evt = new CustomEvent<AddNotificationsDetail>(`notifications:${destinationId}:add`, {
-    detail: { notifications, opts }
+    detail: { notifications, opts },
   });
   document.dispatchEvent(evt);
 };
@@ -50,9 +50,12 @@ export const notify = (
  * @param ids            The IDs of the notification that should be removed.  If
  *                       not provided, all notifications will be removed.
  */
-export const clear = (destinationId: string, ids: SingleOrArray<UINotification["id"]> | undefined) => {
+export const clear = (
+  destinationId: string,
+  ids: SingleOrArray<UINotification["id"]> | undefined,
+) => {
   const evt = new CustomEvent<ClearNotificationsDetail>(`notifications:${destinationId}:clear`, {
-    detail: ids
+    detail: ids,
   });
   document.dispatchEvent(evt);
 };
@@ -71,13 +74,16 @@ export const clear = (destinationId: string, ids: SingleOrArray<UINotification["
 export const lookupAndNotify = <K extends UIExistingNotificationId>(
   destinationId: string,
   id: K,
-  params: InferExistingNotificationParams<typeof existingNotifications[K]> = {} as InferExistingNotificationParams<
+  params: InferExistingNotificationParams<
     typeof existingNotifications[K]
-  >
+  > = {} as InferExistingNotificationParams<typeof existingNotifications[K]>,
 ) => {
-  const evt = new CustomEvent<LookupAndNotifyDetail<K>>(`notifications:${destinationId}:lookupAndNotify`, {
-    detail: { id, params }
-  });
+  const evt = new CustomEvent<LookupAndNotifyDetail<K>>(
+    `notifications:${destinationId}:lookupAndNotify`,
+    {
+      detail: { id, params },
+    },
+  );
   document.dispatchEvent(evt);
 };
 
@@ -93,9 +99,13 @@ export const lookupAndNotify = <K extends UIExistingNotificationId>(
  * @param e              The HTTP request error that occurred.
  * @param opts           Options for the dispatching of the notification(s).
  */
-export const handleRequestError = (destinationId: string, e: Error, opts?: UINotificationOptions) => {
+export const handleRequestError = (
+  destinationId: string,
+  e: Error,
+  opts?: UINotificationOptions,
+) => {
   const evt = new CustomEvent<RequestErrorDetail>(`notifications:${destinationId}:requestError`, {
-    detail: { error: e, opts }
+    detail: { error: e, opts },
   });
   document.dispatchEvent(evt);
 };

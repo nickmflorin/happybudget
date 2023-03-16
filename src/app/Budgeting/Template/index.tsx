@@ -1,7 +1,8 @@
 import { useEffect } from "react";
+
+import { isNil } from "lodash";
 import { useSelector, useDispatch } from "react-redux";
 import { Redirect, Switch, useHistory, useLocation, useRouteMatch } from "react-router-dom";
-import { isNil } from "lodash";
 
 import { budgeting } from "lib";
 import { Icon } from "components";
@@ -9,9 +10,8 @@ import { BudgetLayout } from "components/layout";
 import { Route, PathParamsRoute } from "components/routes";
 
 import Account from "./Account";
-import SubAccount from "./SubAccount";
 import Accounts from "./Accounts";
-
+import SubAccount from "./SubAccount";
 import { actions, selectors } from "../store";
 
 type TemplateProps = {
@@ -24,14 +24,18 @@ const Template = (props: TemplateProps): JSX.Element => {
   const dispatch = useDispatch();
   const match = useRouteMatch();
   const budget = useSelector((s: Application.Store) =>
-    selectors.selectBudgetDetail<Model.Template, false>(s, { domain: "template", public: false })
+    selectors.selectBudgetDetail<Model.Template, false>(s, { domain: "template", public: false }),
   );
   const budgetLoading = useSelector((s: Application.Store) =>
-    selectors.selectBudgetLoading(s, { domain: "template", public: false })
+    selectors.selectBudgetLoading(s, { domain: "template", public: false }),
   );
   useEffect(() => {
     dispatch(
-      actions.template.requestBudgetAction(null, { budgetId: props.budgetId, domain: "template", public: false })
+      actions.template.requestBudgetAction(null, {
+        budgetId: props.budgetId,
+        domain: "template",
+        public: false,
+      }),
     );
   }, [props.budgetId]);
 
@@ -40,17 +44,17 @@ const Template = (props: TemplateProps): JSX.Element => {
       budgetLoading={budgetLoading}
       sidebar={[
         {
-          icon: <Icon icon={"copy"} weight={"light"} />,
-          activeIcon: <Icon icon={"copy"} weight={"solid"} />,
+          icon: <Icon icon="copy" weight="light" />,
+          activeIcon: <Icon icon="copy" weight="solid" />,
           onClick: () => history.push("/templates"),
           tooltip: {
             content: "My Templates",
-            placement: "right"
-          }
+            placement: "right",
+          },
         },
         {
-          icon: <Icon icon={"file-spreadsheet"} weight={"light"} />,
-          activeIcon: <Icon icon={"file-spreadsheet"} weight={"solid"} />,
+          icon: <Icon icon="file-spreadsheet" weight="light" />,
+          activeIcon: <Icon icon="file-spreadsheet" weight="solid" />,
           onClick: () => {
             if (!isNaN(props.budgetId)) {
               const templateLastVisited = budgeting.urls.getLastVisited("template", props.budgetId);
@@ -66,9 +70,9 @@ const Template = (props: TemplateProps): JSX.Element => {
             !location.pathname.startsWith(`/templates/${props.budgetId}/fringes`),
           tooltip: {
             content: "Template",
-            placement: "right"
-          }
-        }
+            placement: "right",
+          },
+        },
       ]}
     >
       <Switch>
@@ -80,7 +84,10 @@ const Template = (props: TemplateProps): JSX.Element => {
             <Account id={params.accountId} budgetId={props.budgetId} budget={budget} />
           )}
         />
-        <Route path={match.url + "/accounts"} render={() => <Accounts budgetId={props.budgetId} budget={budget} />} />
+        <Route
+          path={match.url + "/accounts"}
+          render={() => <Accounts budgetId={props.budgetId} budget={budget} />}
+        />
         <PathParamsRoute<{ subaccountId: number }>
           params={["subaccountId"]}
           path={match.url + "/subaccounts/:subaccountId"}

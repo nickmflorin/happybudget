@@ -1,10 +1,12 @@
 import { isNil, filter, map, includes, reduce } from "lodash";
-
 import { ProcessCellForExportParams } from "@ag-grid-community/core";
 
 import { hooks, tabling, notifications } from "lib";
 
-export type UseClipboardReturnType = [(params: ProcessCellForExportParams) => string, (fields?: string[]) => CSVData];
+export type UseClipboardReturnType = [
+  (params: ProcessCellForExportParams) => string,
+  (fields?: string[]) => CSVData,
+];
 
 export type UseClipboardParams<R extends Table.RowData, M extends Model.RowHttpModel> = {
   readonly apis: Table.GridApis | null;
@@ -12,10 +14,13 @@ export type UseClipboardParams<R extends Table.RowData, M extends Model.RowHttpM
   readonly setCellCutChange?: (ch: Table.SoloCellChange<R> | null) => void;
 };
 
-const processCellValueForClipboard = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
+const processCellValueForClipboard = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+>(
   column: Table.DataColumn<R, M>,
   row: Table.BodyRow<R>,
-  value: Table.RawRowValue
+  value: Table.RawRowValue,
 ): string => {
   const processor = column.processCellForClipboard;
   if (!isNil(processor) && tabling.rows.isModelRow(row)) {
@@ -24,9 +29,9 @@ const processCellValueForClipboard = <R extends Table.RowData, M extends Model.R
     // The value should never be undefined at this point.
     if (value === undefined) {
       console.warn(
-        `Encountered undefined value for field ${column.field} when it was not expected, row=${notifications.objToJson(
-          row
-        )}.`
+        `Encountered undefined value for field ${
+          column.field
+        } when it was not expected, row=${notifications.objToJson(row)}.`,
       );
       return "";
     } else if (tabling.columns.isBodyColumn(column) && column.nullValue === value) {
@@ -38,12 +43,15 @@ const processCellValueForClipboard = <R extends Table.RowData, M extends Model.R
 };
 
 const useClipboard = <R extends Table.RowData, M extends Model.RowHttpModel>(
-  params: UseClipboardParams<R, M>
+  params: UseClipboardParams<R, M>,
 ): UseClipboardReturnType => {
-  const processCellForClipboard: (p: ProcessCellForExportParams) => string = hooks.useDynamicCallback(
-    (p: ProcessCellForExportParams): string => {
+  const processCellForClipboard: (p: ProcessCellForExportParams) => string =
+    hooks.useDynamicCallback((p: ProcessCellForExportParams): string => {
       if (!isNil(p.node)) {
-        const c: Table.RealColumn<R, M> | null = tabling.columns.getRealColumn(params.columns, p.column.getColId());
+        const c: Table.RealColumn<R, M> | null = tabling.columns.getRealColumn(
+          params.columns,
+          p.column.getColId(),
+        );
         if (!isNil(c) && tabling.columns.isDataColumn(c)) {
           params.setCellCutChange?.(null);
           const row: Table.BodyRow<R> = p.node.data;
@@ -51,8 +59,7 @@ const useClipboard = <R extends Table.RowData, M extends Model.RowHttpModel>(
         }
       }
       return "";
-    }
-  );
+    });
 
   const getCSVData = hooks.useDynamicCallback((fields?: string[]) => {
     const gridApi = params.apis?.grid;
@@ -63,7 +70,7 @@ const useClipboard = <R extends Table.RowData, M extends Model.RowHttpModel>(
           tabling.columns.isDataColumn(column) &&
           !isNil(column.field) &&
           column.canBeExported !== false &&
-          (isNil(fields) || includes(fields, column.field))
+          (isNil(fields) || includes(fields, column.field)),
       ) as Table.DataColumn<R, M>[];
       const csvData: CSVData = [map(cs, (col: Table.DataColumn<R, M>) => col.headerName || "")];
       gridApi.forEachNode((node: Table.RowNode) => {
@@ -81,15 +88,20 @@ const useClipboard = <R extends Table.RowData, M extends Model.RowHttpModel>(
                 if (!isNil(column.valueGetter)) {
                   processedValue = column.valueGetter(
                     row,
-                    filter(rows, (r: Table.Row<R>) => tabling.rows.isBodyRow(r)) as Table.BodyRow<R>[]
+                    filter(rows, (r: Table.Row<R>) =>
+                      tabling.rows.isBodyRow(r),
+                    ) as Table.BodyRow<R>[],
                   );
                 } else if (!isNil(column.field)) {
                   processedValue = row.data[column.field];
                 }
-                return [...current, processCellValueForClipboard<R, M>(column, row, processedValue)];
+                return [
+                  ...current,
+                  processCellValueForClipboard<R, M>(column, row, processedValue),
+                ];
               },
-              []
-            )
+              [],
+            ),
           );
         }
       });

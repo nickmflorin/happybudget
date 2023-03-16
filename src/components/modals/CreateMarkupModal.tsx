@@ -8,7 +8,7 @@ interface CreateMarkupModalProps<
   PARENT extends Model.Account | Model.SubAccount,
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  RSP extends Http.MarkupResponseTypes<B, PARENT> = Http.MarkupResponseTypes<B, PARENT>
+  RSP extends Http.MarkupResponseTypes<B, PARENT> = Http.MarkupResponseTypes<B, PARENT>,
 > extends Omit<CreateModelModalProps<Model.Markup, RSP>, "children"> {
   readonly parentId: PARENT["id"];
   readonly children?: number[];
@@ -24,7 +24,7 @@ const CreateMarkupModal = <
   PARENT extends Model.Account | Model.SubAccount,
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  RSP extends Http.MarkupResponseTypes<B, PARENT> = Http.MarkupResponseTypes<B, PARENT>
+  RSP extends Http.MarkupResponseTypes<B, PARENT> = Http.MarkupResponseTypes<B, PARENT>,
 >({
   parentId,
   parentType,
@@ -34,8 +34,8 @@ const CreateMarkupModal = <
 }: CreateMarkupModalProps<B, PARENT, R, M, RSP>): JSX.Element => (
   <CreateModelModal<Model.Markup, Http.MarkupPayload, MarkupFormValues, RSP>
     {...props}
-    title={"Markup"}
-    titleIcon={"badge-percent"}
+    title="Markup"
+    titleIcon="badge-percent"
     createSync={(payload: Http.MarkupPayload, callbacks: CreateModelCallbacks<RSP>) =>
       table.dispatchEvent({ type: "markupAdd", payload, ...callbacks })
     }
@@ -51,7 +51,7 @@ const CreateMarkupModal = <
         if (!isNaN(parseFloat(rate))) {
           mutated = {
             ...mutated,
-            rate: parseFloat((parseFloat(rate) / 100.0).toFixed(2))
+            rate: parseFloat((parseFloat(rate) / 100.0).toFixed(2)),
           };
         }
       } else {

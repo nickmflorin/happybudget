@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { Route, Redirect, RouteProps } from "react-router-dom";
+
 import axios from "axios";
+import { Route, Redirect, RouteProps } from "react-router-dom";
 
 import * as api from "api";
 import { notifications, http } from "lib";
 import * as store from "store";
-
 import { WrapInApplicationSpinner } from "components";
 
 export type PrivateRouteProps = RouteProps & {
@@ -13,7 +13,11 @@ export type PrivateRouteProps = RouteProps & {
   readonly revalidate?: boolean;
 };
 
-const PrivateRoute = ({ forceReloadFromStripe, revalidate, ...props }: PrivateRouteProps): JSX.Element => {
+const PrivateRoute = ({
+  forceReloadFromStripe,
+  revalidate,
+  ...props
+}: PrivateRouteProps): JSX.Element => {
   const authenticatedUser = store.hooks.useUser();
   const [redirect, setRedirect] = useState(false);
   const [authenticating, setAuthenticating] = useState(true);
@@ -30,7 +34,7 @@ const PrivateRoute = ({ forceReloadFromStripe, revalidate, ...props }: PrivateRo
       api
         .validateAuthToken(
           { force_reload_from_stripe: forceReloadFromStripe || false },
-          { cancelToken: newCancelToken() }
+          { cancelToken: newCancelToken() },
         )
         .then((response: Model.User) => {
           if (response.id !== authenticatedUser.id) {
@@ -39,7 +43,7 @@ const PrivateRoute = ({ forceReloadFromStripe, revalidate, ...props }: PrivateRo
               level: "error",
               message:
                 `Auth token validation returned user with ID ${response.id} but ` +
-                `current user is ${authenticatedUser.id}.  Logging them out.`
+                `current user is ${authenticatedUser.id}.  Logging them out.`,
             });
             setAuthenticating(false);
           } else {
@@ -64,7 +68,7 @@ const PrivateRoute = ({ forceReloadFromStripe, revalidate, ...props }: PrivateRo
   }, [authenticatedUser]);
 
   if (redirect === true) {
-    return <Redirect to={"/"} />;
+    return <Redirect to="/" />;
   } else {
     return (
       <WrapInApplicationSpinner loading={authenticating} hideWhileLoading={true}>

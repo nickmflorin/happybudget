@@ -1,6 +1,6 @@
+import { isNil, filter } from "lodash";
 import { SagaIterator, Saga } from "redux-saga";
 import { spawn } from "redux-saga/effects";
-import { isNil, filter } from "lodash";
 
 import { redux } from "lib";
 
@@ -9,7 +9,10 @@ import * as tasks from "./tasks";
 
 export const createPublicRootSaga = (config: Application.StoreConfig): Saga => {
   function* applicationSaga(): SagaIterator {
-    const publicConfig = filter(config.modules, (c: Application.ModuleConfig) => c.isPublic === true);
+    const publicConfig = filter(
+      config.modules,
+      (c: Application.ModuleConfig) => c.isPublic === true,
+    );
     for (let i = 0; i < publicConfig.length; i++) {
       const moduleConfig: Application.ModuleConfig = publicConfig[i];
       if (!isNil(moduleConfig.rootSaga)) {
@@ -25,17 +28,20 @@ const createApplicationSaga = (config: Application.StoreConfig): Saga => {
 
   const contactsSaga = redux.createAuthenticatedModelListSaga({
     tasks: { request: redux.convertContextTaskToTask(tasks.contacts.request) },
-    actions: { request: actions.requestContactsAction }
+    actions: { request: actions.requestContactsAction },
   });
   const filteredContactsSaga = redux.createAuthenticatedModelListSaga({
     tasks: { request: redux.convertContextTaskToTask(tasks.contacts.requestFiltered) },
     actions: {
       request: actions.requestFilteredContactsAction,
-      setSearch: actions.setContactsSearchAction
-    }
+      setSearch: actions.setContactsSearchAction,
+    },
   });
   function* applicationSaga(): SagaIterator {
-    const authenticatedConfig = filter(config.modules, (c: Application.ModuleConfig) => c.isPublic !== true);
+    const authenticatedConfig = filter(
+      config.modules,
+      (c: Application.ModuleConfig) => c.isPublic !== true,
+    );
     for (let i = 0; i < authenticatedConfig.length; i++) {
       const moduleConfig: Application.ModuleConfig = authenticatedConfig[i];
       if (!isNil(moduleConfig.rootSaga)) {

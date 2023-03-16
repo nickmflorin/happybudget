@@ -1,15 +1,16 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { useLocation, useHistory } from "react-router-dom";
+
 import { map, find, isNil } from "lodash";
+import { useLocation, useHistory } from "react-router-dom";
 
 import { ui } from "lib";
 import { ShowHide } from "components";
 
-import GenericSidebarItem from "./GenericSidebarItem";
 import ExpandedSidebarItem from "./ExpandedSidebarItem";
+import GenericSidebarItem from "./GenericSidebarItem";
 
 const ParentSidebarItem = (
-  props: IExpandedParentSidebarItem & { readonly closeSidebarOnClick?: () => void }
+  props: IExpandedParentSidebarItem & { readonly closeSidebarOnClick?: () => void },
 ): JSX.Element => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
@@ -42,7 +43,10 @@ const ParentSidebarItem = (
 					want to "click" the default item. */
           if (!isActive) {
             if (!open) {
-              let defaultItem = find(submenu, (i: IExpandedSingleSidebarItem) => i.default === true);
+              let defaultItem = find(
+                submenu,
+                (i: IExpandedSingleSidebarItem) => i.default === true,
+              );
               if (defaultItem === undefined) {
                 defaultItem = submenu[0];
               }
@@ -62,18 +66,16 @@ const ParentSidebarItem = (
         }}
       />
       <ShowHide show={open}>
-        <div className={"sidebar-sub-menu"}>
-          {map(submenu, (subItem: IExpandedSingleSidebarItem, i: number) => {
-            return (
-              <GenericSidebarItem<IExpandedSingleSidebarItem>
-                key={i}
-                {...subItem}
-                closeSidebarOnClick={closeSidebarOnClick}
-              >
-                <span className={"text-container"}>{subItem.label}</span>
-              </GenericSidebarItem>
-            );
-          })}
+        <div className="sidebar-sub-menu">
+          {map(submenu, (subItem: IExpandedSingleSidebarItem, i: number) => (
+            <GenericSidebarItem<IExpandedSingleSidebarItem>
+              key={i}
+              {...subItem}
+              closeSidebarOnClick={closeSidebarOnClick}
+            >
+              <span className="text-container">{subItem.label}</span>
+            </GenericSidebarItem>
+          ))}
         </div>
       </ShowHide>
     </React.Fragment>

@@ -1,14 +1,14 @@
 import React, { useState, useRef, useMemo } from "react";
+
 import { isNil } from "lodash";
 
 import * as api from "api";
 import { notifications } from "lib";
-
 import { Separator } from "components";
-import { TaggedActuals } from "components/model/contacts";
-import { ContactForm } from "components/forms";
 import { ImageAndName } from "components/fields";
 import { IImageAndNameRef } from "components/fields/ImageAndName";
+import { ContactForm } from "components/forms";
+import { TaggedActuals } from "components/model/contacts";
 
 import { EditModelModal, EditModelModalProps } from "./generic";
 
@@ -17,7 +17,11 @@ interface EditContactModalProps extends EditModelModalProps<Model.Contact> {
   readonly onAttachmentAdded?: (m: Model.Attachment) => void;
 }
 
-const EditContactModal = ({ onAttachmentRemoved, onAttachmentAdded, ...props }: EditContactModalProps): JSX.Element => {
+const EditContactModal = ({
+  onAttachmentRemoved,
+  onAttachmentAdded,
+  ...props
+}: EditContactModalProps): JSX.Element => {
   const [image, setImage] = useState<UploadedImage | null | undefined>(undefined);
   /*
   Note: We have to use a ref here, instead of storing firstName and lastName in
@@ -37,13 +41,13 @@ const EditContactModal = ({ onAttachmentRemoved, onAttachmentAdded, ...props }: 
         headerRef.current?.setLastName(changedValues.last_name);
       }
     },
-    []
+    [],
   );
 
   return (
     <EditModelModal
       {...props}
-      className={"contact-modal"}
+      className="contact-modal"
       update={api.updateContact}
       request={api.getContact}
       autoFocusField={1}
@@ -51,7 +55,9 @@ const EditContactModal = ({ onAttachmentRemoved, onAttachmentAdded, ...props }: 
         <ImageAndName
           value={contact.image}
           onChange={(f: UploadedImage | null) => setImage(f)}
-          onError={(error: Error | string) => form.notify(typeof error === "string" ? error : error.message)}
+          onError={(error: Error | string) =>
+            form.notify(typeof error === "string" ? error : error.message)
+          }
           ref={headerRef}
           initialValues={{ first_name: contact.first_name, last_name: contact.last_name }}
         />
@@ -66,7 +72,10 @@ const EditContactModal = ({ onAttachmentRemoved, onAttachmentAdded, ...props }: 
       }}
       setFormData={(contact: Model.Contact, form: FormInstance<Http.ContactPayload>) =>
         form.setFields([
-          { name: "contact_type", value: contact.contact_type !== null ? contact.contact_type.id : null },
+          {
+            name: "contact_type",
+            value: contact.contact_type !== null ? contact.contact_type.id : null,
+          },
           { name: "first_name", value: contact.first_name },
           { name: "last_name", value: contact.last_name },
           { name: "company", value: contact.company },
@@ -75,7 +84,7 @@ const EditContactModal = ({ onAttachmentRemoved, onAttachmentAdded, ...props }: 
           { name: "rate", value: contact.rate },
           { name: "city", value: contact.city },
           { name: "phone_number", value: contact.phone_number },
-          { name: "notes", value: contact.notes }
+          { name: "notes", value: contact.notes },
         ])
       }
     >
@@ -95,12 +104,12 @@ const EditContactModal = ({ onAttachmentRemoved, onAttachmentAdded, ...props }: 
                       notifications.internal.notify({
                         error: e,
                         level: "error",
-                        dispatchToSentry: true
+                        dispatchToSentry: true,
                       });
                       form.notify({ message: "There was an error downloading your attachment." });
                     },
                     path: `/v1/contacts/${m.id}/attachments/`,
-                    modelId: m.id
+                    modelId: m.id,
                   }
                 : undefined
             }
@@ -108,7 +117,7 @@ const EditContactModal = ({ onAttachmentRemoved, onAttachmentAdded, ...props }: 
           <Separator />
           <TaggedActuals
             contactId={props.modelId}
-            title={"History"}
+            title="History"
             onError={(e: Error) => form.handleRequestError(e)}
           />
         </React.Fragment>

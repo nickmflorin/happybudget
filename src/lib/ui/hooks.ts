@@ -1,22 +1,23 @@
-import { RefObject, useRef, useEffect, useState, useMemo } from "react";
-import { forEach, isNil, debounce, uniqueId } from "lodash";
+import { RefObject, useRef, useEffect, useState, useMemo, useCallback } from "react";
+
 import * as JsSearch from "js-search";
+import { isEqual, forEach, isNil, debounce, uniqueId } from "lodash";
 import { useMediaQuery } from "react-responsive";
 
+import { notifications } from "lib";
 import { Breakpoints } from "style/constants";
-
-import { hooks, notifications } from "lib";
 
 export * from "./tsxHooks";
 
 export const useIsMounted = (): RefObject<boolean> => {
   const _isMounted = useRef(true);
 
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       _isMounted.current = false;
-    };
-  }, []);
+    },
+    [],
+  );
 
   return _isMounted;
 };
@@ -25,23 +26,27 @@ export const useId = (prefix: string) => useMemo(() => uniqueId(prefix), []);
 
 export type UseSizeConfig<
   T extends string = StandardSize,
-  P extends UseSizeProps<T, string> = UseSizeProps<T, "size">
+  P extends UseSizeProps<T, string> = UseSizeProps<T, "size">,
 > = {
   readonly options?: T[];
   readonly default?: T;
   readonly sizeProp?: keyof P;
 };
 
-export const useSize = <T extends string = StandardSize, P extends UseSizeProps<T, string> = UseSizeProps<T, "size">>(
+export const useSize = <
+  T extends string = StandardSize,
+  P extends UseSizeProps<T, string> = UseSizeProps<T, "size">,
+>(
   props: P,
-  config?: UseSizeConfig<T, P>
+  config?: UseSizeConfig<T, P>,
 ): T | undefined =>
   useMemo<T | undefined>((): T | undefined => {
     const sizeProp = config?.sizeProp || "size";
     if (props[sizeProp as keyof P] !== undefined) {
       return props[sizeProp as keyof P] as unknown as T;
     } else {
-      const options = config?.options || (["xsmall", "small", "medium", "standard", "large", "xlarge"] as T[]);
+      const options =
+        config?.options || (["xsmall", "small", "medium", "standard", "large", "xlarge"] as T[]);
       for (let i = 0; i < options.length; i++) {
         if (props[options[i]] === true) {
           return options[i];
@@ -55,7 +60,7 @@ export const InitialModalRef: ModalInstance = {
   ...notifications.ui.InitialNotificationsManager,
   /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   setLoading: () => {},
-  loading: false
+  loading: false,
 };
 
 export const useModal = (): NonNullRef<ModalInstance> => {
@@ -64,7 +69,9 @@ export const useModal = (): NonNullRef<ModalInstance> => {
   return ref;
 };
 
-export const useModalIfNotDefined = (modal?: NonNullRef<ModalInstance>): NonNullRef<ModalInstance> => {
+export const useModalIfNotDefined = (
+  modal?: NonNullRef<ModalInstance>,
+): NonNullRef<ModalInstance> => {
   const ref = useRef<ModalInstance>(InitialModalRef);
   const returnRef = useMemo(() => (!isNil(modal) ? modal : ref), [modal, ref.current]);
   return returnRef;
@@ -72,26 +79,24 @@ export const useModalIfNotDefined = (modal?: NonNullRef<ModalInstance>): NonNull
 
 export const InitialDropdownRef: IDropdownRef = {
   /* eslint-disable-next-line @typescript-eslint/no-empty-function */
-  setVisible: () => {}
+  setVisible: () => {},
 };
 
-export const useDropdown = (): NonNullRef<IDropdownRef> => {
-  return useRef<IDropdownRef>(InitialDropdownRef);
-};
+export const useDropdown = (): NonNullRef<IDropdownRef> => useRef<IDropdownRef>(InitialDropdownRef);
 
-export const useDropdownIfNotDefined = (dropdown?: NonNullRef<IDropdownRef>): NonNullRef<IDropdownRef> => {
+export const useDropdownIfNotDefined = (
+  dropdown?: NonNullRef<IDropdownRef>,
+): NonNullRef<IDropdownRef> => {
   const ref = useRef<IDropdownRef>(InitialDropdownRef);
   const returnRef = useMemo(() => (!isNil(dropdown) ? dropdown : ref), [dropdown, ref.current]);
   return returnRef;
 };
 
-export const useLessThanBreakpoint = (id: Style.BreakpointId): boolean => {
-  return useMediaQuery({ query: `(max-width: ${Breakpoints[id]}px)` });
-};
+export const useLessThanBreakpoint = (id: Style.BreakpointId): boolean =>
+  useMediaQuery({ query: `(max-width: ${Breakpoints[id]}px)` });
 
-export const useGreaterThanBreakpoint = (id: Style.BreakpointId): boolean => {
-  return useMediaQuery({ query: `(min-width: ${Breakpoints[id]}px)` });
-};
+export const useGreaterThanBreakpoint = (id: Style.BreakpointId): boolean =>
+  useMediaQuery({ query: `(min-width: ${Breakpoints[id]}px)` });
 
 const createRootElement = (id: string | number): HTMLElement => {
   const rootContainer = document.createElement("div");
@@ -176,7 +181,11 @@ export interface SearchOptions {
   readonly disabled?: boolean;
 }
 
-export const useDebouncedJSSearch = <T>(search: string | undefined, models: T[], options: SearchOptions): T[] => {
+export const useDebouncedJSSearch = <T>(
+  search: string | undefined,
+  models: T[],
+  options: SearchOptions,
+): T[] => {
   const [jsSearch, setJsSearch] = useState<JsSearch.Search | undefined>(undefined);
   const [filteredModels, setFilteredModels] = useState<T[]>(models);
 
@@ -211,7 +220,7 @@ export const useDebouncedJSSearch = <T>(search: string | undefined, models: T[],
     } else {
       setFilteredModels(models);
     }
-  }, [search, hooks.useDeepEqualMemo(models)]);
+  }, [search, useComparedValueRef(models)]);
 
   return filteredModels;
 };
@@ -222,4 +231,42 @@ export const useTrackFirstRender = (): boolean => {
     isFirstRender.current = false;
   }, []);
   return isFirstRender.current;
+};
+
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+type Comparator = (a: any, b: any) => boolean;
+
+/**
+ * A hook that returns a value of type {@link number} that increments each time the provided value,
+ * {@link T}, changes - where a change is determined by a comparison function {@link Comparator}
+ * that can be provided to the hook.
+ */
+export function useComparedValueRef<T>(value: T, comparator?: Comparator) {
+  const ref = useRef<T | undefined>(undefined);
+  const signalRef = useRef<number>(0);
+
+  comparator = comparator || isEqual;
+  if (!comparator(ref.current, value)) {
+    ref.current = value;
+    signalRef.current += 1;
+  }
+  return signalRef.current;
+}
+
+/**
+ * A variation of React's `useMemo` hook that performs a deep comparison rather than a value
+ * comparison when determining if a value has changed.
+ */
+export const useDeepEqualMemo = <T>(
+  callback: Parameters<typeof useMemo<T>>[0],
+  dependencies: Parameters<typeof useMemo<T>>[1],
+) => useMemo<T>(callback, [callback, useComparedValueRef(dependencies, isEqual)]);
+
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+export const useDynamicCallback = <T>(callback: (...args: any[]) => T) => {
+  const ref = useRef<typeof callback>(callback);
+  ref.current = callback;
+  const func: typeof callback = (...args: Parameters<typeof callback>) =>
+    ref.current.apply(this, args);
+  return useCallback(func, []);
 };

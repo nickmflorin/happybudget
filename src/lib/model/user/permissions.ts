@@ -1,30 +1,33 @@
 import { includes, map, filter } from "lodash";
 
 export enum Permissions {
-  MULTIPLE_BUDGETS = "multiple_budgets"
+  MULTIPLE_BUDGETS = "multiple_budgets",
 }
 
 export const ProductPermissions: { [key in Model.ProductPermissionId]: Array<Model.ProductId> } = {
-  multiple_budgets: ["standard"]
+  multiple_budgets: ["standard"],
 };
 
 export enum ProductPermissionIds {
-  MULTIPLE_BUDGETS = "multiple_budgets"
+  MULTIPLE_BUDGETS = "multiple_budgets",
 }
 
-export const userHasProduct = (user: Model.User, product?: SingleOrArray<Model.ProductId> | null): boolean => {
+export const userHasProduct = (
+  user: Model.User,
+  product?: SingleOrArray<Model.ProductId> | null,
+): boolean => {
   if (user.billing_status === null || user.product_id === null) {
     if (user.product_id !== null) {
       /* This should not happen, as these should coincide in the backend - but
 				 just in case, we want to issue an error. */
       console.error(
-        `User ${user.id} does not have a billing status, but has an assigned product ID ${user.product_id}.`
+        `User ${user.id} does not have a billing status, but has an assigned product ID ${user.product_id}.`,
       );
     } else if (user.billing_status !== null) {
       /* This should not happen, as these should coincide in the backend - but
 				 just in case, we want to issue an error. */
       console.error(
-        `User ${user.id} does not have a product ID, but has an assigned billing status ${user.billing_status}.`
+        `User ${user.id} does not have a product ID, but has an assigned billing status ${user.billing_status}.`,
       );
     }
     /* A null product means that we are interested in Users that do not have
@@ -49,5 +52,5 @@ export const userHasProduct = (user: Model.User, product?: SingleOrArray<Model.P
 export const userHasPermission = (user: Model.User, permission: Model.ProductPermissionId) =>
   filter(
     map(ProductPermissions[permission], (p: Model.ProductId) => userHasProduct(user, p)),
-    (v: boolean) => v === true
+    (v: boolean) => v === true,
   ).length !== 0;

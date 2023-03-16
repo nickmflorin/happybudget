@@ -1,7 +1,9 @@
 import React from "react";
+
 import classNames from "classnames";
 
 import { WrapInApplicationSpinner } from "components";
+
 import CollapsedLayout, { CollapsedLayoutProps } from "./CollapsedLayout";
 
 export type BudgetLayoutProps = CollapsedLayoutProps & {

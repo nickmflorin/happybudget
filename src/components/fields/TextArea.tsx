@@ -1,7 +1,8 @@
 import React from "react";
+
+import classNames from "classnames";
 import { Input as AntDInput } from "antd";
 import { TextAreaProps as AntDTextAreaProps } from "antd/lib/input";
-import classNames from "classnames";
 
 export type TextAreaProps = AntDTextAreaProps;
 

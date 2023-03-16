@@ -1,4 +1,5 @@
 import classNames from "classnames";
+
 import RootTooltip from "./Tooltip";
 
 const InfoTooltip = ({ children, ...props }: TooltipProps): JSX.Element => (

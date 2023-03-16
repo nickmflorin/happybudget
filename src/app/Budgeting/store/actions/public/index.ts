@@ -19,5 +19,7 @@ export const responseBudgetAction = creator<Http.RenderedDetailResponse<Model.Bu
 export const requestBudgetAction = creator<Redux.RequestPayload, C>("Request");
 
 export const loadingFringesAction = creator<boolean, FC>("fringes.Loading");
-export const responseFringesAction = creator<Http.TableResponse<Model.Fringe>, FC>("fringes.Response");
+export const responseFringesAction = creator<Http.TableResponse<Model.Fringe>, FC>(
+  "fringes.Response",
+);
 export const setFringesSearchAction = creator<string, FC>("fringes.SetSearch");

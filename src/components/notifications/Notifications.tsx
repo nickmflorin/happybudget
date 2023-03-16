@@ -1,6 +1,8 @@
 import React from "react";
-import { isNil, map } from "lodash";
+
 import classNames from "classnames";
+import { isNil, map } from "lodash";
+
 import Notification, { NotificationProps } from "./Notification";
 
 export type NotificationsProps = StandardComponentProps & {
@@ -16,7 +18,10 @@ export type NotificationsProps = StandardComponentProps & {
   readonly children?: RenderPropChild<{ notification: UINotification }>;
 };
 
-const WrapInStatic = (props: { readonly children: JSX.Element; readonly static?: boolean }): JSX.Element => {
+const WrapInStatic = (props: {
+  readonly children: JSX.Element;
+  readonly static?: boolean;
+}): JSX.Element => {
   if (props.static === true) {
     return <div style={{ position: "static" }}>{props.children}</div>;
   }

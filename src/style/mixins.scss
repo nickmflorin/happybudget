@@ -24,7 +24,7 @@ $standards: (
   "standard": $standard-size,
   "medium": $medium-size,
   "small": $small-size,
-  "xsmall": $xsmall-size
+  "xsmall": $xsmall-size,
 );
 
 @function standard($metric: "standard", $map: $standards) {

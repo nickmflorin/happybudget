@@ -1,10 +1,12 @@
 import { isNil, includes, filter, map } from "lodash";
-
 import { NavigateToNextCellParams, TabToNextCellParams } from "@ag-grid-community/core";
 
 import { hooks, tabling } from "lib";
 
-export interface UseCellNavigationParams<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> {
+export interface UseCellNavigationParams<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+> {
   readonly apis: Table.GridApis | null;
   readonly columns: Table.Column<R, M>[];
   readonly onNewRowRequired?: (newRowIndex: number) => void;
@@ -14,7 +16,7 @@ type UseCellNavigationReturnType = [
   (p: NavigateToNextCellParams) => Table.CellPosition,
   (p: TabToNextCellParams) => Table.CellPosition,
   (loc: Table.CellPosition) => void,
-  (loc: Table.CellPosition) => void
+  (loc: Table.CellPosition) => void,
 ];
 
 type FindNavigatableRowOptions = {
@@ -24,7 +26,7 @@ type FindNavigatableRowOptions = {
 const findNextNavigatableNodes = <R extends Table.RowData>(
   api: Table.GridApi,
   startingIndex: number,
-  opts?: FindNavigatableRowOptions
+  opts?: FindNavigatableRowOptions,
 ): [Table.RowNode[], number, number] => {
   const d = opts?.direction !== undefined ? opts.direction : "asc";
   const indexIsValid = (index: number) => {
@@ -80,11 +82,14 @@ const findNextNavigatableNodes = <R extends Table.RowData>(
   }
 };
 
-const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  params: UseCellNavigationParams<R, M>
+const useCellNavigation = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+>(
+  params: UseCellNavigationParams<R, M>,
 ): UseCellNavigationReturnType => {
-  const navigateToNextCell: (p: NavigateToNextCellParams) => Table.CellPosition = hooks.useDynamicCallback(
-    (p: NavigateToNextCellParams): Table.CellPosition => {
+  const navigateToNextCell: (p: NavigateToNextCellParams) => Table.CellPosition =
+    hooks.useDynamicCallback((p: NavigateToNextCellParams): Table.CellPosition => {
       if (!isNil(p.nextCellPosition)) {
         const field = p.nextCellPosition.column.getColId();
         const column = tabling.columns.getColumn(params.columns, field);
@@ -94,16 +99,20 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
 
           if (verticalAscend === true || verticalDescend === true) {
             const direction: "asc" | "desc" = verticalAscend === true ? "asc" : "desc";
-            const [rowNodes, _, additionalIndex] = findNextNavigatableNodes(p.api, p.nextCellPosition.rowIndex, {
-              direction
-            });
+            const [rowNodes, _, additionalIndex] = findNextNavigatableNodes(
+              p.api,
+              p.nextCellPosition.rowIndex,
+              {
+                direction,
+              },
+            );
             if (rowNodes.length !== 0) {
               return {
                 ...p.nextCellPosition,
                 rowIndex:
                   verticalAscend === true
                     ? p.nextCellPosition.rowIndex + additionalIndex
-                    : p.nextCellPosition.rowIndex - additionalIndex
+                    : p.nextCellPosition.rowIndex - additionalIndex,
               };
             }
             return p.nextCellPosition;
@@ -115,8 +124,7 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
         }
       }
       return p.previousCellPosition;
-    }
-  );
+    });
 
   const tabToNextCell: (p: TabToNextCellParams) => Table.CellPosition = hooks.useDynamicCallback(
     (p: TabToNextCellParams): Table.CellPosition => {
@@ -127,20 +135,26 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
         const column = tabling.columns.getColumn(params.columns, field);
         if (!isNil(column) && column.cType === "action") {
           let nextCellPosition = { ...p.nextCellPosition };
-          const [rowNodes, _, additionalIndex] = findNextNavigatableNodes(p.api, p.nextCellPosition.rowIndex);
+          const [rowNodes, _, additionalIndex] = findNextNavigatableNodes(
+            p.api,
+            p.nextCellPosition.rowIndex,
+          );
           if (rowNodes.length !== 0) {
             nextCellPosition = {
               ...p.nextCellPosition,
-              rowIndex: p.nextCellPosition.rowIndex + additionalIndex
+              rowIndex: p.nextCellPosition.rowIndex + additionalIndex,
             };
           }
           const agColumns = params.apis?.column.getAllColumns();
           if (!isNil(agColumns)) {
             const actionColumns = filter(agColumns, (c: Table.AgColumn) =>
               includes(
-                map(tabling.columns.filterActionColumns(params.columns), (ci: Table.ActionColumn<R, M>) => ci.colId),
-                c.getColId()
-              )
+                map(
+                  tabling.columns.filterActionColumns(params.columns),
+                  (ci: Table.ActionColumn<R, M>) => ci.colId,
+                ),
+                c.getColId(),
+              ),
             );
             if (p.backwards === false && params.columns.length > actionColumns.length) {
               return { ...nextCellPosition, column: agColumns[actionColumns.length] };
@@ -151,66 +165,81 @@ const useCellNavigation = <R extends Table.RowData, M extends Model.RowHttpModel
         }
       }
       return p.nextCellPosition === null ? p.previousCellPosition : p.nextCellPosition;
-    }
+    },
   );
 
-  const moveToLocation: (loc: Table.CellPosition) => void = hooks.useDynamicCallback((loc: Table.CellPosition) => {
-    params.apis?.grid.setFocusedCell(loc.rowIndex, loc.column);
-    params.apis?.grid.clearRangeSelection();
-  });
+  const moveToLocation: (loc: Table.CellPosition) => void = hooks.useDynamicCallback(
+    (loc: Table.CellPosition) => {
+      params.apis?.grid.setFocusedCell(loc.rowIndex, loc.column);
+      params.apis?.grid.clearRangeSelection();
+    },
+  );
 
-  const moveToNextRow: (loc: Table.CellPosition) => void = hooks.useDynamicCallback((loc: Table.CellPosition) => {
-    if (!isNil(params.apis)) {
-      const node: Table.RowNode | undefined = params.apis.grid.getDisplayedRowAtIndex(loc.rowIndex);
-      if (!isNil(node)) {
-        const row: Table.BodyRow<R> = node.data;
-        const [nodes, rowIndex, _] = findNextNavigatableNodes(params.apis.grid, loc.rowIndex + 1, {
-          direction: "asc"
-        });
+  const moveToNextRow: (loc: Table.CellPosition) => void = hooks.useDynamicCallback(
+    (loc: Table.CellPosition) => {
+      if (!isNil(params.apis)) {
+        const node: Table.RowNode | undefined = params.apis.grid.getDisplayedRowAtIndex(
+          loc.rowIndex,
+        );
+        if (!isNil(node)) {
+          const row: Table.BodyRow<R> = node.data;
+          const [nodes, rowIndex, _] = findNextNavigatableNodes(
+            params.apis.grid,
+            loc.rowIndex + 1,
+            {
+              direction: "asc",
+            },
+          );
 
-        const rows: Table.BodyRow<R>[] = map(nodes, (n: Table.RowNode) => n.data as Table.BodyRow<R>);
+          const rows: Table.BodyRow<R>[] = map(
+            nodes,
+            (n: Table.RowNode) => n.data as Table.BodyRow<R>,
+          );
 
-        /* We only want to add a new row if we are either at the last BodyRow of
+          /* We only want to add a new row if we are either at the last BodyRow of
 					 the entire table or at the last ModelRow of the entire table (in which
 					 case the only BodyRow(s) after it should be MarkupRow(s)). */
-        const newRowRequired = (r: Table.BodyRow<R>) => {
-          if (rows.length === 0) {
-            return true;
-          } else if (
-            tabling.rows.isModelRow(r) &&
-            filter(rows, (ri: Table.BodyRow<R>) => tabling.rows.isModelRow(ri)).length === 0
-          ) {
-            return true;
-          }
-          return false;
-        };
-
-        if (!isNil(node)) {
-          if (newRowRequired(row)) {
-            if (!isNil(params.onNewRowRequired)) {
-              params.onNewRowRequired(loc.rowIndex);
+          const newRowRequired = (r: Table.BodyRow<R>) => {
+            if (rows.length === 0) {
+              return true;
+            } else if (
+              tabling.rows.isModelRow(r) &&
+              filter(rows, (ri: Table.BodyRow<R>) => tabling.rows.isModelRow(ri)).length === 0
+            ) {
+              return true;
             }
-          } else {
-            moveToLocation({ rowIndex, column: loc.column });
+            return false;
+          };
+
+          if (!isNil(node)) {
+            if (newRowRequired(row)) {
+              if (!isNil(params.onNewRowRequired)) {
+                params.onNewRowRequired(loc.rowIndex);
+              }
+            } else {
+              moveToLocation({ rowIndex, column: loc.column });
+            }
           }
         }
       }
-    }
-  });
+    },
+  );
 
-  const moveToNextColumn: (loc: Table.CellPosition) => void = hooks.useDynamicCallback((loc: Table.CellPosition) => {
-    const agColumns = params.apis?.column.getAllColumns();
-    if (!isNil(agColumns)) {
-      const index = agColumns.indexOf(loc.column);
-      if (index !== -1) {
-        if (index === agColumns.length - 1) {
-          moveToNextRow({ rowIndex: loc.rowIndex, column: agColumns[0] });
-        } else {
-          moveToLocation({ rowIndex: loc.rowIndex, column: agColumns[index + 1] });
+  const moveToNextColumn: (loc: Table.CellPosition) => void = hooks.useDynamicCallback(
+    (loc: Table.CellPosition) => {
+      const agColumns = params.apis?.column.getAllColumns();
+      if (!isNil(agColumns)) {
+        const index = agColumns.indexOf(loc.column);
+        if (index !== -1) {
+          if (index === agColumns.length - 1) {
+            moveToNextRow({ rowIndex: loc.rowIndex, column: agColumns[0] });
+          } else {
+            moveToLocation({ rowIndex: loc.rowIndex, column: agColumns[index + 1] });
+          }
         }
       }
-    }
-  });
+    },
+  );
 
   return [navigateToNextCell, tabToNextCell, moveToNextColumn, moveToNextRow];
 };

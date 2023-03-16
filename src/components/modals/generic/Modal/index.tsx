@@ -1,7 +1,7 @@
 import React, { ReactNode, useImperativeHandle, useState } from "react";
-import { isNil } from "lodash";
-import classNames from "classnames";
 
+import classNames from "classnames";
+import { isNil } from "lodash";
 import { Modal as RootModal } from "antd";
 
 import { notifications } from "lib";
@@ -24,24 +24,26 @@ const Modal = ({
   const [loading, setLoading] = useState(false);
   const notificationsManager = notifications.ui.useNotificationsManager({
     defaultBehavior: "append",
-    defaultClosable: false
+    defaultClosable: false,
   });
 
   useImperativeHandle(modal, () => ({ ...notificationsManager, loading, setLoading }));
 
   return (
     <RootModal
-      cancelText={"Cancel"}
+      cancelText="Cancel"
       destroyOnClose={true}
       getContainer={false}
       okButtonProps={{
         ...okButtonProps,
         className: classNames("btn", okButtonClass),
-        loading: buttonSpinnerOnLoad === true && loading
+        loading: buttonSpinnerOnLoad === true && loading,
       }}
       cancelButtonProps={{ ...cancelButtonProps, className: "btn btn--default" }}
       {...props}
-      className={classNames("modal", props.className, { "modal--no-footer": props.footer === null })}
+      className={classNames("modal", props.className, {
+        "modal--no-footer": props.footer === null,
+      })}
       visible={open}
       title={
         typeof props.title === "string" && !isNil(titleIcon) ? (

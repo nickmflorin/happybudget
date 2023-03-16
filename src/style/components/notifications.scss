@@ -4,13 +4,13 @@
   display: flex;
 
   .notification-left {
-		@include size(22px);
+    @include size(22px);
     padding: 3px;
     margin-right: 6px;
-		@include vertical-flex-c();
+    @include vertical-flex-c();
 
     .icon {
-      font-size: $xlarge-text-size;;
+      font-size: $xlarge-text-size;
     }
   }
 
@@ -21,7 +21,7 @@
 
     .notification-message {
       font-weight: 500;
-      font-size: $standard-text-size;;
+      font-size: $standard-text-size;
       line-height: 22px;
       color: $text-primary;
       font-family: $avenir;
@@ -29,7 +29,7 @@
 
     .notification-detail {
       margin-top: 2px;
-      font-size: $medium-text-size;;
+      font-size: $medium-text-size;
       line-height: 16px;
       font-family: $avenir;
       font-weight: 400;
@@ -43,7 +43,7 @@
     margin-left: 6px;
 
     .icon {
-      font-size: $xlarge-text-size;;
+      font-size: $xlarge-text-size;
     }
   }
 
@@ -87,11 +87,11 @@
     }
   }
 
-	&.bare {
-		background-color: $white !important;
-		border: none !important;
-		padding: 0px !important;
-	}
+  &.bare {
+    background-color: $white !important;
+    border: none !important;
+    padding: 0px !important;
+  }
 }
 
 .notifications {
@@ -105,34 +105,34 @@
 }
 
 .input-field-notifications {
-	margin-top: 8px !important;
-	margin-bottom: 2px !important;
+  margin-top: 8px !important;
+  margin-bottom: 2px !important;
 
-	> .notification {
+  > .notification {
     &:not(:last-child) {
       margin-bottom: 4px;
     }
   }
 
-	.notification-left {
-		@include size(16px);
+  .notification-left {
+    @include size(16px);
     padding: 2px;
     margin-right: 4px;
 
     .icon {
       font-size: $medium-text-size;
-			@include size(12px);
+      @include size(12px);
     }
   }
 
-	.notification-middle {
+  .notification-middle {
     display: flex;
     flex-direction: column;
     flex-grow: 100;
 
     .notification-message {
       font-weight: 500;
-      font-size: $medium-text-size;;
+      font-size: $medium-text-size;
       line-height: 16px;
       color: $text-primary;
       font-family: $avenir;
@@ -140,7 +140,7 @@
 
     .notification-detail {
       margin-top: 2px;
-      font-size: $small-text-size;;
+      font-size: $small-text-size;
       line-height: 16px;
       font-family: $avenir;
       font-weight: 400;
@@ -148,13 +148,13 @@
     }
   }
 
-	.notification-right {
+  .notification-right {
     @include size(14px);
     padding: 3px;
     margin-left: 4px;
 
     .icon {
-      font-size: $medium-text-size;;
+      font-size: $medium-text-size;
     }
   }
 }
@@ -163,7 +163,7 @@
   .notification {
     border-radius: 0px;
     padding: 4px;
-		margin-bottom: 0px !important;
+    margin-bottom: 0px !important;
 
     .notification-middle {
       flex-direction: row;
@@ -189,28 +189,28 @@
     background-color: rgba(0, 0, 0, 0.6);
     max-width: 320px;
     padding: 6px 10px;
-		border: none !important;
+    border: none !important;
 
-		.icon {
-			color: $white !important;
-		}
+    .icon {
+      color: $white !important;
+    }
 
     .notification-message {
-      font-size: $standard-text-size;;
+      font-size: $standard-text-size;
       font-weight: 500;
       font-family: $avenir;
-			color: $white;
+      color: $white;
     }
 
     .notification-detail {
-      font-size: $small-text-size;;
+      font-size: $small-text-size;
       font-weight: 400;
-			color: $white;
+      color: $white;
       font-family: $avenir;
     }
 
-		&:not(:last-child) {
-			margin-bottom: 10px;
-		}
+    &:not(:last-child) {
+      margin-bottom: 10px;
+    }
   }
 }

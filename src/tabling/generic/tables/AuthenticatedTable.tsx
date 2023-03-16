@@ -1,16 +1,16 @@
 import React, { useImperativeHandle, useState, useMemo, useRef } from "react";
+
 import { forEach, isNil, uniq, map, filter, includes, reduce } from "lodash";
 import { Subtract } from "utility-types";
 
 import { tabling, util, hooks, notifications } from "lib";
-
 import { TableNotifications } from "components/notifications";
 import { useConfirmation } from "components/notifications/hooks";
 import { AuthenticatedGrid } from "tabling/generic";
 
+import TableWrapper from "./TableWrapper";
 import * as genericColumns from "../columns";
 import { AuthenticatedGridProps, AuthenticatedDataGrid } from "../grids";
-import { AuthenticatedMenu } from "../menus";
 import {
   FooterGrid,
   AuthenticatedFooterGridProps,
@@ -21,18 +21,20 @@ import {
   DataGridProps,
   ConnectedAuthenticatedTableInjectedProps,
   InternalAuthenticateDataGridProps,
-  configureTable
+  configureTable,
 } from "../hocs";
-import TableWrapper from "./TableWrapper";
+import { AuthenticatedMenu } from "../menus";
 
 export type AuthenticatedTableDataGridProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
-> = InternalAuthenticateDataGridProps<R, M> & DataGridProps<R, M> & Omit<AuthenticatedGridProps<R, M>, "id">;
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+> = InternalAuthenticateDataGridProps<R, M> &
+  DataGridProps<R, M> &
+  Omit<AuthenticatedGridProps<R, M>, "id">;
 
 export type BaseTableProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel,
 > = TableConfigurationProps<R, M> &
   DataGridProps<R, M> & {
     readonly framework?: Table.Framework;
@@ -51,7 +53,7 @@ export type AuthenticatedTableProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Table.Context = Table.Context,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = BaseTableProps<R, M> &
   Omit<AuthenticateDataGridProps<R, M>, "apis"> &
   ConnectAuthenticatedTableProps<R, M, C, S> &
@@ -70,7 +72,7 @@ type _AuthenticatedTableProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Table.Context = Table.Context,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = AuthenticatedTableProps<R, M, C, S> & ConfiguredTableInjectedProps;
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -79,10 +81,10 @@ const TableFooterGrid = FooterGrid<any, any, AuthenticatedFooterGridProps<any, a
   className: "grid--table-footer",
   rowClass: "row--table-footer",
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  getFooterColumn: (col: Table.DataColumn<any, any, any>) => col.footer || null
+  getFooterColumn: (col: Table.DataColumn<any, any, any>) => col.footer || null,
 })(AuthenticatedGrid) as {
   <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-    props: Omit<AuthenticatedFooterGridProps<R, M>, "id">
+    props: Omit<AuthenticatedFooterGridProps<R, M>, "id">,
   ): JSX.Element;
 };
 
@@ -93,10 +95,10 @@ const PageFooterGrid = FooterGrid<any, any, AuthenticatedFooterGridProps<any, an
   rowClass: "row--page-footer",
   rowHeight: 28,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  getFooterColumn: (col: Table.DataColumn<any, any, any>) => col.page || null
+  getFooterColumn: (col: Table.DataColumn<any, any, any>) => col.page || null,
 })(AuthenticatedGrid) as {
   <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-    props: Omit<AuthenticatedFooterGridProps<R, M>, "id">
+    props: Omit<AuthenticatedFooterGridProps<R, M>, "id">,
   ): JSX.Element;
 };
 
@@ -104,9 +106,9 @@ const AuthenticatedTable = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Table.Context = Table.Context,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 >(
-  props: _AuthenticatedTableProps<R, M, C, S>
+  props: _AuthenticatedTableProps<R, M, C, S>,
 ): JSX.Element => {
   const grid = tabling.hooks.useDataGrid();
   const [savingVisible, setSavingVisible] = useState(false);
@@ -122,7 +124,7 @@ const AuthenticatedTable = <
 
   const NotificationsHandler = notifications.ui.useNotificationsManager({
     defaultBehavior: "append",
-    defaultClosable: true
+    defaultClosable: true,
   });
 
   /**
@@ -142,21 +144,28 @@ const AuthenticatedTable = <
         if (typeof props.excludeColumns === "function") {
           return props.excludeColumns(c);
         }
-        return includes(Array.isArray(props.excludeColumns) ? props.excludeColumns : [props.excludeColumns], c.field);
+        return includes(
+          Array.isArray(props.excludeColumns) ? props.excludeColumns : [props.excludeColumns],
+          c.field,
+        );
       }
       return false;
     };
     let cs = [
       genericColumns.CheckboxColumn<R, M>(
-        { ...props.checkboxColumn, pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined },
+        {
+          ...props.checkboxColumn,
+          pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined,
+        },
         props.hasEditColumn,
-        props.checkboxColumnWidth
+        props.checkboxColumnWidth,
       ),
       ...map(
         filter(
           props.columns,
           (c: Table.Column<R, M>) =>
-            (tabling.columns.isDataColumn(c) && !evaluateColumnExclusionProp(c)) || !tabling.columns.isDataColumn(c)
+            (tabling.columns.isDataColumn(c) && !evaluateColumnExclusionProp(c)) ||
+            !tabling.columns.isDataColumn(c),
         ),
         (c: Table.Column<R, M>) =>
           tabling.columns.isRealColumn(c)
@@ -165,27 +174,40 @@ const AuthenticatedTable = <
                 cellRendererParams: {
                   ...c.cellRendererParams,
                   selector: props.selector,
-                  footerRowSelectors: props.footerRowSelectors
+                  footerRowSelectors: props.footerRowSelectors,
                 },
-                cellEditorParams: { ...c.cellEditorParams, selector: props.selector }
+                cellEditorParams: { ...c.cellEditorParams, selector: props.selector },
               } as Table.RealColumn<R, M>)
-            : c
-      )
+            : c,
+      ),
     ];
     if (props.hasDragColumn !== false) {
       cs = [
         genericColumns.DragColumn<R, M>({
-          pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined
+          pinned: props.pinFirstColumn || props.pinActionColumns ? "left" : undefined,
         }),
-        ...cs
+        ...cs,
       ];
     }
     return map(cs, (c: Table.Column<R, M>) => ({
       ...c,
-      cellRendererParams: { ...c.cellRendererParams, table: props.table.current, tableContext: props.tableContext },
-      cellEditorParams: { ...c.cellEditorParams, table: props.table.current, tableContext: props.tableContext }
+      cellRendererParams: {
+        ...c.cellRendererParams,
+        table: props.table.current,
+        tableContext: props.tableContext,
+      },
+      cellEditorParams: {
+        ...c.cellEditorParams,
+        table: props.table.current,
+        tableContext: props.tableContext,
+      },
     }));
-  }, [hooks.useDeepEqualMemo(props.columns), props.selector, props.excludeColumns, props.table.current]);
+  }, [
+    hooks.useDeepEqualMemo(props.columns),
+    props.selector,
+    props.excludeColumns,
+    props.table.current,
+  ]);
 
   /**
    * Modified version of the onEvent callback passed into the Grid.  This
@@ -232,13 +254,17 @@ const AuthenticatedTable = <
               const parsedFields = reduce(
                 tabling.columns.filterBodyColumns(props.columns),
                 (curr: string[], c: Table.BodyColumn<R, M>) => [...curr, ...(c.parsedFields || [])],
-                []
+                [],
               );
               if (!includes(parsedFields, field)) {
-                const change = util.getKeyValue<Table.RowChangeData<R>, keyof Table.EditableRow<R>["data"]>(field)(
-                  rowChange.data
-                ) as Table.CellChange;
-                const col: Table.Column<R, M> | null = tabling.columns.getColumn(props.columns, field);
+                const change = util.getKeyValue<
+                  Table.RowChangeData<R>,
+                  keyof Table.EditableRow<R>["data"]
+                >(field)(rowChange.data) as Table.CellChange;
+                const col: Table.Column<R, M> | null = tabling.columns.getColumn(
+                  props.columns,
+                  field,
+                );
                 if (!isNil(col) && tabling.columns.isBodyColumn<R, M>(col)) {
                   /*
 										Check if the cellChange is associated with a Column that has
@@ -251,11 +277,14 @@ const AuthenticatedTable = <
 										changed, should refresh other columns. */
                   if (!isNil(col.refreshColumns)) {
                     const fieldsToRefresh = col.refreshColumns(change);
-                    if (!isNil(fieldsToRefresh) && (!Array.isArray(fieldsToRefresh) || fieldsToRefresh.length !== 0)) {
+                    if (
+                      !isNil(fieldsToRefresh) &&
+                      (!Array.isArray(fieldsToRefresh) || fieldsToRefresh.length !== 0)
+                    ) {
                       hasColumnsToRefresh = true;
                       columnsToRefresh = uniq([
                         ...columnsToRefresh,
-                        ...(Array.isArray(fieldsToRefresh) ? fieldsToRefresh : [fieldsToRefresh])
+                        ...(Array.isArray(fieldsToRefresh) ? fieldsToRefresh : [fieldsToRefresh]),
                       ]);
                     }
                   }
@@ -271,7 +300,7 @@ const AuthenticatedTable = <
           apis?.grid.refreshCells({
             force: true,
             rowNodes: nodesToRefresh,
-            columns: columnsToRefresh
+            columns: columnsToRefresh,
           });
         }
       }
@@ -282,7 +311,7 @@ const AuthenticatedTable = <
 			been changed. */
       props.onEvent(event);
     },
-    [props.onEvent, hooks.useDeepEqualMemo(props.columns)]
+    [props.onEvent, hooks.useDeepEqualMemo(props.columns)],
   );
 
   const setSaving = useMemo(
@@ -315,7 +344,7 @@ const AuthenticatedTable = <
         _setSaving(false);
       }
     },
-    [saving, hideSavingChangesTimout.current]
+    [saving, hideSavingChangesTimout.current],
   );
 
   const [confirmModal, confirmRowDelete] = useConfirmation<[Table.EditableRow<R>[]]>({
@@ -327,8 +356,8 @@ const AuthenticatedTable = <
     onConfirmed: (rows: Table.EditableRow<R>[]) =>
       props.onEvent({
         payload: { rows: map(rows, (r: Table.EditableRow<R>) => r.id) },
-        type: "rowDelete"
-      })
+        type: "rowDelete",
+      }),
   });
 
   const actions = useMemo<Table.AuthenticatedMenuActions<R, M>>(
@@ -342,18 +371,19 @@ const AuthenticatedTable = <
             isWriteOnly: true,
             onClick: () => {
               const apis: Table.GridApis | null = props.tableApis.get("data");
-              const rows = filter((apis?.grid.getSelectedRows() || []) as Table.BodyRow<R>[], (r: Table.BodyRow<R>) =>
-                tabling.rows.isEditableRow(r)
+              const rows = filter(
+                (apis?.grid.getSelectedRows() || []) as Table.BodyRow<R>[],
+                (r: Table.BodyRow<R>) => tabling.rows.isEditableRow(r),
               ) as Table.EditableRow<R>[];
               if (rows.length !== 0) {
                 confirmRowDelete([rows], `You are about to delete ${rows.length} rows.`);
               }
-            }
-          }
+            },
+          },
         ],
-        !isNil(props.actions) ? props.actions : []
+        !isNil(props.actions) ? props.actions : [],
       ),
-    [props.actions, props.tableApis, selectedRows.length]
+    [props.actions, props.tableApis, selectedRows.length],
   );
 
   useImperativeHandle(props.table, () => ({
@@ -409,7 +439,9 @@ const AuthenticatedTable = <
       if (!isNil(apis)) {
         const position: Table.CellPosition | null = apis.grid.getFocusedCell();
         if (!isNil(position)) {
-          const node: Table.RowNode | undefined = apis.grid.getDisplayedRowAtIndex(position.rowIndex);
+          const node: Table.RowNode | undefined = apis.grid.getDisplayedRowAtIndex(
+            position.rowIndex,
+          );
           if (!isNil(node)) {
             const row: Table.BodyRow<R> = node.data;
             return row;
@@ -417,7 +449,7 @@ const AuthenticatedTable = <
         }
       }
       return null;
-    }
+    },
   }));
 
   const addNewRow = hooks.useDynamicCallback(() => {
@@ -426,7 +458,7 @@ const AuthenticatedTable = <
       _onEvent({
         type: "rowAdd",
         payload: { count: 1 },
-        placeholderIds: [tabling.rows.placeholderRowId()]
+        placeholderIds: [tabling.rows.placeholderRowId()],
       });
     }
   });
@@ -504,8 +536,8 @@ const AuthenticatedTable = <
           checkboxColumn={{
             cellRenderer: "NewRowCell",
             cellRendererParams: {
-              onNewRow: addNewRow
-            }
+              onNewRow: addNewRow,
+            },
           }}
         />
         {confirmModal}
@@ -515,13 +547,15 @@ const AuthenticatedTable = <
 };
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export default configureTable<_AuthenticatedTableProps<any, any, any>, any, any>(AuthenticatedTable) as {
+export default configureTable<_AuthenticatedTableProps<any, any, any>, any, any>(
+  AuthenticatedTable,
+) as {
   <
     R extends Table.RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     C extends Table.Context = Table.Context,
-    S extends Redux.TableStore<R> = Redux.TableStore<R>
+    S extends Redux.TableStore<R> = Redux.TableStore<R>,
   >(
-    props: Subtract<_AuthenticatedTableProps<R, M, C, S>, ConfiguredTableInjectedProps>
+    props: Subtract<_AuthenticatedTableProps<R, M, C, S>, ConfiguredTableInjectedProps>,
   ): JSX.Element;
 };

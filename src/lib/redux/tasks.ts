@@ -1,6 +1,6 @@
+import { isNil, map, filter, isEqual } from "lodash";
 import { SagaIterator } from "redux-saga";
 import { call, select, all, CallEffect } from "redux-saga/effects";
-import { isNil, map, filter, isEqual } from "lodash";
 
 import * as api from "api";
 import { redux, notifications } from "lib";
@@ -19,8 +19,11 @@ type MininumDetailRequestEffectStore<M extends Model.HttpModel> = MinimumRequest
   readonly data: M | null;
 };
 
-export const canUseCachedDetailResponse = <M extends Model.HttpModel, S extends MininumDetailRequestEffectStore<M>>(
-  s: S
+export const canUseCachedDetailResponse = <
+  M extends Model.HttpModel,
+  S extends MininumDetailRequestEffectStore<M>,
+>(
+  s: S,
 ) => s.data !== null && canUseCachedResponse(s);
 
 type MimimumListRequestEffectStore = MinimumRequestEffectStore & {
@@ -28,7 +31,10 @@ type MimimumListRequestEffectStore = MinimumRequestEffectStore & {
   readonly query?: Http.ListQuery;
 };
 
-export const canUseCachedListResponse = <S extends MimimumListRequestEffectStore>(s: S, query?: Http.ListQuery) => {
+export const canUseCachedListResponse = <S extends MimimumListRequestEffectStore>(
+  s: S,
+  query?: Http.ListQuery,
+) => {
   /*
 	If the response was already received and there was not an error, it is
 	safe to use the last request (pending a determination if the list query
@@ -44,7 +50,7 @@ export const canUseCachedListResponse = <S extends MimimumListRequestEffectStore
 export const canUseCachedIndexedResponse = <S, DS extends MinimumRequestEffectStore>(
   s: Redux.ModelIndexedStore<S>,
   getStore: (s: S) => DS,
-  id: number
+  id: number,
 ) => {
   /*
 	This can happen due to timing in between Redux Reducers & Sagas.  When a
@@ -60,7 +66,7 @@ export const canUseCachedIndexedListResponse = <S, TS extends MimimumListRequest
   s: Redux.ModelIndexedStore<S>,
   getStore: (s: S) => TS,
   id: number,
-  query?: Http.ListQuery
+  query?: Http.ListQuery,
 ) => {
   /*
 	This can happen due to timing in between Redux Reducers & Sagas.  When a
@@ -75,11 +81,11 @@ export const canUseCachedIndexedListResponse = <S, TS extends MimimumListRequest
 export const canUseCachedIndexedDetailResponse = <
   M extends Model.HttpModel,
   S,
-  DS extends MininumDetailRequestEffectStore<M>
+  DS extends MininumDetailRequestEffectStore<M>,
 >(
   s: Redux.ModelIndexedStore<S>,
   getStore: (s: S) => DS,
-  id: number
+  id: number,
 ) => {
   /*
 	This can happen due to timing in between Redux Reducers & Sagas.  When a
@@ -103,23 +109,25 @@ type WrapListRequestEffectsHandleConfig = {
   readonly errorMessage: string;
 };
 
-type WrapListRequestEffectHandleConfig<S extends MimimumListRequestEffectStore> = WrapListRequestEffectsHandleConfig & {
-  readonly query?: Http.ListQuery;
-  readonly selectStore?: (s: Application.Store) => S;
-};
+type WrapListRequestEffectHandleConfig<S extends MimimumListRequestEffectStore> =
+  WrapListRequestEffectsHandleConfig & {
+    readonly query?: Http.ListQuery;
+    readonly selectStore?: (s: Application.Store) => S;
+  };
 
 type WrapListRequestEffectConfig<S extends MimimumListRequestEffectStore> =
   | WrapListRequestEffectConfigErrorREConfig<S>
   | WrapListRequestEffectHandleConfig<S>;
 
 const isHandleErrorConfig = <S extends MimimumListRequestEffectStore>(
-  c: WrapListRequestEffectConfig<S>
-): c is WrapListRequestEffectHandleConfig<S> => (c as WrapListRequestEffectHandleConfig<S>).table !== undefined;
+  c: WrapListRequestEffectConfig<S>,
+): c is WrapListRequestEffectHandleConfig<S> =>
+  (c as WrapListRequestEffectHandleConfig<S>).table !== undefined;
 
 type WrapListRequestEffectRT<
   C,
   S extends MimimumListRequestEffectStore,
-  CFG extends WrapListRequestEffectConfig<S> = WrapListRequestEffectConfig<S>
+  CFG extends WrapListRequestEffectConfig<S> = WrapListRequestEffectConfig<S>,
 > = CFG extends WrapListRequestEffectHandleConfig<S>
   ? Redux.ListRequestEffectRT<C>
   : Redux.ListRequestEffectRTWithError<C>;
@@ -127,16 +135,18 @@ type WrapListRequestEffectRT<
 export const wrapListRequestEffect = <
   C,
   S extends MimimumListRequestEffectStore,
-  CFG extends WrapListRequestEffectConfig<S> = WrapListRequestEffectConfig<S>
+  CFG extends WrapListRequestEffectConfig<S> = WrapListRequestEffectConfig<S>,
 >(
   effect: CallEffect<Http.ListResponse<C>>,
   action: Redux.Action<Redux.TableRequestPayload>,
-  config: CFG
+  config: CFG,
 ): CallEffect<WrapListRequestEffectRT<C, S, CFG>> => {
   type RT = SagaIterator<WrapListRequestEffectRT<C, S, CFG>>;
   return call<() => RT>(function* (): SagaIterator {
     const requestCached = yield select((s: Application.Store) =>
-      !isNil(config.selectStore) ? canUseCachedListResponse(config.selectStore(s), config.query) : false
+      !isNil(config.selectStore)
+        ? canUseCachedListResponse(config.selectStore(s), config.query)
+        : false,
     );
     if (!requestCached || redux.requestActionIsForced(action)) {
       try {
@@ -147,7 +157,7 @@ export const wrapListRequestEffect = <
           config.table.handleRequestError(e as Error, {
             message: config.errorMessage,
             detail: config.errorDetail,
-            dispatchClientErrorToSentry: true
+            dispatchClientErrorToSentry: true,
           });
           /* If the error is not an api.RequestError, it will be thrown in the
              handleRequestError method. */
@@ -178,22 +188,23 @@ type ResponseOrNull<CS extends unknown[]> = {
 
 export const wrapListRequestEffects = <CS extends unknown[]>(
   effects: MultipleRequestEffects<CS>,
-  config: WrapListRequestEffectsHandleConfig
+  config: WrapListRequestEffectsHandleConfig,
 ) =>
   call<() => SagaIterator<ResponseOrNull<CS>>>(function* (): SagaIterator {
     const results: MultipleRequestEffectRTs<CS> = yield all(effects);
     const errors = map(
       filter(
         results as Redux.ListRequestEffectRTWithError<CS[number]>[],
-        (r: Redux.ListRequestEffectRTWithError<CS[number]>) => redux.tableRequestEffectRTIsError<CS[number]>(r)
+        (r: Redux.ListRequestEffectRTWithError<CS[number]>) =>
+          redux.tableRequestEffectRTIsError<CS[number]>(r),
       ) as Redux.RequestEffectError[],
-      (er: Redux.RequestEffectError) => er.error
+      (er: Redux.RequestEffectError) => er.error,
     );
     if (errors.length === 1) {
       config.table.handleRequestError(errors[0], {
         message: config.errorMessage,
         detail: config.errorDetail,
-        dispatchClientErrorToSentry: true
+        dispatchClientErrorToSentry: true,
       });
     } else if (errors.length !== 0) {
       /*
@@ -205,13 +216,13 @@ export const wrapListRequestEffects = <CS extends unknown[]>(
 			of the relevant requests failed. */
       config.table.notify({
         message: config.errorMessage,
-        detail: config.errorDetail
+        detail: config.errorDetail,
       });
     }
     const rs = yield call(() =>
       map(results, (r: Redux.ListRequestEffectRTWithError<CS[number]>) =>
-        redux.tableRequestEffectRTIsError(r) ? { error: r.error } : r
-      )
+        redux.tableRequestEffectRTIsError(r) ? { error: r.error } : r,
+      ),
     );
     return rs as ResponseOrNull<CS>;
   });

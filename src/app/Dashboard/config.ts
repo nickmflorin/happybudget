@@ -4,7 +4,7 @@ const Config: Application.ModuleConfig<Modules.Dashboard.Store> = {
   rootReducer: rootReducer,
   rootSaga: rootSaga,
   initialState: initialState,
-  label: "dashboard"
+  label: "dashboard",
 };
 
 export default Config;

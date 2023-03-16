@@ -1,16 +1,22 @@
 import React from "react";
 
-import PublicToolbar from "./PublicToolbar";
 import Menu, { InternalMenuProps, MenuProps } from "./Menu";
+import PublicToolbar from "./PublicToolbar";
 
-export type PublicMenuProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = Omit<
+export type PublicMenuProps<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+> = Omit<
   MenuProps<Table.PublicMenuActionParams<R, M>, R, M>,
   "menuActionParams" | "savingChangesPortalId" | "saving" | "savingVisible"
 > & {
   readonly columns: Table.DataColumn<R, M>[];
 };
 
-type InternalUnathenticatedMenuProps<R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = Omit<
+type InternalUnathenticatedMenuProps<
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+> = Omit<
   InternalMenuProps<Table.PublicMenuActionParams<R, M>, R, M>,
   "menuActionParams" | "toolbar" | "hasDragColumn"
 > & {
@@ -19,21 +25,22 @@ type InternalUnathenticatedMenuProps<R extends Table.RowData, M extends Model.Ro
   readonly columns: Table.DataColumn<R, M>[];
 };
 
-const UnathenticatedMenu = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  props: Omit<InternalUnathenticatedMenuProps<R, M>, "menuPortalId">
-) => {
-  return (
-    <Menu<Table.PublicMenuActionParams<R, M>, R, M>
-      {...props}
-      toolbar={PublicToolbar}
-      hasDragColumn={false}
-      menuActionParams={{
-        apis: props.apis,
-        hiddenColumns: props.hiddenColumns,
-        columns: props.columns
-      }}
-    />
-  );
-};
+const UnathenticatedMenu = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+>(
+  props: Omit<InternalUnathenticatedMenuProps<R, M>, "menuPortalId">,
+) => (
+  <Menu<Table.PublicMenuActionParams<R, M>, R, M>
+    {...props}
+    toolbar={PublicToolbar}
+    hasDragColumn={false}
+    menuActionParams={{
+      apis: props.apis,
+      hiddenColumns: props.hiddenColumns,
+      columns: props.columns,
+    }}
+  />
+);
 
 export default React.memo(UnathenticatedMenu) as typeof UnathenticatedMenu;

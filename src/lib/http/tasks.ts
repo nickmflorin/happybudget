@@ -1,13 +1,14 @@
+import * as Sentry from "@sentry/react";
 import axios from "axios";
+import { isNil } from "lodash";
 import { SagaIterator } from "redux-saga";
 import { call, cancelled } from "redux-saga/effects";
-import * as Sentry from "@sentry/react";
-
-import { isNil } from "lodash";
 
 import * as api from "api";
 
-const isProvidedRequestConfig = <ARGS extends unknown[]>(arg: ARGS[number]): arg is Http.RequestOptions =>
+const isProvidedRequestConfig = <ARGS extends unknown[]>(
+  arg: ARGS[number],
+): arg is Http.RequestOptions =>
   typeof arg === "object" &&
   ((arg as Http.RequestOptions).headers !== undefined ||
     (arg as Http.RequestOptions).publicTokenId !== undefined ||
@@ -26,11 +27,11 @@ const handleCancel = (e: Error) => {
   });
 };
 
-export function request<R, ARGS extends unknown[], C extends Redux.ActionContext = Redux.ActionContext>(
-  service: Http.Service<R, ARGS>,
-  ctx?: C,
-  ...args: ARGS
-) {
+export function request<
+  R,
+  ARGS extends unknown[],
+  C extends Redux.ActionContext = Redux.ActionContext,
+>(service: Http.Service<R, ARGS>, ctx?: C, ...args: ARGS) {
   return call<() => SagaIterator<R>>(function* (): SagaIterator {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();

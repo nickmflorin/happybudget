@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState, RefObject, useImperativeHandle } from "react";
-import { Page } from "react-pdf/dist/esm/entry.webpack";
+
 import { pdf as PDF } from "@react-pdf/renderer";
 import { debounce, isNil } from "lodash";
+import { Page } from "react-pdf/dist/esm/entry.webpack";
 
 import { util, hooks } from "lib";
-import { registerFonts } from "style/pdf";
-
 import { Pagination } from "components";
 import { Button, PrimaryButton } from "components/buttons";
+import { registerFonts } from "style/pdf";
+
 import EmptyDocument from "./EmptyDocument";
 import { RenderDocument } from "./primitive";
 
@@ -33,7 +34,7 @@ const generateFile = async (component: JSX.Element): Promise<string | ArrayBuffe
               .then((result: ArrayBuffer | string) => resolve(result))
               .catch((e: Error) => reject(e));
           })
-          .catch((e: Error) => reject(e))
+          .catch((e: Error) => reject(e)),
       )
       .catch((e: Error) => reject(e));
   });
@@ -45,7 +46,7 @@ const Previewer = ({
   previewer,
   renderComponent,
   onExportSuccess,
-  onRenderError
+  onRenderError,
 }: PreviewerProps): JSX.Element => {
   const [generatingPdf, setGeneratingPdf] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -70,7 +71,7 @@ const Previewer = ({
           .finally(() => setGeneratingPdf(false));
       }
     },
-    [renderComponent]
+    [renderComponent],
   );
 
   const debouncedRender = useMemo(() => debounce(render, 20), []);
@@ -105,11 +106,12 @@ const Previewer = ({
     }
   });
 
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       debouncedRender.cancel();
-    };
-  }, []);
+    },
+    [],
+  );
 
   useImperativeHandle(previewer, () => ({
     render,
@@ -120,14 +122,14 @@ const Previewer = ({
       const PdfFunc = (): JSX.Element => <EmptyDocument {...props} />;
       const pdfComponent = PdfFunc();
       render(pdfComponent);
-    }
+    },
   }));
 
   return (
-    <div className={"previewer"}>
+    <div className="previewer">
       {refreshRequired && (
         <div
-          className={"previewer-refresh"}
+          className="previewer-refresh"
           onClick={() => {
             if (generatingPdf || loadingData) {
               return;
@@ -136,12 +138,12 @@ const Previewer = ({
             render();
           }}
         >
-          <Button className={"btn--over"} disabled={generatingPdf || loadingData}>
-            {"Refresh"}
+          <Button className="btn--over" disabled={generatingPdf || loadingData}>
+            Refresh
           </Button>
         </div>
       )}
-      <div className={"preview-content"}>
+      <div className="preview-content">
         <RenderDocument
           file={file}
           loadingOnNoFile={false}
@@ -156,15 +158,21 @@ const Previewer = ({
           <Page pageNumber={page} />
         </RenderDocument>
       </div>
-      <div className={"preview-footer"}>
-        <Pagination total={numPages} pageSize={1} current={page} small={true} onChange={(p: number) => setPage(p)} />
+      <div className="preview-footer">
+        <Pagination
+          total={numPages}
+          pageSize={1}
+          current={page}
+          small={true}
+          onChange={(p: number) => setPage(p)}
+        />
         <PrimaryButton
-          htmlType={"submit"}
+          htmlType="submit"
           disabled={generatingPdf || loadingData || exporting}
           loading={exporting}
           onClick={() => exportPdf({})}
         >
-          {"Export"}
+          Export
         </PrimaryButton>
       </div>
     </div>

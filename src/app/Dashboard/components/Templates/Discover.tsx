@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
-import { useDispatch } from "react-redux";
+
 import { isNil } from "lodash";
+import { useDispatch } from "react-redux";
+import { useHistory } from "react-router-dom";
 
 import * as store from "store";
-
 import { ShowHide } from "components";
-import { CommunityTemplateCard, CommunityTemplateStaffCard, EmptyCard } from "components/containers/cards";
+import {
+  CommunityTemplateCard,
+  CommunityTemplateStaffCard,
+  EmptyCard,
+} from "components/containers/cards";
 import { EditTemplateModal, CreateTemplateModal } from "components/modals";
 import { IsStaff } from "components/permissions";
 
 import GenericOwnedTemplate, { RenderGenericOwnedTemplateCardParams } from "./GenericOwnedTemplate";
-
 import { actions } from "../../store";
 
 interface DiscoverProps {
@@ -34,18 +37,24 @@ const Discover: React.FC<DiscoverProps> = ({ onCreateBudget, onDeriveBudget }): 
   return (
     <React.Fragment>
       <GenericOwnedTemplate
-        title={"Discover"}
+        title="Discover"
         selector={(s: Application.Store) => s.dashboard.community}
         onSearch={(v: string) => dispatch(actions.setCommunitySearchAction(v, {}))}
-        onUpdatePagination={(p: Pagination) => dispatch(actions.setCommunityPaginationAction(p, {}))}
-        onUpdateOrdering={(o: Redux.UpdateOrderingPayload) => dispatch(actions.updateCommunityOrderingAction(o, {}))}
+        onUpdatePagination={(p: Pagination) =>
+          dispatch(actions.setCommunityPaginationAction(p, {}))
+        }
+        onUpdateOrdering={(o: Redux.UpdateOrderingPayload) =>
+          dispatch(actions.updateCommunityOrderingAction(o, {}))
+        }
         onCreate={onCreateBudget}
-        onDeleted={(b: Model.SimpleTemplate) => dispatch(actions.removeCommunityFromStateAction(b.id, {}))}
+        onDeleted={(b: Model.SimpleTemplate) =>
+          dispatch(actions.removeCommunityFromStateAction(b.id, {}))
+        }
         lastCard={(budgets: Model.SimpleTemplate[]) => (
           <ShowHide show={budgets.length !== 0}>
             <EmptyCard
-              className={"template-empty-card"}
-              icon={"plus"}
+              className="template-empty-card"
+              icon="plus"
               onClick={() => setCreateTempateModalOpen(true)}
             />
           </ShowHide>
@@ -57,7 +66,7 @@ const Discover: React.FC<DiscoverProps> = ({ onCreateBudget, onDeriveBudget }): 
 							 frontend. */
           if (params.budget.hidden === true && user.is_staff === false) {
             console.error(
-              "The API is returning hidden community templates for non-staff users!  This is a security problem!"
+              "The API is returning hidden community templates for non-staff users!  This is a security problem!",
             );
           }
           let card: JSX.Element = (
@@ -66,16 +75,22 @@ const Discover: React.FC<DiscoverProps> = ({ onCreateBudget, onDeriveBudget }): 
               disabled={params.deleting}
               loading={params.deleting}
               onVisibilityToggled={(b: Model.Template) =>
-                dispatch(actions.updateCommunityInStateAction({ id: params.budget.id, data: b }, {}))
+                dispatch(
+                  actions.updateCommunityInStateAction({ id: params.budget.id, data: b }, {}),
+                )
               }
               onEdit={() => history.push(`/templates/${params.budget.id}/accounts`)}
               onEditNameImage={() => setTemplateToEdit(params.budget.id)}
               onClick={() => onDeriveBudget(params.budget.id)}
-              onDuplicated={(b: Model.Template) => dispatch(actions.addCommunityToStateAction(b, {}))}
+              onDuplicated={(b: Model.Template) =>
+                dispatch(actions.addCommunityToStateAction(b, {}))
+              }
             />
           );
           if (user.is_staff !== true) {
-            card = <CommunityTemplateCard {...params} onClick={() => onDeriveBudget(params.budget.id)} />;
+            card = (
+              <CommunityTemplateCard {...params} onClick={() => onDeriveBudget(params.budget.id)} />
+            );
           }
           if (params.budget.hidden === true) {
             return <IsStaff>{card}</IsStaff>;
@@ -91,7 +106,9 @@ const Discover: React.FC<DiscoverProps> = ({ onCreateBudget, onDeriveBudget }): 
             onCancel={() => setTemplateToEdit(undefined)}
             onSuccess={(template: Model.Template) => {
               setTemplateToEdit(undefined);
-              dispatch(actions.updateCommunityInStateAction({ id: template.id, data: template }, {}));
+              dispatch(
+                actions.updateCommunityInStateAction({ id: template.id, data: template }, {}),
+              );
             }}
           />
         </IsStaff>

@@ -1,4 +1,5 @@
 import React from "react";
+
 import Notifications from "./Notifications";
 
 type TableNotificationsProps = {
@@ -15,7 +16,7 @@ const TableNotifications = ({ tableId, offset = 30, ...props }: TableNotificatio
        hidden attributes on the parent. */
     staticWrapper={true}
     {...props}
-    className={"table-notifications"}
+    className="table-notifications"
     style={{ bottom: `${offset}px` }}
   />
 );

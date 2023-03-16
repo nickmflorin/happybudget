@@ -1,7 +1,8 @@
-import React, { ReactNode, useMemo } from "react";
 import { useRouter } from "next/router";
-import { map, isNil, reduce } from "lodash";
+import React, { ReactNode, useMemo } from "react";
+
 import classNames from "classnames";
+import { map, isNil, reduce } from "lodash";
 
 import { Button } from "components/buttons";
 import { DropdownMenu } from "components/dropdowns";
@@ -9,9 +10,7 @@ import { TooltipWrapper } from "components/tooltips";
 
 const isLazyBreadCrumbItem = <P extends Record<string, unknown> = Record<string, unknown>>(
   item: IBreadCrumbItem | ILazyBreadCrumbItem<P>,
-): item is ILazyBreadCrumbItem<P> => {
-  return (item as ILazyBreadCrumbItem<P>).func !== undefined;
-};
+): item is ILazyBreadCrumbItem<P> => (item as ILazyBreadCrumbItem<P>).func !== undefined;
 
 type BreadCrumbGenericItemProps = StandardComponentProps & {
   readonly url?: string;
@@ -92,14 +91,14 @@ const BreadCrumbItem = React.memo(({ item, ...props }: BreadCrumbItemProps): JSX
     >
       {!isNil(item.options) && item.options.length !== 0 ? (
         <DropdownMenu
-          menuClassName={"bread-crumb-dropdown"}
+          menuClassName="bread-crumb-dropdown"
           defaultSelected={[item.id]}
           models={item.options}
         >
           {renderDropdownButton(item)}
         </DropdownMenu>
       ) : (
-        <div className={"text-wrapper"}>{renderItem(item)}</div>
+        <div className="text-wrapper">{renderItem(item)}</div>
       )}
     </BreadCrumbGenericItem>
   );
@@ -122,7 +121,7 @@ const BreadCrumbItems = React.memo(({ children }: BreadCrumbItemsProps): JSX.Ele
             return (
               <React.Fragment key={index}>
                 {child}
-                <span className={"slash"}>{"/"}</span>
+                <span className="slash">/</span>
               </React.Fragment>
             );
           }

@@ -20,7 +20,7 @@ export type RowManagerConfig<RW extends Table.Row<R>, R extends Table.RowData> =
 export type BodyRowManagerConfig<
   RW extends Table.BodyRow<R>,
   R extends Table.RowData,
-  M extends Model.RowHttpModel
+  M extends Model.RowHttpModel,
 > = Pick<CreateRowConfig<RW, R>, "rowType"> & {
   readonly columns: Table.Column<R, M>[];
 };
@@ -33,18 +33,18 @@ export type CreateBodyRowConfig<RW extends Table.BodyRow<R>, R extends Table.Row
 };
 
 export const createRow = <RW extends Table.Row<R>, R extends Table.RowData>(
-  config: CreateRowConfig<RW, R>
+  config: CreateRowConfig<RW, R>,
 ): Pick<RW, "id" | "rowType" | "gridId"> => ({
   id: config.id,
   rowType: config.rowType,
-  gridId: config.gridId
+  gridId: config.gridId,
 });
 
 abstract class BodyRowManager<
   RW extends Table.BodyRow<R>,
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  ARGS extends unknown[]
+  ARGS extends unknown[],
 > {
   public rowType: RW["rowType"];
   public gridId: RW["gridId"];
@@ -67,7 +67,7 @@ abstract class BodyRowManager<
   ): Pick<RW, "id" | "rowType" | "gridId" | "data"> {
     return {
       ...createRow({ ...config, rowType: this.rowType, gridId: this.gridId }),
-      data: config.data || this.createData(...args)
+      data: config.data || this.createData(...args),
     };
   }
 
@@ -91,7 +91,9 @@ abstract class BodyRowManager<
             /* If the field is not on the model, then there is a problem with
                the column configurations.  Log an error and set the value on
                the row to the nullValue. */
-            console.error(`Could not obtain row value for field ${c.field}, ${notifications.objToJson(args)}!`);
+            console.error(
+              `Could not obtain row value for field ${c.field}, ${notifications.objToJson(args)}!`,
+            );
             return { ...obj, [c.field]: c.nullValue };
           }
           return { ...obj, [c.field]: value };
@@ -105,18 +107,18 @@ abstract class BodyRowManager<
           throw err;
         }
       },
-      {} as R
+      {} as R,
     );
   }
 }
 
 export const createFooterRow = <Grid extends Table.FooterGridId = Table.FooterGridId>(
-  config: Omit<RowManagerConfig<Table.FooterRow<Grid>, Table.RowData>, "rowType">
+  config: Omit<RowManagerConfig<Table.FooterRow<Grid>, Table.RowData>, "rowType">,
 ): Table.FooterRow =>
   createRow<Table.FooterRow, Table.RowData>({
     ...config,
     rowType: "footer",
-    id: ids.footerRowId(config.gridId)
+    id: ids.footerRowId(config.gridId),
   });
 
 export default BodyRowManager;

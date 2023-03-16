@@ -48,13 +48,19 @@ const RichTextNode = ({ node, ...props }: RichTextNodeProps): JSX.Element => {
   } else {
     if (typeof node.data === "string") {
       return (
-        <Text {...props} styles={[...(props.styles || []), ...pdf.parsers.convertTagsToFontStyles([node.tag])]}>
+        <Text
+          {...props}
+          styles={[...(props.styles || []), ...pdf.parsers.convertTagsToFontStyles([node.tag])]}
+        >
           {node.data}
         </Text>
       );
     } else {
       return (
-        <Text {...props} styles={[...(props.styles || []), ...pdf.parsers.convertTagsToFontStyles([node.tag])]}>
+        <Text
+          {...props}
+          styles={[...(props.styles || []), ...pdf.parsers.convertTagsToFontStyles([node.tag])]}
+        >
           {map(node.data, (n: Pdf.HTMLNode, index: number) => (
             <RichTextNode key={index} node={n} />
           ))}
@@ -71,10 +77,13 @@ interface RichTextProps extends Pdf.StandardComponentProps {
 const RichText = ({ nodes, ...props }: RichTextProps): JSX.Element => (
   <View {...props}>
     {filter(
-      map(Array.isArray(nodes) ? nodes : [nodes], (node: Pdf.HTMLNode, index: number): JSX.Element | null => (
-        <RichTextNode key={index} node={node} />
-      )),
-      (element: JSX.Element | null) => !isNil(element)
+      map(
+        Array.isArray(nodes) ? nodes : [nodes],
+        (node: Pdf.HTMLNode, index: number): JSX.Element | null => (
+          <RichTextNode key={index} node={node} />
+        ),
+      ),
+      (element: JSX.Element | null) => !isNil(element),
     )}
   </View>
 );

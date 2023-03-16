@@ -51,7 +51,7 @@ declare namespace Application {
     S extends
       | PublicModuleStores[keyof PublicModuleStores]
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-      | AuthenticatedModuleStores[keyof AuthenticatedModuleStores] = any
+      | AuthenticatedModuleStores[keyof AuthenticatedModuleStores] = any,
   > {
     readonly rootSaga?: import("redux-saga").Saga;
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */

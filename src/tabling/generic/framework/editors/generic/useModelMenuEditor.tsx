@@ -1,4 +1,5 @@
 import { ForwardedRef, useImperativeHandle, useState, useEffect, useMemo } from "react";
+
 import { isNil } from "lodash";
 
 import { hooks, tabling, ui } from "lib";
@@ -11,7 +12,7 @@ export type UseModelMenuEditorParams<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Table.Context = Table.Context,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = Table.EditorProps<R, M, C, S, V | null>;
 
 export type IEditor<
@@ -20,9 +21,13 @@ export type IEditor<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Table.Context = Table.Context,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = Omit<UseModelMenuEditorParams<V, R, M, C, S>, "forwardedRef"> & {
-  readonly onChange: (value: V | null, e: Table.CellDoneEditingEvent, stopEditing?: boolean) => void;
+  readonly onChange: (
+    value: V | null,
+    e: Table.CellDoneEditingEvent,
+    stopEditing?: boolean,
+  ) => void;
   readonly isFirstRender: boolean;
   readonly value: V | null;
   readonly changedEvent: Table.CellDoneEditingEvent | null;
@@ -35,10 +40,10 @@ const useModelMenuEditor = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Table.Context = Table.Context,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 >(
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  params: UseModelMenuEditorParams<V, R, M, C, S> & { readonly forwardedRef: ForwardedRef<any> }
+  params: UseModelMenuEditorParams<V, R, M, C, S> & { readonly forwardedRef: ForwardedRef<any> },
 ): [IEditor<V, CM, R, M, C, S>] => {
   const menu = ui.menu.useMenu<MenuItemSelectedState, CM>();
 
@@ -81,8 +86,8 @@ const useModelMenuEditor = <
     }
   }, [params.charPress]);
 
-  const wrapEditor = useMemo(() => {
-    return {
+  const wrapEditor = useMemo(
+    () => ({
       ...params,
       isFirstRender,
       menu,
@@ -95,23 +100,20 @@ const useModelMenuEditor = <
         setStopEditingOnChangeEvent(stopEditing);
         setValue(model);
         setChangedEvent(e);
-      }
-    };
-  }, [value, menu]);
+      },
+    }),
+    [value, menu],
+  );
 
-  useImperativeHandle(params.forwardedRef, () => {
-    return {
-      getValue: () => {
-        return value;
-      },
-      isCancelBeforeStart() {
-        return params.keyPress === KEY_BACKSPACE || params.keyPress === KEY_DELETE;
-      },
-      isCancelAfterEnd() {
-        return false;
-      }
-    };
-  });
+  useImperativeHandle(params.forwardedRef, () => ({
+    getValue: () => value,
+    isCancelBeforeStart() {
+      return params.keyPress === KEY_BACKSPACE || params.keyPress === KEY_DELETE;
+    },
+    isCancelAfterEnd() {
+      return false;
+    },
+  }));
 
   useEffect(() => {
     const keyListener = (e: KeyboardEvent) => {

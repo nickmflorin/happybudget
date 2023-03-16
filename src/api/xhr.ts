@@ -13,7 +13,11 @@ type XHRRequestOptions<R> = {
   readonly send?: boolean;
 };
 
-export const xhrRequestor = <R>(req: XMLHttpRequest, data: FormData, opts?: XHRRequestOptions<R>): XMLHttpRequest => {
+export const xhrRequestor = <R>(
+  req: XMLHttpRequest,
+  data: FormData,
+  opts?: XHRRequestOptions<R>,
+): XMLHttpRequest => {
   req.withCredentials = true;
   setRequestHeaders(req);
 
@@ -26,9 +30,9 @@ export const xhrRequestor = <R>(req: XMLHttpRequest, data: FormData, opts?: XHRR
       {
         data: req.response,
         url: req.responseURL,
-        status: req.status
+        status: req.status,
       },
-      true
+      true,
     );
     if (err !== null) {
       // If the user is being force logged out - do nothing.
@@ -56,16 +60,15 @@ export const xhrPostRequest = <R>(path: string, data: FormData, opts?: XHRReques
 type F = File | ActualFileObject;
 type UploadableFileProp = F | FileList | F[];
 
-const isFile = (f: UploadableFileProp): f is F => {
-  return typeof f === "object" && (f as F).name !== undefined;
-};
+const isFile = (f: UploadableFileProp): f is F =>
+  typeof f === "object" && (f as F).name !== undefined;
 
 const isFiles = (f: UploadableFileProp): f is F[] => Array.isArray(f);
 
 export const uploadAttachmentFile = (
   file: File | ActualFileObject | (File | ActualFileObject)[] | FileList,
   path: string,
-  options?: XHRRequestOptions<Model.Attachment[]>
+  options?: XHRRequestOptions<Model.Attachment[]>,
 ): XMLHttpRequest => {
   const formData = new FormData();
   if (isFile(file)) {
@@ -79,6 +82,6 @@ export const uploadAttachmentFile = (
   }
   return xhrPostRequest<{ readonly data: Model.Attachment[] }>(path, formData, {
     ...options,
-    success: (r: { readonly data: Model.Attachment[] }) => options?.success?.(r.data)
+    success: (r: { readonly data: Model.Attachment[] }) => options?.success?.(r.data),
   });
 };

@@ -1,4 +1,5 @@
 import { useMemo, useCallback } from "react";
+
 import { isNil, includes, reduce } from "lodash";
 
 import { ui, hooks, model, http } from "lib";
@@ -19,7 +20,7 @@ interface PrivateEditModelModalProps<
   M extends Model.GenericHttpModel,
   P extends Http.ModelPayload<M> = Http.ModelPayload<M>,
   V = P,
-  R = M
+  R = M,
 > extends EditModelModalProps<M, R> {
   readonly form?: FormInstance<V>;
   readonly title?: string | JSX.Element | ((m: M, form: FormInstance<V>) => JSX.Element | string);
@@ -46,7 +47,7 @@ const EditModelModal = <
   M extends Model.GenericHttpModel,
   P extends Http.ModelPayload<M> = Http.ModelPayload<M>,
   V extends Record<string, unknown> = P,
-  R = M
+  R = M,
 >({
   modelId,
   autoFocusField,
@@ -97,7 +98,7 @@ const EditModelModal = <
     conditional: () => props.open === true,
     getToken,
     onError,
-    onLoading
+    onLoading,
   });
 
   const title = useMemo(() => {
@@ -119,7 +120,7 @@ const EditModelModal = <
       }
       onSuccess(response);
     },
-    [isMounted.current, onSuccess]
+    [isMounted.current, onSuccess],
   );
 
   const _onError = useMemo(
@@ -131,7 +132,7 @@ const EditModelModal = <
         }
       }
     },
-    [isMounted.current, interceptError]
+    [isMounted.current, interceptError],
   );
 
   const onOk = useCallback(() => {
@@ -142,12 +143,14 @@ const EditModelModal = <
           payload = reduce(
             payload,
             (curr: P, value: P[keyof P], k: string) =>
-              ((Array.isArray(convertEmptyStringsToNull) && includes(convertEmptyStringsToNull, k as keyof P)) ||
-                (!Array.isArray(convertEmptyStringsToNull) && convertEmptyStringsToNull !== false)) &&
+              ((Array.isArray(convertEmptyStringsToNull) &&
+                includes(convertEmptyStringsToNull, k as keyof P)) ||
+                (!Array.isArray(convertEmptyStringsToNull) &&
+                  convertEmptyStringsToNull !== false)) &&
               value === ("" as unknown as P[keyof P])
                 ? { ...curr, [k]: null }
                 : curr,
-            payload
+            payload,
           );
           if (!isNil(update)) {
             onLoading(true);
@@ -168,8 +171,8 @@ const EditModelModal = <
   return (
     <Modal
       {...props}
-      okText={"Save"}
-      cancelText={"Cancel"}
+      okText="Save"
+      cancelText="Cancel"
       title={title}
       okButtonProps={{ disabled: Form.loading }}
       onOk={onOk}

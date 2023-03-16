@@ -8,8 +8,9 @@ this directory.
 This file should only ever contain one test - the test that is responsible for using "sass-true"
 to run the testable files in this directory.
 */
-import glob from "glob";
 import path from "path";
+
+import glob from "glob";
 import { runSass } from "sass-true";
 
 /* The SASS Jest "project" scopes the `rootDir` of the project's configuration to this directory

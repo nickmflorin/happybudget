@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, forwardRef, useImperativeHandle, ForwardedRef } from "react";
-import { isNil } from "lodash";
-import classNames from "classnames";
-import { CKEditor, CKEditorProps, CKEditorEvent, EditorInstance } from "@ckeditor/ckeditor5-react";
-import BalloonEditor from "@ckeditor/ckeditor5-build-balloon";
 
-interface EditorProps extends Omit<CKEditorProps, "editor" | "config" | "onChange" | "onBlur" | "data"> {
+import BalloonEditor from "@ckeditor/ckeditor5-build-balloon";
+import { CKEditor, CKEditorProps, CKEditorEvent, EditorInstance } from "@ckeditor/ckeditor5-react";
+import classNames from "classnames";
+import { isNil } from "lodash";
+
+interface EditorProps
+  extends Omit<CKEditorProps, "editor" | "config" | "onChange" | "onBlur" | "data"> {
   readonly className?: string;
   readonly style?: React.CSSProperties;
   readonly initialValue?: string;
@@ -14,7 +16,7 @@ interface EditorProps extends Omit<CKEditorProps, "editor" | "config" | "onChang
 
 const Editor = (
   { initialValue, onChange, onBlur, className, style, ...props }: EditorProps,
-  ref: ForwardedRef<IEditor>
+  ref: ForwardedRef<IEditor>,
 ): JSX.Element => {
   const editor = useRef<EditorInstance | null>(null);
   const isInitialChange = useRef(true);
@@ -36,7 +38,7 @@ const Editor = (
         return editor.current.getData();
       }
       return "";
-    }
+    },
   }));
 
   return (
@@ -55,9 +57,9 @@ const Editor = (
               { model: "heading3", view: "h3", title: "Heading 3", class: "ck-heading_heading3" },
               { model: "heading4", view: "h4", title: "Heading 4", class: "ck-heading_heading4" },
               { model: "heading5", view: "h5", title: "Heading 5", class: "ck-heading_heading5" },
-              { model: "heading6", view: "h6", title: "Heading 6", class: "ck-heading_heading6" }
-            ]
-          }
+              { model: "heading6", view: "h6", title: "Heading 6", class: "ck-heading_heading6" },
+            ],
+          },
         }}
         onReady={(e: EditorInstance) => (editor.current = e)}
         onBlur={(event: CKEditorEvent, e: EditorInstance) => {

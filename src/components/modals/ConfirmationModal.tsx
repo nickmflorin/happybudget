@@ -4,9 +4,14 @@ import { Confirmation, ConfirmationProps } from "components/notifications";
 
 import { Modal } from "./generic";
 
-type ConfirmationModalProps = ModalProps & Pick<ConfirmationProps, "suppressionKey" | "message" | "children">;
+type ConfirmationModalProps = ModalProps &
+  Pick<ConfirmationProps, "suppressionKey" | "message" | "children">;
 
-const ConfirmationModal = ({ suppressionKey, message, ...props }: ConfirmationModalProps): JSX.Element => (
+const ConfirmationModal = ({
+  suppressionKey,
+  message,
+  ...props
+}: ConfirmationModalProps): JSX.Element => (
   <Modal
     {...props}
     okText={props.okText || "Ok"}

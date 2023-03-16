@@ -1,10 +1,11 @@
 import React, { useMemo } from "react";
+
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import { DEFAULT_COLOR_SCHEME, Colors } from "style/constants";
 import { model, util } from "lib";
 import { TooltipWrapper } from "components/tooltips";
+import { DEFAULT_COLOR_SCHEME, Colors } from "style/constants";
 
 const TagRenderer = <S extends React.CSSProperties | Pdf.Style = React.CSSProperties>({
   textColor,
@@ -38,10 +39,12 @@ const TagRenderer = <S extends React.CSSProperties | Pdf.Style = React.CSSProper
         { uppercase },
         { "fill-width": fillWidth },
         { disabled: disabled },
-        params.className
+        params.className,
       )}
       style={style as React.CSSProperties}
-      onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => !disabled && params.onClick?.(e)}
+      onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) =>
+        !disabled && params.onClick?.(e)
+      }
     >
       {!isNil(contentRender) ? (
         contentRender({
@@ -53,7 +56,7 @@ const TagRenderer = <S extends React.CSSProperties | Pdf.Style = React.CSSProper
           textClassName,
           textStyle,
           text,
-          ...params
+          ...params,
         })
       ) : (
         <span className={textClassName} style={textStyle as React.CSSProperties}>
@@ -68,9 +71,9 @@ const MemoizedTagRenderer = React.memo(TagRenderer) as typeof TagRenderer;
 
 export const Tag = <
   M extends Model.Model = Model.Model,
-  S extends React.CSSProperties | Pdf.Style = React.CSSProperties
+  S extends React.CSSProperties | Pdf.Style = React.CSSProperties,
 >(
-  props: TagProps<M, S>
+  props: TagProps<M, S>,
 ): JSX.Element => {
   const tagText = useMemo((): string | M[keyof M] => {
     if (props.isPlural === true && !isNil(props.pluralText)) {
@@ -84,13 +87,13 @@ export const Tag = <
       return model.getModelName(props.children, {
         isPlural: props.isPlural,
         getModelName: props.getModelText,
-        modelNameField: props.modelTextField
+        modelNameField: props.modelTextField,
       });
     } else if (!isNil(props.model)) {
       return model.getModelName(props.model, {
         isPlural: props.isPlural,
         getModelName: props.getModelText,
-        modelNameField: props.modelTextField
+        modelNameField: props.modelTextField,
       });
     }
     return "";
@@ -101,7 +104,7 @@ export const Tag = <
     props.children,
     props.model,
     props.getModelText,
-    props.modelTextField
+    props.modelTextField,
   ]);
 
   const tagColor = useMemo((): Style.HexColor | null => {
@@ -111,13 +114,13 @@ export const Tag = <
       return model.getModelColor(props.children, {
         scheme: props.scheme,
         getModelColor: props.getModelColor,
-        modelColorField: props.modelColorField
+        modelColorField: props.modelColorField,
       });
     } else if (!isNil(props.model)) {
       return model.getModelColor(props.model, {
         scheme: props.scheme,
         getModelColor: props.getModelColor,
-        modelColorField: props.modelColorField
+        modelColorField: props.modelColorField,
       });
     } else if (!isNil(props.colorIndex)) {
       const colorScheme = props.scheme || DEFAULT_COLOR_SCHEME;
@@ -134,7 +137,7 @@ export const Tag = <
     props.getModelColor,
     props.modelColorField,
     props.scheme,
-    props.colorIndex
+    props.colorIndex,
   ]);
 
   const tagTextColor = useMemo(() => {
@@ -143,11 +146,13 @@ export const Tag = <
     }
     /* The tagColor is null when we want the tag to be transparent, in which case
 		   the secondary text color should be contrasted enough on the background. */
-    return tagColor !== null ? util.colors.contrastedForegroundColor(tagColor) : Colors.TEXT_SECONDARY;
+    return tagColor !== null
+      ? util.colors.contrastedForegroundColor(tagColor)
+      : Colors.TEXT_SECONDARY;
   }, [tagColor, props]);
 
-  const renderParams = useMemo<ITagRenderParams<S>>(() => {
-    return {
+  const renderParams = useMemo<ITagRenderParams<S>>(
+    () => ({
       className: props.className,
       uppercase: props.uppercase || false,
       color: tagColor,
@@ -159,19 +164,20 @@ export const Tag = <
       textClassName: props.textClassName,
       contentRender: props.contentRender,
       onClick: props.onClick,
-      disabled: props.disabled
-    };
-  }, [
-    props.className,
-    props.textClassName,
-    props.style,
-    props.textStyle,
-    props.uppercase,
-    tagColor,
-    tagTextColor,
-    tagText,
-    props.fillWidth
-  ]);
+      disabled: props.disabled,
+    }),
+    [
+      props.className,
+      props.textClassName,
+      props.style,
+      props.textStyle,
+      props.uppercase,
+      tagColor,
+      tagTextColor,
+      tagText,
+      props.fillWidth,
+    ],
+  );
 
   /* If the render method is provided, it is responsible for rendering the
      entire Tag - not just the contents inside of the Tag.  This is primarily

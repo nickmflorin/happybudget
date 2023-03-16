@@ -1,8 +1,8 @@
 import React from "react";
 
+import connectCellToStore from "./connectCellToStore";
 import { ValueCell } from "./generic";
 import useFormattedValue from "./useFormattedValue";
-import connectCellToStore from "./connectCellToStore";
 
 const BodyCell = <
   R extends Table.RowData,
@@ -10,7 +10,7 @@ const BodyCell = <
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   V extends string | number | null = string | number | null,
-  CL extends Table.DataColumn<R, M, V> = Table.DataColumn<R, M, V>
+  CL extends Table.DataColumn<R, M, V> = Table.DataColumn<R, M, V>,
 >({
   value,
   ...props

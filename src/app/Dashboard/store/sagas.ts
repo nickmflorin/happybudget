@@ -16,14 +16,17 @@ function* watchForBudgetsRefreshSaga(): SagaIterator {
     [
       actions.requestBudgetsAction.toString(),
       actions.setBudgetsPaginationAction.toString(),
-      actions.updateBudgetsOrderingAction.toString()
+      actions.updateBudgetsOrderingAction.toString(),
     ],
-    tasks.getBudgetsTask
+    tasks.getBudgetsTask,
   );
 }
 
 function* watchForBudgetsPermissioningRefreshSaga(): SagaIterator {
-  yield takeLatest([actions.requestPermissioningBudgetsAction.toString()], tasks.getBudgetsPermissioningTask);
+  yield takeLatest(
+    [actions.requestPermissioningBudgetsAction.toString()],
+    tasks.getBudgetsPermissioningTask,
+  );
 }
 
 function* watchForSearchBudgetsSaga(): SagaIterator {
@@ -35,9 +38,9 @@ function* watchForArchiveRefreshSaga(): SagaIterator {
     [
       actions.requestArchiveAction.toString(),
       actions.setArchivePaginationAction.toString(),
-      actions.updateArchiveOrderingAction.toString()
+      actions.updateArchiveOrderingAction.toString(),
     ],
-    tasks.getArchiveTask
+    tasks.getArchiveTask,
   );
 }
 
@@ -50,9 +53,9 @@ function* watchForCollaboratingRefreshSaga(): SagaIterator {
     [
       actions.requestCollaboratingAction.toString(),
       actions.setCollaboratingPaginationAction.toString(),
-      actions.updateCollaboratingOrderingAction.toString()
+      actions.updateCollaboratingOrderingAction.toString(),
     ],
-    tasks.getCollaboratingTask
+    tasks.getCollaboratingTask,
   );
 }
 
@@ -61,7 +64,10 @@ function* watchForSearchCollaboratingSaga(): SagaIterator {
 }
 
 function* watchForArchivePermissioningRefreshSaga(): SagaIterator {
-  yield takeLatest([actions.requestPermissioningArchiveAction.toString()], tasks.getArchivePermissioningTask);
+  yield takeLatest(
+    [actions.requestPermissioningArchiveAction.toString()],
+    tasks.getArchivePermissioningTask,
+  );
 }
 
 function* watchForTemplatesRefreshSaga(): SagaIterator {
@@ -69,9 +75,9 @@ function* watchForTemplatesRefreshSaga(): SagaIterator {
     [
       actions.requestTemplatesAction.toString(),
       actions.setTemplatesPaginationAction.toString(),
-      actions.updateTemplatesOrderingAction.toString()
+      actions.updateTemplatesOrderingAction.toString(),
     ],
-    tasks.getTemplatesTask
+    tasks.getTemplatesTask,
   );
 }
 
@@ -84,9 +90,9 @@ function* watchForCommunityRefreshSaga(): SagaIterator {
     [
       actions.requestCommunityAction.toString(),
       actions.setCommunityPaginationAction.toString(),
-      actions.updateCommunityOrderingAction.toString()
+      actions.updateCommunityOrderingAction.toString(),
     ],
-    tasks.getCommunityTask
+    tasks.getCommunityTask,
   );
 }
 
@@ -99,18 +105,24 @@ const ActionMap = {
   handleEvent: actions.handleContactsTableEventAction,
   loading: actions.loadingContactsAction,
   response: actions.responseContactsAction,
-  setSearch: actions.setContactsSearchAction
+  setSearch: actions.setContactsSearchAction,
 };
 
-export const createContactsTableSaga = (table: Table.TableInstance<Tables.ContactRowData, Model.Contact>) =>
-  tabling.sagas.createAuthenticatedTableSaga<Tables.ContactRowData, Model.Contact, Tables.ContactTableStore>({
+export const createContactsTableSaga = (
+  table: Table.TableInstance<Tables.ContactRowData, Model.Contact>,
+) =>
+  tabling.sagas.createAuthenticatedTableSaga<
+    Tables.ContactRowData,
+    Model.Contact,
+    Tables.ContactTableStore
+  >({
     actions: ActionMap,
     selectStore: (state: Application.Store) => state.dashboard.contacts,
     tasks: store.tasks.contacts.createTableTaskSet({
       table,
       selectStore: (state: Application.Store) => state.dashboard.contacts,
-      actions: ActionMap
-    })
+      actions: ActionMap,
+    }),
   });
 
 export default function* rootSaga(): SagaIterator {

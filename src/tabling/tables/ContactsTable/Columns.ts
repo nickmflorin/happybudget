@@ -2,6 +2,7 @@ import { isNil } from "lodash";
 import { ValueSetterParams } from "@ag-grid-community/core";
 
 import { model, tabling, util, formatters } from "lib";
+
 import { columns } from "../../generic";
 
 type R = Tables.ContactRowData;
@@ -27,7 +28,7 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
       const parsed = !isNil(value) ? model.parseFirstAndLastName(value) : null;
       return [
         { field: "first_name", value: !isNil(parsed) ? parsed[0] : null },
-        { field: "last_name", value: !isNil(parsed) ? parsed[1] : null }
+        { field: "last_name", value: !isNil(parsed) ? parsed[1] : null },
       ];
     },
     valueSetter: (params: ValueSetterParams) => {
@@ -42,7 +43,9 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
       return true;
     },
     valueGetter: (row: Table.BodyRow<R>) =>
-      tabling.rows.isModelRow(row) ? util.conditionalJoinString(row.data.first_name, row.data.last_name) : null
+      tabling.rows.isModelRow(row)
+        ? util.conditionalJoinString(row.data.first_name, row.data.last_name)
+        : null,
   }),
   columns.BodyColumn<R, M>({
     field: "company",
@@ -50,7 +53,7 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     headerName: "Company",
     dataType: "text",
     width: 100,
-    minWidth: 100
+    minWidth: 100,
   }),
   columns.BodyColumn<R, M>({
     field: "position",
@@ -58,7 +61,7 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     headerName: "Job Title",
     dataType: "text",
     width: 100,
-    minWidth: 100
+    minWidth: 100,
   }),
   columns.BodyColumn<R, M>({
     field: "phone_number",
@@ -67,7 +70,7 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     dataType: "phone",
     cellRenderer: { data: "PhoneNumberCell" },
     width: 120,
-    minWidth: 120
+    minWidth: 120,
   }),
   columns.BodyColumn<R, M>({
     field: "email",
@@ -77,7 +80,7 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     cellRenderer: { data: "EmailCell" },
     valueSetter: tabling.columns.emailValueSetter("email"),
     width: 100,
-    minWidth: 100
+    minWidth: 100,
   }),
   columns.BodyColumn<R, M>({
     field: "rate",
@@ -85,11 +88,11 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     headerName: "Rate",
     dataType: "currency",
     valueFormatter: formatters.currencyFormatter((v: string | number) =>
-      console.error(`Could not parse currency value ${String(v)} for field 'rate'.`)
+      console.error(`Could not parse currency value ${String(v)} for field 'rate'.`),
     ),
     valueSetter: tabling.columns.numericValueSetter("rate"),
     width: 75,
-    minWidth: 75
+    minWidth: 75,
   }),
   columns.ChoiceSelectColumn<R, M, Model.ContactType | null>({
     field: "contact_type",
@@ -100,12 +103,12 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     cellEditor: "ContactTypeEditor",
     processCellFromClipboard: (name: string) => model.contact.ContactTypes.infer(name),
     width: 100,
-    minWidth: 100
+    minWidth: 100,
   }),
   columns.AttachmentsColumn({
     field: "attachments",
     width: 120,
-    minWidth: 120
+    minWidth: 120,
   }),
   columns.BodyColumn<R, M>({
     field: "notes",
@@ -114,8 +117,8 @@ const Columns: Table.Column<Tables.ContactRowData, M>[] = [
     width: 100,
     minWidth: 100,
     flex: 1,
-    dataType: "longText"
-  })
+    dataType: "longText",
+  }),
 ];
 
 export default Columns;

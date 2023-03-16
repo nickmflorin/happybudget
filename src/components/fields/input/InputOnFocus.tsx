@@ -1,4 +1,12 @@
-import React, { useState, useEffect, useRef, useImperativeHandle, ForwardedRef, forwardRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useImperativeHandle,
+  ForwardedRef,
+  forwardRef,
+} from "react";
+
 import classNames from "classnames";
 import { isNil } from "lodash";
 import { InputRef } from "antd";
@@ -13,8 +21,13 @@ interface InputOnFocusProps extends React.HTMLProps<HTMLInputElement> {
 }
 
 const InputOnFocus = (
-  { children, renderBlurredContent, renderBlurredContentOnNoValue = false, ...props }: InputOnFocusProps,
-  ref: ForwardedRef<Pick<InputRef, "focus" | "blur">>
+  {
+    children,
+    renderBlurredContent,
+    renderBlurredContentOnNoValue = false,
+    ...props
+  }: InputOnFocusProps,
+  ref: ForwardedRef<Pick<InputRef, "focus" | "blur">>,
 ): JSX.Element => {
   const innerRef = useRef<HTMLInputElement>(null);
   const [focused, setFocused] = useState(false);
@@ -33,7 +46,7 @@ const InputOnFocus = (
 		 auto-focused with our Form mechanics. */
   useImperativeHandle(ref, () => ({
     focus: () => setFocused(true),
-    blur: () => setFocused(false)
+    blur: () => setFocused(false),
   }));
 
   // Note that the tabIndex is required to allow the div to be focusable.
@@ -46,7 +59,8 @@ const InputOnFocus = (
       onBlur={() => setFocused(false)}
     >
       {focused === true ||
-      (renderBlurredContentOnNoValue === false && (props.value === undefined || props.value === "")) ? (
+      (renderBlurredContentOnNoValue === false &&
+        (props.value === undefined || props.value === "")) ? (
         <input {...props} value={!isNil(props.value) ? props.value : ""} ref={innerRef} />
       ) : (
         /*
@@ -64,7 +78,7 @@ const InputOnFocus = (
 				behavior of the parent `input-div` component.
         */
         <div
-          className={"input-div-content"}
+          className="input-div-content"
           tabIndex={0}
           onFocus={(e: React.FocusEvent<HTMLDivElement>) => e.stopPropagation()}
           onBlur={(e: React.FocusEvent<HTMLDivElement>) => e.stopPropagation()}

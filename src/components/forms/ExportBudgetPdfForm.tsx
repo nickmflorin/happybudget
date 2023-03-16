@@ -1,13 +1,20 @@
-import { useState, useMemo, useRef, forwardRef, ForwardedRef, useImperativeHandle, useEffect } from "react";
+import {
+  useState,
+  useMemo,
+  useRef,
+  forwardRef,
+  ForwardedRef,
+  useImperativeHandle,
+  useEffect,
+} from "react";
+
 import classNames from "classnames";
 import { isNil, debounce } from "lodash";
-
 import { Switch, Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
 import * as api from "api";
 import { model, ui } from "lib";
-
 import { Form, ShowHide, Separator } from "components";
 import { ColumnSelect, Input, CKEditor, AccountTableSelect } from "components/fields";
 import { PdfImageUploader } from "components/fields/uploaders";
@@ -29,10 +36,11 @@ interface ExportFormProps extends FormProps<ExportBudgetPdfFormOptions> {
 
 const ExportForm = (
   { accountsLoading, accounts, columns, ...props }: ExportFormProps,
-  ref: ForwardedRef<IExportFormRef<ExportBudgetPdfFormOptions>>
+  ref: ForwardedRef<IExportFormRef<ExportBudgetPdfFormOptions>>,
 ): JSX.Element => {
   const select = ui.select.useHeaderTemplateSelect();
-  const [displayedHeaderTemplate, setDisplayedHeaderTemplate] = useState<Model.HeaderTemplate | null>(null);
+  const [displayedHeaderTemplate, setDisplayedHeaderTemplate] =
+    useState<Model.HeaderTemplate | null>(null);
 
   const suppressValueChangeTrigger = useRef(false);
   const leftInfoEditor = useRef<IEditor>(null);
@@ -47,37 +55,42 @@ const ExportForm = (
   const [leftImage, _setLeftImage] = useState<UploadedImage | SavedImage | null>(null);
   const [rightImage, _setRightImage] = useState<UploadedImage | SavedImage | null>(null);
 
-  const _formDataWithoutHeader = useMemo(() => {
-    return (values: Omit<ExportBudgetPdfFormOptions, NonFormFields>): Omit<ExportBudgetPdfFormOptions, "header"> => {
-      let options: Partial<ExportBudgetPdfFormOptions> = {
-        ...values,
-        includeNotes
-      };
-      if (includeNotes === true) {
-        options = { ...options, notes: notesHtml };
-      }
-      return options as ExportBudgetPdfFormOptions;
-    };
-  }, [notesHtml, includeNotes]);
-
-  const getHeaderTemplateData = useMemo<() => HeaderTemplateFormData>(
-    () => (): HeaderTemplateFormData => {
-      return {
-        header: headerEditor.current?.getData() || null,
-        left_info: leftInfoEditor.current?.getData() || null,
-        right_info: rightInfoEditor.current?.getData() || null,
-        right_image: rightImage,
-        left_image: leftImage
-      };
-    },
-    [headerEditor.current, leftInfoEditor.current, rightInfoEditor.current, leftImage, rightImage]
+  const _formDataWithoutHeader = useMemo(
+    () =>
+      (
+        values: Omit<ExportBudgetPdfFormOptions, NonFormFields>,
+      ): Omit<ExportBudgetPdfFormOptions, "header"> => {
+        let options: Partial<ExportBudgetPdfFormOptions> = {
+          ...values,
+          includeNotes,
+        };
+        if (includeNotes === true) {
+          options = { ...options, notes: notesHtml };
+        }
+        return options as ExportBudgetPdfFormOptions;
+      },
+    [notesHtml, includeNotes],
   );
 
-  const formData = useMemo(() => {
-    return (values: Omit<ExportBudgetPdfFormOptions, NonFormFields>): ExportBudgetPdfFormOptions => {
-      return { ..._formDataWithoutHeader(values), header: getHeaderTemplateData() };
-    };
-  }, [_formDataWithoutHeader, getHeaderTemplateData]);
+  const getHeaderTemplateData = useMemo<() => HeaderTemplateFormData>(
+    () => (): HeaderTemplateFormData => ({
+      header: headerEditor.current?.getData() || null,
+      left_info: leftInfoEditor.current?.getData() || null,
+      right_info: rightInfoEditor.current?.getData() || null,
+      right_image: rightImage,
+      left_image: leftImage,
+    }),
+    [headerEditor.current, leftInfoEditor.current, rightInfoEditor.current, leftImage, rightImage],
+  );
+
+  const formData = useMemo(
+    () =>
+      (values: Omit<ExportBudgetPdfFormOptions, NonFormFields>): ExportBudgetPdfFormOptions => ({
+        ..._formDataWithoutHeader(values),
+        header: getHeaderTemplateData(),
+      }),
+    [_formDataWithoutHeader, getHeaderTemplateData],
+  );
 
   const _setHeader = useMemo(
     () => (header: HeaderTemplateFormData) => {
@@ -87,7 +100,7 @@ const ExportForm = (
       _setRightImage(header.right_image);
       _setLeftImage(header.left_image);
     },
-    []
+    [],
   );
 
   useEffect(() => {
@@ -97,7 +110,7 @@ const ExportForm = (
       const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
       props.onValuesChange?.(
         { header: displayedHeaderTemplate },
-        { ..._formDataWithoutHeader(values), header: displayedHeaderTemplate }
+        { ..._formDataWithoutHeader(values), header: displayedHeaderTemplate },
       );
     } else {
       const header = props.initialValues?.header || {
@@ -105,7 +118,7 @@ const ExportForm = (
         left_image: null,
         right_image: null,
         left_info: "",
-        right_info: ""
+        right_info: "",
       };
       _setHeader(header);
       const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
@@ -124,11 +137,14 @@ const ExportForm = (
         const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
         props.onValuesChange?.(
           { header: { ...getHeaderTemplateData(), left_image: img } },
-          { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), left_image: img } }
+          {
+            ..._formDataWithoutHeader(values),
+            header: { ...getHeaderTemplateData(), left_image: img },
+          },
         );
       }
     },
-    [_formDataWithoutHeader, getHeaderTemplateData, suppressValueChangeTrigger.current]
+    [_formDataWithoutHeader, getHeaderTemplateData, suppressValueChangeTrigger.current],
   );
 
   const setRightImage = useMemo(
@@ -141,11 +157,14 @@ const ExportForm = (
         const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
         props.onValuesChange?.(
           { header: { ...getHeaderTemplateData(), right_image: img } },
-          { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), right_image: img } }
+          {
+            ..._formDataWithoutHeader(values),
+            header: { ...getHeaderTemplateData(), right_image: img },
+          },
         );
       }
     },
-    [_formDataWithoutHeader, getHeaderTemplateData, suppressValueChangeTrigger.current]
+    [_formDataWithoutHeader, getHeaderTemplateData, suppressValueChangeTrigger.current],
   );
 
   const setHeader = useMemo(
@@ -157,11 +176,14 @@ const ExportForm = (
         const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
         props.onValuesChange?.(
           { header: { ...getHeaderTemplateData(), header: html } },
-          { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), header: html } }
+          {
+            ..._formDataWithoutHeader(values),
+            header: { ...getHeaderTemplateData(), header: html },
+          },
         );
       }
     },
-    [_formDataWithoutHeader, getHeaderTemplateData, suppressValueChangeTrigger.current]
+    [_formDataWithoutHeader, getHeaderTemplateData, suppressValueChangeTrigger.current],
   );
 
   const setLeftInfo = useMemo(
@@ -173,11 +195,14 @@ const ExportForm = (
         const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
         props.onValuesChange?.(
           { header: { ...getHeaderTemplateData(), left_info: html } },
-          { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), left_info: html } }
+          {
+            ..._formDataWithoutHeader(values),
+            header: { ...getHeaderTemplateData(), left_info: html },
+          },
         );
       }
     },
-    [_formDataWithoutHeader, getHeaderTemplateData, suppressValueChangeTrigger.current]
+    [_formDataWithoutHeader, getHeaderTemplateData, suppressValueChangeTrigger.current],
   );
 
   const setRightInfo = useMemo(
@@ -189,23 +214,26 @@ const ExportForm = (
         const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
         props.onValuesChange?.(
           { header: { ...getHeaderTemplateData(), right_info: html } },
-          { ..._formDataWithoutHeader(values), header: { ...getHeaderTemplateData(), right_info: html } }
+          {
+            ..._formDataWithoutHeader(values),
+            header: { ...getHeaderTemplateData(), right_info: html },
+          },
         );
       }
     },
-    [_formDataWithoutHeader, getHeaderTemplateData, suppressValueChangeTrigger.current]
+    [_formDataWithoutHeader, getHeaderTemplateData, suppressValueChangeTrigger.current],
   );
 
   useImperativeHandle(ref, () => ({
     getFormData: () => {
       const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
       return formData(values);
-    }
+    },
   }));
 
-  const rawFormInitialValues = useMemo<Omit<ExportBudgetPdfFormOptions, RichTextFields> | undefined>(():
-    | Omit<ExportBudgetPdfFormOptions, RichTextFields>
-    | undefined => {
+  const rawFormInitialValues = useMemo<
+    Omit<ExportBudgetPdfFormOptions, RichTextFields> | undefined
+  >((): Omit<ExportBudgetPdfFormOptions, RichTextFields> | undefined => {
     if (!isNil(props.initialValues)) {
       /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
       const { header, notes, ...rest } = props.initialValues as ExportBudgetPdfFormOptions;
@@ -221,7 +249,7 @@ const ExportForm = (
         left_info: data.left_info,
         header: data.header,
         right_info: data.right_info,
-        name
+        name,
       };
       if (!isNil(data.left_image) && model.isUploadedImage(data.left_image)) {
         requestPayload = { ...requestPayload, left_image: data.left_image.data };
@@ -269,7 +297,7 @@ const ExportForm = (
           setSaving(false);
         });
     },
-    [getHeaderTemplateData]
+    [getHeaderTemplateData],
   );
 
   const updateTemplate = useMemo(
@@ -278,7 +306,7 @@ const ExportForm = (
       let requestPayload: Http.HeaderTemplatePayload = {
         left_info: data.left_info,
         header: data.header,
-        right_info: data.right_info
+        right_info: data.right_info,
       };
       /* We only want to include the images in the payload if they were changed
 				 - this means they are either null or of the UploadedImage form. */
@@ -307,7 +335,7 @@ const ExportForm = (
           setSaving(false);
         });
     },
-    [getHeaderTemplateData]
+    [getHeaderTemplateData],
   );
 
   const onSave = useMemo(
@@ -322,16 +350,17 @@ const ExportForm = (
         }
       }
     },
-    [createTemplate, updateTemplate, displayedHeaderTemplate]
+    [createTemplate, updateTemplate, displayedHeaderTemplate],
   );
 
   const debouncedSave = useMemo(() => debounce(onSave, 400), [onSave]);
 
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       debouncedSave.cancel();
-    };
-  }, []);
+    },
+    [],
+  );
 
   return (
     <Form.Form
@@ -345,7 +374,7 @@ const ExportForm = (
       }}
       onValuesChange={(
         changedValues: Partial<Omit<ExportBudgetPdfFormOptions, NonFormFields>>,
-        values: Omit<ExportBudgetPdfFormOptions, NonFormFields>
+        values: Omit<ExportBudgetPdfFormOptions, NonFormFields>,
       ) => {
         /* Note: Since the images are not included as a part of the underlying
 					 Form mechanics, they will not trigger this hook.  This means that we
@@ -353,19 +382,18 @@ const ExportForm = (
 					 change. */
         props.onValuesChange?.(changedValues, formData(values));
       }}
-      layout={"vertical"}
+      layout="vertical"
     >
-      <Form.ItemSection label={"Header"}>
-        <Form.Item label={"Title"}>
+      <Form.ItemSection label="Header">
+        <Form.Item label="Title">
           <CKEditor
             ref={headerEditor}
             initialValue={props.initialValues?.header?.header || ""}
             onChange={(html: string) => setHeader(html)}
           />
         </Form.Item>
-
-        <div className={"export-header-sides"}>
-          <Form.Item label={"Left Side"} className={"export-header-side-item"}>
+        <div className="export-header-sides">
+          <Form.Item label="Left Side" className="export-header-side-item">
             <PdfImageUploader
               value={leftImage}
               onChange={(left_image: UploadedImage | null) => setLeftImage(left_image)}
@@ -377,8 +405,7 @@ const ExportForm = (
               onChange={(html: string) => setLeftInfo(html)}
             />
           </Form.Item>
-
-          <Form.Item className={"export-header-side-item"} label={"Right Side"}>
+          <Form.Item className="export-header-side-item" label="Right Side">
             <PdfImageUploader
               value={rightImage}
               onChange={(right_image: UploadedImage | null) => setRightImage(right_image)}
@@ -391,7 +418,6 @@ const ExportForm = (
             />
           </Form.Item>
         </div>
-
         <HeaderTemplateSaveForm
           value={displayedHeaderTemplate}
           onChange={(m: Model.HeaderTemplate | null) => setDisplayedHeaderTemplate(m)}
@@ -407,19 +433,18 @@ const ExportForm = (
           style={{ marginTop: 10 }}
         />
       </Form.ItemSection>
-
       <Separator style={{ margin: "2px auto" }} />
-
-      <Form.ItemSection label={"Table Options"}>
-        <Form.Item name={"date"} label={"Budget Date"}>
+      <Form.ItemSection label="Table Options">
+        <Form.Item name="date" label="Budget Date">
           <Input />
         </Form.Item>
-
-        <Form.Item label={"Columns"} name={"columns"}>
-          <ColumnSelect<R, M, C> getOptionLabel={(c: C) => c.pdfHeaderName || c.headerName || ""} options={columns} />
+        <Form.Item label="Columns" name="columns">
+          <ColumnSelect<R, M, C>
+            getOptionLabel={(c: C) => c.pdfHeaderName || c.headerName || ""}
+            options={columns}
+          />
         </Form.Item>
-
-        <Form.Item label={"Show All Tables"} horizontalLayoutOverride={true}>
+        <Form.Item label="Show All Tables" horizontalLayoutOverride={true}>
           <Checkbox
             defaultChecked={isNil(rawFormInitialValues?.tables)}
             checked={showAllTables}
@@ -428,7 +453,10 @@ const ExportForm = (
               setShowAllTables(e.target.checked);
               if (e.target.checked === true) {
                 props.form.setFields([{ name: "tables", value: undefined }]);
-                props.onValuesChange?.({ tables: undefined }, { ...formData(values), tables: undefined });
+                props.onValuesChange?.(
+                  { tables: undefined },
+                  { ...formData(values), tables: undefined },
+                );
               } else {
                 props.form.setFields([{ name: "tables", value: [] }]);
                 props.onValuesChange?.({ tables: [] }, { ...formData(values), tables: [] });
@@ -436,38 +464,42 @@ const ExportForm = (
             }}
           />
         </Form.Item>
-        <Form.Item label={"Tables"} name={"tables"} style={{ marginBottom: 5 }}>
+        <Form.Item label="Tables" name="tables" style={{ marginBottom: 5 }}>
           <AccountTableSelect
             isDisabled={accountsLoading || showAllTables}
             isLoading={accountsLoading}
             options={accounts}
           />
         </Form.Item>
-        <Form.Item valuePropName={"checked"} name={"excludeZeroTotals"} label={"Exclude Accounts Totalling Zero"}>
+        <Form.Item
+          valuePropName="checked"
+          name="excludeZeroTotals"
+          label="Exclude Accounts Totalling Zero"
+        >
           <Switch
-            checkedChildren={"ON"}
-            unCheckedChildren={"OFF"}
+            checkedChildren="ON"
+            unCheckedChildren="OFF"
             defaultChecked={rawFormInitialValues?.excludeZeroTotals === true}
           />
         </Form.Item>
       </Form.ItemSection>
-
       <Separator style={{ margin: "2px auto" }} />
-
-      <Form.ItemSection label={"Notes"}>
-        <Form.Item label={"Include Notes Section"}>
+      <Form.ItemSection label="Notes">
+        <Form.Item label="Include Notes Section">
           <Switch
-            checkedChildren={"ON"}
-            unCheckedChildren={"OFF"}
+            checkedChildren="ON"
+            unCheckedChildren="OFF"
             defaultChecked={false}
             onChange={(checked: boolean) => {
               const values: ExportBudgetPdfFormOptions = props.form.getFieldsValue();
-              props.onValuesChange?.({ includeNotes: checked }, { ...formData(values), includeNotes: checked });
+              props.onValuesChange?.(
+                { includeNotes: checked },
+                { ...formData(values), includeNotes: checked },
+              );
               setIncludeNotes(checked);
             }}
           />
         </Form.Item>
-
         <ShowHide show={includeNotes}>
           <Form.Item>
             <CKEditor

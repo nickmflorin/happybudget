@@ -16,7 +16,7 @@
     a {
       font-family: $roboto;
       font-weight: 400;
-      font-size: $medium-text-size;;
+      font-size: $medium-text-size;
     }
     @include media("<=xl") {
       margin-bottom: 45px;
@@ -24,7 +24,7 @@
   }
 
   .link-text-base {
-    font-size: $medium-text-size;;
+    font-size: $medium-text-size;
     text-align: center;
     margin-top: 12px;
     font-family: $roboto;
@@ -49,7 +49,7 @@
       margin-left: 6px;
       font-family: $roboto;
       font-weight: 400;
-      font-size: $medium-text-size;;
+      font-size: $medium-text-size;
       line-height: 15px;
     }
   }

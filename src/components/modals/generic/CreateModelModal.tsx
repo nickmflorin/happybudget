@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+
 import { isNil, includes, reduce } from "lodash";
 
 import { ui, hooks, http } from "lib";
@@ -18,7 +19,7 @@ interface PrivateCreateModelModalProps<
   M extends Model.GenericHttpModel,
   P extends Http.ModelPayload<M> = Http.ModelPayload<M>,
   V = P,
-  R = M
+  R = M,
 > extends CreateModelModalProps<M, R> {
   readonly form?: FormInstance<V>;
   readonly title?: string | JSX.Element | ((form: FormInstance<V>) => JSX.Element | string);
@@ -43,7 +44,7 @@ const CreateModelModal = <
   M extends Model.GenericHttpModel,
   P extends Http.ModelPayload<M> = Http.ModelPayload<M>,
   V extends Record<string, unknown> = P,
-  R = M
+  R = M,
 >({
   autoFocusField,
   form,
@@ -83,7 +84,7 @@ const CreateModelModal = <
       }
       onSuccess(response);
     },
-    [isMounted.current, onSuccess]
+    [isMounted.current, onSuccess],
   );
 
   const _onError = useMemo(
@@ -95,7 +96,7 @@ const CreateModelModal = <
         }
       }
     },
-    [isMounted.current, interceptError]
+    [isMounted.current, interceptError],
   );
 
   const onOk = useMemo(
@@ -107,12 +108,14 @@ const CreateModelModal = <
             payload = reduce(
               payload,
               (curr: P, value: P[keyof P], k: string) =>
-                ((Array.isArray(convertEmptyStringsToNull) && includes(convertEmptyStringsToNull, k as keyof P)) ||
-                  (!Array.isArray(convertEmptyStringsToNull) && convertEmptyStringsToNull !== false)) &&
+                ((Array.isArray(convertEmptyStringsToNull) &&
+                  includes(convertEmptyStringsToNull, k as keyof P)) ||
+                  (!Array.isArray(convertEmptyStringsToNull) &&
+                    convertEmptyStringsToNull !== false)) &&
                 value === ("" as unknown as P[keyof P])
                   ? { ...curr, [k]: null }
                   : curr,
-              payload
+              payload,
             );
             if (!isNil(create)) {
               onLoading(true);
@@ -129,14 +132,14 @@ const CreateModelModal = <
           return;
         });
     },
-    [Form, create, cancelToken, interceptPayload]
+    [Form, create, cancelToken, interceptPayload],
   );
 
   return (
     <Modal
       {...props}
-      okText={"Create"}
-      cancelText={"Cancel"}
+      okText="Create"
+      cancelText="Cancel"
       title={title}
       okButtonProps={{ disabled: Form.loading }}
       onOk={onOk}

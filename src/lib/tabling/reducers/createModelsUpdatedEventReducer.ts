@@ -1,7 +1,14 @@
 import { isNil, reduce, filter, includes, intersection } from "lodash";
 
 import { tabling, redux, util, model } from "lib";
-import { groupRowFromState, reorderRows, markupRowFromState, updateRowGroup, rowGroupRowFromState } from "./util";
+
+import {
+  groupRowFromState,
+  reorderRows,
+  markupRowFromState,
+  updateRowGroup,
+  rowGroupRowFromState,
+} from "./util";
 
 /**
  * Reducer that updates the Redux.TableStore<R> store by converting models to
@@ -15,15 +22,15 @@ const createModelsUpdatedEventReducer = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  C extends Redux.ActionContext = Redux.ActionContext
+  C extends Redux.ActionContext = Redux.ActionContext,
 >(
-  config: Table.AuthenticatedReducerConfig<R, M, S, C>
+  config: Table.AuthenticatedReducerConfig<R, M, S, C>,
 ): Redux.BasicReducer<S, Table.ModelsUpdatedEvent<M>> => {
   const groupRowManager = new tabling.rows.GroupRowManager<R, M>({ columns: config.columns });
   const markupRowManager = new tabling.rows.MarkupRowManager({ columns: config.columns });
   const modelRowManager = new tabling.rows.ModelRowManager<R, M>({
     getRowChildren: config.getModelRowChildren,
-    columns: config.columns
+    columns: config.columns,
   });
 
   /**
@@ -40,36 +47,52 @@ const createModelsUpdatedEventReducer = <
    *          updated Table.GroupRow.
    */
   const updateGroupInState = (group: Model.Group, s: S, reorder = true) => {
-    const groupRow: Table.GroupRow<R> | null = groupRowFromState<R, S>(s, tabling.rows.groupRowId(group.id));
+    const groupRow: Table.GroupRow<R> | null = groupRowFromState<R, S>(
+      s,
+      tabling.rows.groupRowId(group.id),
+    );
     if (!isNil(groupRow)) {
       const newGroupRow: Table.GroupRow<R> = groupRowManager.create({ model: group });
       const groupsWithChild: Table.GroupRow<R>[] = filter(
         s.data,
-        (r: Table.Row<R>) => tabling.rows.isGroupRow(r) && intersection(r.children, newGroupRow.children).length !== 0
+        (r: Table.Row<R>) =>
+          tabling.rows.isGroupRow(r) && intersection(r.children, newGroupRow.children).length !== 0,
       ) as Table.GroupRow<R>[];
       const newState = reduce(
         groupsWithChild,
-        (st: S, gChild: Table.GroupRow<R>) => {
-          return {
-            ...st,
-            data: util.replaceInArray<Table.BodyRow<R>>(
-              st.data,
-              { id: gChild.id },
-              {
-                ...gChild,
-                children: filter(gChild.children, (id: number) => !includes(newGroupRow.children, id))
-              }
-            )
-          };
-        },
-        s
+        (st: S, gChild: Table.GroupRow<R>) => ({
+          ...st,
+          data: util.replaceInArray<Table.BodyRow<R>>(
+            st.data,
+            { id: gChild.id },
+            {
+              ...gChild,
+              children: filter(
+                gChild.children,
+                (id: number) => !includes(newGroupRow.children, id),
+              ),
+            },
+          ),
+        }),
+        s,
       );
       return reorder
         ? reorderRows({
             ...newState,
-            data: util.replaceInArray<Table.BodyRow<R>>(newState.data, { id: groupRow.id }, newGroupRow)
+            data: util.replaceInArray<Table.BodyRow<R>>(
+              newState.data,
+              { id: groupRow.id },
+              newGroupRow,
+            ),
           })
-        : { ...newState, data: util.replaceInArray<Table.BodyRow<R>>(newState.data, { id: groupRow.id }, newGroupRow) };
+        : {
+            ...newState,
+            data: util.replaceInArray<Table.BodyRow<R>>(
+              newState.data,
+              { id: groupRow.id },
+              newGroupRow,
+            ),
+          };
     }
     return s;
   };
@@ -98,17 +121,25 @@ const createModelsUpdatedEventReducer = <
     const isSubAccountRowData = (d: BR): d is Tables.SubAccountRowData =>
       (d as Tables.SubAccountRowData).fringe_contribution !== undefined;
 
-    const markupRow: Table.MarkupRow<R> | null = markupRowFromState<R, S>(s, tabling.rows.markupRowId(markup.id));
+    const markupRow: Table.MarkupRow<R> | null = markupRowFromState<R, S>(
+      s,
+      tabling.rows.markupRowId(markup.id),
+    );
     if (!isNil(markupRow)) {
       const updatedMarkupRow = markupRowManager.create({ model: markup });
       const childrenRows = filter(
         s.data,
-        (r: Table.BodyRow<R>) => tabling.rows.isModelRow(r) && includes(updatedMarkupRow.children, r.id)
+        (r: Table.BodyRow<R>) =>
+          tabling.rows.isModelRow(r) && includes(updatedMarkupRow.children, r.id),
       ) as Table.ModelRow<R>[];
       // Update the Markup Row itself in state.
       s = {
         ...s,
-        data: util.replaceInArray<Table.BodyRow<R>>(s.data, { id: updatedMarkupRow.id }, updatedMarkupRow)
+        data: util.replaceInArray<Table.BodyRow<R>>(
+          s.data,
+          { id: updatedMarkupRow.id },
+          updatedMarkupRow,
+        ),
       };
       /* Update the children rows of the MarkupRow to reflect the new MarkupRow
 				data. */
@@ -123,7 +154,9 @@ const createModelsUpdatedEventReducer = <
           const otherMarkupRows = filter(
             s.data,
             (ri: Table.BodyRow<R>) =>
-              tabling.rows.isMarkupRow(ri) && includes(ri.children, row.id) && ri.id !== updatedMarkupRow.id
+              tabling.rows.isMarkupRow(ri) &&
+              includes(ri.children, row.id) &&
+              ri.id !== updatedMarkupRow.id,
           ) as Table.MarkupRow<R>[];
           return {
             ...st,
@@ -152,14 +185,14 @@ const createModelsUpdatedEventReducer = <
                       : row.data.nominal_value +
                           row.data.accumulated_fringe_contribution +
                           row.data.accumulated_markup_contribution,
-                    [...otherMarkupRows, updatedMarkupRow]
-                  )
-                }
-              }
-            )
+                    [...otherMarkupRows, updatedMarkupRow],
+                  ),
+                },
+              },
+            ),
           };
         },
-        s
+        s,
       );
     }
     return reorder ? reorderRows(s) : s;
@@ -179,12 +212,16 @@ const createModelsUpdatedEventReducer = <
   const updateModelInState = (m: M, group: number | null | undefined, s: S, reorder = true) => {
     const modelRow: Table.ModelRow<R> | null = redux.modelFromState<Table.ModelRow<R>>(
       filter(s.data, (ri: Table.BodyRow<R>) => tabling.rows.isModelRow(ri)) as Table.ModelRow<R>[],
-      m.id
+      m.id,
     );
     if (!isNil(modelRow)) {
       s = {
         ...s,
-        data: util.replaceInArray<Table.BodyRow<R>>(s.data, { id: modelRow.id }, modelRowManager.create({ model: m }))
+        data: util.replaceInArray<Table.BodyRow<R>>(
+          s.data,
+          { id: modelRow.id },
+          modelRowManager.create({ model: m }),
+        ),
       };
       /*
 			If the `group` on the event payload is undefined, it means
@@ -194,7 +231,7 @@ const createModelsUpdatedEventReducer = <
       if (group !== undefined) {
         const groupRowId = group !== null ? tabling.rows.groupRowId(group) : null;
         const previousGroupRow: Table.GroupRow<R> | null = rowGroupRowFromState<R, S>(s, m.id, {
-          warnOnMissing: false
+          warnOnMissing: false,
         });
         const previousGroupRowId = !isNil(previousGroupRow) ? previousGroupRow.id : null;
         // Make sure the Group actually changed before proceeding.
@@ -217,8 +254,8 @@ const createModelsUpdatedEventReducer = <
               data: util.replaceInArray<Table.BodyRow<R>>(
                 s.data,
                 { id: previousGroupRow.id },
-                groupRowManager.removeChildren(previousGroupRow, [modelRow.id])
-              )
+                groupRowManager.removeChildren(previousGroupRow, [modelRow.id]),
+              ),
             };
           }
         }
@@ -228,16 +265,17 @@ const createModelsUpdatedEventReducer = <
     return s;
   };
 
-  const isMarkup = (p: Table.ModelTableEventPayload<M> | Model.Group | Model.Markup): p is Model.Markup =>
-    (p as Model.Markup).type === "markup";
+  const isMarkup = (
+    p: Table.ModelTableEventPayload<M> | Model.Group | Model.Markup,
+  ): p is Model.Markup => (p as Model.Markup).type === "markup";
 
-  const isGroup = (p: Table.ModelTableEventPayload<M> | Model.Group | Model.Markup): p is Model.Group =>
-    (p as Model.Group).type === "group";
+  const isGroup = (
+    p: Table.ModelTableEventPayload<M> | Model.Group | Model.Markup,
+  ): p is Model.Group => (p as Model.Group).type === "group";
 
   return (state: S = config.initialState, e: Table.ModelsUpdatedEvent<M>): S => {
-    const payloads: (Table.ModelTableEventPayload<M> | Model.Group | Model.Markup)[] = Array.isArray(e.payload)
-      ? e.payload
-      : [e.payload];
+    const payloads: (Table.ModelTableEventPayload<M> | Model.Group | Model.Markup)[] =
+      Array.isArray(e.payload) ? e.payload : [e.payload];
     return reorderRows(
       reduce(
         payloads,
@@ -250,8 +288,8 @@ const createModelsUpdatedEventReducer = <
             return updateModelInState(p.model, p.group, s, false);
           }
         },
-        state
-      )
+        state,
+      ),
     );
   };
 };

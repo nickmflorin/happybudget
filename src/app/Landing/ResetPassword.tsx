@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Redirect, useLocation } from "react-router-dom";
+
 import { isNil, includes } from "lodash";
+import { Redirect, useLocation } from "react-router-dom";
 
 import * as api from "api";
 import { ui } from "lib";
-
 import { LandingFormContainer } from "components/containers";
 import { ResetPasswordForm } from "components/forms";
 import { IResetPasswordFormValues } from "components/forms/ResetPasswordForm";
@@ -39,7 +39,7 @@ const ResetPassword = (): JSX.Element => {
     return <Redirect to={redirect} />;
   }
   return (
-    <LandingFormContainer title={"Reset password"}>
+    <LandingFormContainer title="Reset password">
       <ResetPasswordForm
         style={{ marginTop: 20 }}
         form={form}
@@ -59,10 +59,10 @@ const ResetPassword = (): JSX.Element => {
                       {
                         closable: true,
                         level: "success",
-                        message: "Your password was successfully changed."
-                      }
-                    ]
-                  }
+                        message: "Your password was successfully changed.",
+                      },
+                    ],
+                  },
                 });
               })
               .catch((e: Error) => {
@@ -75,7 +75,10 @@ const ResetPassword = (): JSX.Element => {
 								 duplicating all the error handling code here). */
                 if (
                   e instanceof api.AuthenticationError &&
-                  includes([api.ErrorCodes.auth.TOKEN_EXPIRED, api.ErrorCodes.auth.TOKEN_INVALID], e.code)
+                  includes(
+                    [api.ErrorCodes.auth.TOKEN_EXPIRED, api.ErrorCodes.auth.TOKEN_INVALID],
+                    e.code,
+                  )
                 ) {
                   setRedirect({
                     pathname: "/login",
@@ -83,9 +86,9 @@ const ResetPassword = (): JSX.Element => {
                       tokenNotification: {
                         tokenType: "password-recovery",
                         userId: e.userId,
-                        code: e.code as Http.TokenErrorCode
-                      }
-                    }
+                        code: e.code as Http.TokenErrorCode,
+                      },
+                    },
                   });
                 } else {
                   form.handleRequestError(e);

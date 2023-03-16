@@ -1,18 +1,20 @@
 import React from "react";
+
+import { isNil } from "lodash";
 import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
-import { isNil } from "lodash";
 
 import * as api from "api";
-import { tabling, util } from "lib";
+import { logger } from "internal";
+import { tabling, conditionalJoinString } from "lib";
 import * as store from "store";
-
 import { hooks } from "components/model";
 import { framework } from "tabling/generic";
 import { AuthenticatedTable, AuthenticatedTableProps } from "tabling/generic/tables";
-import { useAttachments } from "../hooks";
-import Framework from "./framework";
+
 import Columns from "./Columns";
+import Framework from "./framework";
+import { useAttachments } from "../hooks";
 
 type R = Tables.ContactRowData;
 type M = Model.Contact;
@@ -46,12 +48,12 @@ const ContactsTable = (props: Props): JSX.Element => {
     setEditAttachments,
     modal,
     addAttachment,
-    removeAttachment
+    removeAttachment,
   ] = useAttachments({
     table: props.table.current,
     listAttachments: api.getContactAttachments,
     deleteAttachment: api.deleteContactAttachment,
-    path: (id: number) => `/v1/contacts/${id}/attachments/`
+    path: (id: number) => `/v1/contacts/${id}/attachments/`,
   });
 
   const [__, editContactModal, editContact, _] = hooks.useContacts({
@@ -59,7 +61,7 @@ const ContactsTable = (props: Props): JSX.Element => {
     onUpdated: (m: Model.Contact) =>
       props.table.current.dispatchEvent({
         type: "modelsUpdated",
-        payload: { model: m }
+        payload: { model: m },
       }),
     onAttachmentRemoved: (id: number, attachmentId: number) => {
       const row = props.table.current.getRow(id);
@@ -67,15 +69,13 @@ const ContactsTable = (props: Props): JSX.Element => {
         if (tabling.rows.isModelRow(row)) {
           removeAttachment(row, attachmentId);
         } else {
-          console.warn(
-            `Suspicous Behavior: After attachment was added, row with ID
-            ${id} did not refer to a model row.`
+          logger.warn(
+            `Suspicous Behavior: After attachment was added, row with ID ${id} did not refer to a model row.`,
           );
         }
       } else {
-        console.warn(
-          `Suspicous Behavior: After attachment was added, could not find row in
-          state for ID ${id}.`
+        logger.warn(
+          `Suspicous Behavior: After attachment was added, could not find row in state for ID ${id}.`,
         );
       }
     },
@@ -85,33 +85,33 @@ const ContactsTable = (props: Props): JSX.Element => {
         if (tabling.rows.isModelRow(row)) {
           addAttachment(row, m);
         } else {
-          console.warn(
-            `Suspicous Behavior: After attachment was added, row with ID
-            ${id} did not refer to a model row.`
+          logger.warn(
+            `Suspicous Behavior: After attachment was added, row with ID ${id} did not refer to a model row.`,
           );
         }
       } else {
-        console.warn(
-          `Suspicous Behavior: After attachment was added, could not find row in
-          state for ID ${id}.`
+        logger.warn(
+          `Suspicous Behavior: After attachment was added, could not find row in state for ID ${id}.`,
         );
       }
-    }
+    },
   });
 
   return (
     <React.Fragment>
       <AuthenticatedTable<R, M, Table.Context, Tables.ContactTableStore>
         {...props}
-        tableId={"contacts"}
+        tableId="contacts"
         tableContext={{}}
         showPageFooter={false}
         minimal={true}
         rowHeight={40}
         sizeToFit={true}
         constrainTableFooterHorizontally={true}
-        getModelRowName={(r: Table.DataRow<R>) => util.conditionalJoinString(r.data.first_name, r.data.last_name)}
-        getModelRowLabel={"Contact"}
+        getModelRowName={(r: Table.DataRow<R>) =>
+          conditionalJoinString(r.data.first_name, r.data.last_name)
+        }
+        getModelRowLabel="Contact"
         framework={Framework}
         editColumnConfig={
           [
@@ -119,13 +119,13 @@ const ContactsTable = (props: Props): JSX.Element => {
               typeguard: tabling.rows.isModelRow,
               action: (r: Table.ModelRow<R>) => editContact({ id: r.id, rowId: r.id }),
               behavior: "expand",
-              tooltip: "Edit"
-            }
+              tooltip: "Edit",
+            },
           ] as [Table.EditColumnRowConfig<R, Table.ModelRow<R>>]
         }
         actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
           framework.actions.ToggleColumnAction<R, M>(props.table.current, params),
-          framework.actions.ExportCSVAction<R, M>(props.table.current, params, "contacts")
+          framework.actions.ExportCSVAction<R, M>(props.table.current, params, "contacts"),
         ]}
         columns={tabling.columns.normalizeColumns(Columns, {
           attachments: (col: Table.Column<R, M>) => ({
@@ -135,9 +135,9 @@ const ContactsTable = (props: Props): JSX.Element => {
             cellRendererParams: {
               ...col.cellRendererParams,
               onAttachmentAdded: addAttachment,
-              uploadAttachmentsPath: (id: number) => `/v1/contacts/${id}/attachments/`
-            }
-          })
+              uploadAttachmentsPath: (id: number) => `/v1/contacts/${id}/attachments/`,
+            },
+          }),
         })}
       />
       {modal}

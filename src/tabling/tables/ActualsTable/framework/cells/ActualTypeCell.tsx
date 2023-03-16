@@ -10,9 +10,7 @@ const ActualTypeCell = (
     ActualsTableContext,
     Tables.ActualTableStore,
     Model.Tag
-  >
-): JSX.Element => {
-  return <ModelTagCell {...props} />;
-};
+  >,
+): JSX.Element => <ModelTagCell {...props} />;
 
 export default React.memo(ActualTypeCell);

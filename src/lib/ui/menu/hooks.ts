@@ -1,4 +1,5 @@
 import { useRef, useMemo } from "react";
+
 import { isNil } from "lodash";
 
 import { notifications } from "lib";
@@ -19,21 +20,19 @@ export const InitialMenuRef: IMenuRef<any, any> = {
   /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   focus: () => {},
   /* eslint-disable-next-line @typescript-eslint/no-empty-function */
-  focusSearch: () => {}
+  focusSearch: () => {},
 };
 
 export const useMenu = <
   S extends Record<string, unknown> = MenuItemSelectedState,
-  M extends MenuItemModel<S> = MenuItemModel<S>
->(): NonNullRef<IMenuRef<S, M>> => {
-  return useRef<IMenuRef<S, M>>(InitialMenuRef);
-};
+  M extends MenuItemModel<S> = MenuItemModel<S>,
+>(): NonNullRef<IMenuRef<S, M>> => useRef<IMenuRef<S, M>>(InitialMenuRef);
 
 export const useMenuIfNotDefined = <
   S extends Record<string, unknown> = MenuItemSelectedState,
-  M extends MenuItemModel<S> = MenuItemModel<S>
+  M extends MenuItemModel<S> = MenuItemModel<S>,
 >(
-  menu?: NonNullRef<IMenuRef<S, M>>
+  menu?: NonNullRef<IMenuRef<S, M>>,
 ): NonNullRef<IMenuRef<S, M>> => {
   const ref = useRef<IMenuRef<S, M>>(InitialMenuRef);
   const returnRef = useMemo(() => (!isNil(menu) ? menu : ref), [menu, ref.current]);
@@ -44,7 +43,7 @@ export const InitialContentMenuRef: ContentMenuInstance = {
   ...notifications.ui.InitialNotificationsManager,
   /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   setLoading: () => {},
-  loading: false
+  loading: false,
 };
 
 export const useContentMenu = (): NonNullRef<ContentMenuInstance> => {
@@ -52,7 +51,9 @@ export const useContentMenu = (): NonNullRef<ContentMenuInstance> => {
   return ref;
 };
 
-export const useContentMenuIfNotDefined = (menu?: NonNullRef<ContentMenuInstance>): NonNullRef<ContentMenuInstance> => {
+export const useContentMenuIfNotDefined = (
+  menu?: NonNullRef<ContentMenuInstance>,
+): NonNullRef<ContentMenuInstance> => {
   const ref = useRef<ContentMenuInstance>(InitialContentMenuRef);
   const returnRef = useMemo(() => (!isNil(menu) ? menu : ref), [menu, ref.current]);
   return returnRef;

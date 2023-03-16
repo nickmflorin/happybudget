@@ -52,14 +52,14 @@ export const detectNextInPattern = (values: Table.PreviousValues<PatternValue>):
   const findLastSeparator = (value: string): SeparatorAndIndex | null => {
     const indices: number[] = filter(
       map(SEPARATORS, (sep: string) =>
-        findLastIndex(value, (c: string) => c.toLowerCase() === sep.toLocaleLowerCase())
+        findLastIndex(value, (c: string) => c.toLowerCase() === sep.toLocaleLowerCase()),
       ),
-      (i: number) => i !== -1
+      (i: number) => i !== -1,
     );
     if (indices.length !== 0) {
       return {
         separator: value[Math.max(...indices)],
-        index: Math.max(...indices)
+        index: Math.max(...indices),
       };
     }
     return null;
@@ -176,20 +176,26 @@ of AGGrid or outside of the context of AGGrid, in the reducers.
 */
 type Source<R extends Table.RowData> = AGSource | ReduxSource<R>;
 
-const isAgSource = <R extends Table.RowData>(source: Source<R> | Omit<ReduxSource<R>, "count">): source is AGSource =>
-  (source as AGSource).api !== undefined;
+const isAgSource = <R extends Table.RowData>(
+  source: Source<R> | Omit<ReduxSource<R>, "count">,
+): source is AGSource => (source as AGSource).api !== undefined;
 
 const isReduxSource = <R extends Table.RowData>(
-  source: Source<R>
-): source is ReduxSource<R> | Omit<ReduxSource<R>, "count"> => (source as ReduxSource<R>).store !== undefined;
+  source: Source<R>,
+): source is ReduxSource<R> | Omit<ReduxSource<R>, "count"> =>
+  (source as ReduxSource<R>).store !== undefined;
 
-const getSourceIndex = <R extends Table.RowData>(source: AGSource | Omit<ReduxSource<R>, "count">): number => {
-  const numRows = isAgSource(source) ? tabling.aggrid.getRows(source.api).length : source.store.length;
+const getSourceIndex = <R extends Table.RowData>(
+  source: AGSource | Omit<ReduxSource<R>, "count">,
+): number => {
+  const numRows = isAgSource(source)
+    ? tabling.aggrid.getRows(source.api).length
+    : source.store.length;
   if (!isNil(source.newIndex)) {
     if (source.newIndex > numRows) {
       console.warn(
         `New index ${source.newIndex} exceeds the number of rows (${numRows}). ` +
-          `Defaulting to the end of the table/store at ${numRows}.`
+          `Defaulting to the end of the table/store at ${numRows}.`,
       );
       return numRows;
     }
@@ -211,7 +217,7 @@ const getSourceIndex = <R extends Table.RowData>(source: AGSource | Omit<ReduxSo
  */
 export const findPreviousModelRows = <R extends Table.RowData>(
   source: AGSource | Omit<ReduxSource<R>, "count">,
-  filling?: boolean
+  filling?: boolean,
 ): Table.PreviousValues<Table.ModelRow<R> | Partial<R> | Table.PlaceholderRow<R>> | null => {
   /*
 	If finding the previous ModelRow<R>(s) from AG Grid, we can specify the index
@@ -221,7 +227,7 @@ export const findPreviousModelRows = <R extends Table.RowData>(
   let runningIndex = getSourceIndex(source);
 
   const isModelRowOrData = (
-    r: Table.BodyRow<R> | Partial<R>
+    r: Table.BodyRow<R> | Partial<R>,
   ): r is Table.ModelRow<R> | Table.PlaceholderRow<R> | Partial<R> =>
     tabling.rows.isRow(r) ? tabling.rows.isModelRow(r) || tabling.rows.isPlaceholderRow(r) : true;
 
@@ -283,12 +289,16 @@ export const findPreviousModelRows = <R extends Table.RowData>(
     return null;
   }
   modelRowsOrData.reverse();
-  return modelRowsOrData as Table.PreviousValues<Table.ModelRow<R> | Table.PlaceholderRow<R> | Partial<R>>;
+  return modelRowsOrData as Table.PreviousValues<
+    Table.ModelRow<R> | Table.PlaceholderRow<R> | Partial<R>
+  >;
 };
 
-const mapPreviousValues = <T, R>(values: Table.PreviousValues<T>, fn: (v: T) => R): Table.PreviousValues<R> => {
-  return values.length === 1 ? [fn(values[0])] : [fn(values[0]), fn(values[1])];
-};
+const mapPreviousValues = <T, R>(
+  values: Table.PreviousValues<T>,
+  fn: (v: T) => R,
+): Table.PreviousValues<R> =>
+  values.length === 1 ? [fn(values[0])] : [fn(values[0]), fn(values[1])];
 
 const detectPatternFromPreviousRows = <R extends Table.RowData>(
   /*
@@ -297,7 +307,7 @@ const detectPatternFromPreviousRows = <R extends Table.RowData>(
   yet, only the data that is used to create the new rows via the API.
   */
   previousRows: Table.PreviousValues<Table.ModelRow<R> | Partial<R> | Table.PlaceholderRow<R>>,
-  field: string
+  field: string,
 ): PatternValue | null => {
   let columnSupportsSmartInference = true;
 
@@ -339,12 +349,12 @@ const detectPatternFromPreviousRows = <R extends Table.RowData>(
         console.warn(
           "Cannot perform smart inference as an undefined value was detected " +
             `for column ${field}.  This most likely means there is an inconstency ` +
-            "with how the new row data is being generated between any two given rows."
+            "with how the new row data is being generated between any two given rows.",
         );
       } else {
         console.warn(
           `Smart inference is being used on column ${field} that has a ` +
-            `data type (${typeof v}) that does not support smart inference.`
+            `data type (${typeof v}) that does not support smart inference.`,
         );
       }
       break;
@@ -358,14 +368,20 @@ const detectPatternFromPreviousRows = <R extends Table.RowData>(
 
 export const inferFillCellValue = <R extends Table.RowData, M extends Model.RowHttpModel>(
   params: FillOperationParams,
-  cs: Table.BodyColumn<R, M>[]
+  cs: Table.BodyColumn<R, M>[],
 ): Table.RawRowValue => {
   if (params.direction === "down") {
-    const c: Table.BodyColumn<R, M> | null = tabling.columns.getColumn(cs, params.column.getColId());
+    const c: Table.BodyColumn<R, M> | null = tabling.columns.getColumn(
+      cs,
+      params.column.getColId(),
+    );
     /* The column will be by default not-fake and readable (`isRead !== false`)
 			 since it is already in the table. */
     if (!isNil(c) && c.smartInference === true && !isNil(params.rowNode.rowIndex)) {
-      const previousRows = findPreviousModelRows<R>({ api: params.api, newIndex: params.rowNode.rowIndex }, true);
+      const previousRows = findPreviousModelRows<R>(
+        { api: params.api, newIndex: params.rowNode.rowIndex },
+        true,
+      );
       if (!isNil(previousRows)) {
         return detectPatternFromPreviousRows(previousRows, params.column.getColId());
       }
@@ -376,7 +392,7 @@ export const inferFillCellValue = <R extends Table.RowData, M extends Model.RowH
 
 export const generateNewRowData = <R extends Table.RowData, M extends Model.RowHttpModel>(
   source: Source<R>,
-  cs: Table.BodyColumn<R, M>[]
+  cs: Table.BodyColumn<R, M>[],
 ): Partial<R>[] => {
   if (isReduxSource(source) && source.count !== undefined && source.count !== 1) {
     if (source.count === 0) {
@@ -415,8 +431,8 @@ export const generateNewRowData = <R extends Table.RowData, M extends Model.RowH
           }
           return curr;
         },
-        {}
-      )
+        {},
+      ),
     ];
   }
 };

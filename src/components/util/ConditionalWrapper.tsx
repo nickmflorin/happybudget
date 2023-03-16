@@ -5,7 +5,11 @@ type ConditionalWrapperProps = StandardComponentProps & {
   readonly children: ReactNode | ((wrapped: boolean) => ReactNode);
 };
 
-const ConditionalWrapper = ({ conditional, children, ...props }: ConditionalWrapperProps): JSX.Element =>
+const ConditionalWrapper = ({
+  conditional,
+  children,
+  ...props
+}: ConditionalWrapperProps): JSX.Element =>
   conditional ? (
     <div {...props}>{typeof children === "function" ? children(true) : children}</div>
   ) : (

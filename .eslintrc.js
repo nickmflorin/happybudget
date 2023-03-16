@@ -15,9 +15,8 @@ const modifyExtensions = (...insert) =>
 
 const GENERIC_INTERNAL_MODULE_GROUP = ["api", "lib", "internal", "store", "config", "core"];
 const COMPONENT_INTERNAL_MODULE_GROUP = ["app", "components", "tabling", "style"];
-const INTERNAL_MODULES = [...GENERIC_INTERNAL_MODULE_GROUP, ...GENERIC_INTERNAL_MODULE_GROUP];
+const INTERNAL_MODULES = [...GENERIC_INTERNAL_MODULE_GROUP, ...COMPONENT_INTERNAL_MODULE_GROUP];
 
-console.log(process.env);
 const pathGroupPattern = packages =>
   `{${packages.reduce((prev, v) => [...prev, `${v}`, `${v}/**`], []).join(",")}}`;
 
@@ -105,7 +104,7 @@ const BASE_RULES = {
       ignoreUrls: true,
       ignoreTemplateLiterals: true,
       ignoreRegExpLiterals: true,
-      ignorePattern: "^\\/\\* eslint-disable-next-line(.?)+ \\*\\/$",
+      ignorePattern: "\\/\\*\\s+eslint-disable-next-line(.?)+\\*\\/$",
     },
   ],
   "prefer-const": "error",
@@ -120,6 +119,7 @@ const BASE_RULES = {
   "no-console": "error",
   "import/order": ["error", IMPORT_ORDER_CONFIG],
   "no-restricted-imports": ["error", { patterns: RESTRICTED_IMPORT_PATTERNS }],
+  "react/display-name": "off",
 };
 
 const TS_BASE_RULES = {
@@ -158,7 +158,7 @@ module.exports = {
         /* Importing from components or lib without using a namespace is often times necessary in
            tests because the test is testing a function or component that is not exported outside
            of the module in a namespace because it is not needed outside of the module.  */
-        "no-restricted-imports": ["error", { patterns: RESTRICTED_IMPORT_PATTERNS.slice(2) }],
+        "no-restricted-imports": ["error", { patterns: RESTRICTED_IMPORT_PATTERNS.slice(3) }],
       },
     },
     {

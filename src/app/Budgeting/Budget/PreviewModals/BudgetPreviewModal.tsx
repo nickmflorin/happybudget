@@ -1,11 +1,11 @@
 import { useEffect, useState, useRef, useMemo } from "react";
-import { isNil, map, filter } from "lodash";
+
 import classNames from "classnames";
+import { isNil, map, filter } from "lodash";
 
 import * as api from "api";
 import { ui, tabling, pdf, util, http } from "lib";
 import * as store from "store";
-
 import { ExportBudgetPdfForm } from "components/forms";
 import { PreviewModal } from "components/modals";
 import { SubAccountsTable } from "tabling";
@@ -18,7 +18,7 @@ type C = Table.DataColumn<R, M>;
 
 const SubAccountColumns = filter(
   SubAccountsTable.Columns,
-  (c: Table.Column<R, M>) => tabling.columns.isDataColumn(c) && c.includeInPdf !== false
+  (c: Table.Column<R, M>) => tabling.columns.isDataColumn(c) && c.includeInPdf !== false,
 ) as C[];
 
 const DEFAULT_OPTIONS: ExportBudgetPdfFormOptions = {
@@ -29,13 +29,13 @@ const DEFAULT_OPTIONS: ExportBudgetPdfFormOptions = {
     left_image: null,
     right_image: null,
     left_info: "<h6>Production Company</h6><p>Address:</p><p>Phone:</p>",
-    right_info: "<h6>Client / Agency</h6><p>Address:</p><p>Phone:</p>"
+    right_info: "<h6>Client / Agency</h6><p>Address:</p><p>Phone:</p>",
   },
   includeNotes: false,
   columns: filter(
     map(SubAccountColumns, (column: C) => tabling.columns.normalizedField<R, M>(column)),
-    (field: string | undefined) => !isNil(field)
-  )
+    (field: string | undefined) => !isNil(field),
+  ),
 };
 
 interface BudgetPdfFuncProps {
@@ -83,10 +83,10 @@ const BudgetPreviewModal = ({
           ...opts.header,
           header: pdf.parsers.convertHtmlIntoNodes(opts.header.header || "") || [],
           left_info: pdf.parsers.convertHtmlIntoNodes(opts.header.left_info || "") || [],
-          right_info: pdf.parsers.convertHtmlIntoNodes(opts.header.right_info || "") || []
-        }
+          right_info: pdf.parsers.convertHtmlIntoNodes(opts.header.right_info || "") || [],
+        },
       }),
-    []
+    [],
   );
 
   useEffect(() => {
@@ -94,8 +94,8 @@ const BudgetPreviewModal = ({
       ...DEFAULT_OPTIONS,
       header: {
         ...DEFAULT_OPTIONS.header,
-        header: `<h2>${budgetName}</h2><p>Cost Summary</p>`
-      }
+        header: `<h2>${budgetName}</h2><p>Cost Summary</p>`,
+      },
     });
   }, [budgetName]);
 
@@ -113,7 +113,7 @@ const BudgetPreviewModal = ({
             const pdfComponent = BudgetPdfFunc({
               budget: response,
               contacts: cs,
-              options: convertOptions(options)
+              options: convertOptions(options),
             });
             previewer.current?.render(pdfComponent);
           } else {
@@ -132,11 +132,11 @@ const BudgetPreviewModal = ({
         return BudgetPdfFunc({
           budget,
           contacts: cs,
-          options: convertOptions(options)
+          options: convertOptions(options),
         });
       }
     },
-    [budget, cs, options]
+    [budget, cs, options],
   );
 
   return (
@@ -155,13 +155,16 @@ const BudgetPreviewModal = ({
           ...DEFAULT_OPTIONS,
           header: {
             ...DEFAULT_OPTIONS.header,
-            header: `<h2>${budgetName}</h2><p>Cost Summary</p>`
-          }
+            header: `<h2>${budgetName}</h2><p>Cost Summary</p>`,
+          },
         }}
         accountsLoading={loadingData}
         accounts={!isNil(budget) ? budget.children : []}
         columns={SubAccountColumns}
-        onValuesChange={(changedValues: Partial<ExportBudgetPdfFormOptions>, values: ExportBudgetPdfFormOptions) => {
+        onValuesChange={(
+          changedValues: Partial<ExportBudgetPdfFormOptions>,
+          values: ExportBudgetPdfFormOptions,
+        ) => {
           setOptions(values);
           previewer.current?.refreshRequired();
         }}

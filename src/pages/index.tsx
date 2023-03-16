@@ -1,7 +1,6 @@
 import type { NextPage } from "next";
 
 import * as config from "config";
-
 import { Page } from "components/layout";
 
 const Dashboard: NextPage = () => (

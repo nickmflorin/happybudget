@@ -1,6 +1,7 @@
 import React from "react";
-import SpinnerWrapper from "./SpinnerWrapper";
+
 import Spinner, { SpinnerProps } from "./Spinner";
+import SpinnerWrapper from "./SpinnerWrapper";
 
 export interface WrappedSpinnerProps extends StandardComponentProps {
   readonly spinnerProps?: SpinnerProps;

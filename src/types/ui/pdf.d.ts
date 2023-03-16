@@ -55,7 +55,9 @@ declare namespace Pdf {
     readonly numPages: number;
   };
 
-  type DocumentProps = import("@react-pdf/renderer").default.DocumentProps & { children: JSX.Element | JSX.Element[] };
+  type DocumentProps = import("@react-pdf/renderer").default.DocumentProps & {
+    children: JSX.Element | JSX.Element[];
+  };
 
   type PageRenderParams = {
     readonly pageNumber: number;

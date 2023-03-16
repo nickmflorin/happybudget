@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useMemo } from "react";
-import { useLocation } from "react-router-dom";
-import classNames from "classnames";
-import { map, isNil, includes } from "lodash";
-import { Subtract } from "utility-types";
-import hoistNonReactStatics from "hoist-non-react-statics";
 
+import classNames from "classnames";
+import hoistNonReactStatics from "hoist-non-react-statics";
+import { map, isNil, includes } from "lodash";
+import { useLocation } from "react-router-dom";
+import { Subtract } from "utility-types";
 import { CellMouseOverEvent, CellFocusedEvent } from "@ag-grid-community/core";
 
 import { tabling, hooks, model, notifications } from "lib";
@@ -17,7 +17,7 @@ export type InjectedDataGridProps = {
 
 export type DataGridProps<
   R extends Table.RowData = Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel,
 > = {
   readonly className?: Table.GeneralClassName;
   readonly rowClass?: Table.RowClassName;
@@ -39,7 +39,7 @@ export type DataGridProps<
 
 export type InternalDataGridProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel,
 > = DataGridProps<R, M> & {
   readonly apis: Table.GridApis | null;
   readonly hasEditColumn: boolean;
@@ -53,15 +53,15 @@ const getRowColorDef = <R extends Table.RowData>(row: Table.BodyRow<R>): Table.R
     if (!isNil(colorDef?.color) && !isNil(colorDef?.backgroundColor)) {
       return {
         color: colorDef?.color,
-        backgroundColor: colorDef?.backgroundColor
+        backgroundColor: colorDef?.backgroundColor,
       };
     } else if (!isNil(colorDef?.backgroundColor)) {
       return {
-        backgroundColor: colorDef?.backgroundColor
+        backgroundColor: colorDef?.backgroundColor,
       };
     } else if (!isNil(colorDef?.color)) {
       return {
-        color: colorDef?.color
+        color: colorDef?.color,
       };
     }
   }
@@ -73,38 +73,40 @@ type HOCProps = Partial<Omit<InjectedDataGridProps, "id">> & Pick<InjectedDataGr
 const DataGrid = <
   T extends HOCProps,
   R extends Table.RowData = Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel,
 >(
-  Component: React.FunctionComponent<T>
+  Component: React.FunctionComponent<T>,
 ): React.FunctionComponent<Subtract<T, HOCProps> & InternalDataGridProps<R, M>> => {
   function WithDataGrid(props: Subtract<T, HOCProps> & InternalDataGridProps<R, M>) {
     const oldFocusedEvent = useRef<CellFocusedEvent | null>(null);
     const location = useLocation();
 
-    const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
-      return map(
-        map(props.columns, (col: Table.Column<R, M>) =>
-          tabling.columns.isRealColumn(col)
-            ? {
-                ...col,
-                cellRendererParams: { ...col.cellRendererParams, getRowColorDef }
-              }
-            : col
-        ),
-        (col: Table.Column<R, M>) =>
-          tabling.columns.isCalculatedColumn(col)
-            ? {
-                ...col,
-                cellRendererParams: {
-                  ...col.cellRendererParams,
-                  hasInfo: props.calculatedCellHasInfo,
-                  onInfoClicked: props.onCalculatedCellInfoClicked,
-                  infoTooltip: props.calculatedCellInfoTooltip
+    const columns = useMemo<Table.Column<R, M>[]>(
+      (): Table.Column<R, M>[] =>
+        map(
+          map(props.columns, (col: Table.Column<R, M>) =>
+            tabling.columns.isRealColumn(col)
+              ? {
+                  ...col,
+                  cellRendererParams: { ...col.cellRendererParams, getRowColorDef },
                 }
-              }
-            : col
-      );
-    }, [hooks.useDeepEqualMemo(props.columns)]);
+              : col,
+          ),
+          (col: Table.Column<R, M>) =>
+            tabling.columns.isCalculatedColumn(col)
+              ? {
+                  ...col,
+                  cellRendererParams: {
+                    ...col.cellRendererParams,
+                    hasInfo: props.calculatedCellHasInfo,
+                    onInfoClicked: props.onCalculatedCellInfoClicked,
+                    infoTooltip: props.calculatedCellInfoTooltip,
+                  },
+                }
+              : col,
+        ),
+      [hooks.useDeepEqualMemo(props.columns)],
+    );
 
     const onFirstDataRendered: (e: Table.FirstDataRenderedEvent) => void = useMemo(
       () =>
@@ -157,7 +159,7 @@ const DataGrid = <
             handleQuery(rows);
           }
         },
-      [hooks.useDeepEqualMemo(props.columns), props.onFirstDataRendered]
+      [hooks.useDeepEqualMemo(props.columns), props.onFirstDataRendered],
     );
 
     const getRowClass: Table.GetRowClassName = useMemo(
@@ -168,7 +170,7 @@ const DataGrid = <
         }
         return classNames("row--data", props.rowClass);
       },
-      [props.rowClass]
+      [props.rowClass],
     );
 
     const getRowStyle: Table.GetRowStyle = useMemo(
@@ -177,53 +179,61 @@ const DataGrid = <
           const row: Table.BodyRow<R> = params.node.data;
           return getRowColorDef(row);
         },
-      []
+      [],
     );
 
-    const onCellFocused: (e: CellFocusedEvent) => void = hooks.useDynamicCallback((e: CellFocusedEvent) => {
-      const getCellFromFocusedEvent = (event: CellFocusedEvent): Table.Cell<R, M> | null => {
-        if (!isNil(props.apis) && !isNil(event.rowIndex) && !isNil(event.column)) {
-          const rowNode: Table.RowNode | undefined = props.apis.grid.getDisplayedRowAtIndex(event.rowIndex);
-          const column = tabling.columns.getRealColumn(columns, event.column.getColId());
-          if (!isNil(rowNode) && !isNil(column)) {
-            const row: Table.BodyRow<R> = rowNode.data;
-            return { rowNode, column, row };
+    const onCellFocused: (e: CellFocusedEvent) => void = hooks.useDynamicCallback(
+      (e: CellFocusedEvent) => {
+        const getCellFromFocusedEvent = (event: CellFocusedEvent): Table.Cell<R, M> | null => {
+          if (!isNil(props.apis) && !isNil(event.rowIndex) && !isNil(event.column)) {
+            const rowNode: Table.RowNode | undefined = props.apis.grid.getDisplayedRowAtIndex(
+              event.rowIndex,
+            );
+            const column = tabling.columns.getRealColumn(columns, event.column.getColId());
+            if (!isNil(rowNode) && !isNil(column)) {
+              const row: Table.BodyRow<R> = rowNode.data;
+              return { rowNode, column, row };
+            }
           }
-        }
-        return null;
-      };
+          return null;
+        };
 
-      const cellsTheSame = (cell1: Table.Cell<R, M>, cell2: Table.Cell<R, M>): boolean => {
-        return (
-          tabling.columns.normalizedField<R, M>(cell1.column) === tabling.columns.normalizedField<R, M>(cell2.column) &&
-          cell1.row.id === cell2.row.id
-        );
-      };
+        const cellsTheSame = (cell1: Table.Cell<R, M>, cell2: Table.Cell<R, M>): boolean =>
+          tabling.columns.normalizedField<R, M>(cell1.column) ===
+            tabling.columns.normalizedField<R, M>(cell2.column) && cell1.row.id === cell2.row.id;
 
-      if (!isNil(e.column) && !isNil(props.apis)) {
-        const previousFocusEvent = !isNil(oldFocusedEvent.current) ? { ...oldFocusedEvent.current } : null;
-        oldFocusedEvent.current = e;
+        if (!isNil(e.column) && !isNil(props.apis)) {
+          const previousFocusEvent = !isNil(oldFocusedEvent.current)
+            ? { ...oldFocusedEvent.current }
+            : null;
+          oldFocusedEvent.current = e;
 
-        const col: Table.RealColumn<R, M> | null = tabling.columns.getRealColumn(columns, e.column.getColId());
-        if (!isNil(col)) {
-          const cell: Table.Cell<R, M> | null = getCellFromFocusedEvent(e);
-          const previousCell = !isNil(previousFocusEvent) ? getCellFromFocusedEvent(previousFocusEvent) : null;
-          if (!isNil(cell)) {
-            if (previousCell === null || !cellsTheSame(cell, previousCell)) {
-              if (!isNil(col.onCellFocus)) {
-                col.onCellFocus({ apis: props.apis, cell });
-              }
-              if (!isNil(props.onCellFocusChanged)) {
-                props.onCellFocusChanged({ apis: props.apis, previousCell, cell });
-              }
-              if (!isNil(previousCell) && !isNil(col.onCellUnfocus)) {
-                col.onCellUnfocus({ apis: props.apis, cell: previousCell });
+          const col: Table.RealColumn<R, M> | null = tabling.columns.getRealColumn(
+            columns,
+            e.column.getColId(),
+          );
+          if (!isNil(col)) {
+            const cell: Table.Cell<R, M> | null = getCellFromFocusedEvent(e);
+            const previousCell = !isNil(previousFocusEvent)
+              ? getCellFromFocusedEvent(previousFocusEvent)
+              : null;
+            if (!isNil(cell)) {
+              if (previousCell === null || !cellsTheSame(cell, previousCell)) {
+                if (!isNil(col.onCellFocus)) {
+                  col.onCellFocus({ apis: props.apis, cell });
+                }
+                if (!isNil(props.onCellFocusChanged)) {
+                  props.onCellFocusChanged({ apis: props.apis, previousCell, cell });
+                }
+                if (!isNil(previousCell) && !isNil(col.onCellUnfocus)) {
+                  col.onCellUnfocus({ apis: props.apis, cell: previousCell });
+                }
               }
             }
           }
         }
-      }
-    });
+      },
+    );
 
     const onCellMouseOver: (e: CellMouseOverEvent) => void = useMemo(
       () => (e: CellMouseOverEvent) => {
@@ -237,14 +247,14 @@ const DataGrid = <
           if (e.colDef.colId === undefined && e.colDef.field === undefined) {
             console.error(
               "Encountered a colDef with both the 'field' and 'colId' attributes " +
-                `undefined, colDef=${notifications.objToJson(e.colDef)}`
+                `undefined, colDef=${notifications.objToJson(e.colDef)}`,
             );
           } else if (
             includes(
               map(tabling.columns.filterRealColumns(columns), (col: Table.RealColumn<R, M>) =>
-                tabling.columns.normalizedField<R, M>(col)
+                tabling.columns.normalizedField<R, M>(col),
               ),
-              e.colDef.field || e.colDef.colId
+              e.colDef.field || e.colDef.colId,
             )
           ) {
             const nodes: Table.RowNode[] = [];
@@ -259,68 +269,84 @@ const DataGrid = <
           }
         }
       },
-      []
+      [],
     );
 
     useEffect(() => {
       props.apis?.grid.setQuickFilter(props.search);
     }, [props.search]);
 
-    const moveLeftKeyListener = hooks.useDynamicCallback((localApi: Table.GridApi, e: KeyboardEvent) => {
-      const ctrlCmdPressed = e.ctrlKey || e.metaKey;
-      if (e.key === "ArrowLeft" && ctrlCmdPressed && !isNil(props.onLeft)) {
-        e.preventDefault();
-        props.onLeft();
-      }
-    });
-
-    const moveRightKeyListener = hooks.useDynamicCallback((localApi: Table.GridApi, e: KeyboardEvent) => {
-      const ctrlCmdPressed = e.ctrlKey || e.metaKey;
-      if (e.key === "ArrowRight" && ctrlCmdPressed && !isNil(props.onRight)) {
-        e.preventDefault();
-        props.onRight();
-      }
-    });
-
-    const moveDownKeyListener = hooks.useDynamicCallback((localApi: Table.GridApi, e: KeyboardEvent) => {
-      const ctrlCmdPressed = e.ctrlKey || e.metaKey;
-      if (e.key === "ArrowDown" && ctrlCmdPressed) {
-        const focusedRow = tabling.aggrid.getFocusedRow<R>(localApi);
-        if (!isNil(focusedRow) && !isNil(props.editColumnConfig) && !tabling.rows.isPlaceholderRow(focusedRow)) {
+    const moveLeftKeyListener = hooks.useDynamicCallback(
+      (localApi: Table.GridApi, e: KeyboardEvent) => {
+        const ctrlCmdPressed = e.ctrlKey || e.metaKey;
+        if (e.key === "ArrowLeft" && ctrlCmdPressed && !isNil(props.onLeft)) {
           e.preventDefault();
-          e.stopImmediatePropagation();
-          e.stopPropagation();
-          const expandConfig = tabling.columns.getEditColumnRowConfig<R>(props.editColumnConfig, focusedRow, "expand");
-          if (!isNil(expandConfig)) {
-            expandConfig.action(focusedRow, false);
+          props.onLeft();
+        }
+      },
+    );
+
+    const moveRightKeyListener = hooks.useDynamicCallback(
+      (localApi: Table.GridApi, e: KeyboardEvent) => {
+        const ctrlCmdPressed = e.ctrlKey || e.metaKey;
+        if (e.key === "ArrowRight" && ctrlCmdPressed && !isNil(props.onRight)) {
+          e.preventDefault();
+          props.onRight();
+        }
+      },
+    );
+
+    const moveDownKeyListener = hooks.useDynamicCallback(
+      (localApi: Table.GridApi, e: KeyboardEvent) => {
+        const ctrlCmdPressed = e.ctrlKey || e.metaKey;
+        if (e.key === "ArrowDown" && ctrlCmdPressed) {
+          const focusedRow = tabling.aggrid.getFocusedRow<R>(localApi);
+          if (
+            !isNil(focusedRow) &&
+            !isNil(props.editColumnConfig) &&
+            !tabling.rows.isPlaceholderRow(focusedRow)
+          ) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            e.stopPropagation();
+            const expandConfig = tabling.columns.getEditColumnRowConfig<R>(
+              props.editColumnConfig,
+              focusedRow,
+              "expand",
+            );
+            if (!isNil(expandConfig)) {
+              expandConfig.action(focusedRow, false);
+            }
           }
         }
-      }
-    });
+      },
+    );
 
-    const moveUpKeyListener = hooks.useDynamicCallback((localApi: Table.GridApi, e: KeyboardEvent) => {
-      const ctrlCmdPressed = e.ctrlKey || e.metaKey;
-      if (e.key === "ArrowUp" && ctrlCmdPressed) {
-        e.preventDefault();
-        props.onBack?.();
-      }
-    });
+    const moveUpKeyListener = hooks.useDynamicCallback(
+      (localApi: Table.GridApi, e: KeyboardEvent) => {
+        const ctrlCmdPressed = e.ctrlKey || e.metaKey;
+        if (e.key === "ArrowUp" && ctrlCmdPressed) {
+          e.preventDefault();
+          props.onBack?.();
+        }
+      },
+    );
 
     return (
       <Component
         {...(props as T & InternalDataGridProps<R, M>)}
-        id={"data"}
+        id="data"
         columns={columns}
         keyListeners={[
           ...(props.keyListeners || []),
           moveDownKeyListener,
           moveUpKeyListener,
           moveLeftKeyListener,
-          moveRightKeyListener
+          moveRightKeyListener,
         ]}
         className={classNames("grid--data", props.className)}
-        domLayout={"autoHeight"}
-        rowSelection={"multiple"}
+        domLayout="autoHeight"
+        rowSelection="multiple"
         rowClass={getRowClass}
         getRowStyle={getRowStyle}
         onFirstDataRendered={onFirstDataRendered}

@@ -1,13 +1,15 @@
 import { useMemo } from "react";
+
 import { isNil } from "lodash";
 
 import { tabling } from "lib";
+
 import Cell, { PrivateCellProps, RowExplicitCellProps, CellProps } from "./Cell";
 
 export interface RowExplicitBodyCellProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  V extends Table.RawRowValue = Table.RawRowValue
+  V extends Table.RawRowValue = Table.RawRowValue,
 > extends RowExplicitCellProps<R, M, V> {
   readonly valueGetter?: (c: Table.DataColumn<R, M, V>, rows: Table.BodyRow<R>[]) => V;
 }
@@ -15,7 +17,7 @@ export interface RowExplicitBodyCellProps<
 export interface BodyCellProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  V extends Table.RawRowValue = Table.RawRowValue
+  V extends Table.RawRowValue = Table.RawRowValue,
 > extends RowExplicitBodyCellProps<R, M, V>,
     CellProps<R, M, V> {}
 
@@ -23,7 +25,7 @@ interface PrivateBodyCellProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   V extends Table.RawRowValue = Table.RawRowValue,
-  RW extends Table.BodyRow<R> = Table.BodyRow<R>
+  RW extends Table.BodyRow<R> = Table.BodyRow<R>,
 > extends Omit<PrivateCellProps<R, M, V>, "value" | "rawValue">,
     BodyCellProps<R, M, V> {
   readonly data: Table.BodyRow<R>[];
@@ -34,7 +36,7 @@ const BodyCell = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   V extends Table.RawRowValue = Table.RawRowValue,
-  RW extends Table.BodyRow<R> = Table.BodyRow<R>
+  RW extends Table.BodyRow<R> = Table.BodyRow<R>,
 >({
   data,
   ...props
@@ -46,7 +48,10 @@ const BodyCell = <
         return valueFromValueGetter;
       }
     } else if (!isNil(props.row)) {
-      if (props.column.isApplicableForRowType?.(props.row.rowType) === false || props.hideContent == true) {
+      if (
+        props.column.isApplicableForRowType?.(props.row.rowType) === false ||
+        props.hideContent == true
+      ) {
         /* We do not want to return a nullValue because we want the cell contents
            to be empty. */
         return "" as V;
@@ -60,11 +65,18 @@ const BodyCell = <
     if (isNil(props.column.pdfFormatter)) {
       return typeof rawValue === "string" || typeof rawValue === "number" ? String(rawValue) : "";
     }
-    return typeof rawValue === "string" || typeof rawValue === "number" ? props.column.pdfFormatter(rawValue) : "";
+    return typeof rawValue === "string" || typeof rawValue === "number"
+      ? props.column.pdfFormatter(rawValue)
+      : "";
   }, [rawValue, props.column]);
 
   return (
-    <Cell<R, M, V> {...props} value={value} rawValue={rawValue} textClassName={["td-text", props.textClassName]} />
+    <Cell<R, M, V>
+      {...props}
+      value={value}
+      rawValue={rawValue}
+      textClassName={["td-text", props.textClassName]}
+    />
   );
 };
 

@@ -1,4 +1,5 @@
 import React from "react";
+
 import { isNil } from "lodash";
 
 import { Image } from "components/pdf";
@@ -15,25 +16,25 @@ interface PageProps extends BasePageProps {
 const Page = ({ header, footer, children, ...props }: PageProps): JSX.Element => (
   <BasePage {...props}>
     {!isNil(header) ? (
-      <View className={"page-header"} wrap={false}>
+      <View className="page-header" wrap={false}>
         {header}
       </View>
     ) : (
       <></>
     )}
-    <View className={"page-content"}>{!isNil(children) ? children : <></>}</View>
+    <View className="page-content">{!isNil(children) ? children : <></>}</View>
     {!isNil(footer) ? (
-      <View className={"page-footer"} wrap={false}>
+      <View className="page-footer" wrap={false}>
         {footer}
       </View>
     ) : (
       <></>
     )}
-    <View className={"page-footer"} wrap={false}>
-      <Image className={"footer-logo"} src={String(process.env.PUBLIC_URL) + "/GreenLogo.png"} />
+    <View className="page-footer" wrap={false}>
+      <Image className="footer-logo" src={String(process.env.PUBLIC_URL) + "/GreenLogo.png"} />
       <Label
         fixed={true}
-        className={"page-number"}
+        className="page-number"
         render={(params: Pdf.PageRenderParams) => `Page ${params.pageNumber}`}
       />
     </View>

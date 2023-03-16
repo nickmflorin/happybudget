@@ -1,5 +1,5 @@
-import { combineReducers } from "redux";
 import { includes, isNil } from "lodash";
+import { combineReducers } from "redux";
 
 import * as api from "api";
 import { redux, budgeting, tabling, context } from "lib";
@@ -15,7 +15,7 @@ const FringesColumns = tabling.columns.filterModelColumns(FringesTable.Columns);
 
 const analysisReducer: Redux.Reducer<Modules.Budget.AnalysisStore> = (
   state: Modules.Budget.AnalysisStore = initialState.initialBudgetState.analysis,
-  action: Redux.Action
+  action: Redux.Action,
 ): Modules.Budget.AnalysisStore => {
   if (action.type === actions.analysis.loadingAction.toString()) {
     return { ...state, loading: action.payload };
@@ -33,7 +33,7 @@ const analysisReducer: Redux.Reducer<Modules.Budget.AnalysisStore> = (
       responseWasReceived: true,
       accounts: response.accounts,
       groups: response.groups,
-      actuals: response.actuals
+      actuals: response.actuals,
     };
   }
   return state;
@@ -49,7 +49,7 @@ const subaccountStoreReducer = budgeting.reducers.createAuthenticatedAccountSubA
     loading: actions.subAccount.loadingSubAccountAction,
     response: actions.subAccount.responseSubAccountAction,
     updateInState: actions.subAccount.updateInStateAction,
-    invalidate: actions.subAccount.invalidateSubAccountAction
+    invalidate: actions.subAccount.invalidateSubAccountAction,
   },
   tableActions: {
     request: actions.subAccount.requestAction,
@@ -57,8 +57,8 @@ const subaccountStoreReducer = budgeting.reducers.createAuthenticatedAccountSubA
     loading: actions.subAccount.loadingAction,
     response: actions.subAccount.responseAction,
     setSearch: actions.subAccount.setSearchAction,
-    invalidate: actions.subAccount.invalidateAction
-  }
+    invalidate: actions.subAccount.invalidateAction,
+  },
 });
 
 const accountStoreReducer = budgeting.reducers.createAuthenticatedAccountSubAccountStoreReducer<
@@ -71,7 +71,7 @@ const accountStoreReducer = budgeting.reducers.createAuthenticatedAccountSubAcco
     loading: actions.account.loadingAccountAction,
     response: actions.account.responseAccountAction,
     updateInState: actions.account.updateInStateAction,
-    invalidate: actions.account.invalidateAccountAction
+    invalidate: actions.account.invalidateAccountAction,
   },
   tableActions: {
     request: actions.account.requestAction,
@@ -79,8 +79,8 @@ const accountStoreReducer = budgeting.reducers.createAuthenticatedAccountSubAcco
     loading: actions.account.loadingAction,
     response: actions.account.responseAction,
     setSearch: actions.account.setSearchAction,
-    invalidate: actions.account.invalidateAction
-  }
+    invalidate: actions.account.invalidateAction,
+  },
 });
 
 const genericReducer: Redux.Reducer<Modules.Budget.Store> = combineReducers({
@@ -91,13 +91,16 @@ const genericReducer: Redux.Reducer<Modules.Budget.Store> = combineReducers({
 	*/
   account: redux.reducers.identityReducer<Redux.ModelIndexedStore<Modules.AccountStore>>({}),
   subaccount: redux.reducers.identityReducer<Redux.ModelIndexedStore<Modules.SubAccountStore>>({}),
-  detail: redux.reducers.createDetailReducer<Model.Budget, BudgetActionContext<Model.Budget, false>>({
+  detail: redux.reducers.createDetailReducer<
+    Model.Budget,
+    BudgetActionContext<Model.Budget, false>
+  >({
     initialState: redux.initialDetailResponseState,
     actions: {
       loading: actions.loadingBudgetAction,
       response: actions.responseBudgetAction,
-      updateInState: actions.updateBudgetInStateAction
-    }
+      updateInState: actions.updateBudgetInStateAction,
+    },
   }),
   analysis: analysisReducer,
   fringes: budgeting.reducers.createAuthenticatedFringesTableReducer<Model.Budget>({
@@ -107,8 +110,8 @@ const genericReducer: Redux.Reducer<Modules.Budget.Store> = combineReducers({
       handleEvent: actions.handleFringesTableEventAction,
       loading: actions.loadingFringesAction,
       response: actions.responseFringesAction,
-      setSearch: actions.setFringesSearchAction
-    }
+      setSearch: actions.setFringesSearchAction,
+    },
   }),
   accounts: budgeting.reducers.createAuthenticatedAccountsTableReducer<Model.Budget>({
     initialState: initialState.initialBudgetState.accounts,
@@ -117,8 +120,8 @@ const genericReducer: Redux.Reducer<Modules.Budget.Store> = combineReducers({
       handleEvent: actions.handleTableEventAction,
       loading: actions.loadingAction,
       response: actions.responseAction,
-      setSearch: actions.setSearchAction
-    }
+      setSearch: actions.setSearchAction,
+    },
   }),
   actuals: budgeting.reducers.createAuthenticatedActualsTableReducer({
     initialState: initialState.initialBudgetState.actuals,
@@ -126,69 +129,90 @@ const genericReducer: Redux.Reducer<Modules.Budget.Store> = combineReducers({
       handleEvent: actions.actuals.handleTableEventAction,
       loading: actions.actuals.loadingAction,
       response: actions.actuals.responseAction,
-      setSearch: actions.actuals.setSearchAction
+      setSearch: actions.actuals.setSearchAction,
     },
     columns: ActualColumns,
-    owners: redux.reducers.createAuthenticatedModelListReducer<Model.ActualOwner, ActualsTableActionContext>({
+    owners: redux.reducers.createAuthenticatedModelListReducer<
+      Model.ActualOwner,
+      ActualsTableActionContext
+    >({
       initialState: redux.initialAuthenticatedModelListResponseState,
       actions: {
         loading: actions.actuals.loadingActualOwnersAction,
         response: actions.actuals.responseActualOwnersAction,
-        setSearch: actions.actuals.setActualOwnersSearchAction
-      }
-    })
-  })
+        setSearch: actions.actuals.setActualOwnersSearchAction,
+      },
+    }),
+  }),
 });
 
 const rootReducer: Redux.Reducer<Modules.Budget.Store> = (
   state: Modules.Budget.Store = initialState.initialBudgetState,
-  action: Redux.Action
+  action: Redux.Action,
 ): Modules.Budget.Store => {
   let newState = { ...state, ...genericReducer(state, action) };
   if (includes(["budget.account", "budget.subaccount"], action.label)) {
     if (action.label === "budget.account") {
       const a = action as Redux.AnyPayloadAction<
-        SubAccountActionContext<Model.Budget, false> | SubAccountsTableActionContext<Model.Budget, Model.Account, false>
+        | SubAccountActionContext<Model.Budget, false>
+        | SubAccountsTableActionContext<Model.Budget, Model.Account, false>
       >;
-      const id = context.isSubAccountsTableActionContext(a.context) ? a.context.parentId : a.context.id;
+      const id = context.isSubAccountsTableActionContext(a.context)
+        ? a.context.parentId
+        : a.context.id;
       /*
 			Even though this should not happen, and it is typed to not happen, it
 			has happened - and can lead to strange behavior without a clear
 			indication of what the root cause was. */
       if (typeof id !== "number") {
-        console.error(`Invalid ID ${String(id)} received for budget account indexed store reducer!`);
+        console.error(
+          `Invalid ID ${String(id)} received for budget account indexed store reducer!`,
+        );
         return newState;
       }
       if (isNil(newState.account[id])) {
-        newState = { ...newState, account: { ...newState.account, [id]: initialState.initialAccountState } };
+        newState = {
+          ...newState,
+          account: { ...newState.account, [id]: initialState.initialAccountState },
+        };
       }
       newState = {
         ...newState,
-        account: { ...newState.account, [id]: accountStoreReducer(newState.account[id], a, newState.fringes) }
+        account: {
+          ...newState.account,
+          [id]: accountStoreReducer(newState.account[id], a, newState.fringes),
+        },
       };
     } else {
       const a = action as Redux.AnyPayloadAction<
         | SubAccountActionContext<Model.Budget, false>
         | SubAccountsTableActionContext<Model.Budget, Model.SubAccount, false>
       >;
-      const id = context.isSubAccountsTableActionContext(a.context) ? a.context.parentId : a.context.id;
+      const id = context.isSubAccountsTableActionContext(a.context)
+        ? a.context.parentId
+        : a.context.id;
       /*
 			Even though this should not happen, and it is typed to not happen, it
 			has happened - and can lead to strange behavior without a clear
 			indication of what the root cause was. */
       if (typeof id !== "number") {
-        console.error(`Invalid ID ${String(id)} received for budget subaccount indexed store reducer!`);
+        console.error(
+          `Invalid ID ${String(id)} received for budget subaccount indexed store reducer!`,
+        );
         return newState;
       }
       if (isNil(newState.subaccount[id])) {
-        newState = { ...newState, subaccount: { ...newState.subaccount, [id]: initialState.initialSubAccountState } };
+        newState = {
+          ...newState,
+          subaccount: { ...newState.subaccount, [id]: initialState.initialSubAccountState },
+        };
       }
       newState = {
         ...newState,
         subaccount: {
           ...newState.subaccount,
-          [id]: subaccountStoreReducer(newState.subaccount[id], a, newState.fringes)
-        }
+          [id]: subaccountStoreReducer(newState.subaccount[id], a, newState.fringes),
+        },
       };
     }
   }

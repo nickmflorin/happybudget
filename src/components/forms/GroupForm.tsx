@@ -1,8 +1,8 @@
 import { useEffect } from "react";
+
 import { isNil } from "lodash";
 
 import { model } from "lib";
-
 import { Form } from "components";
 import { Input, ColorSelect, ChildrenSelect } from "components/fields";
 
@@ -30,16 +30,25 @@ const GroupForm = <MM extends Model.SimpleAccount | Model.SimpleSubAccount>({
   }, [error]);
 
   return (
-    <Form.Form layout={"vertical"} {...props}>
-      <Form.Item name={"name"} rules={[{ required: true, message: "Please provide a valid name for the group." }]}>
-        <Input placeholder={"Name"} />
+    <Form.Form layout="vertical" {...props}>
+      <Form.Item
+        name="name"
+        rules={[{ required: true, message: "Please provide a valid name for the group." }]}
+      >
+        <Input placeholder="Name" />
       </Form.Item>
-      <Form.Item name={"color"} label={"Color"}>
-        <ColorSelect colors={colors} useDefault={true} colorSize={20} selectable={true} treatDefaultAsNull={true} />
+      <Form.Item name="color" label="Color">
+        <ColorSelect
+          colors={colors}
+          useDefault={true}
+          colorSize={20}
+          selectable={true}
+          treatDefaultAsNull={true}
+        />
       </Form.Item>
       <Form.Item
-        name={"children"}
-        label={"Subtotal Accounts"}
+        name="children"
+        label="Subtotal Accounts"
         rules={[
           { required: false },
           () => ({
@@ -48,8 +57,8 @@ const GroupForm = <MM extends Model.SimpleAccount | Model.SimpleSubAccount>({
                 return Promise.reject("At least one account must be selected.");
               }
               return Promise.resolve();
-            }
-          })
+            },
+          }),
         ]}
       >
         <ChildrenSelect<MM> parentType={parentType} parentId={parentId} />

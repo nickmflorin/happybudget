@@ -1,5 +1,7 @@
 import { forwardRef, useState, useEffect, useMemo, useImperativeHandle, ForwardedRef } from "react";
+
 import { isNil } from "lodash";
+
 import { DatePicker } from "components/fields";
 
 const KEY_BACKSPACE = 8;
@@ -9,11 +11,11 @@ const DateEditor = <
   R extends Table.RowData & { readonly date: string | null },
   M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Table.Context = Table.Context,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 >(
   props: Table.EditorProps<R, M, C, S>,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  ref: ForwardedRef<any>
+  ref: ForwardedRef<any>,
 ): JSX.Element => {
   const [date, setDate] = useState<Date | null>(!isNil(props.value) ? new Date(props.value) : null);
   const [editing, setEditing] = useState(true);
@@ -24,29 +26,25 @@ const DateEditor = <
     }
   }, [editing]);
 
-  useImperativeHandle(ref, () => {
-    return {
-      getValue: () => {
-        return date;
-      },
-      isCancelBeforeStart() {
-        return props.keyPress === KEY_BACKSPACE || props.keyPress === KEY_DELETE;
-      },
-      isCancelAfterEnd() {
-        return false;
-      }
-    };
-  });
+  useImperativeHandle(ref, () => ({
+    getValue: () => date,
+    isCancelBeforeStart() {
+      return props.keyPress === KEY_BACKSPACE || props.keyPress === KEY_DELETE;
+    },
+    isCancelAfterEnd() {
+      return false;
+    },
+  }));
 
   const onChange = useMemo(
     () => (selectedDate: Date | null) => {
       setDate(selectedDate);
       setEditing(false);
     },
-    [setDate, setEditing]
+    [setDate, setEditing],
   );
 
-  return <DatePicker selected={date} dateFormat={"dd/MM/yyyy"} onChange={onChange} inline />;
+  return <DatePicker selected={date} dateFormat="dd/MM/yyyy" onChange={onChange} inline />;
 };
 
 export default forwardRef(DateEditor);

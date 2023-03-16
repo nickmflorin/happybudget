@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
+
 import { filter } from "lodash";
 
 import { redux, notifications, http } from "lib";
 
-import AttachmentsList from "./AttachmentsList";
 import AttachmentsFilePond from "./AttachmentsFilePond";
+import AttachmentsList from "./AttachmentsList";
 
 export interface EditAttachmentsProps {
   readonly modelId: number;
@@ -15,13 +16,21 @@ export interface EditAttachmentsProps {
   readonly listAttachments: (
     id: number,
     query?: Http.ListQuery,
-    options?: Http.RequestOptions
+    options?: Http.RequestOptions,
   ) => Promise<Http.ListResponse<Model.Attachment>>;
-  readonly deleteAttachment: (id: number, objId: number, options?: Http.RequestOptions) => Promise<null>;
+  readonly deleteAttachment: (
+    id: number,
+    objId: number,
+    options?: Http.RequestOptions,
+  ) => Promise<null>;
 }
 
 const EditAttachments = (props: EditAttachmentsProps): JSX.Element => {
-  const { isActive: isDeleting, removeFromState: setDeleted, addToState: setDeleting } = redux.useTrackModelActions([]);
+  const {
+    isActive: isDeleting,
+    removeFromState: setDeleted,
+    addToState: setDeleting,
+  } = redux.useTrackModelActions([]);
   const [cancelToken] = http.useCancelToken();
   const [loadingAttachments, setLoadingAttachments] = useState(false);
   const [attachments, setAttachments] = useState<Model.Attachment[]>([]);
@@ -40,7 +49,7 @@ const EditAttachments = (props: EditAttachmentsProps): JSX.Element => {
       setAttachments([...attachments, attachment]);
       props.onAttachmentAdded?.(attachment);
     },
-    [attachments, props.onAttachmentAdded]
+    [attachments, props.onAttachmentAdded],
   );
 
   const onAttachmentRemoved = useMemo(
@@ -48,7 +57,7 @@ const EditAttachments = (props: EditAttachmentsProps): JSX.Element => {
       setAttachments(filter(attachments, (a: Model.Attachment) => a.id !== id));
       props.onAttachmentRemoved?.(id);
     },
-    [attachments, props.onAttachmentRemoved]
+    [attachments, props.onAttachmentRemoved],
   );
 
   const onDelete = useMemo(
@@ -60,11 +69,11 @@ const EditAttachments = (props: EditAttachmentsProps): JSX.Element => {
         .catch((e: Error) => notifications.internal.handleRequestError(e))
         .finally(() => setDeleted(attachment.id));
     },
-    [setDeleting, setDeleted]
+    [setDeleting, setDeleted],
   );
 
   return (
-    <div className={"edit-attachments"}>
+    <div className="edit-attachments">
       {attachments.length !== 0 && (
         <AttachmentsList
           attachments={attachments}

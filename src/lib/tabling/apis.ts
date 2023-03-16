@@ -10,8 +10,12 @@ export default class TableApis implements Table.ITableApis {
 		We do this so we don't always have to provide the `primary` ID and the
     `footer` ID since they are common for all table APIs. */
     this.store = {
-      ...reduce(GridIds, (prev: Partial<Table.TableApiSet>, id: Table.GridId) => ({ ...prev, [id]: null }), {}),
-      ...config
+      ...reduce(
+        GridIds,
+        (prev: Partial<Table.TableApiSet>, id: Table.GridId) => ({ ...prev, [id]: null }),
+        {},
+      ),
+      ...config,
     };
   }
 
@@ -33,9 +37,7 @@ export default class TableApis implements Table.ITableApis {
   public columnMap = (callback: (api: Table.ColumnApi) => void) =>
     map(this.columnApis, (api: Table.ColumnApi) => callback(api));
 
-  public clone = (): TableApis => {
-    return new TableApis({ ...this.store });
-  };
+  public clone = (): TableApis => new TableApis({ ...this.store });
 
   public get gridApis(): Table.GridApi[] {
     /* eslint-disable-next-line @typescript-eslint/no-this-alias */
@@ -50,7 +52,7 @@ export default class TableApis implements Table.ITableApis {
         }
         return grids;
       },
-      []
+      [],
     );
   }
 
@@ -67,7 +69,7 @@ export default class TableApis implements Table.ITableApis {
         }
         return columns;
       },
-      []
+      [],
     );
   }
 }

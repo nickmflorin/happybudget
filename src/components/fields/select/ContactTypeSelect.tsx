@@ -1,6 +1,7 @@
 import React from "react";
 
 import { model } from "lib";
+
 import { SingleChoiceSelect, SingleChoiceSelectProps } from "./generic";
 
 export type ContactTypeSelectProps = Omit<SingleChoiceSelectProps<Model.ContactType>, "options">;

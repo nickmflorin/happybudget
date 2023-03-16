@@ -4,7 +4,7 @@ import Cookies from "universal-cookie";
 export const parseHiddenColumns = (
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   obj: any,
-  validateAgainst?: string[]
+  validateAgainst?: string[],
 ): Table.HiddenColumns => {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   let data: any = null;
@@ -32,13 +32,16 @@ export const parseHiddenColumns = (
         }
         return { ...curr };
       },
-      {}
+      {},
     );
   }
   return {};
 };
 
-export const getHiddenColumns = (tableId: string, validateAgainst?: string[]): Table.HiddenColumns => {
+export const getHiddenColumns = (
+  tableId: string,
+  validateAgainst?: string[],
+): Table.HiddenColumns => {
   const cookiesObj = new Cookies();
   const cookiesHiddenColumns = cookiesObj.get(`hidden-columns-${tableId}`);
   return parseHiddenColumns(cookiesHiddenColumns, validateAgainst);

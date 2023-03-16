@@ -28,14 +28,16 @@ declare type ITagRenderParams<S extends React.CSSProperties | Pdf.Style = React.
   readonly uppercase: boolean;
   readonly fillWidth: boolean;
   readonly text: string;
-  readonly contentRender: ((params: Omit<ITagRenderParams<S>, "contentRender">) => JSX.Element) | undefined;
+  readonly contentRender:
+    | ((params: Omit<ITagRenderParams<S>, "contentRender">) => JSX.Element)
+    | undefined;
   readonly onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   readonly disabled?: boolean;
 };
 
 declare type TagProps<
   M extends Model.Model = Model.Model,
-  STYLE extends React.CSSProperties | Pdf.Style = React.CSSProperties
+  STYLE extends React.CSSProperties | Pdf.Style = React.CSSProperties,
 > = {
   readonly className?: string;
   readonly textClassName?: string;

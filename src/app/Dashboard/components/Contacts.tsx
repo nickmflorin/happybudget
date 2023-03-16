@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
+
 import { useDispatch } from "react-redux";
 
 import { tabling } from "lib";
-
 import { Page } from "components/layout";
 import { ContactsTable, connectTableToAuthenticatedStore } from "tabling";
 
@@ -25,8 +25,8 @@ const ConnectedContactsTable = connectTableToAuthenticatedStore<
     handleEvent: actions.handleContactsTableEventAction,
     loading: actions.loadingContactsAction,
     response: actions.responseContactsAction,
-    setSearch: actions.setContactsSearchAction
-  }
+    setSearch: actions.setContactsSearchAction,
+  },
 })(ContactsTable.Table);
 
 const Contacts = (): JSX.Element => {
@@ -38,7 +38,7 @@ const Contacts = (): JSX.Element => {
   }, []);
 
   return (
-    <Page className={"contacts"} title={"My Contacts"}>
+    <Page className="contacts" title="My Contacts">
       <ConnectedContactsTable tableContext={{}} table={table} />
     </Page>
   );

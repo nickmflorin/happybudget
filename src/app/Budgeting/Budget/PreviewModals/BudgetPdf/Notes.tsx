@@ -1,4 +1,5 @@
 import classNames from "classnames";
+
 import { View, RichText, Label } from "components/pdf";
 
 interface NotesProps extends Pdf.StandardComponentProps {
@@ -7,9 +8,9 @@ interface NotesProps extends Pdf.StandardComponentProps {
 
 const Notes = ({ nodes, ...props }: NotesProps): JSX.Element => (
   <View {...props} className={classNames("notes", props.className)}>
-    <Label>{"Notes"}</Label>
-    <View className={"notes-container"}>
-      <RichText className={"notes-text"} nodes={nodes || []} />
+    <Label>Notes</Label>
+    <View className="notes-container">
+      <RichText className="notes-text" nodes={nodes || []} />
     </View>
   </View>
 );

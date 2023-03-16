@@ -4,7 +4,7 @@ declare type MenuItemSelectedState = {
 
 declare type MenuItemStateWithModel<
   S extends Record<string, unknown> = MenuItemSelectedState,
-  M extends MenuItemModel<S> = MenuItemModel<S>
+  M extends MenuItemModel<S> = MenuItemModel<S>,
 > = S & {
   readonly model: M;
 };
@@ -17,7 +17,7 @@ declare type MenuExtraItemClickEvent = {
 
 declare type MenuButtonClickEvent<
   S extends Record<string, unknown> = MenuItemSelectedState,
-  M extends MenuItemModel<S> = MenuItemModel<S>
+  M extends MenuItemModel<S> = MenuItemModel<S>,
 > = {
   readonly menuState: MenuItemStateWithModel<S, M>[];
   readonly event: React.MouseEvent<HTMLButtonElement>;
@@ -40,7 +40,7 @@ type InferStateFromModel<M> = M extends MenuItemModel<infer S> ? S : never;
 
 declare type MenuChangeEvent<
   S extends Record<string, unknown> = MenuItemSelectedState,
-  M extends MenuItemModel<S> = MenuItemModel<S>
+  M extends MenuItemModel<S> = MenuItemModel<S>,
 > = MenuItemModelClickEvent<S> & {
   readonly model: M;
   readonly menuState: MenuItemStateWithModel<S, M>[];
@@ -59,9 +59,10 @@ declare type BaseMenuItemModel = Model.Model & {
   readonly renderContent?: () => JSX.Element;
 };
 
-declare type MenuItemModel<S extends Record<string, unknown> = MenuItemSelectedState> = BaseMenuItemModel & {
-  readonly onClick?: (e: MenuItemModelClickEvent<S>) => void;
-};
+declare type MenuItemModel<S extends Record<string, unknown> = MenuItemSelectedState> =
+  BaseMenuItemModel & {
+    readonly onClick?: (e: MenuItemModelClickEvent<S>) => void;
+  };
 
 declare type ExtraMenuItemModel = BaseMenuItemModel & {
   readonly showOnNoSearchResults?: boolean;
@@ -74,7 +75,7 @@ declare type ExtraMenuItemModel = BaseMenuItemModel & {
 
 declare interface IMenuButton<
   S extends Record<string, unknown> = MenuItemSelectedState,
-  M extends MenuItemModel<S> = MenuItemModel<S>
+  M extends MenuItemModel<S> = MenuItemModel<S>,
 > {
   readonly label: string;
   readonly className?: string;
@@ -85,7 +86,7 @@ declare interface IMenuButton<
 
 declare type IMenuRef<
   S extends Record<string, unknown> = MenuItemSelectedState,
-  M extends MenuItemModel<S> = MenuItemModel<S>
+  M extends MenuItemModel<S> = MenuItemModel<S>,
 > = {
   readonly setItemLoading: (id: M["id"], v: boolean) => void;
   readonly getState: () => S[];
@@ -100,7 +101,7 @@ declare type IMenuRef<
 
 declare type IMenu<
   S extends Record<string, unknown> = MenuItemSelectedState,
-  M extends MenuItemModel<S> = MenuItemModel<S>
+  M extends MenuItemModel<S> = MenuItemModel<S>,
 > = StandardComponentProps & {
   readonly models: M[];
   readonly checkbox?: boolean;

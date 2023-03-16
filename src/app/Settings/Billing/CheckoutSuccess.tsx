@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Redirect, useLocation } from "react-router-dom";
+
 import { isNil } from "lodash";
+import { Redirect, useLocation } from "react-router-dom";
 
 import * as api from "api";
 import * as store from "store";
-
 import { ApplicationSpinner } from "components";
 
 type IRedirect = {
@@ -47,9 +47,9 @@ const CheckoutSuccess = (): JSX.Element => {
               notification: {
                 closable: true,
                 level: "success",
-                message: "Your checkout was successful.  Thank you."
-              }
-            }
+                message: "Your checkout was successful.  Thank you.",
+              },
+            },
           });
         })
         .catch((e: Error) => setRedirect({ pathname: "/billing", state: { sessionId, error: e } }));

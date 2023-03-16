@@ -1,8 +1,15 @@
-import React, { ReactNode, useMemo, ForwardedRef, useState, useImperativeHandle, forwardRef } from "react";
-import { useHistory } from "react-router-dom";
+import React, {
+  ReactNode,
+  useMemo,
+  ForwardedRef,
+  useState,
+  useImperativeHandle,
+  forwardRef,
+} from "react";
+
 import classNames from "classnames";
 import { isNil } from "lodash";
-
+import { useHistory } from "react-router-dom";
 import { Checkbox } from "antd";
 
 import { IconOrSpinner } from "components";
@@ -20,27 +27,29 @@ const MenuItemContent = React.memo(
   (props: MenuItemContentProps): JSX.Element => (
     <React.Fragment>
       {props.checkbox && <Checkbox checked={props.checked} />}
-      <div className={"menu-item-content"}>
+      <div className="menu-item-content">
         {!isNil(props.icon) && (
-          <div className={"icon-wrapper-left"}>
+          <div className="icon-wrapper-left">
             <IconOrSpinner loading={props.loading} icon={props.icon} />
           </div>
         )}
         {isNil(props.icon) && props.loading && (
-          <div className={"icon-wrapper-left"}>
+          <div className="icon-wrapper-left">
             <IconOrSpinner loading={props.loading} />
           </div>
         )}
-        <div className={"menu-item-inner-content"}>{props.children}</div>
-        {!isNil(props.iconAfterLabel) && <div className={"icon-wrapper-right"}>{props.iconAfterLabel}</div>}
+        <div className="menu-item-inner-content">{props.children}</div>
+        {!isNil(props.iconAfterLabel) && (
+          <div className="icon-wrapper-right">{props.iconAfterLabel}</div>
+        )}
       </div>
     </React.Fragment>
-  )
+  ),
 );
 
 type CommonMenuItemProps<
   S extends Record<string, unknown> = MenuItemSelectedState,
-  M extends BaseMenuItemModel = MenuItemModel<S>
+  M extends BaseMenuItemModel = MenuItemModel<S>,
 > = Omit<StandardComponentProps, "id"> & {
   readonly model: M;
   readonly menuId: string;
@@ -54,9 +63,9 @@ type CommonMenuItemProps<
 
 const PrivateCommonMenuItem = <
   S extends Record<string, unknown> = MenuItemSelectedState,
-  M extends MenuItemModel<S> = MenuItemModel<S>
+  M extends MenuItemModel<S> = MenuItemModel<S>,
 >(
-  props: CommonMenuItemProps<S, M> & MenuItemContentProps
+  props: CommonMenuItemProps<S, M> & MenuItemContentProps,
 ): JSX.Element => {
   const history = useHistory();
 
@@ -71,9 +80,9 @@ const PrivateCommonMenuItem = <
         {
           disabled: props.model.disabled || props.model.loading,
           focused: props.focused,
-          "menu-item--extra": props.isExtra
+          "menu-item--extra": props.isExtra,
         },
-        props.className
+        props.className,
       )}
       style={props.style}
       onClick={(e: React.MouseEvent<HTMLLIElement>) => {
@@ -112,7 +121,7 @@ type ExtraMenuItemProps<S extends Record<string, unknown> = MenuItemSelectedStat
   };
 
 export const ExtraMenuItem = <S extends Record<string, unknown> = MenuItemSelectedState>(
-  props: ExtraMenuItemProps<S>
+  props: ExtraMenuItemProps<S>,
 ): JSX.Element => {
   if (props.model.visible === false) {
     return <></>;
@@ -126,24 +135,26 @@ export const ExtraMenuItem = <S extends Record<string, unknown> = MenuItemSelect
       onClick={(e: Table.CellDoneEditingEvent) => {
         props.onClick?.({
           event: e,
-          closeParentDropdown: props.closeParentDropdown
+          closeParentDropdown: props.closeParentDropdown,
         });
       }}
       isExtra={true}
     >
-      <div className={"text-wrapper"}>{props.model.label}</div>
+      <div className="text-wrapper">{props.model.label}</div>
     </CommonMenuItem>
   );
 };
 
 type AnyMenuItemSelectedState<T extends Record<string, unknown>> = T & MenuItemSelectedState;
 
-const isSelectedState = <T extends Record<string, unknown>>(state: T): state is AnyMenuItemSelectedState<T> =>
+const isSelectedState = <T extends Record<string, unknown>>(
+  state: T,
+): state is AnyMenuItemSelectedState<T> =>
   (state as AnyMenuItemSelectedState<T>).selected !== undefined;
 
 type MenuItemProps<
   S extends Record<string, unknown> = MenuItemSelectedState,
-  M extends MenuItemModel<S> = MenuItemModel<S>
+  M extends MenuItemModel<S> = MenuItemModel<S>,
 > = StandardComponentProps &
   Omit<CommonMenuItemProps<S, M>, "onClick" | "isExtra" | "children"> & {
     readonly checkbox?: boolean;
@@ -156,10 +167,10 @@ type MenuItemProps<
 
 const PrivateMenuItem = <
   S extends Record<string, unknown> = MenuItemSelectedState,
-  M extends MenuItemModel<S> = MenuItemModel<S>
+  M extends MenuItemModel<S> = MenuItemModel<S>,
 >(
   props: MenuItemProps<S, M>,
-  ref: ForwardedRef<IMenuItemRef<S>>
+  ref: ForwardedRef<IMenuItemRef<S>>,
 ): JSX.Element => {
   const [_loading, setLoading] = useState(false);
 
@@ -183,9 +194,9 @@ const PrivateMenuItem = <
     () => ({
       closeParentDropdown: props.closeParentDropdown,
       setLoading: (v: boolean) => setLoading(v),
-      getState: () => props.state
+      getState: () => props.state,
     }),
-    [props.closeParentDropdown, props.state]
+    [props.closeParentDropdown, props.state],
   );
 
   const onClick = useMemo(
@@ -193,16 +204,16 @@ const PrivateMenuItem = <
       props.model.onClick?.({
         event: e,
         state: props.state,
-        item: partialRefObj
+        item: partialRefObj,
       }),
-    [(props.model.onClick, props.state, partialRefObj)]
+    [(props.model.onClick, props.state, partialRefObj)],
   );
 
   useImperativeHandle(ref, () => ({
     closeParentDropdown: props.closeParentDropdown,
     setLoading: (v: boolean) => setLoading(v),
     getState: () => props.state,
-    performClick: (e: Table.CellDoneEditingEvent) => onClick(e)
+    performClick: (e: Table.CellDoneEditingEvent) => onClick(e),
   }));
 
   return (
@@ -219,7 +230,7 @@ const PrivateMenuItem = <
       {!isNil(props.renderContent) ? (
         props.renderContent(m, props.state)
       ) : (
-        <div className={"text-wrapper"}>{m.label}</div>
+        <div className="text-wrapper">{m.label}</div>
       )}
     </CommonMenuItem>
   );
@@ -227,9 +238,9 @@ const PrivateMenuItem = <
 
 type MenuItemType = <
   S extends Record<string, unknown> = MenuItemSelectedState,
-  M extends MenuItemModel<S> = MenuItemModel<S>
+  M extends MenuItemModel<S> = MenuItemModel<S>,
 >(
-  props: MenuItemProps<S, M> & { readonly ref: ForwardedRef<IMenuItemRef<S>> }
+  props: MenuItemProps<S, M> & { readonly ref: ForwardedRef<IMenuItemRef<S>> },
 ) => JSX.Element;
 
 export const MenuItem = React.memo(forwardRef(PrivateMenuItem)) as MenuItemType;

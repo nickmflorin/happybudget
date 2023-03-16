@@ -1,18 +1,19 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+
 import hoistNonReactStatics from "hoist-non-react-statics";
+import { useDispatch } from "react-redux";
 import { Subtract } from "utility-types";
 
 import connectTableToStore, {
   StoreConfig,
   ConnectTableProps,
-  ConnectedTableInjectedProps
+  ConnectedTableInjectedProps,
 } from "./connectTableToStore";
 
 export type ConnectedAuthenticatedTableInjectedProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = ConnectedTableInjectedProps<R, S> & {
   readonly onEvent: (e: Table.Event<R, M>) => void;
   readonly onSearch: (v: string) => void;
@@ -22,7 +23,7 @@ export type ConnectAuthenticatedTableProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Table.Context = Table.Context,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = ConnectTableProps<R, M, C, S>;
 
 type AuthenticatedStoreConfig<
@@ -30,7 +31,10 @@ type AuthenticatedStoreConfig<
   M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
-  A extends Redux.AuthenticatedTableActionPayloadMap<R, M> = Redux.AuthenticatedTableActionPayloadMap<R, M>
+  A extends Redux.AuthenticatedTableActionPayloadMap<
+    R,
+    M
+  > = Redux.AuthenticatedTableActionPayloadMap<R, M>,
 > = StoreConfig<R, M, C, S> & {
   readonly actions: Omit<Redux.ActionCreatorMap<A, C>, "request" | "invalidate">;
 };
@@ -40,8 +44,9 @@ type HOCProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel,
   C extends Table.Context = Table.Context,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
-> = Subtract<T, ConnectedAuthenticatedTableInjectedProps<R, M, S>> & ConnectAuthenticatedTableProps<R, M, C, S>;
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
+> = Subtract<T, ConnectedAuthenticatedTableInjectedProps<R, M, S>> &
+  ConnectAuthenticatedTableProps<R, M, C, S>;
 
 const connectTableToAuthenticatedStore =
   <
@@ -50,9 +55,12 @@ const connectTableToAuthenticatedStore =
     M extends Model.RowHttpModel = Model.RowHttpModel,
     C extends Table.Context = Table.Context,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
-    A extends Redux.AuthenticatedTableActionPayloadMap<R, M> = Redux.AuthenticatedTableActionPayloadMap<R, M>
+    A extends Redux.AuthenticatedTableActionPayloadMap<
+      R,
+      M
+    > = Redux.AuthenticatedTableActionPayloadMap<R, M>,
   >(
-    config: AuthenticatedStoreConfig<R, M, C, S, A>
+    config: AuthenticatedStoreConfig<R, M, C, S, A>,
   ) =>
   (Component: React.FunctionComponent<T>): React.FunctionComponent<HOCProps<T, R, M, C, S>> => {
     const ConnectedComponent = connectTableToStore<T, R, M, C, S>(config)(Component);

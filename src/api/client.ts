@@ -4,30 +4,30 @@ import { isNil } from "lodash";
 import * as config from "config";
 import { http } from "lib";
 
-import * as apiUtil from "./util";
 import * as middleware from "./middleware";
+import * as apiUtil from "./util";
 
 export enum HttpRequestMethods {
   GET = "GET",
   POST = "POST",
   DELETE = "DELETE",
   PUT = "PUT",
-  PATCH = "PATCH"
+  PATCH = "PATCH",
 }
 
 export const authenticatedInstance = axios.create({
   baseURL: config.env.API_DOMAIN,
-  withCredentials: true
+  withCredentials: true,
 });
 
 export const tokenValidationInstance = axios.create({
   baseURL: config.env.API_DOMAIN,
-  withCredentials: true
+  withCredentials: true,
 });
 
 export const unauthenticatedInstance = axios.create({
   baseURL: config.env.API_DOMAIN,
-  withCredentials: true
+  withCredentials: true,
 });
 
 /* CSRF Tokens must be included for both authenticated and unauthenticated
@@ -39,21 +39,21 @@ unauthenticatedInstance.interceptors.request.use(middleware.HttpHeaderRequestMid
    response. */
 authenticatedInstance.interceptors.response.use(
   (response: AxiosResponse<Http.Response>): AxiosResponse<Http.Response> => response,
-  middleware.HttpErrorResponseMiddlware(true)
+  middleware.HttpErrorResponseMiddlware(true),
 );
 
 /* The token validation AxiosInstance should not forcefully log out users on a
 	 401 response, because this is done in the route components. */
 tokenValidationInstance.interceptors.response.use(
   (response: AxiosResponse<Http.Response>): AxiosResponse<Http.Response> => response,
-  middleware.HttpErrorResponseMiddlware(false)
+  middleware.HttpErrorResponseMiddlware(false),
 );
 
 /* The unauthenticated AxiosInstance should not forcefully log out users on a 401
    response. */
 unauthenticatedInstance.interceptors.response.use(
   (response: AxiosResponse<Http.Response>): AxiosResponse<Http.Response> => response,
-  middleware.HttpErrorResponseMiddlware(false)
+  middleware.HttpErrorResponseMiddlware(false),
 );
 
 export class ApiClient {
@@ -71,7 +71,7 @@ export class ApiClient {
       | HttpRequestMethods.PUT
       | HttpRequestMethods.DELETE
       | HttpRequestMethods.PATCH,
-    query?: Http.ListQuery | undefined
+    query?: Http.ListQuery | undefined,
   ): Http.V1Url => {
     if (method === HttpRequestMethods.GET) {
       if (!isNil(query)) {
@@ -110,14 +110,14 @@ export class ApiClient {
     url: Http.V1Url,
     query?: Http.ListQuery | undefined,
     payload?: Partial<Http.Payload> | undefined,
-    options?: Http.RequestOptions | undefined
+    options?: Http.RequestOptions | undefined,
   ): Promise<T> => {
     const lookup = {
       [HttpRequestMethods.POST]: this.instance.post.bind(ApiClient),
       [HttpRequestMethods.GET]: this.instance.get.bind(ApiClient),
       [HttpRequestMethods.PUT]: this.instance.put.bind(ApiClient),
       [HttpRequestMethods.DELETE]: this.instance.delete.bind(ApiClient),
-      [HttpRequestMethods.PATCH]: this.instance.patch.bind(ApiClient)
+      [HttpRequestMethods.PATCH]: this.instance.patch.bind(ApiClient),
     };
     url = this._prepare_url(url, method, query);
     let response: AxiosResponse<T>;
@@ -128,28 +128,34 @@ export class ApiClient {
       headers = { ...headers, "X-PublicToken": options.publicTokenId };
     }
     if (method === HttpRequestMethods.GET || method === HttpRequestMethods.DELETE) {
-      response = await lookup[method](url, { cancelToken: options.cancelToken, timeout: options.timeout, headers });
+      response = await lookup[method](url, {
+        cancelToken: options.cancelToken,
+        timeout: options.timeout,
+        headers,
+      });
     } else {
       const _payload = payload || {};
       response = await lookup[method](url, apiUtil.filterPayload<typeof _payload>(_payload), {
         cancelToken: options.cancelToken,
         timeout: options.timeout,
-        headers
+        headers,
       });
     }
     return response.data;
   };
 
-	/**
+  /**
    * Submits a GET request to the provided path.
    *
    * @param path     The path to send the GET request.
    * @param query    The query parameters to embed in the URL.
    * @param options  The options for the request.
    */
-	 get = async <T>(path: Http.V1Url, query?: Http.Query, options?: Http.RequestOptions): Promise<T> => {
-    return this._request<T>(HttpRequestMethods.GET, path, query, {}, options);
-  };
+  get = async <T>(
+    path: Http.V1Url,
+    query?: Http.Query,
+    options?: Http.RequestOptions,
+  ): Promise<T> => this._request<T>(HttpRequestMethods.GET, path, query, {}, options);
 
   /**
    * Submits a GET request to the provided path to retrieve a specific resource
@@ -158,9 +164,8 @@ export class ApiClient {
    * @param path     The path to send the GET request.
    * @param options  The options for the request.
    */
-  retrieve = async <T>(path: Http.V1Url, options?: Http.RequestOptions): Promise<T> => {
-    return this._request<T>(HttpRequestMethods.GET, path, {}, {}, options);
-  };
+  retrieve = async <T>(path: Http.V1Url, options?: Http.RequestOptions): Promise<T> =>
+    this._request<T>(HttpRequestMethods.GET, path, {}, {}, options);
 
   /**
    * Submits a GET request to the provided path to retrieve a a list of resources
@@ -170,9 +175,12 @@ export class ApiClient {
    * @param query    The query parameters to embed in the URL.
    * @param options  The options for the request.
    */
-  list = async <T>(path: Http.V1Url, query?: Http.Query, options?: Http.RequestOptions): Promise<Http.ListResponse<T>> => {
-    return this._request<Http.ListResponse<T>>(HttpRequestMethods.GET, path, query, {}, options);
-  };
+  list = async <T>(
+    path: Http.V1Url,
+    query?: Http.Query,
+    options?: Http.RequestOptions,
+  ): Promise<Http.ListResponse<T>> =>
+    this._request<Http.ListResponse<T>>(HttpRequestMethods.GET, path, query, {}, options);
 
   /**
    * Sends a POST request to the provided path.
@@ -184,10 +192,8 @@ export class ApiClient {
   post = async <T, PL extends Http.Payload = Http.Payload>(
     path: Http.V1Url,
     payload?: PL,
-    options?: Http.RequestOptions
-  ): Promise<T> => {
-    return this._request<T>(HttpRequestMethods.POST, path, {}, payload, options);
-  };
+    options?: Http.RequestOptions,
+  ): Promise<T> => this._request<T>(HttpRequestMethods.POST, path, {}, payload, options);
 
   /**
    * Sends a DELETE request to the provided path.
@@ -195,9 +201,8 @@ export class ApiClient {
    * @param path        The path to send the DELETE request.
    * @param options     The options for the request.
    */
-  delete = async <T>(path: Http.V1Url, options?: Http.RequestOptions): Promise<T> => {
-    return this._request<T>(HttpRequestMethods.DELETE, path, {}, {}, options);
-  };
+  delete = async <T>(path: Http.V1Url, options?: Http.RequestOptions): Promise<T> =>
+    this._request<T>(HttpRequestMethods.DELETE, path, {}, {}, options);
 
   /**
    * Sends a PATCH request to the provided path.
@@ -209,15 +214,13 @@ export class ApiClient {
   patch = async <T, PL extends Partial<Http.Payload> = Partial<Http.Payload>>(
     path: Http.V1Url,
     payload?: PL,
-    options?: Http.RequestOptions
-  ): Promise<T> => {
-    return this._request(HttpRequestMethods.PATCH, path, {}, payload, options);
-  };
+    options?: Http.RequestOptions,
+  ): Promise<T> => this._request(HttpRequestMethods.PATCH, path, {}, payload, options);
 
   upload = async <T, P extends Http.Payload = Http.Payload>(
     url: Http.V1Url,
     payload?: P,
-    options?: Http.RequestOptions
+    options?: Http.RequestOptions,
   ): Promise<AxiosResponse<T>> => {
     url = this._prepare_url(url, HttpRequestMethods.POST);
     return this.instance.post(url, payload, options);

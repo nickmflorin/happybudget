@@ -1,9 +1,9 @@
-import { Saga, SagaMiddleware, Task } from "redux-saga";
 import { isNil } from "lodash";
+import { Saga, SagaMiddleware, Task } from "redux-saga";
 
 const createSagaManager = (
   runSaga: SagaMiddleware["run"],
-  rootSaga: Saga
+  rootSaga: Saga,
 ): [(key: string, saga: Saga) => boolean, (key: string) => boolean, (key: string) => boolean] => {
   const injectedSagas = new Map<string, Task>();
 

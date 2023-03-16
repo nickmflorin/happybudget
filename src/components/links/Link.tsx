@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+
 import classNames from "classnames";
 import { isNil } from "lodash";
 
@@ -11,7 +12,15 @@ export type LinkProps = StandardComponentWithChildrenProps &
     readonly dark?: boolean;
   };
 
-const Link = ({ className, children, tooltip, icon, disabled, dark, ...props }: LinkProps): JSX.Element => {
+const Link = ({
+  className,
+  children,
+  tooltip,
+  icon,
+  disabled,
+  dark,
+  ...props
+}: LinkProps): JSX.Element => {
   const [isHovered, setIsHovered] = useState(false);
   const prefix = ui.useClickableIcon(icon, { isHovered });
 
@@ -22,7 +31,7 @@ const Link = ({ className, children, tooltip, icon, disabled, dark, ...props }: 
         className={classNames("link", className, {
           disabled: disabled === true && isNil(tooltip),
           "link--dark": dark,
-          "fake-disabled": disabled === true && !isNil(tooltip)
+          "fake-disabled": disabled === true && !isNil(tooltip),
         })}
         onMouseEnter={() => setIsHovered(!isHovered)}
         onMouseLeave={() => setIsHovered(!isHovered)}

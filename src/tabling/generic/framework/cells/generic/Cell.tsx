@@ -1,9 +1,9 @@
 import React, { forwardRef, useMemo, RefObject, ForwardedRef } from "react";
-import { isNil } from "lodash";
+
 import classNames from "classnames";
+import { isNil } from "lodash";
 
 import { ui } from "lib";
-
 import { Icon } from "components";
 
 const Cell = <
@@ -13,10 +13,10 @@ const Cell = <
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   V extends Table.RawRowValue = any,
-  CL extends Table.RealColumn<R, M, V> = Table.BodyColumn<R, M, V>
+  CL extends Table.RealColumn<R, M, V> = Table.BodyColumn<R, M, V>,
 >(
   props: Table.CellWithChildrenProps<R, M, C, S, V, CL>,
-  ref: ForwardedRef<HTMLDivElement>
+  ref: ForwardedRef<HTMLDivElement>,
 ): JSX.Element => {
   const row: Table.BodyRow<R> = props.node.data;
   const icon = useMemo<IconOrElement | null | undefined>(() => {
@@ -37,22 +37,26 @@ const Cell = <
         props.className,
         !isNil(props.innerCellClassName) && typeof props.innerCellClassName === "function"
           ? props.innerCellClassName(row)
-          : props.innerCellClassName
+          : props.innerCellClassName,
       )}
       style={{
         ...props.style,
         ...(!isNil(props.innerCellStyle) && typeof props.innerCellStyle === "function"
           ? props.innerCellStyle(row)
-          : props.innerCellStyle)
+          : props.innerCellStyle),
       }}
       ref={ref}
-      onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => !isNil(props.onKeyDown) && props.onKeyDown(event)}
+      onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) =>
+        !isNil(props.onKeyDown) && props.onKeyDown(event)
+      }
     >
       {props.prefixChildren}
       {props.children}
       {props.suffixChildren}
       {!isNil(icon) ? (
-        <div className={"icon-wrapper"}>{ui.iconIsJSX(icon) ? icon : <Icon icon={icon} weight={"light"} />}</div>
+        <div className="icon-wrapper">
+          {ui.iconIsJSX(icon) ? icon : <Icon icon={icon} weight="light" />}
+        </div>
       ) : (
         <></>
       )}
@@ -68,9 +72,11 @@ type CellComponent = {
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     V extends Table.RawRowValue = any,
-    CL extends Table.RealColumn<R, M, V> = Table.BodyColumn<R, M, V>
+    CL extends Table.RealColumn<R, M, V> = Table.BodyColumn<R, M, V>,
   >(
-    props: Table.CellWithChildrenProps<R, M, C, S, V, CL> & { readonly ref?: RefObject<HTMLDivElement> }
+    props: Table.CellWithChildrenProps<R, M, C, S, V, CL> & {
+      readonly ref?: RefObject<HTMLDivElement>;
+    },
   ): JSX.Element;
 };
 

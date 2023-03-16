@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
+
 import { filter, map, isNil, reduce } from "lodash";
 
 import DropdownMenu from "./DropdownMenu";
 
 export interface ExportCSVDropdownMenuProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel,
 > {
   readonly children: React.ReactChild | React.ReactChild[];
   readonly columns: Table.DataColumn<R, M>[];
@@ -13,26 +14,31 @@ export interface ExportCSVDropdownMenuProps<
   readonly hiddenColumns?: Table.HiddenColumns;
 }
 
-const ExportCSVDropdownMenu = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  props: ExportCSVDropdownMenuProps<R, M>
+const ExportCSVDropdownMenu = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+>(
+  props: ExportCSVDropdownMenuProps<R, M>,
 ): JSX.Element => {
   const [selected, setSelected] = useState<string[]>([]);
 
   const exportableColumns = useMemo<Table.DataColumn<R, M>[]>(
     () => filter(props.columns, (col: Table.DataColumn<R, M>) => col.canBeExported !== false),
-    [props.columns]
+    [props.columns],
   );
 
   useEffect(() => {
-    const exportable: Table.DataColumn<R, M>[] = filter(exportableColumns, (col: Table.DataColumn<R, M>) => {
-      return isNil(props.hiddenColumns) || props.hiddenColumns[col.field] !== true;
-    });
+    const exportable: Table.DataColumn<R, M>[] = filter(
+      exportableColumns,
+      (col: Table.DataColumn<R, M>) =>
+        isNil(props.hiddenColumns) || props.hiddenColumns[col.field] !== true,
+    );
     setSelected(map(exportable, (col: Table.DataColumn<R, M>) => col.field));
   }, [props.columns, props.hiddenColumns]);
 
   return (
     <DropdownMenu
-      mode={"multiple"}
+      mode="multiple"
       checkbox={true}
       includeSearch={true}
       keepDropdownOpenOnClick={true}
@@ -48,14 +54,14 @@ const ExportCSVDropdownMenu = <R extends Table.RowData, M extends Model.RowHttpM
             }
             return curr;
           },
-          []
+          [],
         );
         setSelected(selectedIds);
       }}
       selected={selected}
       models={map(exportableColumns, (col: Table.DataColumn<R, M>) => ({
         id: col.field,
-        label: col.headerName || ""
+        label: col.headerName || "",
       }))}
       buttons={[
         {
@@ -68,13 +74,13 @@ const ExportCSVDropdownMenu = <R extends Table.RowData, M extends Model.RowHttpM
                 }
                 return curr;
               },
-              []
+              [],
             );
             props.onDownload(selectedIds);
           },
           label: "Download",
-          className: "btn btn--primary"
-        }
+          className: "btn btn--primary",
+        },
       ]}
     >
       {props.children}

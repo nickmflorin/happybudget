@@ -4,7 +4,10 @@ import { model } from "lib";
 import { framework } from "tabling/generic";
 import { ChoiceSelectEditor } from "tabling/generic/framework/editors";
 
-const FringeUnitEditor = <B extends Model.Budget | Model.Template, P extends Model.Account | Model.SubAccount>(
+const FringeUnitEditor = <
+  B extends Model.Budget | Model.Template,
+  P extends Model.Account | Model.SubAccount,
+>(
   props: Omit<
     framework.editors.ChoiceSelectEditorProps<
       Model.FringeUnit,
@@ -15,7 +18,7 @@ const FringeUnitEditor = <B extends Model.Budget | Model.Template, P extends Mod
     >,
     "models" | "searchIndices"
   >,
-  ref: ForwardedRef<Table.AgEditorRef<Model.FringeUnit>>
+  ref: ForwardedRef<Table.AgEditorRef<Model.FringeUnit>>,
 ) => (
   <ChoiceSelectEditor<
     Model.FringeUnit,

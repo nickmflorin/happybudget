@@ -1,6 +1,7 @@
 import { useHistory } from "react-router-dom";
 
 import { budgeting } from "lib";
+
 import { PublicBudgetTable, PublicBudgetTableProps } from "../BudgetTable";
 
 type R = Tables.AccountRowData;
@@ -26,13 +27,13 @@ const PublicTable = <B extends Model.BaseBudget>(props: PublicTableProps<B>): JS
       showPageFooter={false}
       pinFirstColumn={true}
       tableId={`public-${props.tableContext.domain}-accounts`}
-      menuPortalId={"supplementary-header"}
+      menuPortalId="supplementary-header"
       onRowExpand={(row: Table.ModelRow<R>) =>
         history.push(
           budgeting.urls.getUrl(
             { domain: props.tableContext.domain, id: props.tableContext.budgetId },
-            { type: "account", id: row.id }
-          )
+            { type: "account", id: row.id },
+          ),
         )
       }
     />

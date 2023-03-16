@@ -1,16 +1,22 @@
 import { useReducer, useMemo, useRef, useEffect } from "react";
+
 import axios from "axios";
 import { isNil, filter, map, reduce } from "lodash";
 
 import * as api from "api";
 import { util, hooks } from "lib";
 
-import * as internal from "../internal";
+import {
+  AddNotificationsDetail,
+  RequestErrorDetail,
+  ClearNotificationsDetail,
+  LookupAndNotifyDetail,
+} from "./base";
+import existingNotifications from "./notifications";
+import { UINotificationReducer } from "./reducers";
 import * as typeguards from "./typeguards";
 import { combineFieldNotifications, standardizeNotificationData } from "./util";
-import { UINotificationReducer } from "./reducers";
-import existingNotifications from "./notifications";
-import { AddNotificationsDetail, RequestErrorDetail, ClearNotificationsDetail, LookupAndNotifyDetail } from "./base";
+import * as internal from "../internal";
 
 type UseNotificationsConfig = {
   readonly defaultClosable?: boolean;
@@ -19,23 +25,25 @@ type UseNotificationsConfig = {
 
 export const parseNotifications = (
   notes: SingleOrArray<UINotificationType>,
-  opts?: UINotificationOptions & Pick<UseNotificationsConfig, "handleFieldErrors">
+  opts?: UINotificationOptions & Pick<UseNotificationsConfig, "handleFieldErrors">,
 ): UINotificationData[] => {
   let notices = Array.isArray(notes) ? notes : [notes];
 
   const fieldRelatedErrors = reduce(
-    filter(notices, (n: UINotificationType) => typeguards.isUIFieldNotification(n) || n instanceof api.FieldsError) as (
-      | UIFieldNotification
-      | api.FieldsError
-    )[],
+    filter(
+      notices,
+      (n: UINotificationType) =>
+        typeguards.isUIFieldNotification(n) || n instanceof api.FieldsError,
+    ) as (UIFieldNotification | api.FieldsError)[],
     (curr: UIFieldNotification[], e: api.FieldsError | UIFieldNotification) =>
       e instanceof api.FieldsError ? [...curr, ...e.errors] : [...curr, e],
-    []
+    [],
   );
   // Filter out the notifications that do not pertain to individual fields.
   notices = filter(
     notices,
-    (n: UINotificationType) => !typeguards.isUIFieldNotification(n) && !(n instanceof api.FieldsError)
+    (n: UINotificationType) =>
+      !typeguards.isUIFieldNotification(n) && !(n instanceof api.FieldsError),
   ) as UINonFieldNotificationType[];
   /* For the notification sources that pertain to field type errors, a
 		 callback can be provided that allows for more granular handling of
@@ -89,14 +97,16 @@ export const parseNotifications = (
       }
       return curr;
     },
-    []
+    [],
   );
 };
 
 export const parseKnownRequestErrorNotifications = (
   e: api.ClientError | api.NetworkError | api.ServerError,
   opts?: UINotificationOptions &
-    Pick<UseNotificationsConfig, "handleFieldErrors"> & { readonly dispatchClientErrorToSentry?: boolean }
+    Pick<UseNotificationsConfig, "handleFieldErrors"> & {
+      readonly dispatchClientErrorToSentry?: boolean;
+    },
 ) => {
   if (e instanceof api.ClientError) {
     /*
@@ -109,7 +119,10 @@ export const parseKnownRequestErrorNotifications = (
     if (opts?.dispatchClientErrorToSentry === true) {
       internal.handleRequestError(e);
     }
-    return parseNotifications(e.errors, { message: "There was a problem with your request.", ...opts });
+    return parseNotifications(e.errors, {
+      message: "There was a problem with your request.",
+      ...opts,
+    });
   } else {
     /*
 		Dispatch the notification to the internal handler so we can, if
@@ -119,7 +132,7 @@ export const parseKnownRequestErrorNotifications = (
     return parseNotifications(e, {
       message: "There was an error with your request.",
       detail: "There was a problem communicating with the server.",
-      ...opts
+      ...opts,
     });
   }
 };
@@ -127,7 +140,9 @@ export const parseKnownRequestErrorNotifications = (
 export const parseRequestErrorNotifications = (
   e: Error,
   opts?: UINotificationOptions &
-    Pick<UseNotificationsConfig, "handleFieldErrors"> & { readonly dispatchClientErrorToSentry?: boolean }
+    Pick<UseNotificationsConfig, "handleFieldErrors"> & {
+      readonly dispatchClientErrorToSentry?: boolean;
+    },
 ) => {
   if (!axios.isCancel(e) && !(e instanceof api.ForceLogout)) {
     if (e instanceof api.RequestError) {
@@ -148,19 +163,18 @@ export const parseRequestErrorNotifications = (
  */
 export const useNotifications = (config: UseNotificationsConfig): UINotificationsHandler => {
   const getNotifications = useMemo(
-    () => (notes: SingleOrArray<UINotificationType>, opts?: UINotificationOptions) => {
-      return parseNotifications(notes, {
+    () => (notes: SingleOrArray<UINotificationType>, opts?: UINotificationOptions) =>
+      parseNotifications(notes, {
         ...opts,
         handleFieldErrors: config.handleFieldErrors,
-        closable: opts?.closable === undefined ? config.defaultClosable : opts.closable
-      });
-    },
-    [config?.handleFieldErrors, config.defaultClosable]
+        closable: opts?.closable === undefined ? config.defaultClosable : opts.closable,
+      }),
+    [config?.handleFieldErrors, config.defaultClosable],
   );
 
   return {
     getRequestErrorNotifications: parseKnownRequestErrorNotifications,
-    getNotifications
+    getNotifications,
   };
 };
 
@@ -174,7 +188,7 @@ export const InitialNotificationsManager: UINotificationsManager = {
   clearNotifications: () => {},
   notify: () => [],
   lookupAndNotify: () => [],
-  handleRequestError: () => []
+  handleRequestError: () => [],
 };
 
 /**
@@ -183,12 +197,17 @@ export const InitialNotificationsManager: UINotificationsManager = {
  * @param config UseNotificationsManagerConfig
  * @returns UINotificationsManager
  */
-export const useNotificationsManager = (config: UseNotificationsManagerConfig): UINotificationsManager => {
+export const useNotificationsManager = (
+  config: UseNotificationsManagerConfig,
+): UINotificationsManager => {
   const handler = useNotifications(config);
   const [ns, dispatchNotification] = useReducer(UINotificationReducer, []);
   const timeouts = useRef<NodeJS.Timeout[]>([]);
 
-  const clearNotifications = useMemo(() => (id?: SingleOrArray<UINotification["id"]>) => dispatchNotification(id), []);
+  const clearNotifications = useMemo(
+    () => (id?: SingleOrArray<UINotification["id"]>) => dispatchNotification(id),
+    [],
+  );
 
   const doTimeout = hooks.useDynamicCallback((fn: () => void, ms: number) => {
     const timeout = setTimeout(fn, ms);
@@ -201,9 +220,14 @@ export const useNotificationsManager = (config: UseNotificationsManagerConfig): 
     }
   }, []);
 
-  const notifications = useMemo(() => {
-    return map(ns, (n: Omit<UINotification, "remove">) => ({ ...n, remove: () => clearNotifications(n.id) }));
-  }, [clearNotifications, ns]);
+  const notifications = useMemo(
+    () =>
+      map(ns, (n: Omit<UINotification, "remove">) => ({
+        ...n,
+        remove: () => clearNotifications(n.id),
+      })),
+    [clearNotifications, ns],
+  );
 
   const _notify = useMemo(
     () => (notes: SingleOrArray<UINotificationData>, opts?: UINotificationOptions) => {
@@ -212,25 +236,31 @@ export const useNotificationsManager = (config: UseNotificationsManagerConfig): 
         return {
           ...d,
           id,
-          remove: () => clearNotifications(id)
+          remove: () => clearNotifications(id),
         };
       });
       dispatchNotification({
         notifications: notificationsToAdd,
-        opts: { behavior: config.defaultBehavior, ...opts }
+        opts: { behavior: config.defaultBehavior, ...opts },
       });
       if (!isNil(opts?.duration)) {
-        doTimeout(() => clearNotifications(map(notificationsToAdd, (n: UINotification) => n.id)), opts?.duration);
+        doTimeout(
+          () => clearNotifications(map(notificationsToAdd, (n: UINotification) => n.id)),
+          opts?.duration,
+        );
       } else {
         for (let i = 0; i < notificationsToAdd.length; i++) {
           if (notificationsToAdd[i].duration !== undefined) {
-            doTimeout(() => clearNotifications(notificationsToAdd[i].id), notificationsToAdd[i].duration);
+            doTimeout(
+              () => clearNotifications(notificationsToAdd[i].id),
+              notificationsToAdd[i].duration,
+            );
           }
         }
       }
       return notificationsToAdd;
     },
-    [clearNotifications]
+    [clearNotifications],
   );
 
   /**
@@ -244,7 +274,7 @@ export const useNotificationsManager = (config: UseNotificationsManagerConfig): 
       const notificationsToAdd = handler.getNotifications(notes, opts);
       return _notify(notificationsToAdd, opts);
     },
-    [_notify]
+    [_notify],
   );
 
   const lookupAndNotify = useMemo(
@@ -253,12 +283,12 @@ export const useNotificationsManager = (config: UseNotificationsManagerConfig): 
         id: K,
         params: InferExistingNotificationParams<
           typeof existingNotifications[K]
-        > = {} as InferExistingNotificationParams<typeof existingNotifications[K]>
+        > = {} as InferExistingNotificationParams<typeof existingNotifications[K]>,
       ) => {
         const notificationData = existingNotifications[id](params);
         return notify(notificationData, { ignoreIfDuplicate: true });
       },
-    [notify]
+    [notify],
   );
 
   /**
@@ -271,15 +301,22 @@ export const useNotificationsManager = (config: UseNotificationsManagerConfig): 
    * Sentry and/or the console.
    */
   const handleRequestError = useMemo(
-    () => (e: Error, opts?: UINotificationOptions & { readonly dispatchClientErrorToSentry?: boolean }) => {
-      /* Since we are not using the `getNotifications()` method, which would
+    () =>
+      (
+        e: Error,
+        opts?: UINotificationOptions & { readonly dispatchClientErrorToSentry?: boolean },
+      ) => {
+        /* Since we are not using the `getNotifications()` method, which would
          convert the notifications to UINotificationData[] and dispatch field
          related errors to the field handler, we must explicitly provide the
          field handler from the hook configuration. */
-      const notices = parseRequestErrorNotifications(e, { ...opts, handleFieldErrors: config.handleFieldErrors });
-      return _notify(notices);
-    },
-    []
+        const notices = parseRequestErrorNotifications(e, {
+          ...opts,
+          handleFieldErrors: config.handleFieldErrors,
+        });
+        return _notify(notices);
+      },
+    [],
   );
 
   return {
@@ -287,7 +324,7 @@ export const useNotificationsManager = (config: UseNotificationsManagerConfig): 
     notify,
     clearNotifications,
     lookupAndNotify,
-    notifications
+    notifications,
   };
 };
 
@@ -302,7 +339,9 @@ type UseNotificationsEventListenerConfig = UseNotificationsManagerConfig & {
  * @param config UseNotificationsEventListenerConfig
  * @returns UINotificationsManager
  */
-export const useNotificationsEventListener = (config: UseNotificationsEventListenerConfig): UINotificationsManager => {
+export const useNotificationsEventListener = (
+  config: UseNotificationsEventListenerConfig,
+): UINotificationsManager => {
   const NotificationsHandler = useNotificationsManager(config);
 
   useEffect(() => {
@@ -310,7 +349,8 @@ export const useNotificationsEventListener = (config: UseNotificationsEventListe
       NotificationsHandler.notify(evt.detail.notifications, evt.detail.opts);
     }) as EventListener;
     document.addEventListener(`notifications:${config.destinationId}:add`, listener);
-    return () => document.removeEventListener(`notifications:${config.destinationId}:add`, listener);
+    return () =>
+      document.removeEventListener(`notifications:${config.destinationId}:add`, listener);
   }, []);
 
   useEffect(() => {
@@ -318,7 +358,8 @@ export const useNotificationsEventListener = (config: UseNotificationsEventListe
       NotificationsHandler.handleRequestError(evt.detail.error, evt.detail.opts);
     }) as EventListener;
     document.addEventListener(`notifications:${config.destinationId}:requestError`, listener);
-    return () => document.removeEventListener(`notifications:${config.destinationId}:requestError`, listener);
+    return () =>
+      document.removeEventListener(`notifications:${config.destinationId}:requestError`, listener);
   }, []);
 
   useEffect(() => {
@@ -326,15 +367,22 @@ export const useNotificationsEventListener = (config: UseNotificationsEventListe
       NotificationsHandler.clearNotifications(evt.detail);
     }) as EventListener;
     document.addEventListener(`notifications:${config.destinationId}:clear`, listener);
-    return () => document.removeEventListener(`notifications:${config.destinationId}:clear`, listener);
+    return () =>
+      document.removeEventListener(`notifications:${config.destinationId}:clear`, listener);
   }, []);
 
   useEffect(() => {
-    const listener = (<K extends UIExistingNotificationId>(evt: CustomEvent<LookupAndNotifyDetail<K>>) => {
+    const listener = (<K extends UIExistingNotificationId>(
+      evt: CustomEvent<LookupAndNotifyDetail<K>>,
+    ) => {
       NotificationsHandler.lookupAndNotify(evt.detail.id, evt.detail.params);
     }) as EventListener;
     document.addEventListener(`notifications:${config.destinationId}:lookupAndNotify`, listener);
-    return () => document.removeEventListener(`notifications:${config.destinationId}:lookupAndNotify`, listener);
+    return () =>
+      document.removeEventListener(
+        `notifications:${config.destinationId}:lookupAndNotify`,
+        listener,
+      );
   }, []);
 
   return NotificationsHandler;

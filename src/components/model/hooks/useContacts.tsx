@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+
 import { isNil } from "lodash";
 
 import { model } from "lib";
@@ -15,7 +16,7 @@ type UseContactsReturnType = [
   JSX.Element | null,
   JSX.Element | null,
   (params: EditContactParams) => void,
-  (params?: CreateContactParams) => void
+  (params?: CreateContactParams) => void,
 ];
 
 export type CreateContactParams = {
@@ -53,7 +54,7 @@ const useContacts = (props: UseContactsProps): UseContactsReturnType => {
       );
       setNewContactModal(modal);
     },
-    [props.onCreated]
+    [props.onCreated],
   );
 
   const editContact = useMemo(
@@ -73,7 +74,7 @@ const useContacts = (props: UseContactsProps): UseContactsReturnType => {
       );
       setEditContactModal(modal);
     },
-    [props.onUpdated, props.onAttachmentAdded, props.onAttachmentRemoved]
+    [props.onUpdated, props.onAttachmentAdded, props.onAttachmentRemoved],
   );
 
   return [newContactModal, editContactModal, editContact, createContact];

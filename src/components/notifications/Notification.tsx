@@ -1,7 +1,8 @@
 import React, { useMemo } from "react";
-import { useHistory } from "react-router-dom";
-import { isNil, uniqueId } from "lodash";
+
 import classNames from "classnames";
+import { isNil, uniqueId } from "lodash";
+import { useHistory } from "react-router-dom";
 
 import { notifications } from "lib";
 import { Icon } from "components";
@@ -32,17 +33,17 @@ const Notification = ({ style, className, ...props }: _NotificationProps): JSX.E
 
   const IconLevelMap: { [key in AppNotificationLevel]: IconOrElement } = useMemo(
     () => ({
-      success: <Icon icon={"check-circle"} weight={"solid"} />,
-      info: <Icon icon={"info-circle"} weight={"solid"} />,
-      error: <Icon icon={"exclamation-circle"} weight={"solid"} />,
-      warning: <Icon icon={"exclamation-triangle"} weight={"solid"} />
+      success: <Icon icon="check-circle" weight="solid" />,
+      info: <Icon icon="info-circle" weight="solid" />,
+      error: <Icon icon="exclamation-circle" weight="solid" />,
+      warning: <Icon icon="exclamation-triangle" weight="solid" />,
     }),
-    []
+    [],
   );
 
   const detail = useMemo(
     () => (isNotificationComponentProps(props) ? props.children || props.detail : props.detail),
-    [props]
+    [props],
   );
 
   const detailWithLink = useMemo(() => {
@@ -64,17 +65,17 @@ const Notification = ({ style, className, ...props }: _NotificationProps): JSX.E
       style={style}
       id={id === undefined ? undefined : String(id)}
       className={classNames("notification", level, className, {
-        bare: (props as NoticationComponentProps).bare === true
+        bare: (props as NoticationComponentProps).bare === true,
       })}
     >
-      {props.includeIcon !== false && <div className={"notification-left"}>{icon}</div>}
-      <div className={"notification-middle"}>
-        {!isNil(props.message) && <div className={"notification-message"}>{props.message}</div>}
-        {!isNil(detailWithLink) && <div className={"notification-detail"}>{detailWithLink}</div>}
+      {props.includeIcon !== false && <div className="notification-left">{icon}</div>}
+      <div className="notification-middle">
+        {!isNil(props.message) && <div className="notification-message">{props.message}</div>}
+        {!isNil(detailWithLink) && <div className="notification-detail">{detailWithLink}</div>}
       </div>
       {props.closable !== false && !isNil(props.remove) && (
-        <div className={"notification-right"}>
-          <IconButton fill icon={"times"} onClick={() => props.remove?.()} />
+        <div className="notification-right">
+          <IconButton fill icon="times" onClick={() => props.remove?.()} />
         </div>
       )}
     </div>

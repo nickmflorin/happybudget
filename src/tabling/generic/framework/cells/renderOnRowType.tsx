@@ -1,4 +1,5 @@
 import React from "react";
+
 import { isNil } from "lodash";
 
 type RowTypeRender<T extends { node: Table.RowNode } = { node: Table.RowNode }> = Partial<{
@@ -7,9 +8,9 @@ type RowTypeRender<T extends { node: Table.RowNode } = { node: Table.RowNode }> 
 
 const renderOnRowType = <
   T extends { node: Table.RowNode } = { node: Table.RowNode },
-  R extends Table.RowData = Table.RowData
+  R extends Table.RowData = Table.RowData,
 >(
-  lookup: RowTypeRender<T>
+  lookup: RowTypeRender<T>,
 ) => {
   const WithRowsOfType = (props: T) => {
     const row: Table.BodyRow<R> = props.node.data;

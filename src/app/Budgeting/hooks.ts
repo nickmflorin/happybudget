@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+
 import { isNil, includes } from "lodash";
+import { useSelector, useDispatch } from "react-redux";
 
 import * as api from "api";
 import { redux, hooks, tabling } from "lib";
+
 import * as selectors from "./store/selectors";
 
 type M = Model.SubAccount;
@@ -11,14 +13,14 @@ type R = Tables.SubAccountRowData;
 
 type PublicUseFringesModalControlProps<
   B extends Model.Budget | Model.Template,
-  P extends Model.Account | Model.SubAccount
+  P extends Model.Account | Model.SubAccount,
 > = SubAccountsTableContext<B, P, true> & {
   readonly table: Table.TableInstance<R, M>;
 };
 
 type AuthenticatedUseFringesModalControlProps<
   B extends Model.Budget | Model.Template,
-  P extends Model.Account | Model.SubAccount
+  P extends Model.Account | Model.SubAccount,
 > = SubAccountsTableContext<B, P, false> & {
   readonly table: Table.TableInstance<R, M>;
   readonly tableEventAction: Redux.ActionCreator<
@@ -31,9 +33,10 @@ type AuthenticatedUseFringesModalControlProps<
   >;
 };
 
-type UseFringesModalControlProps<B extends Model.Budget | Model.Template, P extends Model.Account | Model.SubAccount> =
-  | AuthenticatedUseFringesModalControlProps<B, P>
-  | PublicUseFringesModalControlProps<B, P>;
+type UseFringesModalControlProps<
+  B extends Model.Budget | Model.Template,
+  P extends Model.Account | Model.SubAccount,
+> = AuthenticatedUseFringesModalControlProps<B, P> | PublicUseFringesModalControlProps<B, P>;
 
 /**
  * The FringesModal is opened one of two ways:
@@ -54,10 +57,14 @@ type UseFringesModalControlProps<B extends Model.Budget | Model.Template, P exte
  */
 export const useFringesModalControl = <
   B extends Model.Budget | Model.Template,
-  P extends Model.Account | Model.SubAccount
+  P extends Model.Account | Model.SubAccount,
 >(
-  props: UseFringesModalControlProps<B, P>
-): [boolean, (params?: { readonly rowId: Table.ModelRowId; readonly name?: string }) => void, () => void] => {
+  props: UseFringesModalControlProps<B, P>,
+): [
+  boolean,
+  (params?: { readonly rowId: Table.ModelRowId; readonly name?: string }) => void,
+  () => void,
+] => {
   const dispatch = useDispatch();
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
 
@@ -68,8 +75,8 @@ export const useFringesModalControl = <
         domain: props.domain,
         parentType: props.parentType,
         // The store will only be accessed if `public` is `false`.
-        public: props.public
-      }).data
+        public: props.public,
+      }).data,
   );
 
   const onViewFringes = hooks.useDynamicCallback(
@@ -81,7 +88,9 @@ export const useFringesModalControl = <
 			*/
       let fringesModalOpened = false;
       if (!isNil(params) && !isNil(params.name) && props.public !== true) {
-        const subaccountRow = redux.findModelInData(data, params.rowId, { modelName: "SubAccountRow" });
+        const subaccountRow = redux.findModelInData(data, params.rowId, {
+          modelName: "SubAccountRow",
+        });
         if (!isNil(subaccountRow) && tabling.rows.isModelRow(subaccountRow)) {
           api
             .createFringe(props.budgetId, { subaccounts: [params.rowId], name: params.name })
@@ -89,13 +98,18 @@ export const useFringesModalControl = <
               if (includes(subaccountRow.data.fringes, fringe.id)) {
                 // This should never happen - but just in case we need to log.
                 console.error(
-                  `Model row ${subaccountRow.id} is already associated with Fringe ${fringe.id} that was just created!`
+                  `Model row ${subaccountRow.id} is already associated with Fringe ${fringe.id} that was just created!`,
                 );
               } else {
                 /*
 								Once the Fringe is created, we have to add it to the TableStore.
 								*/
-                dispatch(props.fringesTableEventAction({ type: "modelsAdded", payload: { model: fringe } }, props));
+                dispatch(
+                  props.fringesTableEventAction(
+                    { type: "modelsAdded", payload: { model: fringe } },
+                    props,
+                  ),
+                );
                 /*
 								Once the Fringe is added to the TableStore, we have to associate
 								it with the SubAccount for the row that was being edited.
@@ -106,11 +120,11 @@ export const useFringesModalControl = <
                       type: "updateRows",
                       payload: {
                         id: subaccountRow.id,
-                        data: { fringes: [...subaccountRow.data.fringes, fringe.id] }
-                      }
+                        data: { fringes: [...subaccountRow.data.fringes, fringe.id] },
+                      },
                     },
-                    props
-                  )
+                    props,
+                  ),
                 );
               }
               setFringesModalVisible(true);
@@ -124,13 +138,13 @@ export const useFringesModalControl = <
 							still occur.
 							*/
               props.table.handleRequestError(e, {
-                message: "There was an error adding the fringe to the table."
+                message: "There was an error adding the fringe to the table.",
               });
             });
         } else if (!isNil(subaccountRow) && !tabling.rows.isModelRow(subaccountRow)) {
           // This should never happen, but just in case we want to be aware of it.
           console.error(
-            `Row type ${subaccountRow.rowType} encountered when editing Fringe(s) but a model row was expected!`
+            `Row type ${subaccountRow.rowType} encountered when editing Fringe(s) but a model row was expected!`,
           );
         }
       }
@@ -140,7 +154,7 @@ export const useFringesModalControl = <
 				being opened without preemptively adding a Fringe. */
         setFringesModalVisible(true);
       }
-    }
+    },
   );
   return [fringesModalVisible, onViewFringes, () => setFringesModalVisible(false)];
 };

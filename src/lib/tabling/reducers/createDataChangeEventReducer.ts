@@ -7,18 +7,22 @@ const createDataChangeEventReducer =
     R extends Table.RowData,
     M extends Model.RowHttpModel = Model.RowHttpModel,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
-    C extends Redux.ActionContext = Redux.ActionContext
+    C extends Redux.ActionContext = Redux.ActionContext,
   >(
-    config: Omit<Table.AuthenticatedReducerConfig<R, M, S, C>, "defaultDataOnCreate">
-  ): Redux.BasicDynamicReducer<S, Redux.RecalculateRowReducerCallback<S, R>, Table.DataChangeEvent<R>> =>
+    config: Omit<Table.AuthenticatedReducerConfig<R, M, S, C>, "defaultDataOnCreate">,
+  ): Redux.BasicDynamicReducer<
+    S,
+    Redux.RecalculateRowReducerCallback<S, R>,
+    Table.DataChangeEvent<R>
+  > =>
   (
     s: S = config.initialState,
     e: Table.DataChangeEvent<R>,
-    recalculateRow?: Redux.RecalculateRowReducerCallback<S, R>
+    recalculateRow?: Redux.RecalculateRowReducerCallback<S, R>,
   ): S => {
     const modelRowManager = new tabling.rows.ModelRowManager<R, M>({
       getRowChildren: config.getModelRowChildren,
-      columns: config.columns
+      columns: config.columns,
     });
     const markupRowManager = new tabling.rows.MarkupRowManager<R, M>({ columns: config.columns });
 
@@ -36,8 +40,10 @@ const createDataChangeEventReducer =
       consolidated,
       (curr: ChangesPerRow, rowChange: Table.RowChange<R>) => {
         const r: Table.EditableRow<R> | null = redux.findModelInData<Table.EditableRow<R>>(
-          filter(s.data, (ri: Table.BodyRow<R>) => tabling.rows.isEditableRow(ri)) as Table.EditableRow<R>[],
-          rowChange.id
+          filter(s.data, (ri: Table.BodyRow<R>) =>
+            tabling.rows.isEditableRow(ri),
+          ) as Table.EditableRow<R>[],
+          rowChange.id,
         );
         /*
 				A warning will be issued if the row associated with the change could
@@ -53,15 +59,21 @@ const createDataChangeEventReducer =
           return curr;
         }
       },
-      {}
+      {},
     );
     // Apply change to Row stored in state for each Row that was changed.
     return reduce(
       changesPerRow,
       (st: S, dt: { data: Table.RowChangeData<R>; row: Table.EditableRow<R> }) => {
         let r: Table.EditableRow<R> = tabling.rows.isMarkupRow(dt.row)
-          ? markupRowManager.mergeChangesWithRow(dt.row, dt.data as Table.RowChangeData<R, Table.MarkupRow<R>>)
-          : modelRowManager.mergeChangesWithRow(dt.row, dt.data as Table.RowChangeData<R, Table.ModelRow<R>>);
+          ? markupRowManager.mergeChangesWithRow(
+              dt.row,
+              dt.data as Table.RowChangeData<R, Table.MarkupRow<R>>,
+            )
+          : modelRowManager.mergeChangesWithRow(
+              dt.row,
+              dt.data as Table.RowChangeData<R, Table.ModelRow<R>>,
+            );
 
         // Add the default data before recalculations are performed.
         if (tabling.rows.isModelRow(r)) {
@@ -69,7 +81,7 @@ const createDataChangeEventReducer =
             tabling.columns.filterModelColumns(config.columns),
             r,
             dt.data as Table.RowChangeData<R, Table.ModelRow<R>>,
-            config.defaultDataOnUpdate
+            config.defaultDataOnUpdate,
           );
         }
         if (tabling.rows.isDataRow(r)) {
@@ -77,10 +89,10 @@ const createDataChangeEventReducer =
         }
         return {
           ...st,
-          data: util.replaceInArray<Table.BodyRow<R>>(st.data, { id: r.id }, r)
+          data: util.replaceInArray<Table.BodyRow<R>>(st.data, { id: r.id }, r),
         };
       },
-      s
+      s,
     );
   };
 

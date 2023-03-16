@@ -10,7 +10,9 @@ declare namespace Http {
   };
 
   type IClientError<
-    E extends Http.ResponseError | Http.UnknownResponseError = Http.ResponseError | Http.UnknownResponseError
+    E extends Http.ResponseError | Http.UnknownResponseError =
+      | Http.ResponseError
+      | Http.UnknownResponseError,
   > = IRequestError & {
     readonly status: number;
     readonly errorType: ResponseErrorType;
@@ -19,7 +21,9 @@ declare namespace Http {
   };
 
   type ISingularClientError<
-    E extends Http.ResponseError | Http.UnknownResponseError = Http.ResponseError | Http.UnknownResponseError
+    E extends Http.ResponseError | Http.UnknownResponseError =
+      | Http.ResponseError
+      | Http.UnknownResponseError,
   > = IClientError<E> & {
     readonly code: E["code"];
     readonly error: Omit<E, "error_type">;
@@ -52,12 +56,19 @@ declare namespace Http {
   };
 
   type IApiError<
-    E extends Http.ResponseError | Http.UnknownResponseError = Http.ResponseError | Http.UnknownResponseError
+    E extends Http.ResponseError | Http.UnknownResponseError =
+      | Http.ResponseError
+      | Http.UnknownResponseError,
   > = IClientError<E> | IServerError | INetworkError;
 
   type ApiError<
-    E extends Http.ResponseError | Http.UnknownResponseError = Http.ResponseError | Http.UnknownResponseError
-  > = import("api/errors").ClientError<E> | import("api/errors").ServerError | import("api/errors").NetworkError;
+    E extends Http.ResponseError | Http.UnknownResponseError =
+      | Http.ResponseError
+      | Http.UnknownResponseError,
+  > =
+    | import("api/errors").ClientError<E>
+    | import("api/errors").ServerError
+    | import("api/errors").NetworkError;
 
   type BadRequestErrorCode = "bad_request";
   type PermissionErrorCode = "permission_error" | "product_permission_error";
@@ -97,7 +108,15 @@ declare namespace Http {
     | UnknownErrorCode
     | PermissionErrorCode;
 
-  type ResponseErrorType = "unknown" | "http" | "field" | "form" | "auth" | "billing" | "permission" | "bad_request";
+  type ResponseErrorType =
+    | "unknown"
+    | "http"
+    | "field"
+    | "form"
+    | "auth"
+    | "billing"
+    | "permission"
+    | "bad_request";
 
   type ErrorCodeMap = {
     readonly http: HttpErrorCode;

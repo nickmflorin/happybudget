@@ -1,6 +1,7 @@
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+
 import { isNil } from "lodash";
+import { useDispatch } from "react-redux";
 
 import { budgeting, tabling } from "lib";
 import { AccountsTable as GenericAccountsTable, connectTableToAuthenticatedStore } from "tabling";
@@ -23,14 +24,14 @@ const ConnectedTable = connectTableToAuthenticatedStore<
     handleEvent: actions.template.handleTableEventAction,
     loading: actions.template.loadingAction,
     response: actions.template.responseAction,
-    setSearch: actions.template.setSearchAction
+    setSearch: actions.template.setSearchAction,
   },
   tableId: (c: TC) => `${c.domain}-accounts`,
   selector: (c: TC) => selectors.createAccountsTableStoreSelector<Model.Template, false>(c),
   createSaga: (table: Table.TableInstance<R, M>) => sagas.template.accounts.createTableSaga(table),
   footerRowSelectors: (c: TC) => ({
-    footer: selectors.createBudgetFooterSelector(c)
-  })
+    footer: selectors.createBudgetFooterSelector(c),
+  }),
 })(GenericAccountsTable.AuthenticatedTemplate);
 
 interface AccountsProps {
@@ -49,7 +50,13 @@ const Accounts = (props: AccountsProps): JSX.Element => {
   }, [props.budget]);
 
   useEffect(() => {
-    dispatch(actions.template.requestAction(null, { budgetId: props.budgetId, domain: "template", public: false }));
+    dispatch(
+      actions.template.requestAction(null, {
+        budgetId: props.budgetId,
+        domain: "template",
+        public: false,
+      }),
+    );
   }, [props.budgetId]);
 
   return (

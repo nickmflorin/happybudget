@@ -43,7 +43,7 @@ select:-webkit-autofill:focus {
 }
 
 input:-webkit-autofill::first-line {
-  font-size: $medium-text-size;;
+  font-size: $medium-text-size;
   color: $text-primary !important;
   font-family: $avenir;
   font-weight: 500;
@@ -113,7 +113,7 @@ span.input {
       line-height: 24px;
       font-family: $avenir;
       font-weight: 500;
-      font-size: $medium-text-size;;
+      font-size: $medium-text-size;
       letter-spacing: normal;
       padding-left: 2px;
       vertical-align: unset !important;
@@ -123,8 +123,8 @@ span.input {
 
 // The textarea element only supports one size for now, the standard size.
 textarea.text-area {
-	@extend .input-base;
-	@include input_framework();
+  @extend .input-base;
+  @include input_framework();
   min-height: $standard-size !important;
 }
 

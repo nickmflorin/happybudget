@@ -1,9 +1,9 @@
 import React, { useMemo } from "react";
-import { isNil } from "lodash";
+
 import classNames from "classnames";
+import { isNil } from "lodash";
 
 import { tabling } from "lib";
-
 import { Icon } from "components";
 import { IconButton } from "components/buttons";
 
@@ -11,7 +11,7 @@ export interface EditCellProps<
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Table.Context = Table.Context,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > extends Table.CellProps<R, M, C, S, null, Table.ActionColumn<R, M>> {
   readonly editColumnConfig: Table.EditColumnRowConfig<R, Table.NonPlaceholderBodyRow<R>>[];
   readonly alwaysShow?: (row: Table.BodyRow<R>) => boolean;
@@ -19,7 +19,7 @@ export interface EditCellProps<
 
 const Action = <
   R extends Table.RowData,
-  RW extends Table.NonPlaceholderBodyRow<R> = Table.NonPlaceholderBodyRow<R>
+  RW extends Table.NonPlaceholderBodyRow<R> = Table.NonPlaceholderBodyRow<R>,
 >(props: {
   readonly config: Table.EditColumnRowConfig<R, RW>;
   readonly hovered: boolean;
@@ -29,7 +29,7 @@ const Action = <
   const icon: IconProp = useMemo(() => {
     const map: { [key in Table.EditRowActionBehavior]: IconProp } = {
       edit: "pencil",
-      expand: "expand-alt"
+      expand: "expand-alt",
     };
     return map[props.config.behavior];
   }, [props.config.behavior]);
@@ -51,7 +51,7 @@ const Action = <
     }
     const defaultTooltipMap: { [key in Table.EditRowActionBehavior]: string } = {
       edit: "Edit",
-      expand: "Expand"
+      expand: "Expand",
     };
     return defaultTooltipMap[props.config.behavior];
   }, [props.config.behavior, props.config.tooltip, disabled, props.row]);
@@ -59,11 +59,11 @@ const Action = <
   return (
     <IconButton
       className={classNames("ag-grid-action-button", {
-        "fake-disabled": disabled
+        "fake-disabled": disabled,
       })}
-      iconSize={"xsmall"}
-      size={"xsmall"}
-      icon={<Icon icon={icon} weight={"regular"} style={props.iconStyle} />}
+      iconSize="xsmall"
+      size="xsmall"
+      icon={<Icon icon={icon} weight="regular" style={props.iconStyle} />}
       onClick={() => props.config.action(props.row, props.hovered)}
       tooltip={{ content: tooltip, placement: "bottom", overlayClassName: "tooltip-lower" }}
     />
@@ -74,7 +74,7 @@ const EditCell = <
   R extends Table.RowData,
   M extends Model.RowHttpModel = Model.RowHttpModel,
   C extends Table.Context = Table.Context,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 >({
   editColumnConfig,
   alwaysShow,
@@ -84,9 +84,14 @@ const EditCell = <
   // This cell renderer will only be allowed if the row is of type model.
   const row: Table.EditableRow<R> = node.data;
 
-  const config: Table.EditColumnRowConfig<R, Table.NonPlaceholderBodyRow<R>> | null = useMemo(() => {
-    return tabling.columns.getEditColumnRowConfig<R, Table.NonPlaceholderBodyRow<R>>(editColumnConfig, row);
-  }, [row.rowType]);
+  const config: Table.EditColumnRowConfig<R, Table.NonPlaceholderBodyRow<R>> | null = useMemo(
+    () =>
+      tabling.columns.getEditColumnRowConfig<R, Table.NonPlaceholderBodyRow<R>>(
+        editColumnConfig,
+        row,
+      ),
+    [row.rowType],
+  );
 
   const rowIsHovered = () => {
     const parent = props.eGridCell.parentElement;
@@ -97,13 +102,9 @@ const EditCell = <
     return false;
   };
 
-  const showAlways = useMemo(() => {
-    return !isNil(alwaysShow) && alwaysShow(row);
-  }, [alwaysShow, row]);
+  const showAlways = useMemo(() => !isNil(alwaysShow) && alwaysShow(row), [alwaysShow, row]);
 
-  const colorDef = useMemo<Table.RowColorDef>(() => {
-    return props.getRowColorDef(row);
-  }, [row]);
+  const colorDef = useMemo<Table.RowColorDef>(() => props.getRowColorDef(row), [row]);
 
   if (!isNil(config)) {
     if (config.behavior === "expand" && tabling.rows.isModelRow(row)) {
@@ -115,7 +116,11 @@ const EditCell = <
         return (
           <Action
             config={config}
-            iconStyle={tabling.rows.isGroupRow(row) && !isNil(colorDef.color) ? { color: colorDef.color } : {}}
+            iconStyle={
+              tabling.rows.isGroupRow(row) && !isNil(colorDef.color)
+                ? { color: colorDef.color }
+                : {}
+            }
             hovered={rowIsHovered()}
             row={row}
           />

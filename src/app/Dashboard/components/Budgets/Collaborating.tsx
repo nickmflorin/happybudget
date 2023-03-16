@@ -1,18 +1,18 @@
 import { useEffect } from "react";
+
 import { useDispatch } from "react-redux";
 
 import * as config from "config";
-import * as store from "store";
 import { model } from "lib";
-
+import * as store from "store";
 import { Icon } from "components";
 import { PrimaryButtonIconToggle } from "components/buttons";
 import { CollaboratingBudgetCard } from "components/containers/cards";
 import { BudgetDropdownMenu } from "components/dropdowns";
 import { BudgetEmptyIcon } from "components/svgs";
 
-import DashboardPage, { RenderDashboardPageCardParams } from "../DashboardPage";
 import { actions } from "../../store";
+import DashboardPage, { RenderDashboardPageCardParams } from "../DashboardPage";
 
 type CollaboratingProps = {
   readonly onCreate: () => void;
@@ -28,12 +28,19 @@ const Collaborating = (props: CollaboratingProps): JSX.Element => {
 
   return (
     <DashboardPage
-      title={"Collaborating Budgets"}
+      title="Collaborating Budgets"
       selector={(s: Application.Store) => s.dashboard.collaborating}
-      noDataProps={{ title: "You are not collaborating on any budgets yet!", child: <BudgetEmptyIcon /> }}
+      noDataProps={{
+        title: "You are not collaborating on any budgets yet!",
+        child: <BudgetEmptyIcon />,
+      }}
       onSearch={(v: string) => dispatch(actions.setCollaboratingSearchAction(v, {}))}
-      onUpdatePagination={(p: Pagination) => dispatch(actions.setCollaboratingPaginationAction(p, {}))}
-      onUpdateOrdering={(o: Redux.UpdateOrderingPayload) => dispatch(actions.updateCollaboratingOrderingAction(o, {}))}
+      onUpdatePagination={(p: Pagination) =>
+        dispatch(actions.setCollaboratingPaginationAction(p, {}))
+      }
+      onUpdateOrdering={(o: Redux.UpdateOrderingPayload) =>
+        dispatch(actions.updateCollaboratingOrderingAction(o, {}))
+      }
       createMenuElement={
         <BudgetDropdownMenu
           key={1}
@@ -55,9 +62,9 @@ const Collaborating = (props: CollaboratingProps): JSX.Element => {
           }}
         >
           <PrimaryButtonIconToggle
-            breakpoint={"medium"}
-            icon={<Icon icon={"plus"} weight={"regular"} />}
-            text={"Create Budget"}
+            breakpoint="medium"
+            icon={<Icon icon="plus" weight="regular" />}
+            text="Create Budget"
           />
         </BudgetDropdownMenu>
       }

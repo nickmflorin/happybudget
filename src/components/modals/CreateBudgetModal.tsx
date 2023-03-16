@@ -1,8 +1,10 @@
 import { useState } from "react";
+
 import { isNil } from "lodash";
 
 import * as api from "api";
 import { TemplateForm } from "components/forms";
+
 import { CreateModelModal, CreateModelModalProps } from "./generic";
 
 interface CreateBudgetModalProps extends CreateModelModalProps<Model.UserBudget> {
@@ -15,14 +17,17 @@ const CreateBudgetModal = ({ templateId, ...props }: CreateBudgetModalProps): JS
 
   return (
     <CreateModelModal<Model.UserBudget, Http.BudgetPayload>
-      title={"Create Budget"}
+      title="Create Budget"
       {...props}
       create={api.createBudget}
       /* We have to use a large timeout because this is a request
          that sometimes takes a very long time. */
       requestOptions={{ timeout: 120 * 1000 }}
       interceptError={(f: FormInstance<Http.BudgetPayload>, e: Error) => {
-        if (e instanceof api.PermissionError && e.code === api.ErrorCodes.permission.PRODUCT_PERMISSION_ERROR) {
+        if (
+          e instanceof api.PermissionError &&
+          e.code === api.ErrorCodes.permission.PRODUCT_PERMISSION_ERROR
+        ) {
           f.lookupAndNotify("budgetCountPermissionError", {});
           return true;
         }
@@ -36,7 +41,11 @@ const CreateBudgetModal = ({ templateId, ...props }: CreateBudgetModalProps): JS
       }}
     >
       {(form: FormInstance<Http.BudgetPayload>) => (
-        <TemplateForm form={form} onImageChange={(f: UploadedImage | null) => setFile(f)} initialValues={{}} />
+        <TemplateForm
+          form={form}
+          onImageChange={(f: UploadedImage | null) => setFile(f)}
+          initialValues={{}}
+        />
       )}
     </CreateModelModal>
   );

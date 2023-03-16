@@ -1,4 +1,7 @@
 import React, { useMemo, useEffect } from "react";
+
+import classNames from "classnames";
+import { map, isNil, cloneDeep } from "lodash";
 import {
   EditableCallbackParams,
   CellClassParams,
@@ -19,15 +22,12 @@ import {
   PasteStartEvent,
   ProcessDataFromClipboardParams,
   ValueGetterParams,
+  FillOperationParams,
+  ColSpanParams,
 } from "@ag-grid-community/core";
-import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 import { AgGridReact } from "@ag-grid-community/react";
-import { AllModules, ColSpanParams } from "@ag-grid-enterprise/all-modules";
-import classNames from "classnames";
-import { map, isNil, cloneDeep } from "lodash";
 
-import * as config from "config";
-import { tabling, hooks, util } from "lib";
+import { tabling, updateInArray, ui } from "lib";
 
 type OverriddenAgProps =
   | "getRowClass"
@@ -108,9 +108,13 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
   style,
   keyListeners,
   localizePopupParent,
+  getContextMenuItems: _getContextMenuItems,
   ...props
 }: GridProps<R, M>): JSX.Element => {
-  const localColumns = useMemo<Table.RealColumn<R, M>[]>((): Table.RealColumn<R, M>[] => {
+  const localColumns = ui.useDeepEqualMemo<Table.RealColumn<R, M>[]>((): Table.RealColumn<
+    R,
+    M
+  >[] => {
     const cs: Table.RealColumn<R, M>[] = map(
       tabling.columns.filterRealColumns(columns),
       (col: Table.RealColumn<R, M>, index: number): Table.RealColumn<R, M> => {
@@ -135,11 +139,11 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
       },
     );
     return !isNil(checkboxColumn)
-      ? util.updateInArray<Table.RealColumn<R, M>>(cs, { colId: "checkbox" }, checkboxColumn)
+      ? updateInArray<Table.RealColumn<R, M>>(cs, { colId: "checkbox" }, checkboxColumn)
       : cs;
-  }, [hooks.useDeepEqualMemo(columns)]);
+  }, [columns]);
 
-  const colDefs = useMemo(
+  const colDefs = ui.useDeepEqualMemo(
     () =>
       map(
         localColumns,
@@ -151,7 +155,6 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
                 if (!isNil(params.node)) {
                   const row: Table.Row<R> = params.node.data;
                   if (tabling.rows.isBodyRow(row)) {
-                    /* eslint-disable-next-line @typescript-eslint/no-unsafe-return */
                     return tabling.columns.getColumnRowValue(
                       col,
                       row,
@@ -160,7 +163,6 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
                     );
                   }
                 }
-                /* eslint-disable-next-line @typescript-eslint/no-unsafe-return */
                 return col.nullValue;
               }
             : undefined,
@@ -209,7 +211,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
           },
         }),
       ),
-    [hooks.useDeepEqualMemo(localColumns)],
+    [localColumns],
   );
 
   const navigateToNextCell = useMemo(
@@ -251,31 +253,31 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
 	the store.  This only becomes a problem since we are nestling the actual
 	underlying row data in a `data` property of the <Row> model.
   */
-  const rowData = useMemo(
+  const rowData = ui.useDeepEqualMemo(
     () => map(data, (r: Table.BodyRow<R>) => cloneDeep(r)),
-    [hooks.useDeepEqualMemo(data)],
+    [data],
   );
 
   const getContextMenuItems = useMemo(
     () => (params: GetContextMenuItemsParams) => {
-      if (!isNil(props.getContextMenuItems) && !isNil(params.node)) {
+      if (!isNil(_getContextMenuItems) && !isNil(params.node)) {
         const row: Table.Row<R> = params.node.data;
         if (tabling.rows.isBodyRow(row)) {
-          return props.getContextMenuItems(row, params.node);
+          return _getContextMenuItems(row, params.node);
         }
       }
       return [];
     },
-    [props.getContextMenuItems],
+    [_getContextMenuItems],
   );
 
   const getRowClass = useMemo(
     () => (params: RowClassParams) =>
       tabling.aggrid.mergeClassNames<RowClassParams>(params, "row", rowClass),
-    [],
+    [rowClass],
   );
 
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return */
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const getRowNodeId = useMemo(() => (r: any) => r.id, []);
 
   useEffect(() => {
@@ -325,8 +327,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
         getRowClass={getRowClass}
         rowData={rowData}
         columnDefs={colDefs}
-        debug={config.env.TABLE_DEBUG}
-        modules={AllModules}
+        debug={process.env.NEXT_PUBLIC_TABLE_DEBUG === "true"}
         overlayNoRowsTemplate="<span></span>"
         overlayLoadingTemplate="<span></span>"
         popupParent={

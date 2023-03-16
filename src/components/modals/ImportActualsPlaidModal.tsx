@@ -1,10 +1,10 @@
 import React from "react";
+
 import classNames from "classnames";
 import moment from "moment";
 
 import * as api from "api";
 import { ui, model, http } from "lib";
-
 import { Modal } from "components";
 import { ImportActualsPlaidForm } from "components/forms";
 import { ImportActualsPlaidFormValues } from "components/forms/ImportActualsPlaidForm";
@@ -30,7 +30,7 @@ const ImportActualsPlaidModal = ({
     <Modal
       {...props}
       className={classNames("import-actuals-plaid-modal", props.className)}
-      title={"Import Actuals"}
+      title="Import Actuals"
       onOk={() => {
         form
           .validateFields()
@@ -47,9 +47,9 @@ const ImportActualsPlaidModal = ({
                       : values.end_date,
                   public_token: publicToken,
                   source: model.budgeting.ActualImportSources.bank_account.id,
-                  account_ids: accountIds
+                  account_ids: accountIds,
                 },
-                { cancelToken: cancelToken() }
+                { cancelToken: cancelToken() },
               )
               .then((response: Http.ParentChildListResponse<Model.Budget, Model.Actual>) => {
                 form.setLoading(false);

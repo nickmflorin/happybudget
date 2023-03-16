@@ -1,4 +1,5 @@
 import React from "react";
+
 import { isNil } from "lodash";
 
 import { Form } from "components";
@@ -12,8 +13,8 @@ type BudgetFormProps = FormProps<Http.BudgetPayload> & {
 
 const BudgetForm: React.FC<BudgetFormProps> = ({ originalImage, onImageChange, ...props }) => (
   <Form.Form
-    className={"budget-form"}
-    layout={"vertical"}
+    className="budget-form"
+    layout="vertical"
     {...props}
     onFinish={(values: Http.BudgetPayload) => {
       const payload = { ...values };
@@ -30,15 +31,20 @@ const BudgetForm: React.FC<BudgetFormProps> = ({ originalImage, onImageChange, .
       }
     }}
   >
-    <Form.Item name={"name"} rules={[{ required: true, message: "Please provide a valid name for the budget." }]}>
-      <Input placeholder={"Name"} />
+    <Form.Item
+      name="name"
+      rules={[{ required: true, message: "Please provide a valid name for the budget." }]}
+    >
+      <Input placeholder="Name" />
     </Form.Item>
-    <Form.Item label={"Image"} rules={[{ required: false }]}>
+    <Form.Item label="Image" rules={[{ required: false }]}>
       <BudgetImageUploader
         style={{ height: 215 }}
         value={originalImage}
         onChange={(f: UploadedImage | null) => onImageChange?.(f)}
-        onError={(error: Error | string) => props.form.notify(typeof error === "string" ? error : error.message)}
+        onError={(error: Error | string) =>
+          props.form.notify(typeof error === "string" ? error : error.message)
+        }
       />
     </Form.Item>
   </Form.Form>

@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+
 import { isNil } from "lodash";
+
 import { formatters } from "lib";
+
 import Input, { InputProps } from "./Input";
 
 interface PhoneNumberInputProps extends Omit<InputProps, "onChange"> {
@@ -15,7 +18,9 @@ const PhoneNumberInput = ({ onChange, ...props }: PhoneNumberInputProps): JSX.El
     <Input
       {...props}
       value={
-        !isNil(props.value) ? formatters.phoneNumberFormatter(props.value) : formatters.phoneNumberFormatter(_value)
+        !isNil(props.value)
+          ? formatters.phoneNumberFormatter(props.value)
+          : formatters.phoneNumberFormatter(_value)
       }
       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
         let v = e.target.value;

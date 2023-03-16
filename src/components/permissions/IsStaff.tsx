@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
-import { ShowHide } from "components";
+
 import * as store from "store";
+import { ShowHide } from "components";
 
 type IsStaffProps = {
   children: ReactNode;

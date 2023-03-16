@@ -1,6 +1,6 @@
+import { isNil, map, filter } from "lodash";
 import { SagaIterator } from "redux-saga";
 import { call, put, select, all } from "redux-saga/effects";
-import { isNil, map, filter } from "lodash";
 
 import { http } from "lib";
 
@@ -12,11 +12,11 @@ export const task = <
   E extends Table.ChangeEvent<R>,
   R extends Table.RowData,
   M extends Model.RowHttpModel,
-  C extends Redux.ActionContext = Redux.ActionContext
+  C extends Redux.ActionContext = Redux.ActionContext,
 >(
   saga: Redux.TableChangeEventTask<E, R, C>,
   table: Table.TableInstance<R, M>,
-  defaultErrorMessage: string
+  defaultErrorMessage: string,
 ): Redux.TableChangeEventTask<E, R, C> =>
   function* (e: E, ctx: C): SagaIterator {
     table.saving(true);
@@ -28,7 +28,7 @@ export const task = <
       } else {
         table.handleRequestError(err as Error, {
           message: ctx.errorMessage || defaultErrorMessage,
-          dispatchClientErrorToSentry: true
+          dispatchClientErrorToSentry: true,
         });
       }
     } finally {
@@ -36,8 +36,11 @@ export const task = <
     }
   };
 
-export const createChangeEventHandler = <R extends Table.RowData, C extends Redux.ActionContext = Redux.ActionContext>(
-  handlers: Partial<Redux.TableChangeEventTaskMapObject<R, C>>
+export const createChangeEventHandler = <
+  R extends Table.RowData,
+  C extends Redux.ActionContext = Redux.ActionContext,
+>(
+  handlers: Partial<Redux.TableChangeEventTaskMapObject<R, C>>,
 ): Redux.TableChangeEventTask<Table.ChangeEvent<R>, R, C> => {
   function* handleChangeEvent<E extends Table.ChangeEvent<R>>(e: E, context: C): SagaIterator {
     const handler = handlers[e.type] as Redux.TableChangeEventTask<E, R, C> | undefined;
@@ -57,12 +60,16 @@ type CreateBulkTaskConfig<
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   SERVICE extends (...args: any[]) => Promise<any>,
   C extends Redux.ActionContext = Redux.ActionContext,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = {
   readonly table: Table.TableInstance<R, M>;
   readonly loadingActions?: Redux.ActionCreator<boolean, C>[];
   readonly service: (ctx: C) => SERVICE;
-  readonly responseActions: (ctx: C, r: Http.ServiceResponse<SERVICE>, e: Table.RowAddEvent<R>) => Redux.Action[];
+  readonly responseActions: (
+    ctx: C,
+    r: Http.ServiceResponse<SERVICE>,
+    e: Table.RowAddEvent<R>,
+  ) => Redux.Action[];
   readonly selectStore: (state: Application.Store, ctx: C) => S;
   readonly performCreate: (ctx: C, p: Http.BulkCreatePayload<P>) => Parameters<SERVICE>;
 };
@@ -74,9 +81,9 @@ export const createBulkTask = <
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   SERVICE extends (...args: any[]) => Promise<any>,
   C extends Redux.ActionContext = Redux.ActionContext,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>
+  S extends Redux.TableStore<R> = Redux.TableStore<R>,
 >(
-  config: CreateBulkTaskConfig<R, M, P, SERVICE, C, S>
+  config: CreateBulkTaskConfig<R, M, P, SERVICE, C, S>,
 ) => {
   function* bulkCreateTask(e: Table.RowAddEvent<R>, ctx: C): SagaIterator {
     const payload: Partial<R>[] | Table.RowAddIndexPayload | Table.RowAddCountPayload = e.payload;
@@ -88,10 +95,9 @@ export const createBulkTask = <
     if (events.isRowAddCountPayload(payload) || events.isRowAddIndexPayload(payload)) {
       data = rows.generateNewRowData(
         { store, ...payload },
-        filter(config.table.getColumns(), (cl: Table.DataColumn<R, M>) => columns.isBodyColumn(cl)) as Table.BodyColumn<
-          R,
-          M
-        >[]
+        filter(config.table.getColumns(), (cl: Table.DataColumn<R, M>) =>
+          columns.isBodyColumn(cl),
+        ) as Table.BodyColumn<R, M>[],
       );
     } else {
       data = payload;
@@ -104,31 +110,44 @@ export const createBulkTask = <
     if (e.placeholderIds.length !== data.length) {
       throw new Error(
         `Only ${e.placeholderIds.length} placeholder IDs were provided, but ${data.length}
-            new rows are being created.`
+            new rows are being created.`,
       );
     }
     const requestPayload: Http.BulkCreatePayload<P> = rows.createBulkCreatePayload<R, M, P>(
       data,
-      filter(config.table.getColumns(), (c: Table.DataColumn<R, M>) => columns.isBodyColumn(c)) as Table.BodyColumn<
-        R,
-        M
-      >[]
+      filter(config.table.getColumns(), (c: Table.DataColumn<R, M>) =>
+        columns.isBodyColumn(c),
+      ) as Table.BodyColumn<R, M>[],
     );
     if (!isNil(config.loadingActions)) {
-      yield all(map(config.loadingActions, (action: Redux.ActionCreator<boolean, C>) => put(action(true, ctx))));
+      yield all(
+        map(config.loadingActions, (action: Redux.ActionCreator<boolean, C>) =>
+          put(action(true, ctx)),
+        ),
+      );
     }
     config.table.saving(true);
     const performCreate = config.performCreate(ctx, requestPayload);
     try {
-      const response: Http.ServiceResponse<SERVICE> = yield http.request(config.service(ctx), ctx, ...performCreate);
-      yield all(map(config.responseActions(ctx, response, e), (action: Redux.Action) => put(action)));
+      const response: Http.ServiceResponse<SERVICE> = yield http.request(
+        config.service(ctx),
+        ctx,
+        ...performCreate,
+      );
+      yield all(
+        map(config.responseActions(ctx, response, e), (action: Redux.Action) => put(action)),
+      );
     } catch (err: unknown) {
       config.table.handleRequestError(err as Error, {
-        message: ctx.errorMessage || "There was an error creating the table rows."
+        message: ctx.errorMessage || "There was an error creating the table rows.",
       });
     } finally {
       if (!isNil(config.loadingActions)) {
-        yield all(map(config.loadingActions, (action: Redux.ActionCreator<boolean, C>) => put(action(false, ctx))));
+        yield all(
+          map(config.loadingActions, (action: Redux.ActionCreator<boolean, C>) =>
+            put(action(false, ctx)),
+          ),
+        );
       }
       config.table.saving(false);
     }

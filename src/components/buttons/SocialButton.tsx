@@ -1,4 +1,5 @@
 import React from "react";
+
 import { isNil } from "lodash";
 
 import * as config from "config";
@@ -13,8 +14,8 @@ type SocialButtonProps = ButtonProps & {
   readonly onGoogleScriptLoadFailure: (error: Record<string, unknown>) => void;
 };
 
-// The package react-google-login is no longer maintained, and we will need to reimplement social
-// authentication without it.
+/* The package react-google-login is no longer maintained, and we will need to reimplement social
+   authentication without it. */
 const SocialButton = ({
   provider,
   onGoogleSuccess,

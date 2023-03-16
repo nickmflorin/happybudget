@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+
 import { filter, map, isNil } from "lodash";
 
 import DropdownMenu, { DropdownMenuProps } from "./DropdownMenu";
@@ -12,19 +13,22 @@ type ColumnMenuModel = {
 
 export type ToggleColumnsDropdownMenuProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel
+  M extends Model.RowHttpModel = Model.RowHttpModel,
 > = Omit<DropdownMenuProps<MenuItemSelectedState, ColumnMenuModel>, OmitDropdownProps> & {
   readonly columns: Table.DataColumn<R, M>[];
   readonly hiddenColumns?: Table.HiddenColumns;
   readonly onChange?: (field: string, visible: boolean) => void;
 };
 
-const ToggleColumnsDropdownMenu = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
-  props: ToggleColumnsDropdownMenuProps<R, M>
+const ToggleColumnsDropdownMenu = <
+  R extends Table.RowData,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+>(
+  props: ToggleColumnsDropdownMenuProps<R, M>,
 ): JSX.Element => {
   const hideableColumns = useMemo<Table.DataColumn<R, M>[]>(
     () => filter(props.columns, (col: Table.DataColumn<R, M>) => col.canBeHidden !== false),
-    [props.columns]
+    [props.columns],
   );
 
   const selected = useMemo<string[]>(
@@ -32,17 +36,18 @@ const ToggleColumnsDropdownMenu = <R extends Table.RowData, M extends Model.RowH
       map(
         filter(
           hideableColumns,
-          (col: Table.DataColumn<R, M>) => isNil(props.hiddenColumns) || props.hiddenColumns[col.field] !== true
+          (col: Table.DataColumn<R, M>) =>
+            isNil(props.hiddenColumns) || props.hiddenColumns[col.field] !== true,
         ),
-        (col: Table.DataColumn<R, M>) => col.field
+        (col: Table.DataColumn<R, M>) => col.field,
       ),
-    [hideableColumns, props.hiddenColumns]
+    [hideableColumns, props.hiddenColumns],
   );
 
   return (
     <DropdownMenu<MenuItemSelectedState, ColumnMenuModel>
       {...props}
-      mode={"multiple"}
+      mode="multiple"
       includeSearch={true}
       setFocusedFromSelectedState={false}
       searchIndices={["label"]}
@@ -52,7 +57,7 @@ const ToggleColumnsDropdownMenu = <R extends Table.RowData, M extends Model.RowH
       keepDropdownOpenOnClick={true}
       models={map(hideableColumns, (col: Table.DataColumn<R, M>) => ({
         id: col.field,
-        label: col.headerName || ""
+        label: col.headerName || "",
       }))}
       onChange={(e: MenuChangeEvent<MenuItemSelectedState, ColumnMenuModel>) =>
         props.onChange?.(e.model.id, e.state.selected)

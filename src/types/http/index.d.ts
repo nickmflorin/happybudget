@@ -8,7 +8,7 @@ declare namespace Http {
     readonly cancelToken?: import("axios").CancelToken | undefined;
   };
 
-	type QueryParamValue = string | number | boolean;
+  type QueryParamValue = string | number | boolean;
   type Query = Record<string, QueryParamValue>;
 
   type RawQuery = {
@@ -85,18 +85,22 @@ declare namespace Http {
     BulkUpdateServiceArgs<P>
   >;
 
-  type ParentBulkUpdateServiceArgs<P extends PayloadObj> = [number, BulkUpdatePayload<P>, RequestOptions?];
+  type ParentBulkUpdateServiceArgs<P extends PayloadObj> = [
+    number,
+    BulkUpdatePayload<P>,
+    RequestOptions?,
+  ];
   type ParentBulkUpdateService<
     PARENT extends Model.HttpModel,
     C extends Model.HttpModel,
-    P extends PayloadObj
+    P extends PayloadObj,
   > = Service<ParentChildListResponse<PARENT, C>, ParentBulkUpdateServiceArgs<P>>;
 
   type TreeBulkUpdateService<
     GP extends Model.HttpModel,
     PARENT extends Model.HttpModel,
     C extends Model.HttpModel,
-    P extends PayloadObj
+    P extends PayloadObj,
   > = Service<AncestryListResponse<GP, PARENT, C>, ParentBulkUpdateServiceArgs<P>>;
 
   type BulkCreateServiceArgs<P extends PayloadObj> = [BulkCreatePayload<P>, RequestOptions?];
@@ -105,18 +109,22 @@ declare namespace Http {
     BulkCreateServiceArgs<P>
   >;
 
-  type ParentBulkCreateServiceArgs<P extends PayloadObj> = [number, BulkCreatePayload<P>, RequestOptions?];
+  type ParentBulkCreateServiceArgs<P extends PayloadObj> = [
+    number,
+    BulkCreatePayload<P>,
+    RequestOptions?,
+  ];
   type ParentBulkCreateService<
     PARENT extends Model.HttpModel,
     C extends Model.HttpModel,
-    P extends PayloadObj
+    P extends PayloadObj,
   > = Service<ParentChildListResponse<PARENT, C>, ParentBulkCreateServiceArgs<P>>;
 
   type TreeBulkCreateService<
     GP extends Model.HttpModel,
     PARENT extends Model.HttpModel,
     C extends Model.HttpModel,
-    P extends PayloadObj
+    P extends PayloadObj,
   > = Service<AncestryListResponse<GP, PARENT, C>, ParentBulkCreateServiceArgs<P>>;
 
   type Service<R, ARGS extends unknown[] = unknown[]> = (...args: ARGS) => Promise<R>;

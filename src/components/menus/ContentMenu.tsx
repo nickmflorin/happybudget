@@ -1,8 +1,8 @@
 import React, { useImperativeHandle, useState } from "react";
+
 import classNames from "classnames";
 
 import { notifications } from "lib";
-
 import { RenderWithSpinner } from "components";
 import { Notifications } from "components/notifications";
 
@@ -14,13 +14,13 @@ const ContentMenu = ({ menu, children, ...props }: ContentMenuProps): JSX.Elemen
   const [loading, setLoading] = useState(false);
   const notificationsManager = notifications.ui.useNotificationsManager({
     defaultBehavior: "append",
-    defaultClosable: false
+    defaultClosable: false,
   });
 
   useImperativeHandle(menu, () => ({
     ...notificationsManager,
     loading,
-    setLoading
+    setLoading,
   }));
 
   return (

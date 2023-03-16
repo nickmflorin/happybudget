@@ -6,7 +6,9 @@ import { modelListActionReducer } from "./reducers";
 import { findModelInData } from "../util";
 
 export const createSimplePayloadReducer =
-  <P extends Redux.ActionPayload>(config: Redux.ReducerConfig<P, { set: Redux.ActionCreator<P> }>): Redux.Reducer<P> =>
+  <P extends Redux.ActionPayload>(
+    config: Redux.ReducerConfig<P, { set: Redux.ActionCreator<P> }>,
+  ): Redux.Reducer<P> =>
   (state: P = config.initialState, action: Redux.Action<P>): P => {
     if (config.actions.set?.toString() === action.type) {
       return action.payload;
@@ -15,12 +17,16 @@ export const createSimplePayloadReducer =
   };
 
 export const createSimpleBooleanReducer = (
-  config: Omit<Redux.ReducerConfig<boolean, { set: Redux.ActionCreator<boolean> }>, "initialState">
-): Redux.Reducer<boolean> => createSimplePayloadReducer<boolean>({ ...config, initialState: false });
+  config: Omit<Redux.ReducerConfig<boolean, { set: Redux.ActionCreator<boolean> }>, "initialState">,
+): Redux.Reducer<boolean> =>
+  createSimplePayloadReducer<boolean>({ ...config, initialState: false });
 
 export const createSimpleBooleanToggleReducer =
   (
-    config: Omit<Redux.ReducerConfig<boolean, { set: Redux.ActionCreator<boolean | "TOGGLE"> }>, "initialState">
+    config: Omit<
+      Redux.ReducerConfig<boolean, { set: Redux.ActionCreator<boolean | "TOGGLE"> }>,
+      "initialState"
+    >,
   ): Redux.Reducer<boolean> =>
   (state = false, action: Redux.Action<boolean | "TOGGLE">) => {
     if (config.actions.set?.toString() === action.type) {
@@ -45,9 +51,13 @@ export const createDetailReducer =
     M extends Model.HttpModel,
     C extends Redux.ActionContext = Redux.ActionContext,
     A extends Redux.AnyPayloadAction<C> = Redux.AnyPayloadAction<C>,
-    S extends Redux.ModelDetailStore<M> = Redux.ModelDetailStore<M>
+    S extends Redux.ModelDetailStore<M> = Redux.ModelDetailStore<M>,
   >(
-    config: Redux.ReducerConfig<S, Redux.ActionCreatorMap<Redux.ModelDetailActionPayloadMap<M>, C>, C>
+    config: Redux.ReducerConfig<
+      S,
+      Redux.ActionCreatorMap<Redux.ModelDetailActionPayloadMap<M>, C>,
+      C
+    >,
   ): Redux.Reducer<S, C, A> =>
   (state: S = config.initialState, action: A): S => {
     if (!isNil(config.actions.response) && action.type === config.actions.response.toString()) {
@@ -56,13 +66,22 @@ export const createDetailReducer =
         return { ...state, data: null, error: a.payload.error, invalidated: false };
       }
       return { ...state, data: a.payload, error: null, invalidated: false };
-    } else if (!isNil(config.actions.loading) && action.type === config.actions.loading.toString()) {
+    } else if (
+      !isNil(config.actions.loading) &&
+      action.type === config.actions.loading.toString()
+    ) {
       const a: Redux.InferAction<typeof config.actions.loading> = action;
       return { ...state, loading: a.payload };
-    } else if (!isNil(config.actions.updateInState) && action.type === config.actions.updateInState.toString()) {
+    } else if (
+      !isNil(config.actions.updateInState) &&
+      action.type === config.actions.updateInState.toString()
+    ) {
       const a: Redux.InferAction<typeof config.actions.updateInState> = action;
       return { ...state, data: { ...state.data, ...a.payload.data } };
-    } else if (!isNil(config.actions.invalidate) && action.type === config.actions.invalidate.toString()) {
+    } else if (
+      !isNil(config.actions.invalidate) &&
+      action.type === config.actions.invalidate.toString()
+    ) {
       return { ...state, invalidated: true };
     }
     return state;
@@ -81,22 +100,34 @@ export const createListReducer =
     M,
     C extends Redux.ActionContext = Redux.ActionContext,
     A extends Redux.Action<Redux.ActionPayload, C> = Redux.Action<Redux.ActionPayload, C>,
-    S extends Redux.ListStore<M> = Redux.ListStore<M>
+    S extends Redux.ListStore<M> = Redux.ListStore<M>,
   >(
-    config: Redux.ReducerConfig<S, Omit<Redux.ListActionCreatorMap<M, C>, "request">, C>
+    config: Redux.ReducerConfig<S, Omit<Redux.ListActionCreatorMap<M, C>, "request">, C>,
   ): Redux.Reducer<S, C, A> =>
   (state: S = config.initialState, action: A): S => {
     if (!isNil(config.actions.loading) && action.type === config.actions.loading.toString()) {
       const a: Redux.InferAction<typeof config.actions.loading> = action;
       return { ...state, loading: a.payload };
-    } else if (!isNil(config.actions.response) && action.type === config.actions.response.toString()) {
+    } else if (
+      !isNil(config.actions.response) &&
+      action.type === config.actions.response.toString()
+    ) {
       const a: Redux.InferAction<typeof config.actions.response> = action;
       const newState: S = { ...state, responseWasReceived: true, query: a.payload.query };
       if (http.listResponseFailed<M>(a.payload)) {
         return { ...newState, error: a.payload.error, data: [], count: 0, invalidated: false };
       }
-      return { ...state, error: null, data: a.payload.data, count: a.payload.count, invalidated: false };
-    } else if (!isNil(config.actions.invalidate) && action.type === config.actions.invalidate.toString()) {
+      return {
+        ...state,
+        error: null,
+        data: a.payload.data,
+        count: a.payload.count,
+        invalidated: false,
+      };
+    } else if (
+      !isNil(config.actions.invalidate) &&
+      action.type === config.actions.invalidate.toString()
+    ) {
       return { ...state, invalidated: true };
     }
     return state;
@@ -115,9 +146,9 @@ export const createModelListReducer = <
   M extends Model.HttpModel,
   C extends Redux.ActionContext = Redux.ActionContext,
   A extends Redux.AnyPayloadAction<C> = Redux.AnyPayloadAction<C>,
-  S extends Redux.ModelListStore<M> = Redux.ModelListStore<M>
+  S extends Redux.ModelListStore<M> = Redux.ModelListStore<M>,
 >(
-  config: Redux.ReducerConfig<S, Redux.ModelListActionCreatorMap<M, C>, C>
+  config: Redux.ReducerConfig<S, Redux.ModelListActionCreatorMap<M, C>, C>,
 ): Redux.Reducer<S, C, A> => createListReducer<M, C, A, S>(config);
 
 const withAuthentication =
@@ -125,10 +156,10 @@ const withAuthentication =
     M extends Model.HttpModel,
     C extends Redux.ActionContext = Redux.ActionContext,
     A extends Redux.AnyPayloadAction<C> = Redux.AnyPayloadAction<C>,
-    S extends Redux.AuthenticatedModelListStore<M> = Redux.AuthenticatedModelListStore<M>
+    S extends Redux.AuthenticatedModelListStore<M> = Redux.AuthenticatedModelListStore<M>,
   >(
     reducer: Redux.Reducer<S, C, A>,
-    config: Redux.ReducerConfig<S, Redux.AuthenticatedModelListActionCreatorMap<M, C>, C>
+    config: Redux.ReducerConfig<S, Redux.AuthenticatedModelListActionCreatorMap<M, C>, C>,
   ): Redux.Reducer<S, C, A> =>
   (state: S = config.initialState, action: A): S => {
     state = reducer(state, action);
@@ -137,7 +168,7 @@ const withAuthentication =
       if (s.ordering.length !== 0) {
         return {
           ...s,
-          data: http.orderBy(s.data, s.ordering, action.user || null)
+          data: http.orderBy(s.data, s.ordering, action.user || null),
         };
       }
       return s;
@@ -146,9 +177,15 @@ const withAuthentication =
     if (!isNil(config.actions.setSearch) && action.type === config.actions.setSearch.toString()) {
       const a: Redux.InferAction<typeof config.actions.setSearch> = action;
       return { ...state, search: a.payload };
-    } else if (!isNil(config.actions.request) && action.type === config.actions.request.toString()) {
+    } else if (
+      !isNil(config.actions.request) &&
+      action.type === config.actions.request.toString()
+    ) {
       return { ...state, data: [], count: 0 };
-    } else if (!isNil(config.actions.removeFromState) && action.type === config.actions.removeFromState.toString()) {
+    } else if (
+      !isNil(config.actions.removeFromState) &&
+      action.type === config.actions.removeFromState.toString()
+    ) {
       const a: Redux.InferAction<typeof config.actions.removeFromState> = action;
       const existing = findModelInData(state.data, a.payload, { action: a });
       if (isNil(existing)) {
@@ -157,9 +194,12 @@ const withAuthentication =
       return {
         ...state,
         data: filter(state.data, (entity: M) => entity.id !== a.payload),
-        count: state.count - 1
+        count: state.count - 1,
       };
-    } else if (!isNil(config.actions.updateInState) && action.type === config.actions.updateInState.toString()) {
+    } else if (
+      !isNil(config.actions.updateInState) &&
+      action.type === config.actions.updateInState.toString()
+    ) {
       /* Note: Eventually we will want to apply `reorderIfApplicable` here but
          we need to make sure it is fully properly functioning before we do so. */
       const a: Redux.InferAction<typeof config.actions.updateInState> = action;
@@ -170,28 +210,42 @@ const withAuthentication =
       const { id: _, ...withoutId } = a.payload.data;
       return {
         ...state,
-        data: util.replaceInArray<M>(state.data, { id: a.payload.id }, { ...existing, ...withoutId })
+        data: util.replaceInArray<M>(
+          state.data,
+          { id: a.payload.id },
+          { ...existing, ...withoutId },
+        ),
       };
-    } else if (!isNil(config.actions.addToState) && action.type === config.actions.addToState.toString()) {
+    } else if (
+      !isNil(config.actions.addToState) &&
+      action.type === config.actions.addToState.toString()
+    ) {
       const a: Redux.InferAction<typeof config.actions.addToState> = action;
       const existing = findModelInData(state.data, a.payload.id, { warnOnMissing: false });
       if (!isNil(existing)) {
         notifications.internal.inconsistentStateError({
           action: a,
-          reason: "Instance already exists in state when it is not expected to."
+          reason: "Instance already exists in state when it is not expected to.",
         });
         return state;
       }
-      return reorderIfApplicable({ ...state, data: [...state.data, a.payload], count: state.count + 1 });
-    } else if (!isNil(config.actions.updateOrdering) && action.type === config.actions.updateOrdering.toString()) {
+      return reorderIfApplicable({
+        ...state,
+        data: [...state.data, a.payload],
+        count: state.count + 1,
+      });
+    } else if (
+      !isNil(config.actions.updateOrdering) &&
+      action.type === config.actions.updateOrdering.toString()
+    ) {
       const a: Redux.InferAction<typeof config.actions.updateOrdering> = action;
       const existing: Http.FieldOrder<string & keyof M> | undefined = find(state.ordering, {
-        field: a.payload.field as keyof M & string
+        field: a.payload.field as keyof M & string,
       }) as Http.FieldOrder<string & keyof M> | undefined;
       if (isNil(existing)) {
         notifications.internal.inconsistentStateError({
           action: a,
-          reason: "Ordering for field does not exist in state when it is expected to."
+          reason: "Ordering for field does not exist in state when it is expected to.",
         });
         return state;
       }
@@ -205,21 +259,33 @@ const withAuthentication =
             }
             return [...curr, { ...o, order: 0 }];
           },
-          []
-        )
+          [],
+        ),
       };
-    } else if (!isNil(config.actions.setPagination) && action.type === config.actions.setPagination.toString()) {
+    } else if (
+      !isNil(config.actions.setPagination) &&
+      action.type === config.actions.setPagination.toString()
+    ) {
       const a: Redux.InferAction<typeof config.actions.setPagination> = action;
       return !isNil(a.payload.pageSize)
         ? { ...state, page: a.payload.page, pageSize: a.payload.pageSize }
         : { ...state, page: a.payload.page };
-    } else if (!isNil(config.actions.deleting) && action.type === config.actions.deleting.toString()) {
+    } else if (
+      !isNil(config.actions.deleting) &&
+      action.type === config.actions.deleting.toString()
+    ) {
       const a: Redux.InferAction<typeof config.actions.deleting> = action;
       return { ...state, deleting: modelListActionReducer(state.deleting, a.payload) };
-    } else if (!isNil(config.actions.updating) && action.type === config.actions.updating.toString()) {
+    } else if (
+      !isNil(config.actions.updating) &&
+      action.type === config.actions.updating.toString()
+    ) {
       const a: Redux.InferAction<typeof config.actions.updating> = action;
       return { ...state, updating: modelListActionReducer(state.updating, a.payload) };
-    } else if (!isNil(config.actions.creating) && action.type === config.actions.creating.toString()) {
+    } else if (
+      !isNil(config.actions.creating) &&
+      action.type === config.actions.creating.toString()
+    ) {
       const a: Redux.InferAction<typeof config.actions.creating> = action;
       return { ...state, creating: a.payload };
     }
@@ -239,9 +305,9 @@ export const createAuthenticatedModelListReducer = <
   M extends Model.HttpModel,
   C extends Redux.ActionContext = Redux.ActionContext,
   A extends Redux.AnyPayloadAction<C> = Redux.AnyPayloadAction<C>,
-  S extends Redux.AuthenticatedModelListStore<M> = Redux.AuthenticatedModelListStore<M>
+  S extends Redux.AuthenticatedModelListStore<M> = Redux.AuthenticatedModelListStore<M>,
 >(
-  config: Redux.ReducerConfig<S, Redux.AuthenticatedModelListActionCreatorMap<M, C>, C>
+  config: Redux.ReducerConfig<S, Redux.AuthenticatedModelListActionCreatorMap<M, C>, C>,
 ): Redux.Reducer<S, C, A> => {
   const reducer = createModelListReducer<M, C, A, S>(config);
   return withAuthentication<M, C, A, S>(reducer, config);
@@ -250,7 +316,7 @@ export const createAuthenticatedModelListReducer = <
 type ModelIndexedReducerConfig<
   S,
   C extends Redux.ActionContext = Redux.ActionContext,
-  A extends Redux.AnyPayloadAction<C> = Redux.AnyPayloadAction<C>
+  A extends Redux.AnyPayloadAction<C> = Redux.AnyPayloadAction<C>,
 > = {
   readonly initialState: S;
   readonly getId: (a: A) => number;
@@ -271,10 +337,10 @@ export const createModelIndexedReducer =
   <
     S,
     C extends Redux.ActionContext = Redux.ActionContext,
-    A extends Redux.AnyPayloadAction<C> = Redux.AnyPayloadAction<C>
+    A extends Redux.AnyPayloadAction<C> = Redux.AnyPayloadAction<C>,
   >(
     reducer: Redux.Reducer<S, C, A>,
-    config: ModelIndexedReducerConfig<S, C, A>
+    config: ModelIndexedReducerConfig<S, C, A>,
   ): Redux.Reducer<Redux.ModelIndexedStore<S>, C, A> =>
   (state: Redux.ModelIndexedStore<S> | undefined = {}, a: A): Redux.ModelIndexedStore<S> => {
     if (isNil(config.includeAction) || config.includeAction(a) === true) {

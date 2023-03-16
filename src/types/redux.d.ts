@@ -10,13 +10,17 @@ declare namespace Redux {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   type ActionPayload = any;
 
-  type InferAction<CREATOR> = CREATOR extends ActionCreator<infer P, infer C> ? Action<P, C> : never;
+  type InferAction<CREATOR> = CREATOR extends ActionCreator<infer P, infer C>
+    ? Action<P, C>
+    : never;
 
   type Task<P extends ActionPayload = ActionPayload, C extends ActionContext = ActionContext> = (
-    action: Action<P, C>
+    action: Action<P, C>,
   ) => import("@redux-saga/types").SagaIterator;
 
-  type ContextTask<C extends ActionContext = ActionContext> = (context?: C) => import("@redux-saga/types").SagaIterator;
+  type ContextTask<C extends ActionContext = ActionContext> = (
+    context?: C,
+  ) => import("@redux-saga/types").SagaIterator;
 
   type ActionContext = {
     readonly publicTokenId?: string;
@@ -28,10 +32,13 @@ declare namespace Redux {
   type TableChangeEventTask<
     E extends Table.ChangeEvent<R>,
     R extends Table.RowData,
-    C extends ActionContext = ActionContext
+    C extends ActionContext = ActionContext,
   > = (e: E, context: C) => import("@redux-saga/types").SagaIterator;
 
-  type TableChangeEventTaskMapObject<R extends Table.RowData, C extends ActionContext = ActionContext> = {
+  type TableChangeEventTaskMapObject<
+    R extends Table.RowData,
+    C extends ActionContext = ActionContext,
+  > = {
     readonly dataChange: TableChangeEventTask<Table.DataChangeEvent<R>, R, C>;
     readonly rowAdd: TableChangeEventTask<Table.RowAddEvent<R>, R, C>;
     readonly groupAdd: TableChangeEventTask<Table.GroupAddEvent, R, C>;
@@ -54,21 +61,21 @@ declare namespace Redux {
   type Reducer<
     S,
     C extends ActionContext = ActionContext,
-    A extends AnyPayloadAction<C> = AnyPayloadAction<C>
+    A extends AnyPayloadAction<C> = AnyPayloadAction<C>,
   > = BasicReducer<S, A>;
 
   type DynamicReducer<
     S,
     ARG,
     C extends ActionContext = ActionContext,
-    A extends AnyPayloadAction<C> = AnyPayloadAction<C>
+    A extends AnyPayloadAction<C> = AnyPayloadAction<C>,
   > = BasicDynamicReducer<S, ARG, A>;
 
   type DynamicRequiredReducer<
     S,
     ARG,
     C extends ActionContext = ActionContext,
-    A extends AnyPayloadAction<C> = AnyPayloadAction<C>
+    A extends AnyPayloadAction<C> = AnyPayloadAction<C>,
   > = BasicDynamicRequiredReducer<S, ARG, A>;
 
   type BasicReducerWithDefinedState<S, A = Action> = (s: S, a: A) => S;
@@ -76,13 +83,13 @@ declare namespace Redux {
   type ReducerWithDefinedState<
     S,
     C extends ActionContext = ActionContext,
-    A extends AnyPayloadAction<C> = AnyPayloadAction<C>
+    A extends AnyPayloadAction<C> = AnyPayloadAction<C>,
   > = BasicReducerWithDefinedState<S, A>;
 
   type ReducersMapObject<
     S,
     C extends ActionContext = ActionContext,
-    A extends AnyPayloadAction<C> = AnyPayloadAction<C>
+    A extends AnyPayloadAction<C> = AnyPayloadAction<C>,
   > = {
     [K in keyof S]-?: Reducer<S[K], C, A>;
   };
@@ -105,38 +112,54 @@ declare namespace Redux {
   type Action<
     P extends ActionPayload = ActionPayload,
     C extends ActionContext = ActionContext,
-    T extends string = string
+    T extends string = string,
   > = BasicAction<P, T> & {
     readonly context: C;
     readonly label: string | null;
     readonly user?: Model.User | null;
   };
 
-  type AnyPayloadAction<C extends ActionContext = ActionContext, T extends string = string> = Action<
-    ActionPayload,
-    C,
-    T
-  >;
+  type AnyPayloadAction<
+    C extends ActionContext = ActionContext,
+    T extends string = string,
+  > = Action<ActionPayload, C, T>;
 
-  type ActionCreator<P extends ActionPayload = ActionPayload, C extends ActionContext = ActionContext> = {
+  type ActionCreator<
+    P extends ActionPayload = ActionPayload,
+    C extends ActionContext = ActionContext,
+  > = {
     type: string;
     label: string | null;
     toString: () => string;
     (p: P, ctx: Omit<C, "publicTokenId">): Action<P>;
   };
 
-  type AnyPayloadActionCreator<C extends ActionContext = ActionContext> = ActionCreator<ActionPayload, C>;
+  type AnyPayloadActionCreator<C extends ActionContext = ActionContext> = ActionCreator<
+    ActionPayload,
+    C
+  >;
 
-  type TaskConfig<A extends ActionCreatorMap<ActionPayloadMap, C>, C extends ActionContext = ActionContext> = {
+  type TaskConfig<
+    A extends ActionCreatorMap<ActionPayloadMap, C>,
+    C extends ActionContext = ActionContext,
+  > = {
     readonly actions: Omit<A, "request">;
   };
 
-  type ReducerConfig<S, A extends ActionCreatorMap<ActionPayloadMap, C>, C extends ActionContext = ActionContext> = {
+  type ReducerConfig<
+    S,
+    A extends ActionCreatorMap<ActionPayloadMap, C>,
+    C extends ActionContext = ActionContext,
+  > = {
     readonly initialState: S;
     readonly actions: Partial<A>;
   };
 
-  type SagaConfig<T, A extends ActionCreatorMap<ActionPayloadMap, C>, C extends ActionContext = ActionContext> = {
+  type SagaConfig<
+    T,
+    A extends ActionCreatorMap<ActionPayloadMap, C>,
+    C extends ActionContext = ActionContext,
+  > = {
     readonly tasks: T;
     readonly actions: A;
   };
@@ -146,7 +169,10 @@ declare namespace Redux {
     readonly value: false;
     readonly success?: boolean;
   };
-  type ModelListActionStartAction<M extends Model.Model = Model.Model> = { readonly id: M["id"]; readonly value: true };
+  type ModelListActionStartAction<M extends Model.Model = Model.Model> = {
+    readonly id: M["id"];
+    readonly value: true;
+  };
 
   type ModelListActionAction<M extends Model.Model = Model.Model> =
     | ModelListActionStartAction<M>
@@ -327,25 +353,28 @@ declare namespace Redux {
   };
 
   type ModelListActionPayloadMap<M extends Model.HttpModel> = ListActionPayloadMap<M>;
-  type ModelListActionCreatorMap<M extends Model.HttpModel, C extends ActionContext = ActionContext> = Omit<
-    ActionCreatorMap<ModelListActionPayloadMap<M>, C>,
-    "request"
-  > & { readonly request: RequestActionCreator<C> };
-
-  type AuthenticatedModelListActionPayloadMap<M extends Model.HttpModel> = ModelListActionPayloadMap<M> & {
-    readonly updating: ModelListActionAction;
-    readonly creating: boolean;
-    readonly removeFromState: number;
-    readonly deleting: ModelListActionAction;
-    readonly addToState: M;
-    readonly updateInState: UpdateModelPayload<M>;
-    readonly setSearch: string;
-    readonly setPagination: Pagination;
-    readonly updateOrdering: UpdateOrderingPayload<string>;
+  type ModelListActionCreatorMap<
+    M extends Model.HttpModel,
+    C extends ActionContext = ActionContext,
+  > = Omit<ActionCreatorMap<ModelListActionPayloadMap<M>, C>, "request"> & {
+    readonly request: RequestActionCreator<C>;
   };
+
+  type AuthenticatedModelListActionPayloadMap<M extends Model.HttpModel> =
+    ModelListActionPayloadMap<M> & {
+      readonly updating: ModelListActionAction;
+      readonly creating: boolean;
+      readonly removeFromState: number;
+      readonly deleting: ModelListActionAction;
+      readonly addToState: M;
+      readonly updateInState: UpdateModelPayload<M>;
+      readonly setSearch: string;
+      readonly setPagination: Pagination;
+      readonly updateOrdering: UpdateOrderingPayload<string>;
+    };
   type AuthenticatedModelListActionCreatorMap<
     M extends Model.HttpModel,
-    C extends ActionContext = ActionContext
+    C extends ActionContext = ActionContext,
   > = Omit<ActionCreatorMap<AuthenticatedModelListActionPayloadMap<M>, C>, "request"> & {
     readonly request: RequestActionCreator<C>;
   };
@@ -358,7 +387,10 @@ declare namespace Redux {
     readonly request: Task<TableRequestPayload, C> | Task<null, C>;
   };
 
-  type AuthenticatedTableTaskMap<R extends Table.RowData, C extends ActionContext = ActionContext> = TableTaskMap<C> & {
+  type AuthenticatedTableTaskMap<
+    R extends Table.RowData,
+    C extends ActionContext = ActionContext,
+  > = TableTaskMap<C> & {
     readonly handleChangeEvent: TableChangeEventTask<Table.ChangeEvent<R>, R, C>;
   };
 
@@ -370,14 +402,14 @@ declare namespace Redux {
     readonly invalidate: null;
   };
 
-  type TableActionCreatorMap<M extends Model.HttpModel, C extends ActionContext = ActionContext> = Optional<
-    ActionCreatorMap<TableActionPayloadMap<M>, C>,
-    "invalidate"
-  >;
+  type TableActionCreatorMap<
+    M extends Model.HttpModel,
+    C extends ActionContext = ActionContext,
+  > = Optional<ActionCreatorMap<TableActionPayloadMap<M>, C>, "invalidate">;
 
   type AuthenticatedTableActionPayloadMap<
     R extends Table.RowData,
-    M extends Model.RowHttpModel = Model.RowHttpModel
+    M extends Model.RowHttpModel = Model.RowHttpModel,
   > = TableActionPayloadMap<M> & {
     readonly handleEvent: Table.Event<R, M>;
   };
@@ -385,7 +417,7 @@ declare namespace Redux {
   type AuthenticatedTableActionCreatorMap<
     R extends Table.RowData,
     M extends Model.HttpModel,
-    C extends ActionContext = ActionContext
+    C extends ActionContext = ActionContext,
   > = Optional<ActionCreatorMap<AuthenticatedTableActionPayloadMap<R, M>, C>, "invalidate">;
 
   type TableStore<D extends Table.RowData = Table.RowData> = {
@@ -443,7 +475,7 @@ declare namespace Redux {
 
   type RecalculateRowReducerCallback<S extends TableStore<R>, R extends Table.RowData> = (
     state: S,
-    row: Table.DataRow<R>
+    row: Table.DataRow<R>,
   ) => Partial<R>;
 
   type BudgetTableStore<R extends Tables.BudgetRowData> = TableStore<R>;

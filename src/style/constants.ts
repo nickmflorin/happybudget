@@ -6,7 +6,7 @@ export const Breakpoints: Style.Breakpoints = {
   large: 768,
   xl: 1024,
   xxl: 1200,
-  xxxl: 1580
+  xxxl: 1580,
 };
 
 export const DEFAULT_COLOR_SCHEME: Style.HexColor[] = [
@@ -23,7 +23,7 @@ export const DEFAULT_COLOR_SCHEME: Style.HexColor[] = [
   "#76d0ca",
   "#58add6",
   "#ffd2ba",
-  "#beebff"
+  "#beebff",
 ];
 
 export const Colors: { [key: string]: Style.HexColor } = {
@@ -31,7 +31,7 @@ export const Colors: { [key: string]: Style.HexColor } = {
   TEXT_SECONDARY: "#424242",
   TABLE_BORDER: "#F7F7F7",
   COLOR_NO_COLOR: "#EFEFEF",
-  GREEN: "#0fb767"
+  GREEN: "#0fb767",
 };
 
 export const TABLE_BORDER_RADIUS = 8;
@@ -41,7 +41,7 @@ export const FontWeightMap: { [key in Style.FontWeightName]: Style.FontWeight } 
   Regular: 400,
   Light: 300,
   SemiBold: 600,
-  Medium: 600
+  Medium: 600,
 };
 
 export const SupportedFontFaces: Style.FontFace[] = [
@@ -51,8 +51,8 @@ export const SupportedFontFaces: Style.FontFace[] = [
       { weight: "Bold", hasItalic: true },
       { weight: "Medium", hasItalic: true },
       "Regular",
-      { weight: "Light", hasItalic: true }
-    ]
+      { weight: "Light", hasItalic: true },
+    ],
   },
   {
     family: "AvenirNext",
@@ -61,47 +61,46 @@ export const SupportedFontFaces: Style.FontFace[] = [
       "Light",
       "Medium",
       { weight: "Regular", hasItalic: true },
-      { weight: "SemiBold", hasItalic: true }
-    ]
-  }
+      { weight: "SemiBold", hasItalic: true },
+    ],
+  },
 ];
 
-export const fontToString = (font: Style.Font): string => {
-  return `Font { family = ${font.family}, weight: ${font.weight}, italic: ${String(font.italic || false)} }`;
-};
+export const fontToString = (font: Style.Font): string =>
+  `Font { family = ${font.family}, weight: ${font.weight}, italic: ${String(
+    font.italic || false,
+  )} }`;
 
-export const getFontSourceModuleName = (font: Style.Font): string => {
-  return font.italic === true ? `${font.family}_${font.weight}Italic` : `${font.family}_${font.weight}`;
-};
+export const getFontSourceModuleName = (font: Style.Font): string =>
+  font.italic === true ? `${font.family}_${font.weight}Italic` : `${font.family}_${font.weight}`;
 
-export const getFontSourceFileName = (font: Style.Font, extension = "ttf"): string => {
-  return font.italic === true
+export const getFontSourceFileName = (font: Style.Font, extension = "ttf"): string =>
+  font.italic === true
     ? `${font.family}-${font.weight}Italic.${extension}`
     : `${font.family}-${font.weight}.${extension}`;
-};
 
-export const getFontSourceFileDirectory = (font: Style.Font): string => {
-  return font.italic === true ? `${font.family}/${font.weight}/Italic` : `${font.family}/${font.weight}`;
-};
+export const getFontSourceFileDirectory = (font: Style.Font): string =>
+  font.italic === true ? `${font.family}/${font.weight}/Italic` : `${font.family}/${font.weight}`;
 
-export const getFontSourceFile = (font: Style.Font, extension = "ttf"): string => {
-  return `./fonts/${getFontSourceFileDirectory(font)}/${getFontSourceFileName(font, extension)}`;
-};
+export const getFontSourceFile = (font: Style.Font, extension = "ttf"): string =>
+  `./fonts/${getFontSourceFileDirectory(font)}/${getFontSourceFileName(font, extension)}`;
 
-export const fontsFromFontFace = (fontFace: Style.FontFace): Style.Font[] => {
-  return reduce(
+export const fontsFromFontFace = (fontFace: Style.FontFace): Style.Font[] =>
+  reduce(
     fontFace.variants,
     (fonts: Style.Font[], variant: Style.FontVariant) => {
-      fonts = [...fonts, { family: fontFace.family, weight: typeof variant === "string" ? variant : variant.weight }];
+      fonts = [
+        ...fonts,
+        { family: fontFace.family, weight: typeof variant === "string" ? variant : variant.weight },
+      ];
       if (typeof variant !== "string" && variant.hasItalic === true) {
         return [...fonts, { family: fontFace.family, weight: variant.weight, italic: true }];
       }
       return fonts;
     },
-    []
+    [],
   );
-};
 
 export const SupportedFonts: Style.Font[] = flatten(
-  map(SupportedFontFaces, (fontFace: Style.FontFace) => fontsFromFontFace(fontFace))
+  map(SupportedFontFaces, (fontFace: Style.FontFace) => fontsFromFontFace(fontFace)),
 );

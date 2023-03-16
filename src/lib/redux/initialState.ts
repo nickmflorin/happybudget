@@ -6,12 +6,12 @@ export const initialListResponseState: Redux.ListStore<any> = {
   responseWasReceived: false,
   error: null,
   query: {},
-  invalidated: false
+  invalidated: false,
 };
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const initialModelListResponseState: Redux.ModelListStore<any> = {
-  ...initialListResponseState
+  ...initialListResponseState,
 };
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -24,7 +24,7 @@ export const initialAuthenticatedModelListResponseState: Redux.AuthenticatedMode
   deleting: { current: [], completed: [], failed: [] },
   updating: { current: [], completed: [], failed: [] },
   ordering: [],
-  error: null
+  error: null,
 };
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -36,7 +36,7 @@ export const initialTableState: Redux.TableStore<any> = {
   eventIndex: -1,
   responseWasReceived: false,
   error: null,
-  invalidated: false
+  invalidated: false,
 };
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -44,5 +44,5 @@ export const initialDetailResponseState: Redux.ModelDetailStore<any> = {
   loading: false,
   data: null,
   error: null,
-  invalidated: false
+  invalidated: false,
 };

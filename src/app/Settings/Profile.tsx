@@ -1,14 +1,14 @@
 import { useState, useEffect, useRef, useMemo } from "react";
+
 import { isNil } from "lodash";
 
 import * as api from "api";
 import { ui, model, notifications } from "lib";
 import * as store from "store";
-
 import { Tile } from "components/containers";
-import { UserProfileForm } from "components/forms";
 import { ImageAndName } from "components/fields";
 import { IImageAndNameRef } from "components/fields/ImageAndName";
+import { UserProfileForm } from "components/forms";
 import { Page } from "components/layout";
 
 const Profile = (): JSX.Element => {
@@ -37,11 +37,11 @@ const Profile = (): JSX.Element => {
         headerRef.current?.setLastName(changedValues.last_name);
       }
     },
-    []
+    [],
   );
 
   return (
-    <Page className={"profile"} title={"Profile"}>
+    <Page className="profile" title="Profile">
       <Tile style={{ maxWidth: 500 }}>
         <UserProfileForm
           form={form}
@@ -58,7 +58,7 @@ const Profile = (): JSX.Element => {
           initialValues={{
             first_name: user.first_name,
             last_name: user.last_name,
-            timezone: user.timezone
+            timezone: user.timezone,
           }}
           onFinish={(values: Partial<Http.UserPayload>) => {
             form.setLoading(true);
@@ -73,7 +73,7 @@ const Profile = (): JSX.Element => {
               .then((response: Model.User) => {
                 notifications.ui.banner.notify({
                   level: "success",
-                  message: "Your information was successfully saved."
+                  message: "Your information was successfully saved.",
                 });
                 updateUser(response);
               })

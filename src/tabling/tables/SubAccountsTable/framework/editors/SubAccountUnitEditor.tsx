@@ -1,13 +1,16 @@
 import { forwardRef, ForwardedRef } from "react";
-import { useSelector } from "react-redux";
+
 import { isNil } from "lodash";
+import { useSelector } from "react-redux";
 
 import * as store from "store";
-
 import { framework } from "tabling/generic";
 import { ModelSelectEditor } from "tabling/generic/framework/editors";
 
-const SubAccountUnitEditor = <B extends Model.Budget | Model.Template, P extends Model.Account | Model.SubAccount>(
+const SubAccountUnitEditor = <
+  B extends Model.Budget | Model.Template,
+  P extends Model.Account | Model.SubAccount,
+>(
   props: Omit<
     framework.editors.ModelSelectEditorProps<
       Model.Tag,
@@ -18,10 +21,14 @@ const SubAccountUnitEditor = <B extends Model.Budget | Model.Template, P extends
     >,
     "models" | "searchIndices"
   >,
-  ref: ForwardedRef<Table.AgEditorRef<Model.Tag>>
+  ref: ForwardedRef<Table.AgEditorRef<Model.Tag>>,
 ) => {
-  const units = useSelector((s: Application.Store) => store.selectors.selectSubAccountUnitStore(s).data);
-  const unitsLoading = useSelector((s: Application.Store) => store.selectors.selectSubAccountUnitStore(s).loading);
+  const units = useSelector(
+    (s: Application.Store) => store.selectors.selectSubAccountUnitStore(s).data,
+  );
+  const unitsLoading = useSelector(
+    (s: Application.Store) => store.selectors.selectSubAccountUnitStore(s).loading,
+  );
 
   const row: Table.DataRow<Tables.SubAccountRowData> = props.node.data;
   return (

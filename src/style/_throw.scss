@@ -2,25 +2,30 @@
 The contents of this file represent an adaptation of the `error` function, `error` mixin and related
 functionality that are exposed as a part of the "sass-true" testing package.  The "sass-true"
 implementations are internalized and extended for the following reasons:
+
 1. There are frequent, confusing and problematic import issues involving imports from the `throw`
    module of "sass-true".  The import treatment seems to differ between test and non-test
    environments, and has been difficult to work around.  Since the logic that module contains is
    very simple, it makes more sense to define it ourselves so we can tailor it to our needs.
+
 2. There are improvements we can make that better suit the context of this application.  These
    improvements are entirely related to the inclusion of additional debugging information in
    error messages to improve developer experiences and reduce the time required to diagnose and fix
    an error in SASS.
+
 Background
 ----------
 When we test functionality or mixins in SASS, the one thing that SASS does not support (at least not
 now) is the ability to test or assert that a given error is raised under the right conditions.  This
 was the intended purpose of "sass-true"'s `throw` module.  The `throw` module exposes an `error`
 function that is *returned* in logic it uses, rather than using `@error` directly.
+
 The reason this is important is that because if we can configure errors to be returned (instead of
 thrown) *only when in a test environment*, we can assert whether or not the function would have
 otherwise thrown an error because we can test if the error is the output of the function.  This
 works because the logic of the `throw.error` method, in both "sass-true" and here, will only use
 the `@error` directive if the `$catch-errors` global variable is not true.
+
 As such, controlling whether or not the error is thrown or returned is as simple as setting the
 `$catch-errors` variable to `true` in a testing environment.  If all thrown errors are funneled
 through the `error` method below, we will be able to assert in all tests whether or not a function

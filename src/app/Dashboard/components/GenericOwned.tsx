@@ -2,8 +2,8 @@ import React, { useMemo } from "react";
 
 import * as api from "api";
 import { redux, notifications } from "lib";
-
 import { useConfirmation } from "components/notifications";
+
 import DashboardPage, { DashboardPageProps, RenderDashboardPageCardParams } from "./DashboardPage";
 
 export type RenderGenericOwnedCardParams<B extends Model.SimpleBudget | Model.SimpleTemplate> =
@@ -25,9 +25,13 @@ export type GenericOwnedProps<B extends Model.SimpleBudget | Model.SimpleTemplat
 };
 
 const GenericOwned = <B extends Model.SimpleBudget | Model.SimpleTemplate>(
-  props: GenericOwnedProps<B>
+  props: GenericOwnedProps<B>,
 ): JSX.Element => {
-  const { isActive: isDeleting, removeFromState: setDeleted, addToState: setDeleting } = redux.useTrackModelActions([]);
+  const {
+    isActive: isDeleting,
+    removeFromState: setDeleted,
+    addToState: setDeleting,
+  } = redux.useTrackModelActions([]);
 
   const deleteBudget = useMemo(
     () => (b: B, e: MenuItemModelClickEvent) => {
@@ -41,7 +45,7 @@ const GenericOwned = <B extends Model.SimpleBudget | Model.SimpleTemplate>(
         .catch((err: Error) => notifications.internal.handleRequestError(err))
         .finally(() => setDeleted(b.id));
     },
-    [setDeleted, props.onDeleted]
+    [setDeleted, props.onDeleted],
   );
 
   const [confirmModal, confirmBudgetDelete] = useConfirmation<[B, MenuItemModelClickEvent]>({
@@ -50,7 +54,7 @@ const GenericOwned = <B extends Model.SimpleBudget | Model.SimpleTemplate>(
     suppressionKey: props.confirmDeleteProps.suppressionKey,
     detail: "This action is not recoverable, the data will be permanently erased.",
     title: props.confirmDeleteProps.title,
-    onConfirmed: (b: B, e: MenuItemModelClickEvent) => deleteBudget(b, e)
+    onConfirmed: (b: B, e: MenuItemModelClickEvent) => deleteBudget(b, e),
   });
 
   return (
@@ -61,7 +65,7 @@ const GenericOwned = <B extends Model.SimpleBudget | Model.SimpleTemplate>(
           props.renderCard({
             ...params,
             deleting: isDeleting(params.budget.id),
-            onDelete: (e: MenuItemModelClickEvent) => confirmBudgetDelete([params.budget, e])
+            onDelete: (e: MenuItemModelClickEvent) => confirmBudgetDelete([params.budget, e]),
           })
         }
       />

@@ -27,8 +27,14 @@ declare type UploadedImage = {
 declare type UploadError = Error | string;
 declare type UploadFile = import("antd/lib/upload/interface").UploadFile<Http.FileUploadResponse>;
 
-declare type UploadImageParamsNoImage = { loading: boolean; onClear: () => void; error?: UploadError | null };
-declare type UploadImageParamsWithImage = UploadImageParamsNoImage & { image: UploadedImage | SavedImage };
+declare type UploadImageParamsNoImage = {
+  loading: boolean;
+  onClear: () => void;
+  error?: UploadError | null;
+};
+declare type UploadImageParamsWithImage = UploadImageParamsNoImage & {
+  image: UploadedImage | SavedImage;
+};
 declare type UploadImageParams = UploadImageParamsWithImage | UploadImageParamsNoImage;
 
 declare type IUploaderRef = {

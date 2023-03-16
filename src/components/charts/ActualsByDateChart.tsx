@@ -1,6 +1,6 @@
+import { isNil } from "lodash";
 import { ResponsiveBar } from "@nivo/bar";
 import { BarTooltipProps } from "@nivo/bar/dist/types";
-import { isNil } from "lodash";
 
 import { formatters } from "lib";
 
@@ -12,7 +12,9 @@ interface BudgetTotalChartProps<D extends Charts.Datum = Charts.Datum> {
   readonly tooltipLabelPrefix?: (datum: BarTooltipProps<D>) => string;
 }
 
-const ActualsByDateChart = <D extends Charts.Datum = Charts.Datum>(props: BudgetTotalChartProps<D>): JSX.Element => (
+const ActualsByDateChart = <D extends Charts.Datum = Charts.Datum>(
+  props: BudgetTotalChartProps<D>,
+): JSX.Element => (
   <ResponsiveBar<D>
     data={props.data}
     margin={{ top: 20, right: 10, bottom: 22, left: 40 }}
@@ -22,7 +24,7 @@ const ActualsByDateChart = <D extends Charts.Datum = Charts.Datum>(props: Budget
     borderRadius={6}
     borderColor={{ from: "color" }}
     axisLeft={{
-      tickValues: 6
+      tickValues: 6,
     }}
     axisBottom={{
       tickSize: 5,
@@ -30,10 +32,10 @@ const ActualsByDateChart = <D extends Charts.Datum = Charts.Datum>(props: Budget
       tickRotation: 0,
       legend: "country",
       legendPosition: "middle",
-      legendOffset: 32
+      legendOffset: 32,
     }}
-    tooltip={(params: BarTooltipProps<D>): JSX.Element => {
-      return !isNil(props.tooltip) ? (
+    tooltip={(params: BarTooltipProps<D>): JSX.Element =>
+      !isNil(props.tooltip) ? (
         props.tooltip(params)
       ) : (
         <Tooltip<BarTooltipProps<D>>
@@ -42,8 +44,8 @@ const ActualsByDateChart = <D extends Charts.Datum = Charts.Datum>(props: Budget
           value={params.value}
           valueFormatter={formatters.currencyFormatter}
         />
-      );
-    }}
+      )
+    }
     enableLabel={false}
     minValue={0}
     maxValue={1200}
