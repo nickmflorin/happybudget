@@ -1,4 +1,4 @@
-import { enumeratedLiteralsMap, EnumeratedLiteralType } from "../util";
+import { enumeratedLiterals, EnumeratedLiteralType } from "../util";
 
 export type LeadingSlash<T extends string = string, ADD extends boolean = true> = T extends ""
   ? never
@@ -35,7 +35,7 @@ export type JsonObject = {
 
 export type ClientPath<T extends string = string> = TrailingSlash<LeadingSlash<T>, false>;
 
-export const HttpMethods = enumeratedLiteralsMap(["GET", "POST", "PATCH", "DELETE"] as const);
+export const HttpMethods = enumeratedLiterals(["GET", "POST", "PATCH", "DELETE"] as const);
 export type HttpMethod = EnumeratedLiteralType<typeof HttpMethods>;
 
 export type QueryParamValue = string | number | boolean;

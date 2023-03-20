@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { reduce, map, isNil, filter } from "lodash";
-import { CellRange } from "@ag-grid-community/core";
+import { CellRange } from "ag-grid-community";
 
 import * as rows from "./rows";
 

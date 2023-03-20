@@ -9,7 +9,7 @@ import {
   Icons,
 } from "config/configuration/fontAwesome/constants";
 
-import { enumeratedLiteralsMap, EnumeratedLiteralType } from "../../util";
+import { enumeratedLiterals, EnumeratedLiteralType } from "../../util";
 import * as types from "../types";
 
 export * from "config/configuration/fontAwesome/constants";
@@ -211,10 +211,10 @@ export type BasicIconProp = IconName | Icon;
  */
 export type IconProp = BasicIconProp | IconElement;
 
-export const IconSizes = enumeratedLiteralsMap(["small", "medium", "large", "fill"] as const);
+export const IconSizes = enumeratedLiterals(["small", "medium", "large", "fill"] as const);
 export type IconSize = EnumeratedLiteralType<typeof IconSizes>;
 
-export const IconColors = enumeratedLiteralsMap(["brand", "grey", "blue", "white"] as const);
+export const IconColors = enumeratedLiterals(["brand", "grey", "blue", "white"] as const);
 export type IconColor = EnumeratedLiteralType<typeof IconColors>;
 
 export type BaseSVGProps = {

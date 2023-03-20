@@ -24,8 +24,13 @@ import {
   ValueGetterParams,
   FillOperationParams,
   ColSpanParams,
-} from "@ag-grid-community/core";
-import { AgGridReact } from "@ag-grid-community/react";
+  GridReadyEvent,
+  FirstDataRenderedEvent,
+  RowNode,
+  MenuItemDef,
+  GridOptions,
+} from "ag-grid-community";
+import { AgGridReact, AgGridReactProps } from "@ag-grid-community/react";
 
 import { tabling, updateInArray, ui } from "lib";
 
@@ -47,46 +52,50 @@ type OverriddenAgProps =
   | "tabToNextCell"
   | "frameworkComponents";
 
-type UseAgProps<R extends Table.RowData> = Omit<Table.AgGridProps, OverriddenAgProps> & {
+type UseAgProps<R extends Table.RowData, RW extends Table.Row<R> = Table.BodyRow<R>> = Omit<
+  AgGridReactProps<RW>,
+  OverriddenAgProps
+> & {
   readonly allowContextMenuWithControlKey?: boolean;
   readonly frameworkComponents?: Table.FrameworkGroup;
   readonly suppressCopyRowsToClipboard?: boolean;
-  readonly cellStyle?: React.CSSProperties;
-  readonly getRowStyle?: Table.GetRowStyle;
-  readonly navigateToNextCell?: (params: NavigateToNextCellParams) => Table.CellPosition;
-  readonly processCellForClipboard?: (params: ProcessCellForExportParams) => string;
-  readonly tabToNextCell?: (params: TabToNextCellParams) => Table.CellPosition;
-  readonly onCellFocused?: (e: CellFocusedEvent) => void;
-  readonly onCellMouseOver?: (e: CellMouseOverEvent) => void;
-  readonly onCellKeyDown?: (event: CellKeyDownEvent) => void;
-  readonly onSelectionChanged?: (e: SelectionChangedEvent) => void;
-  readonly onGridReady: (e: Table.GridReadyEvent) => void;
-  readonly onFirstDataRendered: (e: Table.FirstDataRenderedEvent) => void;
-  readonly onCellDoubleClicked?: (e: CellDoubleClickedEvent) => void;
-  readonly processDataFromClipboard?: (params: ProcessDataFromClipboardParams) => string[][];
-  readonly processCellFromClipboard?: (params: ProcessCellForExportParams) => Table.RawRowValue;
-  readonly onCellEditingStarted?: (event: CellEditingStartedEvent) => void;
-  readonly onPasteStart?: (event: PasteStartEvent) => void;
-  readonly onPasteEnd?: (event: PasteEndEvent) => void;
-  readonly onCellValueChanged?: (e: CellValueChangedEvent) => void;
-  readonly fillOperation?: (params: FillOperationParams) => boolean;
+  readonly cellStyle?: ui.Style;
+  readonly getRowStyle?: tabling.GetRowStyle<R, RW>;
+  readonly navigateToNextCell?: (params: NavigateToNextCellParams<RW>) => Table.CellPosition;
+  readonly processCellForClipboard?: (params: ProcessCellForExportParams<RW>) => string;
+  readonly tabToNextCell?: (params: TabToNextCellParams<RW>) => Table.CellPosition;
+  readonly onCellFocused?: (e: CellFocusedEvent<RW>) => void;
+  readonly onCellMouseOver?: (e: CellMouseOverEvent<RW>) => void;
+  readonly onCellKeyDown?: (event: CellKeyDownEvent<RW>) => void;
+  readonly onSelectionChanged?: (e: SelectionChangedEvent<RW>) => void;
+  readonly onGridReady: (e: GridReadyEvent<RW>) => void;
+  readonly onFirstDataRendered: (e: FirstDataRenderedEvent<RW>) => void;
+  readonly onCellDoubleClicked?: (e: CellDoubleClickedEvent<RW>) => void;
+  readonly processDataFromClipboard?: (params: ProcessDataFromClipboardParams<RW>) => string[][];
+  readonly processCellFromClipboard?: (params: ProcessCellForExportParams<RW>) => Table.RawRowValue;
+  readonly onCellEditingStarted?: (event: CellEditingStartedEvent<RW>) => void;
+  readonly onPasteStart?: (event: PasteStartEvent<RW>) => void;
+  readonly onPasteEnd?: (event: PasteEndEvent<RW>) => void;
+  readonly onCellValueChanged?: (e: CellValueChangedEvent<RW>) => void;
+  readonly fillOperation?: (params: FillOperationParams<RW>) => boolean;
   readonly getContextMenuItems?: (
     row: Table.BodyRow<R>,
-    node: Table.RowNode,
-  ) => Table.MenuItemDef[];
+    node: RowNode<Table.BodyRow<R>>,
+  ) => MenuItemDef[];
 };
 
 export interface GridProps<
   R extends Table.RowData,
+  RW extends Table.Row<R> = Table.BodyRow<R>,
   M extends Model.RowHttpModel = Model.RowHttpModel,
 > extends UseAgProps<R> {
   readonly id: Table.GridId;
   readonly apis: Table.GridApis | null;
   readonly tableId: string;
-  readonly data?: Table.BodyRow<R>[];
+  readonly data?: RW[];
   readonly keyListeners?: Table.KeyListener[];
   readonly hiddenColumns?: Table.HiddenColumns;
-  readonly gridOptions: Table.GridOptions;
+  readonly gridOptions: GridOptions<RW>;
   readonly checkboxColumn?: Table.PartialActionColumn<R, M>;
   readonly columns: Table.Column<R, M>[];
   readonly className?: Table.GeneralClassName;
@@ -96,7 +105,11 @@ export interface GridProps<
   readonly localizePopupParent?: boolean;
 }
 
-const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>({
+const Grid = <
+  R extends Table.RowData,
+  RW extends Table.Row<R> = Table.BodyRow<R>,
+  M extends Model.RowHttpModel = Model.RowHttpModel,
+>({
   id,
   tableId,
   columns,
@@ -109,6 +122,8 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
   keyListeners,
   localizePopupParent,
   getContextMenuItems: _getContextMenuItems,
+  navigateToNextCell: _navigateToNextCell,
+  tabToNextCell: _tabToNextCell,
   ...props
 }: GridProps<R, M>): JSX.Element => {
   const localColumns = ui.useDeepEqualMemo<Table.RealColumn<R, M>[]>((): Table.RealColumn<
@@ -217,25 +232,25 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
   const navigateToNextCell = useMemo(
     () =>
       (params: NavigateToNextCellParams): CellPosition => {
-        if (!isNil(props.navigateToNextCell)) {
-          return { ...props.navigateToNextCell(params), rowPinned: null };
+        if (_navigateToNextCell !== undefined) {
+          return { ..._navigateToNextCell(params), rowPinned: null };
         }
         return params.nextCellPosition || params.previousCellPosition;
       },
-    [],
+    [_navigateToNextCell],
   );
 
   const tabToNextCell = useMemo(
     () =>
       (params: TabToNextCellParams): CellPosition => {
-        if (!isNil(props.tabToNextCell)) {
-          return { ...props.tabToNextCell(params), rowPinned: null };
+        if (_tabToNextCell !== undefined) {
+          return { ..._tabToNextCell(params), rowPinned: null };
         }
         return params.nextCellPosition === null
           ? params.previousCellPosition
           : params.nextCellPosition;
       },
-    [],
+    [_tabToNextCell],
   );
 
   const getRowStyle = useMemo(
@@ -247,11 +262,10 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
   );
 
   /*
-  We have to deep clone the row data because it is being pulled directly from
-	the store and as such, is immutable.  If we did not do this, than AG Grid would
-	be applying the updates to the elements of the data in the store, i.e. mutating
-	the store.  This only becomes a problem since we are nestling the actual
-	underlying row data in a `data` property of the <Row> model.
+  We have to deep clone the row data because it is being pulled directly from the store and as such,
+  is immutable.  If we did not do this, than AG Grid would be applying the updates to the elements
+  of the data in the store, i.e. mutating the store.  This only becomes a problem since we are
+  nestling the actual underlying row data in a `data` property of the <Row> model.
   */
   const rowData = ui.useDeepEqualMemo(
     () => map(data, (r: Table.BodyRow<R>) => cloneDeep(r)),
@@ -259,7 +273,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
   );
 
   const getContextMenuItems = useMemo(
-    () => (params: GetContextMenuItemsParams) => {
+    () => (params: GetContextMenuItemsParams<Table.BodyRow<R>>) => {
       if (!isNil(_getContextMenuItems) && !isNil(params.node)) {
         const row: Table.Row<R> = params.node.data;
         if (tabling.rows.isBodyRow(row)) {
@@ -276,9 +290,6 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
       tabling.aggrid.mergeClassNames<RowClassParams>(params, "row", rowClass),
     [rowClass],
   );
-
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  const getRowNodeId = useMemo(() => (r: any) => r.id, []);
 
   useEffect(() => {
     const instantiatedListeners: ((e: KeyboardEvent) => void)[] = [];
@@ -303,7 +314,7 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
       className={classNames("ag-theme-alpine", "grid", className)}
       style={style}
     >
-      <AgGridReact
+      <AgGridReact<Table.BodyRow<R>>
         headerHeight={38}
         cellFlashDelay={100}
         cellFadeDelay={500}
@@ -313,12 +324,11 @@ const Grid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowH
         animateRows={true}
         enterMovesDown={false}
         immutableData={true}
-        getRowNodeId={getRowNodeId}
+        getRowNodeId={(r: Table.BodyRow<R>) => `${r.id}`}
         valueCache={true}
         rowBuffer={50}
         {...props}
         rowDragManaged={false}
-        reactUi={false}
         rowHeight={props.rowHeight === undefined ? 36 : props.rowHeight}
         navigateToNextCell={navigateToNextCell}
         tabToNextCell={tabToNextCell}

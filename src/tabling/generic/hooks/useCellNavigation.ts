@@ -1,5 +1,5 @@
 import { isNil, includes, filter, map } from "lodash";
-import { NavigateToNextCellParams, TabToNextCellParams } from "@ag-grid-community/core";
+import { NavigateToNextCellParams, TabToNextCellParams } from "ag-grid-community";
 
 import { hooks, tabling } from "lib";
 

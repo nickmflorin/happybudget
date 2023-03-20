@@ -1,4 +1,4 @@
-import { keys, pickBy, isEqual, find, isNil, findIndex } from "lodash";
+import { keys, pickBy, isEqual, findIndex } from "lodash";
 
 // A type that is meant to represent a valid element of an array that is not an Array itself.
 export type ArrayPrimitive = null | boolean | number | string | Record<string, unknown>;
@@ -59,30 +59,81 @@ export const findDuplicates = <T extends ArrayPrimitive>(
   return count.filter((c: ArrayCount<T>) => c.count > 1).map((c: ArrayCount<T>) => c.value);
 };
 
-export const replaceInArray = <T>(
-  array: T[],
-  predicate: ((i: T) => boolean) | Record<string, unknown>,
-  newValue: T,
-): T[] => {
-  const currentValue = find(array, predicate) as T | undefined;
-  const newArray = [...array];
-  if (!isNil(currentValue)) {
-    const index = findIndex<T>(array, currentValue);
-    newArray[index] = newValue;
+type ArrayLookupOptions = {
+  readonly strict?: false;
+};
+
+type _FindInArrayRT<
+  T extends Record<string, unknown> | Model.Model,
+  O extends ArrayLookupOptions | undefined = undefined,
+> = O extends { readonly strict: true } ? [T, number] : [T, number] | null;
+
+type Predicate<T extends Record<string, unknown>> =
+  | ((obj: T) => boolean)
+  | (T extends Model.Model ? { id: T["id"] } : never);
+
+const _findInArray = <
+  T extends Record<string, unknown> | Model.Model,
+  O extends ArrayLookupOptions | undefined = undefined,
+>(
+  data: T[],
+  predicate: Predicate<T>,
+  options?: O,
+): _FindInArrayRT<T, O> => {
+  const index = findIndex<T>(data, (obj: T) => {
+    if (typeof predicate === "function") {
+      return predicate(obj);
+    } else if ((obj as Model.Model).id === undefined) {
+      throw new Error(
+        `The object ${JSON.stringify(obj)} does not represent a valid model with an ID.`,
+      );
+    }
+    return obj.id === predicate.id;
+  });
+  if (index === -1) {
+    if (options?.strict !== false) {
+      throw new Error("Element defined by predicate not exist in the array.");
+    }
+    return null as _FindInArrayRT<T, O>;
   }
+  return [data[index], index];
+};
+
+export const replaceInArray = <
+  T extends Record<string, unknown> | Model.Model,
+  O extends ArrayLookupOptions | undefined = undefined,
+>(
+  data: T[],
+  predicate: Predicate<T>,
+  newValue: T,
+  options?: O,
+): T[] => {
+  const result = _findInArray(data, predicate, options);
+  if (result === null) {
+    return [...data];
+  }
+  const newArray = [...data];
+  newArray[result[1]] = newValue;
   return newArray;
 };
 
-export const updateInArray = <T extends Record<string, unknown>>(
-  array: T[],
-  predicate: ((i: T) => boolean) | Record<string, unknown>,
-  updateValue: Partial<T>,
+export const updateInArray = <
+  T extends Record<string, unknown> | Model.Model,
+  O extends ArrayLookupOptions | undefined = undefined,
+>(
+  data: T[],
+  predicate: Predicate<T>,
+  updateValue: Partial<T> | ((obj: T) => Partial<T>),
+  options?: O,
 ): T[] => {
-  const currentValue = find(array, predicate) as T | undefined;
-  if (!isNil(currentValue)) {
-    return replaceInArray<T>(array, predicate, { ...currentValue, ...updateValue });
+  const result = _findInArray(data, predicate, options);
+  if (result === null) {
+    return [...data];
   }
-  return array;
+  const newArray = [...data];
+  const updateData = typeof updateValue === "function" ? updateValue(result[0]) : updateValue;
+  newArray[result[1]] = { ...result[0], ...updateData };
+  return newArray;
 };
 
 export const sumArray = (values: number[]): number =>

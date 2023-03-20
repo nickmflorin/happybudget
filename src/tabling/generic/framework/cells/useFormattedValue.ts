@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
 import { isNil } from "lodash";
-import { ValueFormatterParams } from "@ag-grid-community/core";
+import { ValueFormatterParams } from "ag-grid-community";
 
 const useFormattedValue = <
   R extends Table.RowData,

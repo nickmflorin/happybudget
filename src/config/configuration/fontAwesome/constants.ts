@@ -45,21 +45,21 @@ validation logic will throw an Error during the icon registration process.
        with the icon being removed.
 */
 /* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
-import { enumeratedLiteralsMap } from "lib/util/util";
+import { enumeratedLiterals } from "lib/util/util";
 
-export const IconPrefixes = enumeratedLiteralsMap(["far", "fab", "fas"] as const);
+export const IconPrefixes = enumeratedLiterals(["far", "fab", "fas"] as const);
 
 /**
  * An {@link IconCode} represents a more intuitive, human readable form of the FontAwesome prefix
  * values.  For instance, "far" corresponds to the "regular" FontAwesome library, so the code is
  * "regular".
  */
-export const IconCodes = enumeratedLiteralsMap(["solid", "regular", "brand"] as const);
+export const IconCodes = enumeratedLiterals(["solid", "regular", "brand"] as const);
 
 /* When an Icon is added to the registry, the name must be added to this array.  If the name already
    exists, it is because the Icon's name is associated with multiple prefixes and the name does not
    need to be re-added to this array a second time.  This array should be unique. */
-export const IconNames = enumeratedLiteralsMap([
+export const IconNames = enumeratedLiterals([
   "slack",
   "arrow-down",
   "circle-notch",

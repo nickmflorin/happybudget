@@ -1,5 +1,5 @@
 import { filter, isNil, map, findLastIndex, reduce } from "lodash";
-import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
+import { FillOperationParams } from "ag-grid-community/dist/cjs/entities/gridOptions";
 
 import { tabling } from "lib";
 

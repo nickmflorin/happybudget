@@ -34,8 +34,8 @@ import {
   CheckboxSelectionCallbackParams,
   RowDragEvent,
   RowDataUpdatedEvent,
-} from "@ag-grid-community/core";
-import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
+} from "ag-grid-community";
+import { FillOperationParams } from "ag-grid-community/dist/cjs/entities/gridOptions";
 
 import { tabling, hooks, util } from "lib";
 

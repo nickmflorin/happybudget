@@ -21,7 +21,7 @@ const pathGroupPattern = packages =>
   `{${packages.reduce((prev, v) => [...prev, `${v}`, `${v}/**`], []).join(",")}}`;
 
 const IMPORT_ORDER_CONFIG = {
-  groups: ["builtin", "external", "type", "internal", ["parent", "sibling"], "index", "object"],
+  groups: ["builtin", "external", "type", "internal", "parent", "sibling", "index", "object"],
   "newlines-between": "always",
   warnOnUnassignedImports: true,
   distinctGroup: false,
@@ -40,8 +40,8 @@ const IMPORT_ORDER_CONFIG = {
     },
     {
       pattern: "{../*}",
-      group: "sibling",
-      position: "before",
+      group: "parent",
+      position: "after",
     },
     {
       pattern: "{./*}",

@@ -7,7 +7,7 @@ declare type NaiveOnFormatError<
 declare type OnFormatError<P extends string | number | import("moment").Moment = string | number> =
   (v: P) => void;
 
-declare type AGFormatterParams = import("@ag-grid-community/core").ValueFormatterParams;
+declare type AGFormatterParams = import("ag-grid-community").ValueFormatterParams;
 declare type AGFormatter = (params: AGFormatterParams) => string;
 
 declare type NativeFormatterParams<

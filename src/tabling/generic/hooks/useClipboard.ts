@@ -1,5 +1,5 @@
 import { isNil, filter, map, includes, reduce } from "lodash";
-import { ProcessCellForExportParams } from "@ag-grid-community/core";
+import { ProcessCellForExportParams } from "ag-grid-community";
 
 import { hooks, tabling, notifications } from "lib";
 

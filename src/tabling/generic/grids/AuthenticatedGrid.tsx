@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 
 import { map, isNil, reduce } from "lodash";
-import { SelectionChangedEvent } from "@ag-grid-community/core";
+import { SelectionChangedEvent } from "ag-grid-community";
 
 import { tabling, hooks } from "lib";
 import { framework as generic } from "tabling/generic";

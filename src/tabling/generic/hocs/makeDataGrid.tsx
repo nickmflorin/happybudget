@@ -5,7 +5,7 @@ import hoistNonReactStatics from "hoist-non-react-statics";
 import { map, isNil, includes } from "lodash";
 import { useLocation } from "react-router-dom";
 import { Subtract } from "utility-types";
-import { CellMouseOverEvent, CellFocusedEvent } from "@ag-grid-community/core";
+import { CellMouseOverEvent, CellFocusedEvent } from "ag-grid-community";
 
 import { tabling, hooks, model, notifications } from "lib";
 

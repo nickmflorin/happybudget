@@ -1,5 +1,5 @@
 import { findIndex, isNil, map, includes } from "lodash";
-import { Column } from "@ag-grid-community/core";
+import { Column } from "ag-grid-community";
 
 import { tabling, budgeting, formatters } from "lib";
 import { Icon } from "components";

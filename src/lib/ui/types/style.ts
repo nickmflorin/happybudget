@@ -1,4 +1,4 @@
-import { enumeratedLiteralsMap, EnumeratedLiteralType, StringHasLength } from "../../util";
+import { enumeratedLiterals, EnumeratedLiteralType, StringHasLength } from "../../util";
 
 export const CSSSizeUnits = ["px", "%", "rem", "em", "vh", "vw"] as const;
 export type CSSSizeUnit = typeof CSSSizeUnits[number];
@@ -19,7 +19,7 @@ export type CSSSize<E extends CSSSizeUnit | number | undefined = undefined> = E 
   ? `${number}${E}`
   : CSSSize<number> | CSSSize<CSSSizeUnit>;
 
-export const SizeDimensions = enumeratedLiteralsMap(["width", "height", "both"] as const);
+export const SizeDimensions = enumeratedLiterals(["width", "height", "both"] as const);
 
 /**
  * Represents the various dimensions that the props for a component can dictate the component's
@@ -33,7 +33,7 @@ export type CSSFontProperties =
   | `font${Capitalize<_CSSFontPrefixedProperties>}`
   | "lineHeight"
   | "color";
-export const SizeAxes = enumeratedLiteralsMap(["horizontal", "vertical", "both"] as const);
+export const SizeAxes = enumeratedLiterals(["horizontal", "vertical", "both"] as const);
 
 /**
  * Represents the various x-y axes that the props for a component can dictate when specifying how
@@ -49,10 +49,10 @@ export const SizeAxisMap: { [key in SizeAxis]: SizeDimension } = {
   horizontal: "width",
 };
 
-export const SizeContains = enumeratedLiteralsMap(["fit", "square"] as const);
+export const SizeContains = enumeratedLiterals(["fit", "square"] as const);
 export type SizeContain = EnumeratedLiteralType<typeof SizeContains>;
 
-export const CSSDirections = enumeratedLiteralsMap(["top", "bottom", "left", "right"] as const);
+export const CSSDirections = enumeratedLiterals(["top", "bottom", "left", "right"] as const);
 export type CSSDirection = EnumeratedLiteralType<typeof CSSDirections>;
 
 /**

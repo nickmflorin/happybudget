@@ -1,10 +1,7 @@
 import { useState } from "react";
 
 import { isNil, map, reduce, filter } from "lodash";
-import {
-  ProcessCellForExportParams,
-  ProcessDataFromClipboardParams,
-} from "@ag-grid-community/core";
+import { ProcessCellForExportParams, ProcessDataFromClipboardParams } from "ag-grid-community";
 
 import { hooks, tabling } from "lib";
 

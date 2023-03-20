@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 
 import classNames from "classnames";
 import { isNil, find } from "lodash";
-import { Column } from "@ag-grid-community/core";
+import { Column } from "ag-grid-community";
 
 import { tabling, ui } from "lib";
 import { Icon, VerticalFlexCenter } from "components";

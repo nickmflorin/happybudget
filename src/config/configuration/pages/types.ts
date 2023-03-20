@@ -1,4 +1,4 @@
-import { http, model, ui, enumeratedLiteralsMap, EnumeratedLiteralType } from "lib";
+import { http, model, ui, enumeratedLiterals, EnumeratedLiteralType } from "lib";
 
 export type MetaOptionName = "description";
 
@@ -9,7 +9,7 @@ export type HeadOptions = MetaOptions & {
 };
 
 // IDs for pages that are directly navigatable to via the sidebar.
-export const SidebarPageIds = enumeratedLiteralsMap([
+export const SidebarPageIds = enumeratedLiterals([
   "dashboard",
   "machines",
   "machine-groups",
@@ -34,7 +34,7 @@ export type SidebarPagePathSelector<P extends string = string> =
   | RegExp
   | SidebarPagePathCallback;
 
-export const SidebarPageLocations = enumeratedLiteralsMap(["center", "bottom"] as const);
+export const SidebarPageLocations = enumeratedLiterals(["center", "bottom"] as const);
 export type SidebarPageLocation = EnumeratedLiteralType<typeof SidebarPageLocations>;
 
 /**

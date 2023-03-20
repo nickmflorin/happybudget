@@ -1,15 +1,15 @@
 import React, { useMemo, useImperativeHandle } from "react";
 
-import hoistNonReactStatics from "hoist-non-react-statics";
-import { isNil, map, includes } from "lodash";
-import { Subtract } from "utility-types";
 import {
   ProcessCellForExportParams,
   CellKeyDownEvent,
   NavigateToNextCellParams,
   TabToNextCellParams,
   SuppressKeyboardEventParams,
-} from "@ag-grid-community/core";
+} from "ag-grid-community";
+import hoistNonReactStatics from "hoist-non-react-statics";
+import { isNil, map, includes } from "lodash";
+import { Subtract } from "utility-types";
 
 import { hooks, tabling } from "lib";
 

@@ -4,7 +4,7 @@ import { RequiredKeys, OptionalKeys } from "utility-types";
 
 import { HexColor } from "./style";
 import { HTMLElementName, HTMLElementTag } from "../../core";
-import { IntersectionIfPopulated, enumeratedLiteralsMap, EnumeratedLiteralType } from "../../util";
+import { IntersectionIfPopulated, enumeratedLiterals, EnumeratedLiteralType } from "../../util";
 
 type Props = Record<string, unknown>;
 
@@ -277,7 +277,7 @@ export type UniversalComponentProps = Readonly<{
   style?: Style;
 }>;
 
-export const UniversalComponentPropNames = enumeratedLiteralsMap([
+export const UniversalComponentPropNames = enumeratedLiterals([
   "id",
   "className",
   "style",

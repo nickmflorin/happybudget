@@ -1,5 +1,5 @@
 import { isNil } from "lodash";
-import { ValueSetterParams } from "@ag-grid-community/core";
+import { ValueSetterParams } from "ag-grid-community";
 
 import { util } from "lib";
 

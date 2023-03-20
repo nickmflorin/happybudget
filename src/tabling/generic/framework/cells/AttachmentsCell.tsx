@@ -4,17 +4,34 @@ import { isNil, map } from "lodash";
 import { Progress } from "antd";
 
 import * as api from "api";
-import { ui } from "lib";
+import { ui, enumeratedLiterals, EnumeratedLiteralType } from "lib";
 import { Icon } from "components";
 import { AttachmentText } from "components/typography";
 
 import { Cell } from "./generic";
 
+type DragEventName = "dragenter" | "dragover" | "dragleave" | "drop";
+
+type Listener<T extends DragEventName = DragEventName> = {
+  event: T;
+  handler: (e: HTMLElementEventMap[T]) => void;
+};
+
+const DragCountActionTypes = enumeratedLiterals([
+  "increment",
+  "decrement",
+  "set",
+  "clear",
+] as const);
+type DragCountActionType = EnumeratedLiteralType<typeof DragCountActionTypes>;
+
 type DragCountAction = {
-  type: "INCREMENT_COUNT" | "DECREMENT_COUNT" | "SET_DRAG" | "CLEAR";
+  type: DragCountActionType;
   payload?: boolean;
 };
+
 type DragState = { count: number; drag: boolean };
+
 const InitialDragState: DragState = { count: 0, drag: false };
 
 const DragCountReducer = (
@@ -22,14 +39,14 @@ const DragCountReducer = (
   action: DragCountAction,
 ): DragState => {
   let newState = { ...state };
-  if (action.type === "INCREMENT_COUNT") {
+  if (action.type === DragCountActionTypes.INCREMENT) {
     return { ...newState, count: newState.count + 1 };
-  } else if (action.type === "SET_DRAG") {
+  } else if (action.type === DragCountActionTypes.SET) {
     if (action.payload !== undefined) {
       return { ...newState, drag: action.payload };
     }
     return newState;
-  } else if (action.type === "CLEAR") {
+  } else if (action.type === DragCountActionTypes.CLEAR) {
     return { ...newState, count: 0, drag: false };
   } else {
     newState = { ...newState, count: Math.max(newState.count - 1, 0) };
@@ -77,59 +94,77 @@ const AttachmentsCell = <
   }, [value]);
 
   useEffect(() => {
-    const handleDrag = (e: DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-    };
+    const cellRef = divRef.current;
 
-    const handleDragIn = (e: DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      dispatchDragState({ type: "INCREMENT_COUNT" });
-      if (e.dataTransfer?.items && e.dataTransfer.items.length > 0) {
-        dispatchDragState({ type: "SET_DRAG", payload: true });
+    const listeners: Listener[] = [
+      {
+        event: "dragenter",
+        handler: (e: DragEvent) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dispatchDragState({ type: DragCountActionTypes.INCREMENT });
+          if (e.dataTransfer?.items && e.dataTransfer.items.length > 0) {
+            dispatchDragState({ type: DragCountActionTypes.SET, payload: true });
+          }
+        },
+      },
+      {
+        event: "dragover",
+        handler: (e: DragEvent) => {
+          e.preventDefault();
+          e.stopPropagation();
+        },
+      },
+      {
+        event: "dragleave",
+        handler: (e: DragEvent) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dispatchDragState({ type: DragCountActionTypes.DECREMENT });
+        },
+      },
+      {
+        event: "drop",
+        handler: (e: DragEvent) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dispatchDragState({ type: DragCountActionTypes.SET, payload: false });
+          if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
+            api.xhr.uploadAttachmentFile(
+              e.dataTransfer.files,
+              props.uploadAttachmentsPath(row.id),
+              {
+                error: (err: Http.ApiError) => {
+                  props.table.handleRequestError(err, {
+                    message: "There was an error uploading the attachment.",
+                  });
+                  progressCancel();
+                },
+                progress: (computable: boolean, percent: number, total: number) =>
+                  progressUpdate(percent, total),
+                success: (ms: Model.Attachment[]) =>
+                  map(ms, (m: Model.Attachment) => props.onAttachmentAdded(row, m)),
+              },
+            );
+            e.dataTransfer.clearData();
+            dispatchDragState({ type: DragCountActionTypes.CLEAR });
+          }
+        },
+      },
+    ];
+
+    listeners.forEach((l: Listener) => {
+      if (cellRef !== null) {
+        cellRef.addEventListener(l.event, l.handler);
       }
-    };
+    });
 
-    const handleDragOut = (e: DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      dispatchDragState({ type: "DECREMENT_COUNT" });
-    };
-
-    const handleDrop = (e: DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      dispatchDragState({ type: "SET_DRAG", payload: false });
-      if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
-        api.xhr.uploadAttachmentFile(e.dataTransfer.files, props.uploadAttachmentsPath(row.id), {
-          error: (err: Http.ApiError) => {
-            props.table.handleRequestError(err, {
-              message: "There was an error uploading the attachment.",
-            });
-            progressCancel();
-          },
-          progress: (computable: boolean, percent: number, total: number) =>
-            progressUpdate(percent, total),
-          success: (ms: Model.Attachment[]) =>
-            map(ms, (m: Model.Attachment) => props.onAttachmentAdded(row, m)),
-        });
-        e.dataTransfer.clearData();
-        dispatchDragState({ type: "CLEAR" });
-      }
-    };
-
-    if (!isNil(divRef.current)) {
-      divRef.current.addEventListener("dragenter", handleDragIn);
-      divRef.current.addEventListener("dragleave", handleDragOut);
-      divRef.current.addEventListener("dragover", handleDrag);
-      divRef.current.addEventListener("drop", handleDrop);
-    }
     return () => {
-      divRef.current?.removeEventListener("dragenter", handleDragIn);
-      divRef.current?.removeEventListener("dragleave", handleDragOut);
-      divRef.current?.removeEventListener("dragover", handleDrag);
-      divRef.current?.removeEventListener("drop", handleDrop);
+      listeners.forEach((l: Listener) => {
+        if (cellRef !== null) {
+          cellRef.removeEventListener(l.event, l.handler);
+        }
+      });
     };
   });
 
@@ -155,7 +190,7 @@ const AttachmentsCell = <
         );
       }
     }
-  }, [attachment, progressActive, dragState.drag, progressValue]);
+  }, [attachment, progressActive, dragState.drag, progressValue, additionalCount]);
 
   return (
     <Cell {...props} ref={divRef} className="cell--attachments">

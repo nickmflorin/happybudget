@@ -115,40 +115,40 @@ export const applyDefaultsOnCreate = <R extends Table.RowData, M extends Model.R
   return data;
 };
 
-export const applyDefaultsOnUpdate = <R extends Table.RowData, M extends Model.RowHttpModel>(
-  cs: Table.ModelColumn<R, M>[],
-  row: Table.ModelRow<R>,
-  change: Table.RowChangeData<R, Table.ModelRow<R>>,
-  defaults?: Table.DefaultDataOnUpdate<R>,
-): Table.ModelRow<R> => {
-  /* Apply defaults defined on the columns themselves before defaults are
-     are applied from the explicitly passed in default data. */
-  row = {
-    ...row,
-    data: reduce(
-      cs,
-      (curr: R, c: Table.ModelColumn<R, M>) => {
-        if (c.defaultValueOnCreate !== undefined && row.data[c.field] === undefined) {
-          /* Do not pass in the current data with defaults from the columns
-					   applied up until this point, because the callback should expect
-						 that the provided data does not yet include defaults - otherwise,
-						 the result of the callback would depend on the order in which the
-						 callbacks for each possible default are applied. */
-          const defaultValue =
-            typeof c.defaultValueOnUpdate === "function"
-              ? c.defaultValueOnUpdate(row)
-              : c.defaultValueOnUpdate;
-          return { ...curr, [c.field]: defaultValue };
-        }
-        return curr;
-      },
-      row.data,
-    ),
-  };
-  if (defaults !== undefined) {
-    return typeof defaults === "function"
-      ? { ...row, data: insertDefaults(cs, row.data, defaults(row, change), "update") }
-      : { ...row, data: insertDefaults(cs, row.data, defaults, "update") };
-  }
-  return row;
-};
+// export const applyDefaultsOnUpdate = <R extends Table.RowData, M extends Model.RowHttpModel>(
+//   cs: Table.ModelColumn<R, M>[],
+//   row: Table.ModelRow<R>,
+//   change: Table.RowChangeData<R, Table.ModelRow<R>>,
+//   defaults?: Table.DefaultDataOnUpdate<R>,
+// ): Table.ModelRow<R> => {
+//   /* Apply defaults defined on the columns themselves before defaults are
+//      are applied from the explicitly passed in default data. */
+//   row = {
+//     ...row,
+//     data: reduce(
+//       cs,
+//       (curr: R, c: Table.ModelColumn<R, M>) => {
+//         if (c.defaultValueOnCreate !== undefined && row.data[c.field] === undefined) {
+//           /* Do not pass in the current data with defaults from the columns
+// 					   applied up until this point, because the callback should expect
+// 						 that the provided data does not yet include defaults - otherwise,
+// 						 the result of the callback would depend on the order in which the
+// 						 callbacks for each possible default are applied. */
+//           const defaultValue =
+//             typeof c.defaultValueOnUpdate === "function"
+//               ? c.defaultValueOnUpdate(row)
+//               : c.defaultValueOnUpdate;
+//           return { ...curr, [c.field]: defaultValue };
+//         }
+//         return curr;
+//       },
+//       row.data,
+//     ),
+//   };
+//   if (defaults !== undefined) {
+//     return typeof defaults === "function"
+//       ? { ...row, data: insertDefaults(cs, row.data, defaults(row, change), "update") }
+//       : { ...row, data: insertDefaults(cs, row.data, defaults, "update") };
+//   }
+//   return row;
+// };

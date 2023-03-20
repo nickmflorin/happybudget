@@ -1,5 +1,5 @@
 import { isNil, map, findIndex, includes, filter } from "lodash";
-import { SuppressKeyboardEventParams, CellClassParams } from "@ag-grid-community/core";
+import { SuppressKeyboardEventParams, CellClassParams } from "ag-grid-community";
 
 import { util, tabling, budgeting, notifications, formatters } from "lib";
 
