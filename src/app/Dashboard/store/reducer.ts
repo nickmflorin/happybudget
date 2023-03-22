@@ -2,7 +2,7 @@ import { isNil, reduce } from "lodash";
 import { combineReducers } from "redux";
 
 import { redux, tabling } from "lib";
-import { ContactsTable } from "tabling";
+import { ContactsTable } from "components/tabling";
 
 import * as actions from "./actions";
 import initialState from "./initialState";

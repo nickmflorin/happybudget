@@ -2,12 +2,13 @@ import { useEffect } from "react";
 
 import { useDispatch } from "react-redux";
 
-import * as store from "store";
 import { BudgetCard } from "components/containers/cards";
 import { BudgetEmptyIcon } from "components/svgs";
+import * as store from "application/store";
+
+import { actions } from "../../store";
 
 import GenericOwnedBudget, { RenderGenericOwnedBudgetCardParams } from "./GenericOwnedBudget";
-import { actions } from "../../store";
 
 type ActiveProps = {
   readonly onEdit: (b: Model.SimpleBudget) => void;

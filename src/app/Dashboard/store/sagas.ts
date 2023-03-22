@@ -2,7 +2,7 @@ import { SagaIterator } from "redux-saga";
 import { spawn, takeLatest, debounce } from "redux-saga/effects";
 
 import { tabling } from "lib";
-import * as store from "store";
+import * as store from "application/store";
 
 import * as actions from "./actions";
 import * as tasks from "./tasks";

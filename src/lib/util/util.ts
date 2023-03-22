@@ -32,7 +32,7 @@ export const enumeratedLiterals = <V extends readonly string[]>(
   ...(uniq(data) as types.UniqueArray<V>).reduce(
     (prev: types.EnumeratedLiteralsConstants<V>, curr: V[number]) => ({
       ...prev,
-      [curr.toUpperCase().replaceAll("-", "_")]: curr,
+      [curr.toUpperCase().replaceAll("-", "_").replaceAll(" ", "_")]: curr,
     }),
     {} as types.EnumeratedLiteralsConstants<V>,
   ),
@@ -86,7 +86,7 @@ export const enumeratedLiteralsMap = <
   ...(Object.keys(data) as K[]).reduce(
     (prev: types.EnumeratedLiteralsMapConstants<M, K, V>, curr: K) => ({
       ...prev,
-      [curr.toUpperCase().replaceAll("-", "_")]: data[curr],
+      [curr.toUpperCase().replaceAll("-", "_").replaceAll(" ", "_")]: data[curr],
     }),
     {} as types.EnumeratedLiteralsMapConstants<M, K, V>,
   ),

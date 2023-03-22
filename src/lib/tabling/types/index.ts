@@ -7,7 +7,6 @@ export * from "./redux";
 export * from "./rows";
 export * from "./share";
 export * from "./table";
-export * from "./tables";
 
 export type PreviousValues<T> = [T, T] | [T];
 

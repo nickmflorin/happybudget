@@ -2,8 +2,8 @@ import { useMemo } from "react";
 
 import { useSelector, useDispatch } from "react-redux";
 
-import * as store from "store";
 import { Drawer } from "components/layout";
+import * as store from "application/store";
 
 type UseDrawerConfig = {
   readonly render: () => JSX.Element;

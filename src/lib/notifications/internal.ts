@@ -2,8 +2,8 @@ import * as Sentry from "@sentry/react";
 import { isNil, map } from "lodash";
 
 import * as api from "api";
-import * as config from "config";
 import { formatters } from "lib";
+import * as config from "application/config";
 
 import { objToJson } from "./util";
 

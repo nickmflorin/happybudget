@@ -7,12 +7,13 @@ import { tabling, budgeting } from "lib";
 import {
   connectTableToAuthenticatedStore,
   SubAccountsTable as GenericSubAccountsTable,
-} from "tabling";
+} from "components/tabling";
 
-import FringesModal from "./FringesModal";
 import { useFringesModalControl } from "../hooks";
 import { BudgetPage } from "../Pages";
 import { actions, selectors, sagas } from "../store";
+
+import FringesModal from "./FringesModal";
 
 type M = Model.SubAccount;
 type R = Tables.SubAccountRowData;

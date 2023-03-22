@@ -2,9 +2,9 @@ import React from "react";
 
 import { isNil } from "lodash";
 
-import * as config from "config";
 import { Icon } from "components";
 import { HelpLink } from "components/links";
+import * as config from "application/config";
 
 import DropdownMenu, { DropdownMenuProps } from "./DropdownMenu";
 

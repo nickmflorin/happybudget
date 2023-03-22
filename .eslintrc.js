@@ -13,8 +13,8 @@ const EXTENSIONS = ["next/core-web-vitals", "prettier"];
 const modifyExtensions = (...insert) =>
   insert === undefined ? EXTENSIONS : [EXTENSIONS[0], ...insert, ...EXTENSIONS.slice(1)];
 
-const GENERIC_INTERNAL_MODULE_GROUP = ["api", "lib", "internal", "store", "config", "core"];
-const COMPONENT_INTERNAL_MODULE_GROUP = ["app", "components", "tabling", "style"];
+const GENERIC_INTERNAL_MODULE_GROUP = ["api", "application", "lib", "internal", "store", "config"];
+const COMPONENT_INTERNAL_MODULE_GROUP = ["app", "components", "style"];
 const INTERNAL_MODULES = [...GENERIC_INTERNAL_MODULE_GROUP, ...COMPONENT_INTERNAL_MODULE_GROUP];
 
 const pathGroupPattern = packages =>

@@ -4,12 +4,12 @@ import { isNil } from "lodash";
 
 import * as api from "api";
 import { ui, model, notifications } from "lib";
-import * as store from "store";
 import { Tile } from "components/containers";
 import { ImageAndName } from "components/fields";
 import { IImageAndNameRef } from "components/fields/ImageAndName";
 import { UserProfileForm } from "components/forms";
 import { Page } from "components/layout";
+import * as store from "application/store";
 
 const Profile = (): JSX.Element => {
   const form = ui.form.useForm<Http.UserPayload>();

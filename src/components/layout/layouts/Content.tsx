@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { useSelector } from "react-redux";
 import { CSSTransition, TransitionStatus } from "react-transition-group";
 
-import * as store from "store";
+import * as store from "application/store";
 
 import DrawerTarget from "./DrawerTarget";
 

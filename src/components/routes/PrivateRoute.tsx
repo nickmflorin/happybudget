@@ -5,8 +5,8 @@ import { Route, Redirect, RouteProps } from "react-router-dom";
 
 import * as api from "api";
 import { notifications, http } from "lib";
-import * as store from "store";
 import { WrapInApplicationSpinner } from "components";
+import * as store from "application/store";
 
 export type PrivateRouteProps = RouteProps & {
   readonly forceReloadFromStripe?: boolean;

@@ -144,3 +144,31 @@ export type FooterGridConfig<
   readonly rowHeight?: number;
   readonly getFooterColumn: (column: columns.DataColumn<R, M>) => columns.FooterColumn<R, M> | null;
 };
+
+// Either the TopSheet page or an ID of the account.
+export type PdfBudgetTableOption = "topsheet" | number;
+
+export type PdfBudgetTableHeaderOptions = {
+  readonly header: Pdf.HTMLNode[];
+  readonly left_image: UploadedImage | SavedImage | null;
+  readonly left_info: Pdf.HTMLNode[] | null;
+  readonly right_image: UploadedImage | SavedImage | null;
+  readonly right_info: Pdf.HTMLNode[] | null;
+};
+
+export type PdfBudgetTableOptions = {
+  readonly date: string;
+  readonly header: PdfBudgetTableHeaderOptions;
+  readonly columns: string[];
+  readonly tables?: PdfBudgetTableOption[] | null | undefined;
+  readonly excludeZeroTotals: boolean;
+  readonly notes?: Pdf.HTMLNode[];
+  readonly includeNotes: boolean;
+};
+
+export type PdfActualsTableOptions = {
+  readonly date: string;
+  readonly header: Pdf.HTMLNode[];
+  readonly columns: string[];
+  readonly excludeZeroTotals: boolean;
+};

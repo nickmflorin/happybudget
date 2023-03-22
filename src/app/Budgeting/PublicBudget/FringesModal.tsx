@@ -1,7 +1,7 @@
 import React from "react";
 
 import GenericFringesModal from "components/modals/FringesModal";
-import { FringesTable, connectTableToPublicStore } from "tabling";
+import { FringesTable, connectTableToPublicStore } from "components/tabling";
 
 import { actions, selectors } from "../store";
 

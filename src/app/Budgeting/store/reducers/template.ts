@@ -2,7 +2,7 @@ import { filter, intersection, includes, isNil } from "lodash";
 import { combineReducers } from "redux";
 
 import { redux, budgeting, tabling, context } from "lib";
-import { AccountsTable, SubAccountsTable, FringesTable } from "tabling";
+import { AccountsTable, SubAccountsTable, FringesTable } from "components/tabling";
 
 import * as actions from "../actions/template";
 import * as initialState from "../initialState";

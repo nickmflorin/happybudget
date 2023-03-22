@@ -2,10 +2,10 @@ import React from "react";
 
 import { Switch, useHistory, useLocation } from "react-router-dom";
 
-import * as config from "config";
 import { Icon } from "components";
 import { ExpandedLayout } from "components/layout";
 import { ConfigRoute, Route } from "components/routes";
+import * as config from "application/config";
 
 const Profile = config.lazyWithRetry(() => import("./Profile"));
 const Security = config.lazyWithRetry(() => import("./Security"));

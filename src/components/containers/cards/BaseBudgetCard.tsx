@@ -3,7 +3,7 @@ import React, { useEffect, useMemo } from "react";
 import { isNil } from "lodash";
 
 import { util } from "lib";
-import * as store from "store";
+import * as store from "application/store";
 
 import Card, { CardProps } from "./Card";
 

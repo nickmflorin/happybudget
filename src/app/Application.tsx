@@ -4,10 +4,10 @@ import { useSelector, useDispatch } from "react-redux";
 import { Switch, Redirect, Route } from "react-router-dom";
 import { Dispatch } from "redux";
 
-import * as config from "config";
-import * as store from "store";
 import { MultipleBudgetProductPermissionModal } from "components/modals";
 import { NotFoundRoute, PathParamsRoute } from "components/routes";
+import * as config from "application/config";
+import * as store from "application/store";
 
 import { Budget, Template } from "./Budgeting";
 import Dashboard from "./Dashboard";

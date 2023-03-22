@@ -5,12 +5,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
 
 import { redux, tabling } from "lib";
-import * as store from "store";
-import { ActualsTable, connectTableToAuthenticatedStore } from "tabling";
+import { ActualsTable, connectTableToAuthenticatedStore } from "components/tabling";
+import * as store from "application/store";
 
-import { ActualsPreviewModal } from "./PreviewModals";
 import { ActualsPage } from "../Pages";
 import { actions, sagas } from "../store";
+
+import { ActualsPreviewModal } from "./PreviewModals";
 
 type R = Tables.ActualRowData;
 type M = Model.Actual;

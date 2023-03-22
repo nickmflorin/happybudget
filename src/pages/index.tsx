@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 
-import * as config from "config";
 import { Page } from "components/layout";
+import * as config from "application/config";
 
 const Dashboard: NextPage = () => (
   <Page id={config.PageIds.DASHBOARD}>

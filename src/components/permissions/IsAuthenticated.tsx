@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 
-import { hooks } from "store";
 import { ShowHide } from "components";
+import { hooks } from "application/store";
 
 type IsAuthenticatedProps = {
   children: ReactNode;

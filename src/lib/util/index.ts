@@ -5,8 +5,8 @@ export * as clipboard from "./clipboard";
 export * as dates from "./dates";
 export * as events from "./events";
 export * as formatters from "./formatters";
-export * as fs from "./fs";
 export * as html from "./html";
+export * as messages from "./messages";
 export * as parsers from "./parsers";
 export * as validators from "./validators";
 

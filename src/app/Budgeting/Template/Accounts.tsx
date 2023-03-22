@@ -4,7 +4,10 @@ import { isNil } from "lodash";
 import { useDispatch } from "react-redux";
 
 import { budgeting, tabling } from "lib";
-import { AccountsTable as GenericAccountsTable, connectTableToAuthenticatedStore } from "tabling";
+import {
+  AccountsTable as GenericAccountsTable,
+  connectTableToAuthenticatedStore,
+} from "components/tabling";
 
 import { BudgetPage } from "../Pages";
 import { actions, selectors, sagas } from "../store";

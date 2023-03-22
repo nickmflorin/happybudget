@@ -2,7 +2,7 @@ import React, { ReactNode, useEffect } from "react";
 
 import { useDispatch } from "react-redux";
 
-import { setApplicationLoadingAction } from "store/actions";
+import { setApplicationLoadingAction } from "application/store/actions";
 
 interface WrapInApplicationSpinnerProps {
   loading?: boolean;

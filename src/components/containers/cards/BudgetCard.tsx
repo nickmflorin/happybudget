@@ -4,10 +4,10 @@ import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
 
 import * as api from "api";
-import * as config from "config";
 import { http, notifications, model } from "lib";
-import * as store from "store";
 import { Icon } from "components";
+import * as config from "application/config";
+import * as store from "application/store";
 
 import GenericOwnedBudgetCard, { GenericOwnedBudgetCardProps } from "./GenericOwnedBudgetCard";
 

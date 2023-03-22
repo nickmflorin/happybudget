@@ -4,8 +4,8 @@ import classNames from "classnames";
 
 import * as api from "api";
 import { notifications, http } from "lib";
-import * as store from "store";
 import { Icon } from "components";
+import * as store from "application/store";
 
 import GenericTemplateCard, { GenericTemplateCardProps } from "./GenericTemplateCard";
 

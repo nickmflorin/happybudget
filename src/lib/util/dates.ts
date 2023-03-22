@@ -2,7 +2,7 @@ import { isNil } from "lodash";
 import { Moment } from "moment";
 import moment from "moment-timezone";
 
-import * as config from "config";
+import * as config from "application/config";
 
 type IDateOptions = {
   readonly warnOnInvalid?: boolean;

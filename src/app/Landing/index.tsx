@@ -2,10 +2,10 @@ import React from "react";
 
 import { Switch, Route } from "react-router-dom";
 
-import * as config from "config";
 import { Icon } from "components";
 import { ConfigRoute } from "components/routes";
 import { Logo } from "components/svgs";
+import * as config from "application/config";
 
 const Login = config.lazyWithRetry(() => import("./Login"));
 const Signup = config.lazyWithRetry(() => import("./Signup"));

@@ -4,12 +4,16 @@ import { isNil } from "lodash";
 import { useDispatch, useSelector } from "react-redux";
 
 import { tabling, budgeting } from "lib";
-import { connectTableToPublicStore, SubAccountsTable as GenericSubAccountsTable } from "tabling";
+import {
+  connectTableToPublicStore,
+  SubAccountsTable as GenericSubAccountsTable,
+} from "components/tabling";
 
-import FringesModal from "./FringesModal";
 import { useFringesModalControl } from "../hooks";
 import { BudgetPage } from "../Pages";
 import { actions, selectors, sagas } from "../store";
+
+import FringesModal from "./FringesModal";
 
 type M = Model.SubAccount;
 type R = Tables.SubAccountRowData;

@@ -2,12 +2,13 @@ import { useEffect } from "react";
 
 import { useDispatch } from "react-redux";
 
-import * as store from "store";
 import { ArchivedBudgetCard } from "components/containers/cards";
 import { BudgetEmptyIcon } from "components/svgs";
+import * as store from "application/store";
+
+import { actions } from "../../store";
 
 import GenericOwnedBudget, { RenderGenericOwnedBudgetCardParams } from "./GenericOwnedBudget";
-import { actions } from "../../store";
 
 type ArchiveProps = {
   readonly onEdit: (b: Model.SimpleBudget) => void;

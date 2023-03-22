@@ -4,11 +4,11 @@ import { isNil } from "lodash";
 import { useHistory, useLocation } from "react-router-dom";
 
 import * as api from "api";
-import * as config from "config";
 import { ui, notifications } from "lib";
 import { LandingFormContainer } from "components/containers";
 import { LoginForm } from "components/forms";
 import { ILoginFormValues } from "components/forms/LoginForm";
+import * as config from "application/config";
 
 import {
   EmailTokenExpiredNotification,

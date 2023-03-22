@@ -3,7 +3,7 @@ import { combineReducers } from "redux";
 
 import * as api from "api";
 import { redux, budgeting, tabling, context } from "lib";
-import { SubAccountsTable, FringesTable, ActualsTable, AccountsTable } from "tabling";
+import { SubAccountsTable, FringesTable, ActualsTable, AccountsTable } from "components/tabling";
 
 import * as actions from "../actions/budget";
 import * as initialState from "../initialState";

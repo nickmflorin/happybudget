@@ -4,10 +4,10 @@ import { isNil, includes } from "lodash";
 import { useHistory } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
-import * as config from "config";
 import { util } from "lib";
 import { ShowHide } from "components";
 import { IconButton } from "components/buttons";
+import * as config from "application/config";
 
 import Input, { InputProps } from "./Input";
 

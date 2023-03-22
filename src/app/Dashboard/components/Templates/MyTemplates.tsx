@@ -4,14 +4,15 @@ import { isNil } from "lodash";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 
-import * as store from "store";
 import { ShowHide } from "components";
 import { TemplateCard, EmptyCard } from "components/containers/cards";
 import { EditTemplateModal, CreateTemplateModal } from "components/modals";
 import { TemplateEmptyIcon } from "components/svgs";
+import * as store from "application/store";
+
+import { actions } from "../../store";
 
 import GenericOwnedTemplate, { RenderGenericOwnedTemplateCardParams } from "./GenericOwnedTemplate";
-import { actions } from "../../store";
 
 interface MyTemplatesProps {
   readonly onDeriveBudget: (template: number) => void;

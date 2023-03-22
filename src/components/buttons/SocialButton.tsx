@@ -2,7 +2,7 @@ import React from "react";
 
 import { isNil } from "lodash";
 
-import * as config from "config";
+import * as config from "application/config";
 
 import { ButtonProps } from "./Button";
 

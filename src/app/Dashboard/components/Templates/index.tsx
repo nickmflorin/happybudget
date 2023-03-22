@@ -4,14 +4,15 @@ import { isNil } from "lodash";
 import { useDispatch } from "react-redux";
 import { Switch, Route, useHistory } from "react-router-dom";
 
-import * as config from "config";
 import { model } from "lib";
-import * as store from "store";
 import { CreateBudgetModal } from "components/modals";
+import * as config from "application/config";
+import * as store from "application/store";
+
+import { actions } from "../../store";
 
 import Discover from "./Discover";
 import MyTemplates from "./MyTemplates";
-import { actions } from "../../store";
 
 type TemplatesProps = {
   readonly onCreateBudget: () => void;

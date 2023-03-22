@@ -5,8 +5,8 @@ import { useLocation, useHistory } from "react-router-dom";
 
 import * as api from "api";
 import { notifications } from "lib";
-import * as store from "store";
 import { ProductsManager } from "components/model/billing";
+import * as store from "application/store";
 
 const Billing = (): JSX.Element => {
   const [subscribing, setSubscribing] = useState<Model.ProductId | null>(null);

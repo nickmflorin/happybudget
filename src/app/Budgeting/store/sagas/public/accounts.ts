@@ -1,5 +1,5 @@
 import { tabling } from "lib";
-import * as store from "store";
+import * as store from "application/store";
 
 import * as actions from "../../actions/public";
 

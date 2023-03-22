@@ -1,12 +1,45 @@
-import { find, isNil } from "lodash";
+import { find } from "lodash";
 
-import { inferModelFromName } from "./lookup";
+import { inferModelFromName, InferModelFromNameOptions } from "./lookup";
+
+export type IChoice<
+  I extends number = number,
+  N extends string = string,
+  S extends string = string,
+> = {
+  id: I;
+  name: N;
+  slug: S;
+};
+
+export type DynamicChoices<
+  CH extends IChoice<I, N, S>,
+  I extends number = number,
+  N extends string = string,
+  S extends string = string,
+> = {
+  [key in CH["slug"]]: CH;
+};
+
+export type IChoices<
+  CH extends IChoice<I, N, S>,
+  I extends number = number,
+  N extends string = string,
+  S extends string = string,
+> = {
+  readonly choices: CH[];
+  readonly get: (id: I | S) => CH;
+  readonly infer: (
+    name: string,
+    options?: Omit<InferModelFromNameOptions<CH>, "getName">,
+  ) => CH | null;
+} & DynamicChoices<CH, I, N, S>;
 
 export class ChoiceClass<
   I extends number = number,
   N extends string = string,
   S extends string = string,
-> implements Model.Choice<I, N, S>
+> implements IChoice<I, N, S>
 {
   public readonly id: I;
   public readonly name: N;
@@ -38,14 +71,14 @@ class ChoicesClass<
     } else {
       ch = find(this.choices, (c: CH) => c.slug === lookup);
     }
-    if (isNil(ch)) {
+    if (ch === undefined) {
       throw new Error(`Could not find choice for lookup ${lookup}.`);
     }
     return ch;
   };
 
-  infer = (name: string, options?: Omit<Model.InferModelFromNameParams<CH>, "getName">) =>
-    inferModelFromName(this.choices, name, { caseInsensitive: false, ...options });
+  infer = (name: string, options?: Omit<InferModelFromNameOptions<CH>, "getName">) =>
+    inferModelFromName<ChoiceClass>(this.choices, name, { caseInsensitive: false, ...options });
 }
 
 export const Choice = <
@@ -65,13 +98,12 @@ export const Choices = <
   S extends string = string,
 >(
   choices: CH[],
-): Model.Choices<CH, I, N, S> => {
+): IChoices<CH, I, N, S> => {
   const chClass = new ChoicesClass<CH, I, N, S>(choices);
 
-  const dynamic: Model.DynamicChoices<CH, I, N, S> = {} as Model.DynamicChoices<CH, I, N, S>;
+  const dynamic: DynamicChoices<CH, I, N, S> = {} as DynamicChoices<CH, I, N, S>;
   for (let i = 0; i < choices.length; i++) {
     dynamic[choices[i].slug] = choices[i];
   }
-
-  return { ...chClass, ...dynamic };
+  return { ...chClass, ...dynamic } as IChoices<CH, I, N, S>;
 };

@@ -2,7 +2,7 @@ import { SagaIterator } from "redux-saga";
 import { takeLatest, spawn } from "redux-saga/effects";
 
 import { tabling } from "lib";
-import * as store from "store";
+import * as store from "application/store";
 
 import { subAccount as actions, responseFringesAction } from "../../actions/public";
 import * as selectors from "../../selectors";

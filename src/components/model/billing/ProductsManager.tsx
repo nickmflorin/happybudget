@@ -5,10 +5,10 @@ import { isNil } from "lodash";
 
 import * as api from "api";
 import { notifications, model, util } from "lib";
-import * as store from "store";
 import { Separator, RenderOrSpinner } from "components";
 import { PrimaryButton } from "components/buttons";
 import { Tag } from "components/tagging";
+import * as store from "application/store";
 
 import Product from "./Product";
 import ProductsList from "./ProductsList";

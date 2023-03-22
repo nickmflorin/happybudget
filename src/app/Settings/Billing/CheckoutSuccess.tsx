@@ -4,8 +4,8 @@ import { isNil } from "lodash";
 import { Redirect, useLocation } from "react-router-dom";
 
 import * as api from "api";
-import * as store from "store";
 import { ApplicationSpinner } from "components";
+import * as store from "application/store";
 
 type IRedirect = {
   readonly pathname: "/billing";

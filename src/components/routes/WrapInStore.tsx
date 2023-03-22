@@ -9,8 +9,8 @@ import { Store } from "redux";
 
 import * as api from "api";
 import { notifications, model, http } from "lib";
-import { configure } from "store";
 import { ApplicationSpinner, ConnectedApplicationSpinner } from "components";
+import { configure } from "application/store";
 
 type UrlParams = Record<string, string> & { tokenId: string };
 

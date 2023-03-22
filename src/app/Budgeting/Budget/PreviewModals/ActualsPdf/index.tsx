@@ -4,9 +4,9 @@ import { isNil, filter, find, includes } from "lodash";
 
 import { tabling, model } from "lib";
 import { Document, Page, Tag, Text } from "components/pdf";
+import { ActualsTable as GenericActualsTable } from "components/tabling";
+import { ActualsTable } from "components/tabling/pdf";
 import { Colors } from "style/constants";
-import { ActualsTable as GenericActualsTable } from "tabling";
-import { ActualsTable } from "tabling/pdf";
 
 import PageHeader from "./PageHeader";
 

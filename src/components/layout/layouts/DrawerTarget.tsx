@@ -3,8 +3,8 @@ import React from "react";
 import classNames from "classnames";
 import { useDispatch } from "react-redux";
 
-import * as store from "store";
 import { IconButton } from "components/buttons";
+import * as store from "application/store";
 
 const DrawerTarget = (props: Omit<StandardComponentProps, "id">): JSX.Element => {
   const dispatch = useDispatch();

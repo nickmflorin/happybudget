@@ -4,7 +4,6 @@ import { isNil } from "lodash";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 
-import * as store from "store";
 import { ShowHide } from "components";
 import {
   CommunityTemplateCard,
@@ -13,9 +12,11 @@ import {
 } from "components/containers/cards";
 import { EditTemplateModal, CreateTemplateModal } from "components/modals";
 import { IsStaff } from "components/permissions";
+import * as store from "application/store";
+
+import { actions } from "../../store";
 
 import GenericOwnedTemplate, { RenderGenericOwnedTemplateCardParams } from "./GenericOwnedTemplate";
-import { actions } from "../../store";
 
 interface DiscoverProps {
   readonly onDeriveBudget: (template: number) => void;

@@ -1,6 +1,6 @@
 import Cookies from "universal-cookie";
 
-import * as config from "config";
+import * as config from "application/config";
 
 import { parsers } from "./util";
 

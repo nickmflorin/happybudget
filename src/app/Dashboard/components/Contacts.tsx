@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 
 import { tabling } from "lib";
 import { Page } from "components/layout";
-import { ContactsTable, connectTableToAuthenticatedStore } from "tabling";
+import { ContactsTable, connectTableToAuthenticatedStore } from "components/tabling";
 
 import { actions, sagas } from "../store";
 

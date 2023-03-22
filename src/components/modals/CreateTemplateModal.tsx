@@ -3,8 +3,8 @@ import { useState } from "react";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import * as store from "store";
 import { TemplateForm } from "components/forms";
+import * as store from "application/store";
 
 import { CreateModelModal, CreateModelModalProps } from "./generic";
 

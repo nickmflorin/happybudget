@@ -1,10 +1,10 @@
 import { ActualFileObject } from "filepond/types";
 
-import * as config from "config";
+import * as config from "application/config";
 
-import * as errors from "./errors";
+import * as errors from "./deprecated/errors";
 import * as parsers from "./parsers";
-import { setRequestHeaders } from "./util";
+import { setRequestHeaders } from "./util/util";
 
 type XHRRequestOptions<R> = {
   readonly progress?: (computable: boolean, percent: number, total: number) => void;

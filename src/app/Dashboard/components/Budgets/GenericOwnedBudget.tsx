@@ -2,13 +2,13 @@ import React from "react";
 
 import { useDispatch } from "react-redux";
 
-import * as config from "config";
 import { model } from "lib";
-import * as store from "store";
 import { Icon } from "components";
 import { PrimaryButtonIconToggle } from "components/buttons";
 import { BudgetDropdownMenu } from "components/dropdowns";
 import { BudgetEmptyIcon } from "components/svgs";
+import * as config from "application/config";
+import * as store from "application/store";
 
 import GenericOwned, { GenericOwnedProps, RenderGenericOwnedCardParams } from "../GenericOwned";
 

@@ -2,10 +2,10 @@ import React from "react";
 
 import { useHistory } from "react-router-dom";
 
-import * as config from "config";
-import * as store from "store";
 import { Icon } from "components";
 import { AccountCircleLink } from "components/links";
+import * as config from "application/config";
+import * as store from "application/store";
 
 import DropdownMenu, { DropdownMenuProps } from "./DropdownMenu";
 

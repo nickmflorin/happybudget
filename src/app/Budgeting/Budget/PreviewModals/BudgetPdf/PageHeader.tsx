@@ -3,8 +3,8 @@ import React, { useMemo } from "react";
 import { SourceObject } from "@react-pdf/types";
 import { isNil } from "lodash";
 
-import * as config from "config";
 import { View, Text, RichText, Image } from "components/pdf";
+import * as config from "application/config";
 
 type SubHeaderItemImage = {
   readonly image: string;

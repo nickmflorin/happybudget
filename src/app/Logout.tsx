@@ -5,7 +5,7 @@ import { Redirect } from "react-router-dom";
 
 import * as api from "api";
 import { notifications } from "lib";
-import * as store from "store";
+import * as store from "application/store";
 
 export const Logout = (): JSX.Element => {
   const [redirect, setRedirect] = useState(false);

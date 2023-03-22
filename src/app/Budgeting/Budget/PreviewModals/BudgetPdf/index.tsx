@@ -8,8 +8,8 @@ import { Document, View, Page, Tag, Text, NoDataPage } from "components/pdf";
 import {
   AccountsTable as GenericAccountsTable,
   SubAccountsTable as GenericSubAccountsTable,
-} from "tabling";
-import { AccountsTable, AccountTable } from "tabling/pdf";
+} from "components/tabling";
+import { AccountsTable, AccountTable } from "components/tabling/pdf";
 
 import Notes from "./Notes";
 import PageHeader from "./PageHeader";

@@ -2,8 +2,8 @@ import React, { useMemo, useState } from "react";
 
 import * as api from "api";
 import { http, notifications } from "lib";
-import * as store from "store";
 import { Icon } from "components";
+import * as store from "application/store";
 
 import GenericTemplateCard, { GenericTemplateCardProps } from "./GenericTemplateCard";
 

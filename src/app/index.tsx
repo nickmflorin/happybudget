@@ -4,7 +4,7 @@ import { History } from "history";
 import { Router, Switch, Route } from "react-router-dom";
 
 import "style/index.scss";
-import * as config from "config";
+import * as config from "application/config";
 import { ApplicationSpinner } from "components";
 import { ReduxRoute, NotFoundRoute, LandingRoute, ConfigRoute } from "components/routes";
 

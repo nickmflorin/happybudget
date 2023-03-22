@@ -5,8 +5,8 @@ import { map } from "lodash";
 
 import * as api from "api";
 import { http } from "lib";
-import { hooks } from "store";
 import { UserImageOrInitials } from "components/images";
+import { hooks } from "application/store";
 
 import { options, MultiModelAsyncSelect, MultiModelAsyncSelectProps } from "./generic";
 

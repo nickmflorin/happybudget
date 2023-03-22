@@ -9,10 +9,10 @@ import { UploadChangeParam } from "antd/lib/upload";
 import { UploadFile } from "antd/lib/upload/interface";
 
 import * as api from "api";
-import * as config from "config";
 import { util } from "lib";
 import { Icon, RenderWithSpinner, Image, ShowHide } from "components";
 import { ImageClearButton } from "components/buttons";
+import * as config from "application/config";
 
 type UploaderImageProps = StandardComponentProps & {
   readonly image: UploadedImage | SavedImage;

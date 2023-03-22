@@ -7,12 +7,12 @@ import {
   IconNames,
   IconPrefixes,
   Icons,
-} from "config/configuration/fontAwesome/constants";
+} from "application/config/configuration/fontAwesome/constants";
 
 import { enumeratedLiterals, EnumeratedLiteralType } from "../../util";
 import * as types from "../types";
 
-export * from "config/configuration/fontAwesome/constants";
+export * from "application/config/configuration/fontAwesome/constants";
 
 export const IconPrefixMap = {
   [IconCodes.BRAND]: IconPrefixes.FAB,

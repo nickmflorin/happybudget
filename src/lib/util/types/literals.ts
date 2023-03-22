@@ -2,7 +2,9 @@ import * as arrays from "./arrays";
 import * as strings from "./strings";
 
 export type EnumeratedLiteralsConstants<V extends readonly VI[], VI extends string = string> = {
-  [key in keyof V & string as strings.HyphensToUnderscores<Uppercase<V[key] & string>>]: V[key];
+  [key in keyof V & string as strings.SpacesToUnderscores<
+    strings.HyphensToUnderscores<Uppercase<V[key] & string>>
+  >]: V[key];
 };
 
 /**
@@ -153,7 +155,9 @@ export type EnumeratedLiteralsMapConstants<
   K extends string = string,
   V extends readonly (string | number | boolean)[] = readonly (string | number | boolean)[],
 > = {
-  [key in keyof M & string as strings.HyphensToUnderscores<Uppercase<key>>]: V[number];
+  [key in keyof M & string as strings.SpacesToUnderscores<
+    strings.HyphensToUnderscores<Uppercase<key>>
+  >]: V[number];
 };
 
 /**
@@ -227,7 +231,7 @@ export type EnumeratedLiteralsMap<
    *   return <></>
    * }
    */
-  contains: (v: unknown) => v is V[number]
+  contains: (v: unknown) => v is V[number];
 };
 
 /**
