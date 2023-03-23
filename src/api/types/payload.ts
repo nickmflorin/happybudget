@@ -9,7 +9,7 @@ export type AuthTokenValidationPayload = {
 export type PublicTokenValidationPayload = {
   readonly token: string;
   readonly instance: {
-    readonly type: model.HttpModelType;
+    readonly type: model.ApiModelType;
     readonly id: number;
   };
 };
@@ -137,7 +137,7 @@ export type ActualPayload = {
   readonly notes?: model.Actual["notes"];
   readonly actual_type?: number | null;
   readonly attachments?: number[];
-  readonly owner: model.HttpModel<"subaccount"> | model.HttpModel<"markup"> | null;
+  readonly owner: model.TypedApiModel<"subaccount"> | model.TypedApiModel<"markup"> | null;
   readonly previous?: number | null;
 };
 
@@ -201,6 +201,6 @@ export type ModelPayloadMap = {
   collaborator: CollaboratorPayload;
 };
 
-export type ModelPayload<M extends model.HttpModel> = M["type"] extends keyof ModelPayloadMap
+export type ModelPayload<M extends model.TypedApiModel> = M["type"] extends keyof ModelPayloadMap
   ? ModelPayloadMap[M["type"]]
   : never;

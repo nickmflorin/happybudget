@@ -1,10 +1,7 @@
 export * from "./cells";
-export * from "./columns";
 export * from "./editors";
-export * from "./events";
+export * from "./formatting";
 export * from "./framework";
-export * from "./redux";
-export * from "./rows";
 export * from "./share";
 export * from "./table";
 
@@ -20,7 +17,7 @@ interface _ClassNameArray<P> {
 
 export type ClassName<P> = RawClassName | ClassNameParamCallback<P> | _ClassNameArray<P>;
 
-/* type CreateTableDataConfig<R extends RowData, M extends Model.RowHttpModel = Model.RowHttpModel> = {
+/* type CreateTableDataConfig<R extends RowData, M extends model.RowTypedApiModel = model.RowTypedApiModel> = {
      readonly response: Http.SuccessfulTableResponse<M>;
      readonly columns: ModelColumn<R, M>[];
      readonly getModelRowChildren?: (m: M) => number[];

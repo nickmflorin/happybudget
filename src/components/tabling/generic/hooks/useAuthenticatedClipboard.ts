@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-import { isNil, map, reduce, filter } from "lodash";
 import { ProcessCellForExportParams, ProcessDataFromClipboardParams } from "ag-grid-community";
+import { isNil, map, reduce, filter } from "lodash";
 
 import { hooks, tabling } from "lib";
 
@@ -14,15 +14,15 @@ type UseAuthenticatedClipboardReturnType<R extends Table.RowData> = [
   (p: Table.SoloCellChange<R> | null) => void,
 ];
 
-type UseAuthenticatedClipboardParams<R extends Table.RowData, M extends Model.RowHttpModel> = Omit<
-  UseClipboardParams<R, M>,
-  "setCellCutChange"
-> & {
+type UseAuthenticatedClipboardParams<
+  R extends Table.RowData,
+  M extends model.RowTypedApiModel,
+> = Omit<UseClipboardParams<R, M>, "setCellCutChange"> & {
   readonly apis: Table.GridApis | null;
   readonly onEvent: (event: Table.Event<R, M>) => void;
 };
 
-const getWritableColumnsAfter = <R extends Table.RowData, M extends Model.RowHttpModel>(
+const getWritableColumnsAfter = <R extends Table.RowData, M extends model.RowTypedApiModel>(
   api: Table.ColumnApi,
   columns: Table.DataColumn<R, M>[],
   col: Table.AgColumn,
@@ -41,7 +41,7 @@ const getWritableColumnsAfter = <R extends Table.RowData, M extends Model.RowHtt
 
 const processValueFromClipboard = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
 >(
   value: string,
@@ -84,7 +84,7 @@ const processValueFromClipboard = <
 
 const processArrayFromClipboard = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
 >(
   api: Table.ColumnApi,
@@ -122,7 +122,7 @@ const processArrayFromClipboard = <
   );
 };
 
-const useAuthenticatedClipboard = <R extends Table.RowData, M extends Model.RowHttpModel>(
+const useAuthenticatedClipboard = <R extends Table.RowData, M extends model.RowTypedApiModel>(
   params: UseAuthenticatedClipboardParams<R, M>,
 ): UseAuthenticatedClipboardReturnType<R> => {
   const [cutCellChange, setCellCutChange] = useState<Table.SoloCellChange<R> | null>(null);

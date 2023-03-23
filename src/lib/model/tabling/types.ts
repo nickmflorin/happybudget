@@ -2,7 +2,7 @@ import * as tabling from "../../tabling";
 import * as budgeting from "../budgeting";
 import * as contact from "../contact";
 
-type BudgetRowData = budgeting.LineMetrics & {
+export type BudgetRowData = budgeting.LineMetrics & {
   readonly identifier: string | null;
   readonly description: string | null;
 };

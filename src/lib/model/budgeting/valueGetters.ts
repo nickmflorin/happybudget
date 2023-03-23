@@ -1,13 +1,16 @@
 import { filter, reduce, includes } from "lodash";
 
-import { tabling, model } from "lib";
+import * as tabling from "../../tabling";
+import * as tableModels from "../tabling";
 
-export const estimatedValueGetter = <R extends Tables.BudgetRowData>(
-  row: Table.BodyRow<R>,
-  rows: Table.BodyRow<R>[],
+import * as businessLogic from "./businessLogic";
+
+export const estimatedValueGetter = <R extends tableModels.BudgetRowData>(
+  row: tabling.Row<tabling.BodyRowType, R>,
+  rows: tabling.Row<tabling.BodyRowType, R>[],
 ): number => {
-  if (tabling.rows.isDataRow(row)) {
-    return model.budgeting.estimatedValue(row);
+  if (tabling.isDataRow(row)) {
+    return businessLogic.estimatedValue(row);
   } else {
     const childrenRows: Table.DataRow<R>[] = filter(
       rows,

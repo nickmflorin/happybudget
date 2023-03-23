@@ -103,7 +103,7 @@ export const orderTableData = <R extends Table.RowData>(
   });
 };
 
-export const generateTableData = <R extends Table.RowData, M extends Model.RowHttpModel>(
+export const generateTableData = <R extends Table.RowData, M extends model.RowTypedApiModel>(
   config: Table.CreateTableDataConfig<R, M>,
 ): Table.BodyRow<R>[] => {
   const modelRowManager = new managers.ModelRowManager<R, M>({

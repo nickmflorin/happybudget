@@ -42,7 +42,7 @@ export const getEditColumnRowConfig = <
 
 export const normalizedField = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >(
   col: Table.RealColumn<R, M>,
 ): string =>
@@ -52,7 +52,7 @@ declare type Case = "pdf" | "aggrid";
 
 export const getColumnRowValue = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
 >(
   col: Table.DataColumn<R, M, V>,
@@ -230,7 +230,7 @@ export const filterModelColumns = <CA extends Table.Column[]>(
 
 export const isEditable = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   C extends Table.BodyColumn<R, M> = Table.BodyColumn<R, M>,
 >(
   column: C,
@@ -246,7 +246,7 @@ export const isEditable = <
 
 export const parseBaseColumn = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   C extends Table.Column<R, M>,
 >(
   column: C,

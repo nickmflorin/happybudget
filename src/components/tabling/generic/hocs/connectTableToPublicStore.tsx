@@ -19,14 +19,14 @@ export type ConnectedPublicTableInjectedProps<
 
 export type ConnectPublicTableProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = ConnectTableProps<R, M, C, S>;
 
 type PublicStoreConfig<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   A extends Redux.TableActionPayloadMap<M> = Redux.TableActionPayloadMap<M>,
@@ -37,7 +37,7 @@ type PublicStoreConfig<
 type HOCProps<
   T extends ConnectedPublicTableInjectedProps<R, S>,
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = Subtract<T, ConnectedPublicTableInjectedProps<R, S>> & ConnectPublicTableProps<R, M, C, S>;
@@ -46,7 +46,7 @@ const connectTableToPublicStore =
   <
     T extends ConnectedPublicTableInjectedProps<R, S>,
     R extends Table.RowData,
-    M extends Model.RowHttpModel = Model.RowHttpModel,
+    M extends model.RowTypedApiModel = model.RowTypedApiModel,
     C extends Table.Context = Table.Context,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
     A extends Redux.TableActionPayloadMap<M> = Redux.TableActionPayloadMap<M>,

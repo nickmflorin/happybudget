@@ -17,7 +17,7 @@ export const ExportPdfAction = (onExport: () => void): Table.MenuActionObj => ({
 
 export const ExportCSVAction = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >(
   table: Table.TableInstance<R, M>,
   params: Table.PublicMenuActionParams<R, M>,
@@ -43,7 +43,7 @@ export const ExportCSVAction = <
 
 export const ToggleColumnAction = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >(
   table: Table.TableInstance<R, M>,
   params: Table.PublicMenuActionParams<R, M>,
@@ -80,7 +80,7 @@ export const CollaboratorsAction = (
 export const ShareAction = <
   B extends Model.PublicHttpModel,
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
 >(
   config: Table.ShareConfig<B, R, M>,
 ): Table.MenuActionObj => {

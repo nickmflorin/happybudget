@@ -38,7 +38,7 @@ const updateRowsReducer = <
 
 type ControlEventReducers<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = {
   readonly [Property in keyof Table.ControlEvents<R, M>]: Redux.BasicReducerWithDefinedState<
@@ -49,7 +49,7 @@ type ControlEventReducers<
 
 const createControlEventReducer = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   C extends Redux.ActionContext = Redux.ActionContext,
 >(

@@ -1,9 +1,11 @@
+import * as fs from "../../fs";
+import * as model from "../../model";
 import { enumeratedLiterals, EnumeratedLiteralType } from "../../util";
+import * as columns from "../columns";
+import * as events from "../events";
+import * as rows from "../rows";
 
-import * as columns from "./columns";
-import * as events from "./events";
 import * as framework from "./framework";
-import * as rows from "./rows";
 
 export const TableNames = enumeratedLiterals([
   "account-subaccounts",
@@ -19,7 +21,7 @@ export type TableName = EnumeratedLiteralType<typeof TableNames>;
 export type TableContext = Record<string, unknown>;
 
 export type DataGridInstance = {
-  readonly getCSVData: (fields?: string[]) => CSVData;
+  readonly getCSVData: (fields?: string[]) => fs.CSVData;
 };
 
 export type LocallyTrackedChangesCb<R extends rows.Row = rows.Row> = (
@@ -30,7 +32,7 @@ export type TableInstanceAttachmentAction = () => void;
 
 export type TableInstance<
   R extends rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = DataGridInstance &
   UINotificationsManager & {
     readonly saving: (v: boolean) => void;
@@ -81,7 +83,7 @@ export type MenuActionObj = {
 
 export type PublicMenuActionParams<
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = {
   readonly apis: framework.GridApis<R> | null;
   readonly columns: columns.DataColumn<R, M>[];
@@ -90,7 +92,7 @@ export type PublicMenuActionParams<
 
 export type AuthenticatedMenuActionParams<
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = PublicMenuActionParams<R, M> & {
   readonly selectedRows: rows.Row<R, rows.EditableRowType>[];
 };
@@ -98,45 +100,45 @@ export type AuthenticatedMenuActionParams<
 export type MenuActionCallback<
   V,
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   T extends PublicMenuActionParams<R, M> = PublicMenuActionParams<R, M>,
 > = (params: T) => V;
 
 export type MenuAction<
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   T extends PublicMenuActionParams<R, M> = PublicMenuActionParams<R, M>,
 > = MenuActionObj | MenuActionCallback<MenuActionObj, R, M, T>;
 
 export type MenuActions<
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   T extends PublicMenuActionParams<R, M> = PublicMenuActionParams<R, M>,
 > = Array<MenuAction<R, M, T>> | MenuActionCallback<MenuAction<R, M, T>[], R, M, T>;
 
 export type PublicMenuAction<
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = MenuAction<R, M, PublicMenuActionParams<R, M>>;
 
 export type AuthenticatedMenuAction<
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = MenuAction<R, M, AuthenticatedMenuActionParams<R, M>>;
 
 export type PublicMenuActions<
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = MenuActions<R, M, PublicMenuActionParams<R, M>>;
 
 export type AuthenticatedMenuActions<
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = MenuActions<R, M, AuthenticatedMenuActionParams<R, M>>;
 
 export type FooterGridConfig<
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = {
   readonly id: "page" | "footer";
   readonly rowClass: rows.RowClassName<rows.Row<R, rows.BodyRowType>>;
@@ -150,9 +152,9 @@ export type PdfBudgetTableOption = "topsheet" | number;
 
 export type PdfBudgetTableHeaderOptions = {
   readonly header: Pdf.HTMLNode[];
-  readonly left_image: UploadedImage | SavedImage | null;
+  readonly left_image: fs.UploadedImage | fs.SavedImage | null;
   readonly left_info: Pdf.HTMLNode[] | null;
-  readonly right_image: UploadedImage | SavedImage | null;
+  readonly right_image: fs.UploadedImage | fs.SavedImage | null;
   readonly right_info: Pdf.HTMLNode[] | null;
 };
 

@@ -13,7 +13,7 @@ type ColumnMenuModel = {
 
 export type ToggleColumnsDropdownMenuProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = Omit<DropdownMenuProps<MenuItemSelectedState, ColumnMenuModel>, OmitDropdownProps> & {
   readonly columns: Table.DataColumn<R, M>[];
   readonly hiddenColumns?: Table.HiddenColumns;
@@ -22,7 +22,7 @@ export type ToggleColumnsDropdownMenuProps<
 
 const ToggleColumnsDropdownMenu = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >(
   props: ToggleColumnsDropdownMenuProps<R, M>,
 ): JSX.Element => {

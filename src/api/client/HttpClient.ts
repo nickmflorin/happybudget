@@ -1,5 +1,3 @@
-import { Required } from "utility-types";
-
 import { errors } from "application";
 import { logger } from "internal";
 import { model } from "lib";
@@ -10,10 +8,12 @@ import { addQueryParamsToUrl } from "../util";
 
 import {
   ClientRequestOptions,
-  ClientOptions,
-  ClientDynamicRequestOptions,
   ClientResponse,
-  ClientResponseOrError,
+  ClientStrictResponse,
+  ClientConfigurationOptions,
+  DefaultDynamics,
+  ClientSuccessResponse,
+  DefaultDynamicOptions,
 } from "./types";
 
 enum UnknownErrorReasons {
@@ -31,38 +31,33 @@ const UNKNOWN_ERROR_MESSAGES: {
     "Unexpectedly received a response with a body that is not of the expected form.",
 };
 
-const DefaultDynamicOptions: {
-  [key in types.HttpMethod]: Required<ClientDynamicRequestOptions>;
-} = {
-  GET: { json: true, strict: false },
-  POST: { json: true, strict: false },
-  PATCH: { json: true, strict: false },
-  DELETE: { json: false, strict: false },
-};
-
 /**
  * A strongly typed interface for interacting with the native {@link fetch} API for requests between
  * the client and the server such that HTTP errors are consistently and predictably handled,
  * returned and/or thrown and explicit control is provided regarding the manner in which the client
  * communicates responses and errors via the methods it exposes.
  *
- * @see ClientDynamicRequestOptions
+ * @see ClientDynamicRequestFlags
  *
- * @param {ClientOptions} options
- *   A set of options, {@link ClientOptions} provided as either a set of explicit options,
- *   {@link ClientRequestOptions}, or a callback that should take the parameters used to initialize
- *   the {@link Request} when the applicable method on the instance is called and return the
- *   options, {@link ClientRequestOptions}.
+ * @param {ClientConfigurationOptions} options
+ *   A set of options, {@link ClientConfigurationOptions}, that configure the {@link HttpClient}.
+ *
+ *   @see {ClientConfigurationOptions}
  *
  *   These options will be used as default parameters to the {@link Request} unless they are
  *   dynamically overridden when calling the appropriate method on the {@link HttpClient} instance
  *   that is making the request.
  */
 export class HttpClient<PATH extends string> {
-  private readonly options?: ClientOptions;
+  private readonly requestInit?: ClientConfigurationOptions["requestInit"];
+  private readonly domain?: ClientConfigurationOptions["domain"];
+  private readonly pathPrefix?: ClientConfigurationOptions["pathPrefix"];
 
-  constructor(config?: ClientOptions) {
-    this.options = config || {};
+  constructor(config?: ClientConfigurationOptions) {
+    this.pathPrefix = config?.pathPrefix;
+    this.domain = config?.domain;
+    this.requestInit = config?.requestInit;
+
     this.get = this.get.bind(this);
     this.post = this.post.bind(this);
     this.patch = this.patch.bind(this);
@@ -113,13 +108,16 @@ export class HttpClient<PATH extends string> {
     });
   };
 
-  private static getDynamicOption = (
-    optionName: keyof ClientDynamicRequestOptions,
-    method: types.HttpMethod,
-    options: ClientRequestOptions = {},
+  private static getDynamicOption = <T extends types.HttpMethod>(
+    optionName: keyof DefaultDynamics[T],
+    method: T,
+    options: { [key in keyof DefaultDynamics[T]]?: boolean } = {},
   ): boolean => {
-    const v = options[optionName];
-    return v === undefined ? DefaultDynamicOptions[method][optionName] : v;
+    const v: boolean | undefined = options[optionName];
+    const defaults = DefaultDynamicOptions[method] as {
+      [key in keyof DefaultDynamics[T]]: boolean;
+    };
+    return v === undefined ? defaults[optionName] : v;
   };
 
   /**
@@ -196,23 +194,29 @@ export class HttpClient<PATH extends string> {
 
   private request = async <
     B extends types.ApiResponseBody,
-    S extends types.ApiSuccessResponse<B> = types.ApiSuccessResponse<B>,
-    Q extends types.ProcessedQuery = types.ProcessedQuery,
+    R extends types.ApiSuccessResponse<B> = types.ApiSuccessResponse<B>,
+    Q extends types.RawQuery | Record<string, never> = types.RawQuery,
+    M extends types.HttpMethod = types.HttpMethod,
   >(
     path: types.ApiPath<PATH>,
     method: types.HttpMethod,
-    {
-      query,
-      ...options
-    }: ClientRequestOptions & { readonly body?: string; readonly query?: Q } = {},
-  ): Promise<ClientResponse<S | Response, Q>> => {
+    options?: ClientRequestOptions<M> & { readonly body?: string; readonly query?: Q },
+  ): Promise<
+    | ClientResponse<[Response, Q]>
+    | ClientResponse<[B, R, Q]>
+    | ClientStrictResponse<[B, R, Q]>
+    | ClientStrictResponse<[Response, Q]>
+  > => {
+    const { query, strict, json, ...rest } = options || {};
+
     let response: Response | null = null;
     let error: errors.HttpError | null = null;
+
     const request = new Request(
       query !== undefined ? addQueryParamsToUrl(path, query) : path,
-      typeof this.options === "function" && options !== undefined
-        ? this.options(options)
-        : { ...this.options, ...options },
+      typeof this.requestInit === "function" && options !== undefined
+        ? this.requestInit(rest)
+        : { ...this.requestInit, ...rest },
     );
     try {
       response = await fetch(request);
@@ -235,27 +239,42 @@ export class HttpClient<PATH extends string> {
     if (error) {
       /* If the method was called with the 'strict' flag, the calling logic expects that the return
          will be the response, and if it is not the response an error should have been thrown. */
-      if (HttpClient.getDynamicOption("strict", method, options)) {
+      if (HttpClient.getDynamicOption("strict", method, { strict })) {
         throw error;
       }
       logger.error(
-        { url: error.url, path, method: error.method, status: response ? response.status : null },
+        {
+          url: error.url,
+          path,
+          method: error.method,
+          query,
+          status: response ? response.status : null,
+        },
         error.message,
       );
-      return { error };
+      return { error, requestMeta: { query } };
     } else if (response) {
-      let returnResponse: S | Response = response;
-      if (HttpClient.getDynamicOption("json", method, options)) {
-        returnResponse = await response.json();
+      const returnResponse: Response = response;
+      if (HttpClient.getDynamicOption("json", method, { json })) {
+        const jsonResponse: R = await response.json();
+        /* If the calling logic provides the 'strict' flag, it is expecting that the return of the
+           HttpClient method does not nest the response next to an 'error' field, since the error
+           would have been thrown. */
+        if (HttpClient.getDynamicOption("strict", method, { strict })) {
+          return { ...jsonResponse, requestMeta: { query } } as ClientStrictResponse<[B, R, Q]>;
+        }
+        return {
+          response: jsonResponse,
+          requestMeta: { query },
+          error: undefined,
+        } as ClientSuccessResponse<[B, R, Q]>;
       }
-      /* If the method was called with the 'strict' flag, the calling logic is already expecting
-         that (and the return of the method on the HttpClient that was called is typed such that)
-         the return is simply just the response (in its raw form or its JSON body) - because any
-         error would have been thrown.  Returning the error does not make sense if the error would
-         be thrown, because there will never be an error to return. */
-      return HttpClient.getDynamicOption("strict", method, options)
-        ? returnResponse
-        : { response: returnResponse };
+      /* If the calling logic provides the 'strict' flag, it is expecting that the return of the
+         HttpClient method does not nest the response next to an 'error' field, since the error
+         would have been thrown. */
+      return HttpClient.getDynamicOption("strict", method, { strict })
+        ? { ...returnResponse, requestMeta: { query } }
+        : { response: returnResponse, requestMeta: { query } };
     } else {
       // See block comment above regarding null checks around response object.
       throw new Error("This should never happen!");
@@ -265,34 +284,34 @@ export class HttpClient<PATH extends string> {
   public async get<
     B extends types.ApiResponseBody,
     S extends types.ApiSuccessResponse<B> = types.ApiSuccessResponse<B>,
-    Q extends types.ProcessedQuery = types.ProcessedQuery,
+    Q extends types.RawQuery = types.RawQuery,
   >(
     path: types.ApiPath<PATH, "GET">,
     query: Q | undefined,
-    options: Required<ClientRequestOptions<true, true>, "strict">,
-  ): Promise<S>;
+    options: ClientRequestOptions<"GET", { json: true; strict: true }>,
+  ): Promise<ClientStrictResponse<[B, S, Q]>>;
 
   public async get<
     B extends types.ApiResponseBody,
     S extends types.ApiSuccessResponse<B> = types.ApiSuccessResponse<B>,
-    Q extends types.ProcessedQuery = types.ProcessedQuery,
+    Q extends types.RawQuery = types.RawQuery,
   >(
     path: types.ApiPath<PATH, "GET">,
     query?: Q,
-    options?: ClientRequestOptions<false, true>,
-  ): Promise<ClientResponseOrError<S, Q>>;
+    options?: ClientRequestOptions<"GET", { json: true; strict: false }>,
+  ): Promise<ClientResponse<[B, S, Q]>>;
 
-  public async get<Q extends types.ProcessedQuery = types.ProcessedQuery>(
+  public async get<Q extends types.RawQuery = types.RawQuery>(
     path: types.ApiPath<PATH, "GET">,
     query: Q | undefined,
-    options: Required<ClientRequestOptions<true, false>, keyof ClientDynamicRequestOptions>,
-  ): Promise<Response>;
+    options: ClientRequestOptions<"GET", { json: false; strict: true }>,
+  ): Promise<ClientStrictResponse<[Response, Q]>>;
 
-  public async get<Q extends types.ProcessedQuery = types.ProcessedQuery>(
+  public async get<Q extends types.RawQuery = types.RawQuery>(
     path: types.ApiPath<PATH, "GET">,
     query: Q | undefined,
-    options: Required<ClientRequestOptions<false, false>, "json">,
-  ): Promise<ClientResponseOrError<Response>>;
+    options: ClientRequestOptions<"GET", { json: false; strict: false }>,
+  ): Promise<ClientResponse<[Response, Q]>>;
 
   /**
    * Sends a GET request to the provided path, {@link types.ApiPath<PATH, "GET">} with the provided
@@ -306,44 +325,44 @@ export class HttpClient<PATH extends string> {
    * 	 The options for the request.  These options will override any options that were provided
    *   during the configuration of the {@link HttpClient} instance.
    *
-   *   @see {HttpClient}
+   *   @see {ClientRequestOptions}
    *
-   * @returns {Promise<ClientResponse<S | Response>>}
+   * @returns {Promise<ClientResponse> | Promise<ClientStrictResponse>}
    *   A {@link Promise} whose contents depend on the dynamic request options,
-   *   {@link ClientDynamicRequestOptions}, that were supplied to the method.
+   *   {@link ClientDynamicRequestFlags}, that were supplied to the method.
    *
-   *   @see ClientDynamicRequestOptions
+   *   @see ClientDynamicRequestFlags
    */
   public async get<
     B extends types.ApiResponseBody,
     S extends types.ApiSuccessResponse<B> = types.ApiSuccessResponse<B>,
-    Q extends types.ProcessedQuery = types.ProcessedQuery,
+    Q extends types.RawQuery = types.RawQuery,
   >(
     path: types.ApiPath<PATH, "GET">,
     query?: Q,
-    options?: ClientRequestOptions,
-  ): Promise<ClientResponse<S | Response>> {
-    path = types.addQueryParamsToUrl(path, query);
-    return this.request<B, S>(path, types.HttpMethods.GET, options);
+    options?:
+      | ClientRequestOptions<"GET", { json: true; strict: true }>
+      | ClientRequestOptions<"GET", { json: true; strict: false }>
+      | ClientRequestOptions<"GET", { json: false; strict: true }>
+      | ClientRequestOptions<"GET", { json: false; strict: false }>,
+  ) {
+    return this.request<B, S, Q, "GET">(path, types.HttpMethods.GET, {
+      ...options,
+      query,
+    });
   }
 
-  public async retrieve<
-    M extends model.ApiModel,
-    Q extends types.ProcessedQuery = types.ProcessedQuery,
-  >(
+  public async retrieve<M extends model.ApiModel, Q extends types.RawQuery = types.RawQuery>(
     path: types.ApiPath<PATH, "GET">,
     query: Q | undefined,
-    options: Omit<Required<ClientRequestOptions<true, true>, "strict">, "json">,
-  ): Promise<M>;
+    options: ClientRequestOptions<"GET", { json: true; strict: false }>,
+  ): Promise<ClientResponse<[M, Q]>>;
 
-  public async retrieve<
-    M extends model.ApiModel,
-    Q extends types.ProcessedQuery = types.ProcessedQuery,
-  >(
+  public async retrieve<M extends model.ApiModel, Q extends types.RawQuery = types.RawQuery>(
     path: types.ApiPath<PATH, "GET">,
     query?: Q,
-    options?: Omit<ClientRequestOptions<false, true>, "json">,
-  ): Promise<ClientResponseOrError<M>>;
+    options?: ClientRequestOptions<"GET", { json: true; strict: true }>,
+  ): Promise<ClientStrictResponse<[M, Q]>>;
 
   /**
    * Retrieves a model at the provided path, {@link types.ApiPath<PATH, "GET">}, using a request
@@ -353,27 +372,25 @@ export class HttpClient<PATH extends string> {
    *
    * @param {Q} query The query parameters that should be embedded in the URL.
    *
-   * @param {Omit<ClientRequestOptions, "json">} options
+   * @param {ClientRequestOptions} options
    * 	 The options for the request.  These options will override any options that were provided
    *   during the configuration of the {@link HttpClient} instance.
    *
    *   @see {HttpClient}
    *
-   * @returns {Promise<ClientResponse<M>>}
-   *   A {@link Promise} that consists of either the model, {@link M} - in the case that the
-   *   "strict" option is true - or an object that indexes a potential error or the model,
-   *   {@link ClientResponseOrError<M>} - in the case that the "strict" option is false.
+   * @returns {Promise<ClientResponse<M>> | Promise<ClientStrictResponse<M>>}
+   *   A {@link Promise} whose contents depend on the dynamic request options,
+   *   {@link ClientDynamicRequestFlags} that were supplied to the method.
    *
    *   @see ClientDynamicRequestOptions
    */
-  public async retrieve<
-    M extends model.ApiModel,
-    Q extends types.ProcessedQuery = types.ProcessedQuery,
-  >(
+  public async retrieve<M extends model.ApiModel, Q extends types.RawQuery = types.RawQuery>(
     path: types.ApiPath<PATH, "GET">,
     query?: Q,
-    options?: Omit<ClientRequestOptions, "json">,
-  ): Promise<ClientResponse<M>> {
+    options?:
+      | ClientRequestOptions<"GET", { json: true; strict: true }>
+      | ClientRequestOptions<"GET", { json: true; strict: false }>,
+  ) {
     return this.get<M, types.ModelRetrieveResponse<M>, Q>(path, query, {
       ...options,
       strict: false,
@@ -392,23 +409,17 @@ export class HttpClient<PATH extends string> {
     });
   }
 
-  public async list<
-    M extends model.ApiModel,
-    Q extends types.ProcessedQuery = types.ProcessedQuery,
-  >(
-    path: types.ApiPath<PATH, "GET">,
-    query: Q | undefined,
-    options: Omit<Required<ClientRequestOptions<true, true>, "strict">, "json">,
-  ): Promise<types.ModelListResponse<M>>;
-
-  public async list<
-    M extends model.ApiModel,
-    Q extends types.ProcessedQuery = types.ProcessedQuery,
-  >(
+  public async list<M extends model.ApiModel, Q extends types.RawQuery = types.RawQuery>(
     path: types.ApiPath<PATH, "GET">,
     query?: Q,
-    options?: Omit<ClientRequestOptions<false, true>, "json">,
-  ): Promise<ClientResponseOrError<types.ModelListResponse<M>>>;
+    options?: ClientRequestOptions<"GET", { json: true; strict: false }>,
+  ): Promise<ClientResponse<[M[], types.ModelListResponse<M>, Q]>>;
+
+  public async list<M extends model.ApiModel, Q extends types.RawQuery = types.RawQuery>(
+    path: types.ApiPath<PATH, "GET">,
+    query?: Q,
+    options?: ClientRequestOptions<"GET", { json: true; strict: true }>,
+  ): Promise<ClientStrictResponse<[M[], types.ModelListResponse<M>, Q]>>;
 
   /**
    * Retrieves a set of models at the provided path, {@link types.ApiPath<PATH, "GET">}, using a
@@ -418,36 +429,34 @@ export class HttpClient<PATH extends string> {
    *
    * @param {Q} query The query parameters that should be embedded in the URL.
    *
-   * @param {Omit<ClientRequestOptions, "json">} options
+   * @param {ClientRequestOptions} options
    * 	 The options for the request.  These options will override any options that were provided
    *   during the configuration of the {@link HttpClient} instance.
    *
    *   @see {HttpClient}
    *
-   * @returns {Promise<ClientResponse<M>>}
-   *   A {@link Promise} that consists of either the models and metadata,
-   *   {@link types.ModelListResponse<M>} - in the case that the "strict" option is true - or an
-   *   object that indexes a potential error or the models/metadata,
-   *   {@link ClientResponseOrError<ModelListResponse<M>>} - in the case that the "strict" option is
-   *   false.
+   * @returns {Promise<ClientResponse<M>> | Promise<ClientStrictResponse<M>>}
+   *   A {@link Promise} whose contents depend on the dynamic request options,
+   *   {@link ClientDynamicRequestFlags} that were supplied to the method.
    *
    *   @see ClientDynamicRequestOptions
    */
-  public async list<
-    M extends model.ApiModel,
-    Q extends types.ProcessedQuery = types.ProcessedQuery,
-  >(
+  public async list<M extends model.ApiModel, Q extends types.RawQuery = types.RawQuery>(
     path: types.ApiPath<PATH, "GET">,
     query?: Q,
-    options?: Omit<ClientRequestOptions, "json">,
-  ): Promise<ClientResponse<types.ModelListResponse<M>>> {
+    options?:
+      | ClientRequestOptions<"GET", { json: true; strict: true }>
+      | ClientRequestOptions<"GET", { json: true; strict: false }>,
+  ): Promise<
+    | ClientStrictResponse<[M[], types.ModelListResponse<M>, Q]>
+    | ClientResponse<[M[], types.ModelListResponse<M>, Q]>
+  > {
     return this.get<M[], types.ModelListResponse<M>, Q>(path, query, {
-      strict: false,
       ...options,
       json: true,
       /* We have to coerce the options here to satisfy TS, but this will not prevent the 'strict'
          option from changing the return of the method. */
-    } as ClientRequestOptions<false, true>);
+    } as ClientRequestOptions<"GET", { json: true; strict: false }>);
   }
 
   public async post<
@@ -456,9 +465,9 @@ export class HttpClient<PATH extends string> {
     P extends types.Payload = types.Payload,
   >(
     path: types.ApiPath<PATH, "POST">,
-    body: P | undefined,
-    options: Required<ClientRequestOptions<true, true>, "strict">,
-  ): Promise<S>;
+    body?: P | undefined,
+    options?: ClientRequestOptions<"POST", { json: true; strict: true }>,
+  ): Promise<ClientStrictResponse<[B, S, Record<string, never>]>>;
 
   public async post<
     B extends types.ApiResponseBody,
@@ -467,20 +476,20 @@ export class HttpClient<PATH extends string> {
   >(
     path: types.ApiPath<PATH, "POST">,
     body?: P,
-    options?: ClientRequestOptions<false, true>,
-  ): Promise<ClientResponseOrError<S>>;
+    options?: ClientRequestOptions<"POST", { json: true; strict: false }>,
+  ): Promise<ClientResponse<[B, S, Record<string, never>]>>;
 
   public async post<P extends types.Payload = types.Payload>(
     path: types.ApiPath<PATH, "POST">,
-    body: P | undefined,
-    options: Required<ClientRequestOptions<true, false>, keyof ClientDynamicRequestOptions>,
-  ): Promise<Response>;
+    body?: P | undefined,
+    options?: ClientRequestOptions<"POST", { json: false; strict: true }>,
+  ): Promise<ClientStrictResponse<[Response, Record<string, never>]>>;
 
   public async post<P extends types.Payload = types.Payload>(
     path: types.ApiPath<PATH, "POST">,
-    body: P | undefined,
-    options: Required<ClientRequestOptions<false, false>, "json">,
-  ): Promise<ClientResponseOrError<Response>>;
+    body?: P | undefined,
+    options?: ClientRequestOptions<"POST", { json: false; strict: false }>,
+  ): Promise<ClientResponse<[Response, Record<string, never>]>>;
 
   /**
    * Sends a POST request to the provided path, {@link types.ApiPath<PATH, "POST">}, with the
@@ -494,13 +503,13 @@ export class HttpClient<PATH extends string> {
    * 	 The options for the request.  These options will override any options that were provided
    *   during the configuration of the {@link HttpClient} instance.
    *
-   *   @see {HttpClient}
+   *   @see {ClientRequestOptions}
    *
-   * @returns {Promise<ClientResponse<S | Response>>}
+   * @returns {Promise<ClientResponse> | Promise<ClientStrictResponse>}
    *   A {@link Promise} whose contents depend on the dynamic request options,
-   *   {@link ClientDynamicRequestOptions}, that were supplied to the method.
+   *   {@link ClientDynamicRequestFlags}, that were supplied to the method.
    *
-   *   @see ClientDynamicRequestOptions
+   *   @see ClientDynamicRequestFlags
    */
   public async post<
     B extends types.ApiResponseBody,
@@ -509,9 +518,13 @@ export class HttpClient<PATH extends string> {
   >(
     path: types.ApiPath<PATH, "POST">,
     body?: P,
-    options?: ClientRequestOptions,
-  ): Promise<ClientResponse<S | Response>> {
-    return this.request<B, S>(path, types.HttpMethods.POST, {
+    options?:
+      | ClientRequestOptions<"POST", { json: true; strict: true }>
+      | ClientRequestOptions<"POST", { json: true; strict: false }>
+      | ClientRequestOptions<"POST", { json: false; strict: true }>
+      | ClientRequestOptions<"POST", { json: false; strict: false }>,
+  ) {
+    return this.request<B, S, Record<string, never>, "POST">(path, types.HttpMethods.POST, {
       ...options,
       body: body === undefined ? undefined : JSON.stringify(body),
     });
@@ -522,28 +535,26 @@ export class HttpClient<PATH extends string> {
     S extends types.ApiSuccessResponse<B> = types.ApiSuccessResponse<B>,
   >(
     path: types.ApiPath<PATH, "DELETE">,
-    // For a DELETE request, the default value of the `json` option is false.
-    options: Required<ClientRequestOptions<true, true>, keyof ClientDynamicRequestOptions>,
-  ): Promise<S>;
+    options?: ClientRequestOptions<"DELETE", { json: true; strict: true }>,
+  ): Promise<ClientStrictResponse<[B, S, Record<string, never>]>>;
 
   public async delete<
     B extends types.ApiResponseBody,
     S extends types.ApiSuccessResponse<B> = types.ApiSuccessResponse<B>,
   >(
     path: types.ApiPath<PATH, "DELETE">,
-    // For a DELETE request, the default value of the `json` option is false.
-    options: Required<ClientRequestOptions<false, true>, "json">,
-  ): Promise<ClientResponseOrError<S>>;
+    options?: ClientRequestOptions<"DELETE", { json: true; strict: false }>,
+  ): Promise<ClientResponse<[B, S, Record<string, never>]>>;
 
   public async delete(
     path: types.ApiPath<PATH, "DELETE">,
-    options: Required<ClientRequestOptions<true, false>, "strict">,
-  ): Promise<Response>;
+    options?: ClientRequestOptions<"DELETE", { json: false; strict: true }>,
+  ): Promise<ClientStrictResponse<[Response, Record<string, never>]>>;
 
   public async delete(
     path: types.ApiPath<PATH, "DELETE">,
-    options?: ClientRequestOptions<false, false>,
-  ): Promise<ClientResponseOrError<Response>>;
+    options?: ClientRequestOptions<"DELETE", { json: false; strict: false }>,
+  ): Promise<ClientResponse<[Response, Record<string, never>]>>;
 
   /**
    * Sends a DELETE request to the provided path, {@link types.ApiPath<PATH, "DELETE">}.
@@ -554,25 +565,30 @@ export class HttpClient<PATH extends string> {
    * 	 The options for the request.  These options will override any options that were provided
    *   during the configuration of the {@link HttpClient} instance.
    *
-   *   Unlike the other HTTP methods attached to the {@link HttpClient}, for a DELETE request the
-   *   default value of the `json` option is false.
+   *   @see {ClientRequestOptions}
    *
-   *   @see {HttpClient}
-   *
-   * @returns {Promise<S | Response>}
+   * @returns {Promise<ClientResponse> | Promise<ClientStrictResponse>}
    *   A {@link Promise} whose contents depend on the dynamic request options,
-   *   {@link ClientDynamicRequestOptions}, that were supplied to the method.
+   *   {@link ClientDynamicRequestFlags}, that were supplied to the method.
    *
-   *   @see ClientDynamicRequestOptions
+   *   @see ClientDynamicRequestFlags
    */
   public async delete<
     B extends types.ApiResponseBody,
     S extends types.ApiSuccessResponse<B> = types.ApiSuccessResponse<B>,
   >(
     path: types.ApiPath<PATH, "DELETE">,
-    options?: ClientRequestOptions,
-  ): Promise<ClientResponse<S | Response>> {
-    return this.request<B, S>(path, types.HttpMethods.DELETE, options);
+    options?:
+      | ClientRequestOptions<"DELETE", { json: true; strict: true }>
+      | ClientRequestOptions<"DELETE", { json: true; strict: false }>
+      | ClientRequestOptions<"DELETE", { json: false; strict: true }>
+      | ClientRequestOptions<"DELETE", { json: false; strict: false }>,
+  ) {
+    return this.request<B, S, Record<string, never>, "DELETE">(
+      path,
+      types.HttpMethods.DELETE,
+      options,
+    );
   }
 
   public async patch<
@@ -581,9 +597,9 @@ export class HttpClient<PATH extends string> {
     P extends types.Payload = types.Payload,
   >(
     path: types.ApiPath<PATH, "PATCH">,
-    body: P | undefined,
-    options: Required<ClientRequestOptions<true, true>, "strict">,
-  ): Promise<S>;
+    body?: P | undefined,
+    options?: ClientRequestOptions<"PATCH", { json: true; strict: true }>,
+  ): Promise<ClientStrictResponse<[B, S, Record<string, never>]>>;
 
   public async patch<
     B extends types.ApiResponseBody,
@@ -592,20 +608,20 @@ export class HttpClient<PATH extends string> {
   >(
     path: types.ApiPath<PATH, "PATCH">,
     body?: P,
-    options?: ClientRequestOptions<false, true>,
-  ): Promise<ClientResponseOrError<S>>;
+    options?: ClientRequestOptions<"PATCH", { json: true; strict: false }>,
+  ): Promise<ClientResponse<[B, S, Record<string, never>]>>;
 
   public async patch<P extends types.Payload = types.Payload>(
     path: types.ApiPath<PATH, "PATCH">,
-    body: P | undefined,
-    options: Required<ClientRequestOptions<true, false>, keyof ClientDynamicRequestOptions>,
-  ): Promise<Response>;
+    body?: P | undefined,
+    options?: ClientRequestOptions<"PATCH", { json: false; strict: true }>,
+  ): Promise<ClientStrictResponse<[Response, Record<string, never>]>>;
 
   public async patch<P extends types.Payload = types.Payload>(
     path: types.ApiPath<PATH, "PATCH">,
-    body: P | undefined,
-    options: Required<ClientRequestOptions<false, false>, "json">,
-  ): Promise<ClientResponseOrError<Response>>;
+    body?: P | undefined,
+    options?: ClientRequestOptions<"PATCH", { json: false; strict: false }>,
+  ): Promise<ClientResponse<[Response, Record<string, never>]>>;
 
   /**
    * Sends a PATCH request to the provided path, {@link types.ApiPath<PATH, "PATCH">} with the
@@ -619,22 +635,28 @@ export class HttpClient<PATH extends string> {
    * 	 The options for the request.  These options will override any options that were provided
    *   during the configuration of the {@link HttpClient} instance.
    *
-   * @returns {Promise<S | Response>}
-   *   A {@link Promise} whose contents depend on the dynamic request options,
-   *   {@link ClientDynamicRequestOptions}, that were supplied to the method.
+   *   @see {ClientRequestOptions}
    *
-   *   @see ClientDynamicRequestOptions
+   * @returns {Promise<ClientResponse> | Promise<ClientStrictResponse>}
+   *   A {@link Promise} whose contents depend on the dynamic request options,
+   *   {@link ClientDynamicRequestFlags}, that were supplied to the method.
+   *
+   *   @see ClientDynamicRequestFlags
    */
   public async patch<
     B extends types.ApiResponseBody,
-    S extends types.ApiSuccessResponse<B> = types.ApiSuccessResponse<B>,
+    S extends types.ApiSuccessResponse<B>,
     P extends types.Payload = types.Payload,
   >(
     path: types.ApiPath<PATH, "PATCH">,
     body?: P,
-    options?: ClientRequestOptions,
-  ): Promise<ClientResponse<S | Response>> {
-    return this.request<B, S>(path, types.HttpMethods.PATCH, {
+    options?:
+      | ClientRequestOptions<"PATCH", { json: true; strict: true }>
+      | ClientRequestOptions<"PATCH", { json: true; strict: false }>
+      | ClientRequestOptions<"PATCH", { json: false; strict: true }>
+      | ClientRequestOptions<"PATCH", { json: false; strict: false }>,
+  ) {
+    return this.request<B, S, Record<string, never>, "PATCH">(path, types.HttpMethods.PATCH, {
       ...options,
       body: body === undefined ? undefined : JSON.stringify(body),
     });

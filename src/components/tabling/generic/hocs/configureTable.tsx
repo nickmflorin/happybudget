@@ -4,8 +4,8 @@ import hoistNonReactStatics from "hoist-non-react-statics";
 import { map, isNil, filter, reduce } from "lodash";
 import { Subtract } from "utility-types";
 
-import { tabling, hooks, util } from "lib";
 import * as config from "application/config";
+import { tabling, hooks, util } from "lib";
 
 import * as genericColumns from "../columns";
 import { useHiddenColumns } from "../hooks";
@@ -59,7 +59,7 @@ export type ConfiguredTableInjectedProps = {
 
 export type TableConfigurationProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = {
   readonly tableId: string;
   readonly hideEditColumn?: boolean;
@@ -111,7 +111,7 @@ const useTrackGridDataRender = (): [Table.GridSet<boolean>, (gridId: Table.GridI
 const configureTable = <
   T extends ConfiguredTableInjectedProps,
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >(
   Component: React.FunctionComponent<T>,
 ): React.FunctionComponent<

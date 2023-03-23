@@ -12,6 +12,14 @@ export type IChoice<
   slug: S;
 };
 
+type _DistributeChoice<T> = T extends [
+  infer I extends number,
+  infer N extends string,
+  infer S extends string,
+]
+  ? _InferChoice<[I, N, S]>
+  : never;
+
 export type DynamicChoices<
   CH extends IChoice<I, N, S>,
   I extends number = number,

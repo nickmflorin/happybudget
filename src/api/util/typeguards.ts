@@ -8,7 +8,7 @@ export const detailResponseFailed = <M extends Model.HttpModel>(
 ): response is Http.FailedDetailResponse =>
   (response as Http.FailedDetailResponse).error !== undefined;
 
-export const tableResponseFailed = <M extends Model.RowHttpModel = Model.RowHttpModel>(
+export const tableResponseFailed = <M extends model.RowTypedApiModel = model.RowTypedApiModel>(
   response: Http.TableResponse<M>,
 ): response is Http.FailedTableResponse =>
   (response as Http.FailedTableResponse).error !== undefined;

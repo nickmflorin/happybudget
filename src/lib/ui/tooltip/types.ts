@@ -6,7 +6,7 @@ export type IItemizedTooltipItem = {
   readonly formatter?: NativeFormatter<string | number>;
 };
 
-type TooltipContent = string | JSX.Element | IItemizedTooltipItem[];
+export type TooltipContent = string | JSX.Element | IItemizedTooltipItem[];
 
 /* For Tooltips, the className and style will wind up being attributed to the children components.
    We need to use overlayClassName and overlayStyle. */

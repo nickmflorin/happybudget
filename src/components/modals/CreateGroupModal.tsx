@@ -2,7 +2,7 @@ import { GroupForm } from "components/forms";
 
 import { CreateModelModal, CreateModelModalProps, CreateModelCallbacks } from "./generic";
 
-interface CreateGroupModalProps<R extends Table.RowData, M extends Model.RowHttpModel>
+interface CreateGroupModalProps<R extends Table.RowData, M extends model.RowTypedApiModel>
   extends CreateModelModalProps<Model.Group> {
   readonly parentId: number;
   readonly children: number[];
@@ -12,7 +12,7 @@ interface CreateGroupModalProps<R extends Table.RowData, M extends Model.RowHttp
 
 const CreateGroupModal = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   MM extends Model.SimpleAccount | Model.SimpleSubAccount,
 >({
   parentId,

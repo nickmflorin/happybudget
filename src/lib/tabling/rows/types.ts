@@ -1,11 +1,9 @@
 import { RowClassParams } from "ag-grid-community";
 
+import * as model from "../../model";
 import * as ui from "../../ui";
 import { enumeratedLiterals, EnumeratedLiteralType } from "../../util";
-
-import { FooterGridId } from "./framework";
-
-import { ClassName } from ".";
+import { FooterGridId, ClassName } from "../types";
 
 export type EditRowActionBehavior = "expand" | "edit";
 
@@ -95,18 +93,18 @@ export type ModelRow<D extends RowData = RowData> = BaseRow<"model"> & {
   readonly children: number[];
   readonly order: string;
   // This field is primarily used for logging purposes.
-  readonly modelType: Model.RowHttpModelType;
+  readonly modelType: model.RowHttpModelType;
   readonly data: D;
 };
 
 export type MarkupRow = BaseRow<"markup"> & {
   readonly children: number[];
-  readonly data: Model.Markup;
+  readonly data: model.Markup;
 };
 
 export type GroupRow = BaseRow<"group"> & {
   readonly children: number[];
-  readonly data: Model.Group;
+  readonly data: model.Group;
 };
 
 export type PlaceholderRow<D extends RowData = RowData> = BaseRow<"placeholder"> & {

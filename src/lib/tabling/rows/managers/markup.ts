@@ -11,7 +11,7 @@ type CreateMarkupRowConfig = {
 
 class MarkupRowManager<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > extends EditableRowManager<Table.MarkupRow<R>, R, M, [Model.Markup]> {
   constructor(config: Omit<BodyRowManagerConfig<Table.MarkupRow<R>, R, M>, "rowType">) {
     super({ ...config, rowType: "markup" });

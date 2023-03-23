@@ -8,11 +8,15 @@ import {
   RowNode,
 } from "ag-grid-community";
 
-import * as ui from "../../ui";
+import { store } from "application";
 
-import * as columns from "./columns";
+import * as model from "../../model";
+import * as ui from "../../ui";
+import * as columns from "../columns";
+import * as rows from "../rows";
+
+import * as formatting from "./formatting";
 import { GridId, GridApis } from "./framework";
-import * as rows from "./rows";
 import * as table from "./table";
 
 import { ClassName } from ".";
@@ -45,16 +49,16 @@ export type CellStyle<
 // TODO: Move to Cell Renderer file.
 export interface CellProps<
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
   T = CellValue<R, N>,
   C extends table.TableContext = table.TableContext,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>,
+  S extends store.TableStore<R> = store.TableStore<R>,
   CL extends columns.RealColumn<R, M, N, T> = columns.BodyColumn<R, M, N, T>,
 > extends ICellRendererParams<R, T>,
     ui.ComponentProps {
   readonly tableContext: C;
-  readonly tooltip?: Tooltip;
+  readonly tooltip?: ui.Tooltip;
   readonly hideClear?: boolean;
   readonly customCol: CL;
   readonly gridId: GridId;
@@ -70,14 +74,14 @@ export interface CellProps<
      better way of establishing which props are available to cells based on which grid they lie in.
 		 */
   readonly getRowColorDef: (row: rows.Row<R, rows.BodyRowType>) => rows.RowColorDef;
-  readonly selector: (state: Application.Store) => S;
+  readonly selector: (state: store.ApplicationStore) => S;
   readonly onKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void;
   // readonly onEvent?: (event: Event<R, M, EditableRow<R>>) => void;
 }
 
 export type Cell<
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = {
   readonly row: R;
   readonly column: columns.RealColumn<R, M>;
@@ -86,7 +90,7 @@ export type Cell<
 
 export type CellFocusedParams<
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = {
   readonly cell: Cell<R, M>;
   readonly apis: GridApis<R>;
@@ -94,7 +98,7 @@ export type CellFocusedParams<
 
 export type CellFocusChangedParams<
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = {
   readonly cell: Cell<R, M>;
   readonly previousCell: Cell<R, M> | null;
@@ -104,11 +108,11 @@ export type CellFocusChangedParams<
 // TODO: Move to Cell Renderer file.
 export type CellWithChildrenProps<
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
   T = CellValue<R, N>,
   C extends table.TableContext = table.TableContext,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>,
+  S extends store.TableStore<R> = store.TableStore<R>,
   CL extends columns.RealColumn<R, M, N, T> = columns.BodyColumn<R, M, N, T>,
 > = Omit<CellProps<R, M, N, T, C, S, CL>, "value"> & {
   readonly children: ReactNode;
@@ -117,27 +121,27 @@ export type CellWithChildrenProps<
 // TODO: Move to Cell Renderer file.
 export type ValueCellProps<
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
   T = CellValue<R, N>,
   C extends table.TableContext = table.TableContext,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>,
+  S extends store.TableStore<R> = store.TableStore<R>,
   CL extends columns.DataColumn<R, M, N, T> = columns.DataColumn<R, M, N, T>,
 > = CellProps<R, M, N, T, C, S, CL> & {
   /* This is used for extending cells.  Normally, the value formatter will be included on the ColDef
      of the associated column.  But when extending a Cell, we sometimes want to provide a formatter
      for that specific cell. */
-  readonly valueFormatter?: AGFormatter;
+  readonly valueFormatter?: formatting.TableValueFormatter<R, N, T>;
 };
 
 // TODO: Move to Cell Renderer file.
 export type CalculatedCellProps<
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
   T = CellValue<R, N>,
   C extends table.TableContext = table.TableContext,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>,
+  S extends store.TableStore<R> = store.TableStore<R>,
 > = Omit<
   ValueCellProps<R, M, N, T, C, S, columns.CalculatedColumn<R, M, N, T>>,
   "prefixChildren"
@@ -185,7 +189,7 @@ export type CalculatedCellProps<
       N & columns.ColumnFieldName<rows.Row<R, "model">>,
       T
     >,
-  ) => TooltipContent | null;
+  ) => ui.TooltipContent | null;
 };
 
 export type CellPosition = Omit<RootCellPosition, "rowPinned">;
@@ -193,7 +197,7 @@ export type CellPosition = Omit<RootCellPosition, "rowPinned">;
 export type CellConstruct<
   R extends rows.Row<rows.BodyRowType>,
   C extends columns.DataColumn<R, M, N, T>,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
   T = CellValue<R, N>,
 > = {
@@ -203,7 +207,7 @@ export type CellConstruct<
 
 export type PdfCellCallbackParams<
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
   T = CellValue<R, N>,
 > = {
@@ -219,7 +223,7 @@ export type PdfCellCallbackParams<
 export type PdfCellCallback<
   RV,
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
   T = CellValue<R, N>,
 > = (params: PdfCellCallbackParams<R, M, N, T>) => RV;
@@ -227,14 +231,14 @@ export type PdfCellCallback<
 export type PdfOptionalCellCallback<
   RV,
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
   T = CellValue<R, N>,
 > = RV | PdfCellCallback<RV, R, M, N, T> | undefined;
 
 export interface _PdfCellClassName<
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
   T = CellValue<R, N>,
 > {
@@ -243,14 +247,14 @@ export interface _PdfCellClassName<
 
 export type PdfCellClassName<
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
   T = CellValue<R, N>,
 > = PdfOptionalCellCallback<string, R, M, N, T> | _PdfCellClassName<R, M, N, T>;
 
 export interface _PdfCellStyle<
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
   T = CellValue<R, N>,
 > {
@@ -259,14 +263,14 @@ export interface _PdfCellStyle<
 
 export type PdfCellStyle<
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
   T = CellValue<R, N>,
 > = PdfOptionalCellCallback<ReactPDFStyle, R, M, N, T> | _PdfCellStyle<R, M, N, T>;
 
 export type PdfCellStandardProps<
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
   T = CellValue<R, N>,
 > = {

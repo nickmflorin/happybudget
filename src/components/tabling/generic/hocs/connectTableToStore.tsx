@@ -23,7 +23,7 @@ export type ConnectedTableInjectedProps<R extends Table.RowData, S extends Redux
 
 export type ConnectTableProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = {
@@ -37,7 +37,7 @@ type ContextOptionalCallable<R, C extends Table.Context = Table.Context> = R | (
 
 export type StoreConfig<
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = {
@@ -66,7 +66,7 @@ export type StoreConfig<
 type HOCProps<
   T extends ConnectedTableInjectedProps<R, S>,
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = Subtract<T, ConnectedTableInjectedProps<R, S>> & ConnectTableProps<R, M, C, S>;
@@ -74,7 +74,7 @@ type HOCProps<
 type SelectorArg<
   T extends ConnectedTableInjectedProps<R, S>,
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = {
@@ -85,7 +85,7 @@ type SelectorArg<
 const createAgnosticConfiguredSelector = <
   T extends ConnectedTableInjectedProps<R, S>,
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   S extends Redux.TableStore<R>,
   C extends Table.Context = Table.Context,
 >(
@@ -103,7 +103,7 @@ const createConfiguredSelector = <
   RS,
   T extends ConnectedTableInjectedProps<R, S>,
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 >(
@@ -119,7 +119,7 @@ const connectTableToStore =
   <
     T extends ConnectedTableInjectedProps<R, S>,
     R extends Table.RowData,
-    M extends Model.RowHttpModel,
+    M extends model.RowTypedApiModel,
     C extends Table.Context = Table.Context,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
   >(

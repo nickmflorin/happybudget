@@ -2,8 +2,6 @@ import { UploadFile as RootUploadFile } from "antd/lib/upload/interface";
 
 import { FileUploadResponse } from "api";
 
-import * as model from "../model";
-
 export type FileWithExtension<N extends string = string, E extends string = string> = `${N}.${E}`;
 
 export type CSVRow = (string | number | null | undefined)[];
@@ -19,7 +17,7 @@ export type UploadImageParamsNoImage = {
 };
 
 export type UploadImageParamsWithImage = UploadImageParamsNoImage & {
-  image: model.UploadedImage | model.SavedImage;
+  image: UploadedImage | SavedImage;
 };
 export type UploadImageParams = UploadImageParamsWithImage | UploadImageParamsNoImage;
 

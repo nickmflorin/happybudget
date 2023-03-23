@@ -7,7 +7,7 @@ import { Framework } from "./framework";
 
 export type PublicBudgetTableProps<
   R extends Tables.BudgetRowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   B extends Model.Budget | Model.Template,
   C extends BudgetContext<B, true> = BudgetContext<B, true>,
   S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>,
@@ -17,7 +17,7 @@ export type PublicBudgetTableProps<
 
 const PublicBudgetTable = <
   R extends Tables.BudgetRowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   B extends Model.Budget | Model.Template,
   C extends BudgetContext<B, true> = BudgetContext<B, true>,
   S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>,

@@ -1,5 +1,5 @@
-import { filter, isNil, map, findLastIndex, reduce } from "lodash";
 import { FillOperationParams } from "ag-grid-community/dist/cjs/entities/gridOptions";
+import { filter, isNil, map, findLastIndex, reduce } from "lodash";
 
 import { tabling } from "lib";
 
@@ -366,7 +366,7 @@ const detectPatternFromPreviousRows = <R extends Table.RowData>(
   return null;
 };
 
-export const inferFillCellValue = <R extends Table.RowData, M extends Model.RowHttpModel>(
+export const inferFillCellValue = <R extends Table.RowData, M extends model.RowTypedApiModel>(
   params: FillOperationParams,
   cs: Table.BodyColumn<R, M>[],
 ): Table.RawRowValue => {
@@ -390,7 +390,7 @@ export const inferFillCellValue = <R extends Table.RowData, M extends Model.RowH
   return null;
 };
 
-export const generateNewRowData = <R extends Table.RowData, M extends Model.RowHttpModel>(
+export const generateNewRowData = <R extends Table.RowData, M extends model.RowTypedApiModel>(
   source: Source<R>,
   cs: Table.BodyColumn<R, M>[],
 ): Partial<R>[] => {

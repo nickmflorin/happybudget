@@ -1,7 +1,7 @@
-import * as columns from "./columns";
-import * as events from "./events";
-import * as rows from "./rows";
-import * as table from "./table";
+import * as columns from "../columns";
+import * as events from "../events";
+import * as rows from "../rows";
+import * as types from "../types";
 
 export type RowDataSelector<R extends rows.Row> = (
   state: Application.Store,
@@ -9,7 +9,7 @@ export type RowDataSelector<R extends rows.Row> = (
 
 type TaskConfig<
   R extends rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   C extends Redux.ActionContext = Redux.ActionContext,
   A extends Redux.ActionCreatorMap<
@@ -39,7 +39,7 @@ export type DefaultDataOnUpdate<R extends rows.Row> =
 
 export type ReducerConfig<
   R extends rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   C extends Redux.ActionContext = Redux.ActionContext,
   A extends Redux.TableActionCreatorMap<M, C> = Redux.TableActionCreatorMap<M, C>,
@@ -53,7 +53,7 @@ export type ReducerConfig<
 
 export type AuthenticatedReducerConfig<
   R extends rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   C extends Redux.ActionContext = Redux.ActionContext,
   A extends Redux.AuthenticatedTableActionCreatorMap<
@@ -65,7 +65,7 @@ export type AuthenticatedReducerConfig<
 
 export type PublicSagaConfig<
   R extends rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   C extends Redux.ActionContext = Redux.ActionContext,
   A extends PickOptional<Redux.TableActionCreatorMap<M, C>, "request"> = PickOptional<
@@ -79,7 +79,7 @@ export type PublicSagaConfig<
 
 export type AuthenticatedSagaConfig<
   R extends rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   C extends Redux.ActionContext = Redux.ActionContext,
   A extends Optional<

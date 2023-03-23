@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 
-import { isNil } from "lodash";
 import { ValueFormatterParams } from "ag-grid-community";
+import { isNil } from "lodash";
 
 const useFormattedValue = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   V extends string | number | null = string | number | null,

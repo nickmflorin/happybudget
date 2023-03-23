@@ -12,7 +12,7 @@ import Dropdown, { DropdownProps } from "./Dropdown";
 export type ShareDropdownMenuProps<
   P extends Model.PublicHttpModel,
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
 > = Pick<StandardComponentProps, "className"> &
   Omit<DropdownProps, "overlayId" | "overlay"> & {
     readonly instance: P;
@@ -36,7 +36,7 @@ export type ShareDropdownMenuProps<
 const ShareDropdownMenu = <
   P extends Model.PublicHttpModel,
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
 >({
   publicToken,
   menuProps,

@@ -5,12 +5,13 @@ import { isNil } from "lodash";
 
 import { model } from "lib";
 
-import BodyRow, { BodyRowProps } from "./BodyRow";
 import { RowExplicitCellProps } from "../cells/Cell";
+
+import BodyRow, { BodyRowProps } from "./BodyRow";
 
 interface GroupRowProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
 > extends BodyRowProps<R, M, V, Table.GroupRow<R>> {
   readonly cellProps?: RowExplicitCellProps<R, M, V>;
@@ -18,7 +19,7 @@ interface GroupRowProps<
 
 const GroupRow = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
 >(
   props: GroupRowProps<R, M, V>,

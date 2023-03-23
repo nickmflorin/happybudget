@@ -8,7 +8,7 @@ import useModelMenuEditor, { UseModelMenuEditorParams } from "./useModelMenuEdit
 export interface ChoiceSelectEditorProps<
   CM extends Model.Choice<number, string>,
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > extends GenericModelMenuEditorProps<CM, CM, R, M, C, S>,
@@ -20,7 +20,7 @@ export interface ChoiceSelectEditorProps<
 const ChoiceSelectEditor = <
   CM extends Model.Choice<number, string>,
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 >(
@@ -48,7 +48,7 @@ export default forwardRef(ChoiceSelectEditor) as {
   <
     CM extends Model.Choice<number, string>,
     R extends Table.RowData,
-    M extends Model.RowHttpModel = Model.RowHttpModel,
+    M extends model.RowTypedApiModel = model.RowTypedApiModel,
     C extends Table.Context = Table.Context,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
   >(

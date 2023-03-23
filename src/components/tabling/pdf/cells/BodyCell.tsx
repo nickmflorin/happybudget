@@ -8,7 +8,7 @@ import Cell, { PrivateCellProps, RowExplicitCellProps, CellProps } from "./Cell"
 
 export interface RowExplicitBodyCellProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
 > extends RowExplicitCellProps<R, M, V> {
   readonly valueGetter?: (c: Table.DataColumn<R, M, V>, rows: Table.BodyRow<R>[]) => V;
@@ -16,14 +16,14 @@ export interface RowExplicitBodyCellProps<
 
 export interface BodyCellProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
 > extends RowExplicitBodyCellProps<R, M, V>,
     CellProps<R, M, V> {}
 
 interface PrivateBodyCellProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
   RW extends Table.BodyRow<R> = Table.BodyRow<R>,
 > extends Omit<PrivateCellProps<R, M, V>, "value" | "rawValue">,
@@ -34,7 +34,7 @@ interface PrivateBodyCellProps<
 
 const BodyCell = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
   RW extends Table.BodyRow<R> = Table.BodyRow<R>,
 >({

@@ -6,7 +6,7 @@ import DropdownMenu from "./DropdownMenu";
 
 export interface ExportCSVDropdownMenuProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > {
   readonly children: React.ReactChild | React.ReactChild[];
   readonly columns: Table.DataColumn<R, M>[];
@@ -16,7 +16,7 @@ export interface ExportCSVDropdownMenuProps<
 
 const ExportCSVDropdownMenu = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >(
   props: ExportCSVDropdownMenuProps<R, M>,
 ): JSX.Element => {

@@ -1,12 +1,13 @@
 import { isNil } from "lodash";
 
+import * as events from "../../events";
+
 import createChangeEventReducer from "./createChangeEventReducer";
 import createControlEventReducer from "./createControlEventReducer";
-import * as events from "../events";
 
 const createEventReducer = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   C extends Redux.ActionContext = Redux.ActionContext,
 >(

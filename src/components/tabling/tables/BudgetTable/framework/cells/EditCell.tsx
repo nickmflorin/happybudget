@@ -10,7 +10,7 @@ import {
 
 const EditCell = <
   R extends Tables.BudgetRowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   B extends Model.Budget | Model.Template = Model.Budget | Model.Template,
   C extends BudgetActionContext<B, false> = BudgetActionContext<B, false>,
   S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>,

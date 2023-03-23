@@ -5,8 +5,6 @@ import { Subtract } from "utility-types";
 
 import { hooks, tabling } from "lib";
 
-import { BaseTableProps } from "./AuthenticatedTable";
-import TableWrapper from "./TableWrapper";
 import { PublicGrid, PublicGridProps, PublicDataGrid } from "../grids";
 import {
   FooterGrid,
@@ -20,14 +18,17 @@ import {
 } from "../hocs";
 import { PublicMenu } from "../menus";
 
+import { BaseTableProps } from "./AuthenticatedTable";
+import TableWrapper from "./TableWrapper";
+
 export type PublicTableDataGridProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = PublicizeDataGridProps<R, M> & DataGridProps<R, M> & Omit<PublicGridProps<R, M>, "id">;
 
 export type PublicTableProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = BaseTableProps<R, M> &
@@ -38,7 +39,7 @@ export type PublicTableProps<
 
 type _PublicTableProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = PublicTableProps<R, M, C, S> & ConfiguredTableInjectedProps;
@@ -51,7 +52,7 @@ const TableFooterGrid = FooterGrid<any, any, PublicFooterGridProps<any>>({
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   getFooterColumn: (col: Table.DataColumn<any, any, any>) => col.footer || null,
 })(PublicGrid) as {
-  <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
+  <R extends Table.RowData, M extends model.RowTypedApiModel = model.RowTypedApiModel>(
     props: Omit<PublicFooterGridProps<R, M>, "id">,
   ): JSX.Element;
 };
@@ -65,14 +66,14 @@ const PageFooterGrid = FooterGrid<any, any, PublicFooterGridProps<any>>({
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   getFooterColumn: (col: Table.DataColumn<any, any, any>) => col.page || null,
 })(PublicGrid) as {
-  <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
+  <R extends Table.RowData, M extends model.RowTypedApiModel = model.RowTypedApiModel>(
     props: Omit<PublicFooterGridProps<R, M>, "id" | "grid">,
   ): JSX.Element;
 };
 
 const PublicTable = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 >(
@@ -278,7 +279,7 @@ const PublicTable = <
 export default configureTable<_PublicTableProps<any, any, any>, any, any>(PublicTable) as {
   <
     R extends Table.RowData,
-    M extends Model.RowHttpModel = Model.RowHttpModel,
+    M extends model.RowTypedApiModel = model.RowTypedApiModel,
     C extends Table.Context = Table.Context,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
   >(

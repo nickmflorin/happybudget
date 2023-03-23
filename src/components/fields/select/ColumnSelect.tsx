@@ -8,7 +8,7 @@ import { MultiModelSyncSelect, MultiModelSyncSelectProps } from "./generic";
 
 type ColumnModel<
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   C extends Table.DataColumn<R, M> = Table.DataColumn<R, M>,
 > = C & {
   readonly id: C["field"];
@@ -17,7 +17,7 @@ type ColumnModel<
 
 type ColumnSelectProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   C extends Table.DataColumn<R, M> = Table.DataColumn<R, M>,
 > = Omit<MultiModelSyncSelectProps<ColumnModel<R, M, C>>, "getOptionLabel" | "options"> & {
   readonly options: C[];
@@ -26,7 +26,7 @@ type ColumnSelectProps<
 
 const toModel = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   C extends Table.DataColumn<R, M> = Table.DataColumn<R, M>,
 >(
   c: C,
@@ -39,7 +39,7 @@ const toModel = <
 
 const ColumnSelect = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   C extends Table.DataColumn<R, M> = Table.DataColumn<R, M>,
 >(
   props: ColumnSelectProps<R, M, C>,

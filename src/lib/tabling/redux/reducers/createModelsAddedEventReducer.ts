@@ -14,7 +14,7 @@ import { reorderRows, updateRowGroup } from "./util";
  */
 const createModelsAddedEventReducer = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   C extends Redux.ActionContext = Redux.ActionContext,
 >(

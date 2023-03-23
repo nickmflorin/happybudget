@@ -1,5 +1,20 @@
-export const isRow = <R extends Table.RowData, M>(obj: Table.Row<R> | M): obj is Table.Row<R> =>
-  typeof obj === "object" && (obj as Table.Row<R>).rowType !== undefined;
+import { z } from "zod";
+
+import * as types from "./types";
+
+export const RowSchema = z.object({
+  id: z.string(),
+});
+
+export const isRow = <R extends types.Row, TP extends types.RowType = types.RowType>(
+  obj: unknown,
+  rowType?: TP,
+): obj is types.Row<TP> => {
+  if (typeof obj === "object" && obj !== null && !Array.isArray(obj)) {
+  }
+};
+
+typeof obj === "object" && (obj as Table.Row<R>).rowType !== undefined;
 
 export const isPlaceholderRow = <R extends Table.RowData>(
   row: Table.Row<R>,

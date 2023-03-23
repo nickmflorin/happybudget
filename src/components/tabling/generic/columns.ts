@@ -1,9 +1,9 @@
-import { isNil, map, findIndex, includes, filter } from "lodash";
 import { SuppressKeyboardEventParams, CellClassParams } from "ag-grid-community";
+import { isNil, map, findIndex, includes, filter } from "lodash";
 
 import { util, tabling, budgeting, notifications, formatters } from "lib";
 
-export const ActionColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
+export const ActionColumn = <R extends Table.RowData, M extends model.RowTypedApiModel>(
   col: Table.PartialActionColumn<R, M> & { readonly colId: Table.ActionColumnId },
 ): Table.ActionColumn<R, M> => ({
   ...col,
@@ -18,7 +18,7 @@ export const FakeColumn = (col: Table.PartialFakeColumn): Table.FakeColumn => ({
   cType: "fake",
 });
 
-export const CalculatedColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
+export const CalculatedColumn = <R extends Table.RowData, M extends model.RowTypedApiModel>(
   col: Omit<Table.PartialCalculatedColumn<R, M>, "nullValue">,
   width?: number,
 ): Table.CalculatedColumn<R, M> => ({
@@ -53,7 +53,7 @@ export const CalculatedColumn = <R extends Table.RowData, M extends Model.RowHtt
 
 export const BodyColumn = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
 >(
   col: Table.PartialBodyColumn<R, M, V>,
@@ -64,7 +64,7 @@ export const BodyColumn = <
 
 export const AttachmentsColumn = <
   R extends Tables.ActualRowData | Tables.SubAccountRowData | Tables.ContactRowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
 >(
   col: Omit<Table.PartialBodyColumn<R, M, Model.SimpleAttachment[]>, "nullValue">,
   width?: number,
@@ -86,7 +86,7 @@ export const AttachmentsColumn = <
       map(value, (m: Model.SimpleAttachment) => m.id),
   });
 
-export const DragColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
+export const DragColumn = <R extends Table.RowData, M extends model.RowTypedApiModel>(
   col: Table.PartialActionColumn<R, M>,
   width?: number,
 ): Table.ActionColumn<R, M> =>
@@ -99,7 +99,7 @@ export const DragColumn = <R extends Table.RowData, M extends Model.RowHttpModel
     maxWidth: !isNil(width) ? width : 10,
   });
 
-export const EditColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
+export const EditColumn = <R extends Table.RowData, M extends model.RowTypedApiModel>(
   col: Table.PartialActionColumn<R, M>,
   width?: number,
 ): Table.ActionColumn<R, M> =>
@@ -111,7 +111,7 @@ export const EditColumn = <R extends Table.RowData, M extends Model.RowHttpModel
     colId: "edit",
   });
 
-export const CheckboxColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
+export const CheckboxColumn = <R extends Table.RowData, M extends model.RowTypedApiModel>(
   col: Table.PartialActionColumn<R, M>,
   hasEditColumn: boolean,
   width?: number,
@@ -140,7 +140,7 @@ export const CheckboxColumn = <R extends Table.RowData, M extends Model.RowHttpM
    the clipboard processing props are provided. */
 export const SelectColumn = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
 >(
   col: Table.PartialBodyColumn<R, M, V>,
@@ -163,7 +163,7 @@ export const SelectColumn = <
         },
   });
 
-export const TagSelectColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
+export const TagSelectColumn = <R extends Table.RowData, M extends model.RowTypedApiModel>(
   col: Table.PartialBodyColumn<R, M, Model.Tag | null>,
 ): Table.BodyColumn<R, M, Model.Tag | null> =>
   SelectColumn({
@@ -185,7 +185,7 @@ export const TagSelectColumn = <R extends Table.RowData, M extends Model.RowHttp
   });
 export const ChoiceSelectColumn = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   V extends Model.Choice<number, string> | null = Model.Choice<number, string> | null,
 >(
   col: Table.PartialBodyColumn<R, M, V>,
@@ -211,7 +211,7 @@ export const ChoiceSelectColumn = <
 export const IdentifierColumn = <
   T extends "account" | "subaccount",
   R extends Tables.BudgetRowData,
-  M extends Model.RowHttpModel<T>,
+  M extends model.RowTypedApiModel<T>,
 >(
   col: Omit<Table.PartialBodyColumn<R, M, string | null>, "nullValue">,
 ): Table.BodyColumn<R, M, string | null> =>
@@ -277,7 +277,7 @@ export const IdentifierColumn = <
     },
   });
 
-export const EstimatedColumn = <R extends Tables.BudgetRowData, M extends Model.RowHttpModel>(
+export const EstimatedColumn = <R extends Tables.BudgetRowData, M extends model.RowTypedApiModel>(
   props: Omit<Table.PartialCalculatedColumn<R, M>, "nullValue">,
 ): Table.CalculatedColumn<R, M> =>
   CalculatedColumn<R, M>({
@@ -286,7 +286,7 @@ export const EstimatedColumn = <R extends Tables.BudgetRowData, M extends Model.
     valueGetter: budgeting.valueGetters.estimatedValueGetter,
   });
 
-export const ActualColumn = <R extends Tables.BudgetRowData, M extends Model.RowHttpModel>(
+export const ActualColumn = <R extends Tables.BudgetRowData, M extends model.RowTypedApiModel>(
   props: Omit<Table.PartialCalculatedColumn<R, M>, "nullValue">,
 ): Table.CalculatedColumn<R, M> =>
   CalculatedColumn<R, M>({
@@ -295,7 +295,7 @@ export const ActualColumn = <R extends Tables.BudgetRowData, M extends Model.Row
     valueGetter: budgeting.valueGetters.actualValueGetter,
   });
 
-export const VarianceColumn = <R extends Tables.BudgetRowData, M extends Model.RowHttpModel>(
+export const VarianceColumn = <R extends Tables.BudgetRowData, M extends model.RowTypedApiModel>(
   props: Omit<Table.PartialCalculatedColumn<R, M>, "nullValue">,
 ): Table.CalculatedColumn<R, M> =>
   CalculatedColumn<R, M>({

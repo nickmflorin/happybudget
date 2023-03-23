@@ -10,14 +10,14 @@ type CreatePlaceholderRowConfig<R extends Table.RowData> = {
 type PlaceholderRowConfig<
   RW extends Table.PlaceholderRow<R>,
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
 > = Omit<BodyRowManagerConfig<RW, R, M>, "rowType"> & {
   readonly defaultData?: Table.DefaultDataOnCreate<R>;
 };
 
 class PlaceholderRowManager<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > extends BodyRowManager<Table.PlaceholderRow<R>, R, M, [Partial<R> | undefined]> {
   public getRowChildren: ((m: M) => number[]) | undefined;
   public defaultData?: Table.DefaultDataOnCreate<R>;

@@ -2,16 +2,16 @@ import React, { useMemo, useState } from "react";
 
 import { isNil, map } from "lodash";
 
+import * as config from "application/config";
 import { tabling, hooks } from "lib";
 import { CollaboratorsModal } from "components/modals";
 import { AuthenticatedTable, AuthenticatedTableProps, framework } from "components/tabling/generic";
-import * as config from "application/config";
 
 import { Framework } from "./framework";
 
 export type AuthenticatedBudgetTableProps<
   R extends Tables.BudgetRowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   B extends Model.Budget | Model.Template,
   C extends BudgetContext<B> = BudgetContext<B>,
   S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>,
@@ -24,7 +24,7 @@ export type AuthenticatedBudgetTableProps<
 
 const AuthenticatedBudgetTable = <
   R extends Tables.BudgetRowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   B extends Model.Budget | Model.Template,
   C extends BudgetContext<B> = BudgetContext<B>,
   S extends Redux.BudgetTableStore<R> = Redux.BudgetTableStore<R>,

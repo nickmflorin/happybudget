@@ -11,13 +11,13 @@ import { Portal } from "components/layout";
 export type Toolbar<
   T extends Table.PublicMenuActionParams<R, M>,
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
 > = React.ComponentType<T & { readonly actions: Table.MenuActionObj[] }>;
 
 export type MenuProps<
   T extends Table.PublicMenuActionParams<R, M>,
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
 > = {
   readonly search?: string;
   readonly menuPortalId?: string;
@@ -32,7 +32,7 @@ export type MenuProps<
 export type InternalMenuProps<
   T extends Table.PublicMenuActionParams<R, M>,
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
 > = MenuProps<T, R, M> & {
   readonly hasEditColumn?: boolean;
   readonly hasDragColumn?: boolean;
@@ -43,7 +43,7 @@ export type InternalMenuProps<
 const TableMenu = <
   T extends Table.PublicMenuActionParams<R, M>,
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >(
   props: Omit<InternalMenuProps<T, R, M>, "menuPortalId"> & { readonly detached: boolean },
 ) => {
@@ -137,7 +137,7 @@ const TableMenu = <
 const Menu = <
   T extends Table.PublicMenuActionParams<R, M>,
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >({
   menuPortalId,
   ...props

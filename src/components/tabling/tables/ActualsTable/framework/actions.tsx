@@ -1,13 +1,13 @@
 import * as api from "api";
+import * as config from "application/config";
 import { model } from "lib";
 import { Icon } from "components";
 import { ImportActualsDropdownMenu } from "components/dropdowns";
 import { ImportActualsMenuItemModel } from "components/dropdowns/ImportActualsDropdownMenu";
-import * as config from "application/config";
 
 type ImportActualsActionProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = {
   readonly table: Table.TableInstance<R, M>;
   readonly onLinkToken: (linkToken: string) => void;
@@ -15,7 +15,7 @@ type ImportActualsActionProps<
 
 export const ImportActualsAction = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >(
   props: ImportActualsActionProps<R, M>,
 ): Table.MenuActionObj => ({

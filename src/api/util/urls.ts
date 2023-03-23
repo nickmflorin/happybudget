@@ -23,11 +23,27 @@ export const getQueryParams = (url: string): Record<string, string> => {
   return queryParams;
 };
 
-type QueryParamsExclusion = types.QueryParamValue[] | ((v: types.QueryParamValue) => boolean);
-
-type AddQueryParamsToUrlOptions = {
-  readonly exclude: QueryParamsExclusion;
-};
+export const processRawQueryParams = (query: types.RawQuery = {}): types.ProcessedQuery =>
+  Object.keys(query).reduce((prev: types.ProcessedQuery, key: string): types.ProcessedQuery => {
+    const value = query[key];
+    // Automatically exclude null or undefined values from the query string.
+    if (value !== null && value !== undefined) {
+      if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+        if (typeof value === "string" && value.trim() === "") {
+          return prev;
+        }
+        return { ...prev, [key]: value };
+      } else if (types.queryParamIsOrdering(value)) {
+        return { ...prev, [key]: convertOrderingQueryToString(value) };
+      }
+      logger.warn(
+        { value: String(value) },
+        `Invalid value ${String(value)} provided as a query parameter to URL.`,
+      );
+      return prev;
+    }
+    return prev;
+  }, {});
 
 /**
  * Adds the provided query parameters to the provided URL, accounting for query parameters that may
@@ -39,42 +55,16 @@ type AddQueryParamsToUrlOptions = {
  *   query parameters, and the provided query parameters will be merged with the existing ones.
  *
  * @param {types.RawQuery} query  The query parameters to add to the URL as an object.
- *
- * @param {AddQueryParamsToUrlOptions} options
- *   Options that can be supplied to to the method.  This includes a `filter` option, which is
- *   responsible for removing query parameters (or not including them) if they meet the filter
- *   criteria.
  */
-export const addQueryParamsToUrl = (
-  url: string,
-  query: types.RawQuery = {},
-  options?: AddQueryParamsToUrlOptions,
-): string => {
+export const addQueryParamsToUrl = (url: string, query: types.RawQuery = {}): string => {
   const existingQuery = getQueryParams(url);
   const newQuery = query || {};
   const mergedQuery: types.RawQuery = { ...existingQuery, ...newQuery };
+  const processed = processRawQueryParams(mergedQuery);
 
   const urlParams = new URLSearchParams();
-  Object.keys(mergedQuery).forEach((key: string) => {
-    const value = mergedQuery[key];
-    // Automatically exclude null or undefined values from the query string.
-    if (value !== null && value !== undefined) {
-      /* Even though this is typed to always be the case, we perform a runtime
-         check here and log if it fails. */
-      if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
-        const exclusion: QueryParamsExclusion = options?.exclude || [];
-        if (
-          typeof exclusion === "function" ? exclusion(value) !== true : !exclusion.includes(value)
-        ) {
-          urlParams.append(key, encodeURIComponent(value));
-        }
-      } else {
-        logger.warn(
-          { value: String(value) },
-          `Invalid value ${String(value)} provided as a query parameter to URL.`,
-        );
-      }
-    }
+  Object.keys(processed).forEach((key: string) => {
+    urlParams.append(key, encodeURIComponent(processed[key]));
   });
   if (urlParams.toString() !== "") {
     return url.split("?")[0] + "?" + urlParams.toString();

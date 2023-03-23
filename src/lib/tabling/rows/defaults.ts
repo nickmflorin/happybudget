@@ -4,14 +4,14 @@ import { tabling } from "lib";
 
 type Context = "update" | "create";
 
-function insertDefaults<R extends Table.RowData, M extends Model.RowHttpModel>(
+function insertDefaults<R extends Table.RowData, M extends model.RowTypedApiModel>(
   cs: Table.ModelColumn<R, M>[],
   data: R,
   defaults: Partial<R>,
   context: "update",
 ): R;
 
-function insertDefaults<R extends Table.RowData, M extends Model.RowHttpModel>(
+function insertDefaults<R extends Table.RowData, M extends model.RowTypedApiModel>(
   cs: Table.ModelColumn<R, M>[],
   data: Partial<R>,
   defaults: Partial<R>,
@@ -52,7 +52,7 @@ function insertDefaults<R extends Table.RowData, M extends Model.RowHttpModel>(
  */
 function insertDefaults<
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   D extends Partial<R> | R,
 >(cs: Table.ModelColumn<R, M>[], data: D, defaults: Partial<R>, context: Context): D {
   let key: keyof R;
@@ -78,7 +78,7 @@ function insertDefaults<
   return data;
 }
 
-export const applyDefaultsOnCreate = <R extends Table.RowData, M extends Model.RowHttpModel>(
+export const applyDefaultsOnCreate = <R extends Table.RowData, M extends model.RowTypedApiModel>(
   cs: Table.ModelColumn<R, M>[],
   data?: Partial<R> | undefined,
   defaults?: Table.DefaultDataOnCreate<R>,
@@ -115,7 +115,7 @@ export const applyDefaultsOnCreate = <R extends Table.RowData, M extends Model.R
   return data;
 };
 
-// export const applyDefaultsOnUpdate = <R extends Table.RowData, M extends Model.RowHttpModel>(
+// export const applyDefaultsOnUpdate = <R extends Table.RowData, M extends model.RowTypedApiModel>(
 //   cs: Table.ModelColumn<R, M>[],
 //   row: Table.ModelRow<R>,
 //   change: Table.RowChangeData<R, Table.ModelRow<R>>,

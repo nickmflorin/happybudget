@@ -1,15 +1,17 @@
 import { isNil } from "lodash";
 
-import { redux } from "lib";
+import { model } from "lib";
+
+import * as types from "./types";
 
 type ActionCreatorConfig<
-  P extends Redux.ActionPayload,
-  C extends Redux.ActionContext = Redux.ActionContext,
+  P extends types.ActionPayload,
+  C extends types.ActionContext = types.ActionContext,
 > = {
   readonly ctx?: Pick<C, "errorMessage">;
   readonly label?: string;
   readonly prefix?: string;
-  readonly prepareAction?: (p: P) => Omit<Redux.Action<P>, "type">;
+  readonly prepareAction?: (p: P) => Omit<types.Action<P>, "type">;
 };
 
 /**
@@ -18,19 +20,19 @@ type ActionCreatorConfig<
  * optionally provided label.
  */
 export const createAction = <
-  P extends Redux.ActionPayload,
-  C extends Redux.ActionContext = Redux.ActionContext,
+  P extends types.ActionPayload,
+  C extends types.ActionContext = types.ActionContext,
 >(
   type: string,
   config?: ActionCreatorConfig<P, C>,
-): Redux.ActionCreator<P, C> => {
+): types.ActionCreator<P, C> => {
   const actionType = !isNil(config?.prefix)
     ? `${config?.prefix as string}.${type}`
     : !isNil(config?.label)
     ? `${config?.label as string}.${type}`
     : type;
 
-  function actionCreator(payload: P, dynamicContext: Omit<C, "publicTokenId">): Redux.Action<P> {
+  function actionCreator(payload: P, dynamicContext: Omit<C, "publicTokenId">): types.Action<P> {
     let pyload = payload;
     if (config?.prepareAction) {
       const prepared = config?.prepareAction(payload);
@@ -63,67 +65,55 @@ export const createAction = <
  * be created with the same configuration.
  */
 export const createActionCreator =
-  <C extends Redux.ActionContext = Redux.ActionContext>(
-    config?: ActionCreatorConfig<Redux.ActionPayload, C>,
+  <C extends types.ActionContext = types.ActionContext>(
+    config?: ActionCreatorConfig<types.ActionPayload, C>,
   ): {
-    <PR extends Redux.ActionPayload, CR extends Redux.ActionContext = Redux.ActionContext>(
+    <PR extends types.ActionPayload, CR extends types.ActionContext = types.ActionContext>(
       type: string,
       config?: ActionCreatorConfig<PR, CR>,
-    ): Redux.ActionCreator<PR, CR>;
+    ): types.ActionCreator<PR, CR>;
   } =>
-  <PR extends Redux.ActionPayload, CR extends Redux.ActionContext = Redux.ActionContext>(
+  <PR extends types.ActionPayload, CR extends types.ActionContext = types.ActionContext>(
     type: string,
     c?: ActionCreatorConfig<PR, CR>,
   ) =>
     // Dynamic configuration should override static configuration.
     createAction<PR, CR>(type, { ...config, ...c });
 
-export const setApplicationLoadingAction =
-  redux.actions.createAction<boolean>("SetApplicationLoading");
-export const setApplicationDrawerAction = redux.actions.createAction<boolean | "TOGGLE">(
-  "SetApplicationDrawer",
-);
+export const setApplicationLoadingAction = createAction<boolean>("SetApplicationLoading");
+export const setApplicationDrawerAction = createAction<boolean | "TOGGLE">("SetApplicationDrawer");
 
 export const updateLoggedInUserMetricsAction =
-  redux.actions.createAction<Redux.UserMetricsActionPayload>("user.UpdateMetrics");
-export const updateLoggedInUserAction =
-  redux.actions.createAction<Model.User>("user.UpdateInState");
-export const clearLoggedInUserAction = redux.actions.createAction<null>("user.Clear");
-export const setProductPermissionModalOpenAction = redux.actions.createAction<boolean>(
+  createAction<types.UserMetricsActionPayload>("user.UpdateMetrics");
+export const updateLoggedInUserAction = createAction<model.User>("user.UpdateInState");
+export const clearLoggedInUserAction = createAction<null>("user.Clear");
+export const setProductPermissionModalOpenAction = createAction<boolean>(
   "SetProductPermissionModalOpen",
 );
 
-export const requestContactsAction =
-  redux.actions.createAction<Redux.RequestPayload>("contacts.Request");
-export const loadingContactsAction = redux.actions.createAction<boolean>("contacts.Loading");
+export const requestContactsAction = createAction<types.RequestActionPayload>("contacts.Request");
+export const loadingContactsAction = createAction<boolean>("contacts.Loading");
 export const responseContactsAction =
-  redux.actions.createAction<Http.RenderedListResponse<Model.Contact>>("contacts.Response");
-export const removeContactFromStateAction = redux.actions.createAction<number>(
-  "user.contacts.RemoveFromState",
+  createAction<Http.RenderedListResponse<model.Contact>>("contacts.Response");
+export const removeContactFromStateAction = createAction<number>("user.contacts.RemoveFromState");
+export const updateContactInStateAction = createAction<types.UpdateModelPayload<model.Contact>>(
+  "user.contacts.UpdateInState",
 );
-export const updateContactInStateAction = redux.actions.createAction<
-  Redux.UpdateModelPayload<Model.Contact>
->("user.contacts.UpdateInState");
-export const addContactToStateAction = redux.actions.createAction<Model.Contact>(
-  "user.contacts.AddToState",
-);
-export const setContactsSearchAction =
-  redux.actions.createAction<string>("user.contacts.SetSearch");
-export const requestFilteredContactsAction = redux.actions.createAction<Redux.RequestPayload>(
+export const addContactToStateAction = createAction<model.Contact>("user.contacts.AddToState");
+export const setContactsSearchAction = createAction<string>("user.contacts.SetSearch");
+export const requestFilteredContactsAction = createAction<types.RequestActionPayload>(
   "user.contacts.RequestFiltered",
 );
-export const loadingFilteredContactsAction = redux.actions.createAction<boolean>(
-  "user.contacts.LoadingFiltered",
-);
-export const responseFilteredContactsAction = redux.actions.createAction<
-  Http.RenderedListResponse<Model.Contact>
+export const loadingFilteredContactsAction = createAction<boolean>("user.contacts.LoadingFiltered");
+export const responseFilteredContactsAction = createAction<
+  Http.RenderedListResponse<model.Contact>
 >("user.contacts.ResponseFiltered");
-export const responseSubAccountUnitsAction = redux.actions.createAction<
-  Http.RenderedListResponse<Model.Tag>
->("budget.subaccountunits.Response");
-export const responseFringeColorsAction = redux.actions.createAction<
-  Http.RenderedListResponse<string>
->("budget.fringecolors.Response");
-export const responseActualTypesAction = redux.actions.createAction<
-  Http.RenderedListResponse<Model.Tag>
->("budget.actualstypes.Response");
+export const responseSubAccountUnitsAction = createAction<Http.RenderedListResponse<model.Tag>>(
+  "budget.subaccountunits.Response",
+);
+export const responseFringeColorsAction = createAction<Http.RenderedListResponse<string>>(
+  "budget.fringecolors.Response",
+);
+export const responseActualTypesAction = createAction<Http.RenderedListResponse<model.Tag>>(
+  "budget.actualstypes.Response",
+);

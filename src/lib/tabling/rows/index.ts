@@ -5,3 +5,4 @@ export * from "./ids";
 export * from "./managers";
 export * from "./typeguards";
 export * from "./patterns";
+export * from "./types";

@@ -1,5 +1,5 @@
-import { isNil, filter, map, includes, reduce } from "lodash";
 import { ProcessCellForExportParams } from "ag-grid-community";
+import { isNil, filter, map, includes, reduce } from "lodash";
 
 import { hooks, tabling, notifications } from "lib";
 
@@ -8,7 +8,7 @@ export type UseClipboardReturnType = [
   (fields?: string[]) => CSVData,
 ];
 
-export type UseClipboardParams<R extends Table.RowData, M extends Model.RowHttpModel> = {
+export type UseClipboardParams<R extends Table.RowData, M extends model.RowTypedApiModel> = {
   readonly apis: Table.GridApis | null;
   readonly columns: Table.Column<R, M>[];
   readonly setCellCutChange?: (ch: Table.SoloCellChange<R> | null) => void;
@@ -16,7 +16,7 @@ export type UseClipboardParams<R extends Table.RowData, M extends Model.RowHttpM
 
 const processCellValueForClipboard = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >(
   column: Table.DataColumn<R, M>,
   row: Table.BodyRow<R>,
@@ -42,7 +42,7 @@ const processCellValueForClipboard = <
   }
 };
 
-const useClipboard = <R extends Table.RowData, M extends Model.RowHttpModel>(
+const useClipboard = <R extends Table.RowData, M extends model.RowTypedApiModel>(
   params: UseClipboardParams<R, M>,
 ): UseClipboardReturnType => {
   const processCellForClipboard: (p: ProcessCellForExportParams) => string =

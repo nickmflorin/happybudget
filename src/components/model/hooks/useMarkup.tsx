@@ -6,7 +6,7 @@ import { CreateMarkupModal, EditMarkupModal } from "components/modals";
 
 interface UseMarkupProps<
   R extends Tables.BudgetRowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   B extends Model.BaseBudget,
   PARENT extends Model.Account | Model.SubAccount,
   RSP extends Http.MarkupResponseTypes<B, PARENT> = Http.MarkupResponseTypes<B, PARENT>,
@@ -21,7 +21,7 @@ type UseMarkupReturnType = [JSX.Element, (m: number) => void, (ms?: number[]) =>
 
 const useMarkup = <
   R extends Tables.BudgetRowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   MM extends Model.Account | Model.SubAccount,
   B extends Model.BaseBudget,
   PARENT extends Model.Account | Model.SubAccount,

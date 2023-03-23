@@ -4,7 +4,7 @@ import Cell, { CellProps } from "./Cell";
 
 const HeaderCell = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
 >(
   props: Omit<CellProps<R, M, V>, "rawValue" | "value">,

@@ -5,7 +5,7 @@ import { ValueCell } from "components/tabling/generic/framework/cells";
 
 const IdentifierCell = <
   R extends Tables.BudgetRowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   B extends Model.Budget | Model.Template = Model.Budget | Model.Template,
   PUBLIC extends boolean = boolean,
   C extends BudgetActionContext<B, PUBLIC> = BudgetActionContext<B, PUBLIC>,
@@ -17,13 +17,13 @@ const IdentifierCell = <
 export default framework.connectCellToStore<
   Table.ValueCellProps<
     Tables.BudgetRowData,
-    Model.RowHttpModel,
+    model.RowTypedApiModel,
     BudgetActionContext,
     Redux.BudgetTableStore<Tables.BudgetRowData>,
     string | null
   >,
   Tables.BudgetRowData,
-  Model.RowHttpModel,
+  model.RowTypedApiModel,
   BudgetActionContext,
   Redux.BudgetTableStore<Tables.BudgetRowData>,
   string | null

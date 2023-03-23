@@ -9,7 +9,7 @@ const KEY_DELETE = 46;
 
 const DateEditor = <
   R extends Table.RowData & { readonly date: string | null },
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 >(

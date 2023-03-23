@@ -5,7 +5,7 @@ import BodyRow, { BodyRowProps } from "./BodyRow";
 
 const FooterRow = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
 >(
   props: BodyRowProps<R, M, V>,

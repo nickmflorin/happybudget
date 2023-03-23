@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useMemo } from "react";
 
+import { CellMouseOverEvent, CellFocusedEvent } from "ag-grid-community";
 import classNames from "classnames";
 import hoistNonReactStatics from "hoist-non-react-statics";
 import { map, isNil, includes } from "lodash";
 import { useLocation } from "react-router-dom";
 import { Subtract } from "utility-types";
-import { CellMouseOverEvent, CellFocusedEvent } from "ag-grid-community";
 
 import { tabling, hooks, model, notifications } from "lib";
 
@@ -17,7 +17,7 @@ export type InjectedDataGridProps = {
 
 export type DataGridProps<
   R extends Table.RowData = Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = {
   readonly className?: Table.GeneralClassName;
   readonly rowClass?: Table.RowClassName;
@@ -39,7 +39,7 @@ export type DataGridProps<
 
 export type InternalDataGridProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = DataGridProps<R, M> & {
   readonly apis: Table.GridApis | null;
   readonly hasEditColumn: boolean;
@@ -73,7 +73,7 @@ type HOCProps = Partial<Omit<InjectedDataGridProps, "id">> & Pick<InjectedDataGr
 const DataGrid = <
   T extends HOCProps,
   R extends Table.RowData = Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >(
   Component: React.FunctionComponent<T>,
 ): React.FunctionComponent<Subtract<T, HOCProps> & InternalDataGridProps<R, M>> => {

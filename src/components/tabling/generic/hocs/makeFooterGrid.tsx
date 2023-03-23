@@ -12,7 +12,7 @@ type WithFooterGridProps<T> = T & { readonly id: "page" | "footer" };
 
 export interface FooterGridProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > extends GridProps<R, M> {
   readonly constrainHorizontally?: boolean;
   readonly apis: Table.GridApis | null;
@@ -20,14 +20,14 @@ export interface FooterGridProps<
 
 export interface AuthenticatedFooterGridProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > extends AuthenticatedGridProps<R, M> {
   readonly constrainHorizontally?: boolean;
 }
 
 export interface PublicFooterGridProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > extends PublicGridProps<R, M> {
   readonly constrainHorizontally?: boolean;
 }
@@ -35,7 +35,7 @@ export interface PublicFooterGridProps<
 const FooterGrid =
   <
     R extends Table.RowData,
-    M extends Model.RowHttpModel = Model.RowHttpModel,
+    M extends model.RowTypedApiModel = model.RowTypedApiModel,
     T extends FooterGridProps<R, M> = FooterGridProps<R, M>,
   >(
     config: Table.FooterGridConfig<R, M>,

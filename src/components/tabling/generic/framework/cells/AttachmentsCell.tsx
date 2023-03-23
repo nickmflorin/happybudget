@@ -59,7 +59,7 @@ const DragCountReducer = (
 
 interface AttachmentsCellProps<
   R extends Tables.ActualRowData | Tables.SubAccountRowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > extends Table.CellProps<R, M, C, S, Model.SimpleAttachment[]> {
@@ -69,7 +69,7 @@ interface AttachmentsCellProps<
 
 const AttachmentsCell = <
   R extends Tables.ActualRowData | Tables.SubAccountRowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 >({

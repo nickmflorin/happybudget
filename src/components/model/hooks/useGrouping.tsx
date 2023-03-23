@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 import { tabling } from "lib";
 import { CreateGroupModal, EditGroupModal } from "components/modals";
 
-interface UseGroupingProps<R extends Tables.BudgetRowData, M extends Model.RowHttpModel> {
+interface UseGroupingProps<R extends Tables.BudgetRowData, M extends model.RowTypedApiModel> {
   readonly parentId: number;
   readonly parentType: Model.ParentType;
   readonly table: Table.TableInstance<R, M>;
@@ -18,7 +18,7 @@ type UseGroupingReturnType<R extends Tables.BudgetRowData> = [
   (gs: number[]) => void,
 ];
 
-const useGrouping = <R extends Tables.BudgetRowData, M extends Model.RowHttpModel>(
+const useGrouping = <R extends Tables.BudgetRowData, M extends model.RowTypedApiModel>(
   props: UseGroupingProps<R, M>,
 ): UseGroupingReturnType<R> => {
   const [groupAccounts, setGroupAccounts] = useState<number[] | undefined>(undefined);

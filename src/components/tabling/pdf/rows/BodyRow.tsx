@@ -3,13 +3,14 @@ import React from "react";
 import classNames from "classnames";
 import { includes, isNil } from "lodash";
 
-import Row, { RowProps } from "./Row";
 import { BodyCell } from "../cells";
 import { RowExplicitBodyCellProps } from "../cells/BodyCell";
 
+import Row, { RowProps } from "./Row";
+
 export interface BodyRowProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
   RW extends Table.BodyRow<R> = Table.BodyRow<R>,
 > extends RowProps<R, M, V> {
@@ -26,7 +27,7 @@ export interface BodyRowProps<
 
 const BodyRow = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
   RW extends Table.BodyRow<R> = Table.BodyRow<R>,
 >({

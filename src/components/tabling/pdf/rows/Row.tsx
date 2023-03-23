@@ -7,7 +7,7 @@ import { View } from "components/pdf";
 
 export type RowProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
 > = Pdf.StandardComponentProps & {
   readonly columns: Table.DataColumn<R, M, V>[];
@@ -17,7 +17,7 @@ export type RowProps<
 
 const Row = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
 >(
   props: RowProps<R, M, V> & {

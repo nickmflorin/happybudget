@@ -28,6 +28,11 @@ export type TrailingSlash<T extends string = string, ADD extends boolean = true>
 
 export type ClientPath<T extends string = string> = TrailingSlash<LeadingSlash<T>, false>;
 
+export type HttpsDomain = `https://${string}`;
+export type HttpDomain = `http://${string}`;
+
+export type Domain = HttpsDomain | HttpDomain;
+
 export const HttpMethods = enumeratedLiterals(["GET", "POST", "PATCH", "DELETE"] as const);
 export type HttpMethod = EnumeratedLiteralType<typeof HttpMethods>;
 
@@ -182,9 +187,9 @@ export type ApiSuccessResponse<D extends ApiResponseBody = model.JsonObject> = {
   readonly data: D;
 };
 
-export type ModelRetrieveResponse<M extends model.JsonModel> = ApiSuccessResponse<M>;
+export type ModelRetrieveResponse<M extends model.ApiModel> = ApiSuccessResponse<M>;
 
-export type ModelListResponse<M extends model.JsonModel> = ApiSuccessResponse<M[]> & {
+export type ModelListResponse<M extends model.ApiModel> = ApiSuccessResponse<M[]> & {
   readonly count: number;
 };
 

@@ -6,7 +6,7 @@ import { tabling } from "lib";
 
 type UseHiddenColumnsParams<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = {
   readonly tableId: string;
   readonly columns: Table.DataColumn<R, M>[];
@@ -59,7 +59,7 @@ const hiddenColumnsReducer = (
 
 const useHiddenColumns = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >(
   params: UseHiddenColumnsParams<R, M>,
 ): UseHiddenColumnsReturnType => {

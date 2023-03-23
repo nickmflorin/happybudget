@@ -28,14 +28,14 @@ import TableWrapper from "./TableWrapper";
 
 export type AuthenticatedTableDataGridProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = InternalAuthenticateDataGridProps<R, M> &
   DataGridProps<R, M> &
   Omit<AuthenticatedGridProps<R, M>, "id">;
 
 export type BaseTableProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = TableConfigurationProps<R, M> &
   DataGridProps<R, M> & {
     readonly framework?: Table.Framework;
@@ -52,7 +52,7 @@ export type BaseTableProps<
 
 export type AuthenticatedTableProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = BaseTableProps<R, M> &
@@ -71,7 +71,7 @@ export type AuthenticatedTableProps<
 
 type _AuthenticatedTableProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = AuthenticatedTableProps<R, M, C, S> & ConfiguredTableInjectedProps;
@@ -84,7 +84,7 @@ const TableFooterGrid = FooterGrid<any, any, AuthenticatedFooterGridProps<any, a
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   getFooterColumn: (col: Table.DataColumn<any, any, any>) => col.footer || null,
 })(AuthenticatedGrid) as {
-  <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
+  <R extends Table.RowData, M extends model.RowTypedApiModel = model.RowTypedApiModel>(
     props: Omit<AuthenticatedFooterGridProps<R, M>, "id">,
   ): JSX.Element;
 };
@@ -98,14 +98,14 @@ const PageFooterGrid = FooterGrid<any, any, AuthenticatedFooterGridProps<any, an
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   getFooterColumn: (col: Table.DataColumn<any, any, any>) => col.page || null,
 })(AuthenticatedGrid) as {
-  <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
+  <R extends Table.RowData, M extends model.RowTypedApiModel = model.RowTypedApiModel>(
     props: Omit<AuthenticatedFooterGridProps<R, M>, "id">,
   ): JSX.Element;
 };
 
 const AuthenticatedTable = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 >(
@@ -553,7 +553,7 @@ export default configureTable<_AuthenticatedTableProps<any, any, any>, any, any>
 ) as {
   <
     R extends Table.RowData,
-    M extends Model.RowHttpModel = Model.RowHttpModel,
+    M extends model.RowTypedApiModel = model.RowTypedApiModel,
     C extends Table.Context = Table.Context,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
   >(

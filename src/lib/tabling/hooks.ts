@@ -9,7 +9,7 @@ export const InitialGridRef: Table.DataGridInstance = {
 export const useDataGrid = (): NonNullRef<Table.DataGridInstance> =>
   useRef<Table.DataGridInstance>(InitialGridRef);
 
-export const InitialTableRef: Table.TableInstance<Table.RowData, Model.RowHttpModel> = {
+export const InitialTableRef: Table.TableInstance<Table.RowData, model.RowTypedApiModel> = {
   ...InitialGridRef,
   notifications: [],
   /* eslint-disable-next-line @typescript-eslint/no-empty-function */
@@ -40,6 +40,6 @@ export const InitialTableRef: Table.TableInstance<Table.RowData, Model.RowHttpMo
 
 export const useTable = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >(): NonNullRef<Table.TableInstance<R, M>> =>
   useRef<Table.TableInstance<R, M>>(InitialTableRef as Table.TableInstance<R, M>);

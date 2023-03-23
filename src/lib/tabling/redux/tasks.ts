@@ -4,14 +4,14 @@ import { call, put, select, all } from "redux-saga/effects";
 
 import { http } from "lib";
 
-import * as columns from "./columns";
-import * as events from "./events";
-import * as rows from "./rows";
+import * as columns from "../columns";
+import * as events from "../events";
+import * as rows from "../rows";
 
 export const task = <
   E extends Table.ChangeEvent<R>,
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   C extends Redux.ActionContext = Redux.ActionContext,
 >(
   saga: Redux.TableChangeEventTask<E, R, C>,
@@ -55,7 +55,7 @@ export const createChangeEventHandler = <
 
 type CreateBulkTaskConfig<
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   P extends Http.PayloadObj,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   SERVICE extends (...args: any[]) => Promise<any>,
@@ -76,7 +76,7 @@ type CreateBulkTaskConfig<
 
 export const createBulkTask = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   P extends Http.PayloadObj,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   SERVICE extends (...args: any[]) => Promise<any>,

@@ -7,7 +7,7 @@ import { tabling, hooks, util } from "lib";
 
 export type UseContextMenuParams<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = {
   readonly apis: Table.GridApis | null;
   readonly data: Table.BodyRow<R>[];
@@ -73,7 +73,10 @@ const evaluateCases = <R extends Table.RowData, RW extends Table.BodyRow<R>>(
   return String(def);
 };
 
-const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>(
+const useContextMenu = <
+  R extends Table.RowData,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
+>(
   params: UseContextMenuParams<R, M>,
 ): [(row: Table.BodyRow<R>, node: Table.RowNode) => Table.MenuItemDef[]] => {
   const getRowName = useMemo(

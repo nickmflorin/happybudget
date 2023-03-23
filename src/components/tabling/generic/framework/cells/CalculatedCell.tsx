@@ -12,7 +12,7 @@ import connectCellToStore from "./connectCellToStore";
 
 const CalculatedCell = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 >({
@@ -78,14 +78,14 @@ const CalculatedCell = <
 export default connectCellToStore<
   Table.CalculatedCellProps<
     Table.RowData,
-    Model.RowHttpModel,
+    model.RowTypedApiModel,
     Table.Context,
     Redux.TableStore<Table.RowData>
   >,
   Table.RowData,
-  Model.RowHttpModel,
+  model.RowTypedApiModel,
   Table.Context,
   Redux.TableStore<Table.RowData>,
   number | null,
-  Table.CalculatedColumn<Table.RowData, Model.RowHttpModel, number | null>
+  Table.CalculatedColumn<Table.RowData, model.RowTypedApiModel, number | null>
 >(React.memo(CalculatedCell)) as typeof CalculatedCell;

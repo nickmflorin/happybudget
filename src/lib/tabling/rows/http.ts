@@ -2,7 +2,10 @@ import { isNil, reduce } from "lodash";
 
 import { tabling } from "lib";
 
-const issueWarningsForParsedFieldColumn = <R extends Table.RowData, M extends Model.RowHttpModel>(
+const issueWarningsForParsedFieldColumn = <
+  R extends Table.RowData,
+  M extends model.RowTypedApiModel,
+>(
   col: Table.BodyColumn<R, M>,
 ) => {
   if (col.parsedFields?.length === 0) {
@@ -22,7 +25,7 @@ const issueWarningsForParsedFieldColumn = <R extends Table.RowData, M extends Mo
 
 export const patchPayload = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   P extends Http.PayloadObj,
   RW extends Table.EditableRow<R> = Table.EditableRow<R>,
 >(
@@ -79,7 +82,7 @@ export const patchPayload = <
 
 export const bulkPatchPayload = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   P extends Http.PayloadObj,
   RW extends Table.EditableRow<R> = Table.EditableRow<R>,
 >(
@@ -95,7 +98,7 @@ export const bulkPatchPayload = <
 
 export const bulkPatchPayloads = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   P extends Http.PayloadObj,
   RW extends Table.EditableRow<R> = Table.EditableRow<R>,
 >(
@@ -125,7 +128,7 @@ export const bulkPatchPayloads = <
 
 export const postPayload = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   P extends Http.PayloadObj,
 >(
   data: Partial<R>,
@@ -151,7 +154,7 @@ export const postPayload = <
 
 export const postPayloads = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   P extends Http.PayloadObj,
 >(
   p: Table.RowAddDataPayload<R> | Table.RowAddDataEvent<R>,
@@ -171,7 +174,7 @@ export const postPayloads = <
 
 export const createBulkUpdatePayload = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   P extends Http.PayloadObj,
   RW extends Table.EditableRow<R> = Table.EditableRow<R>,
 >(
@@ -181,7 +184,7 @@ export const createBulkUpdatePayload = <
 
 export const createBulkCreatePayload = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   P extends Http.PayloadObj,
 >(
   p: Partial<R>[],

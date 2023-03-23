@@ -12,7 +12,7 @@ export const isSyntheticClickEvent = (e: Table.CellDoneEditingEvent): e is Synth
 
 export const isChangeEvent = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   RW extends Table.EditableRow<R> = Table.EditableRow<R>,
 >(
   e: Table.Event<R, M, RW>,
@@ -21,7 +21,7 @@ export const isChangeEvent = <
 
 export const isControlEvent = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   RW extends Table.EditableRow<R> = Table.EditableRow<R>,
 >(
   e: Table.Event<R, M, RW>,
@@ -30,7 +30,7 @@ export const isControlEvent = <
 
 export const isMetaEvent = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   RW extends Table.EditableRow<R> = Table.EditableRow<R>,
 >(
   e: Table.Event<R, M, RW>,
@@ -38,7 +38,7 @@ export const isMetaEvent = <
 
 export const isTraversibleEvent = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   RW extends Table.EditableRow<R> = Table.EditableRow<R>,
 >(
   e: Table.Event<R, M, RW>,
@@ -55,7 +55,7 @@ export const isDataChangeEvent = <
 export const isActionWithChangeEvent = <
   T extends Table.ChangeEventId,
   R extends Table.RowData = Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   RW extends Table.EditableRow<R> = Table.ModelRow<R>,
   C extends Redux.ActionContext = Redux.ActionContext,
 >(
@@ -66,14 +66,14 @@ export const isActionWithChangeEvent = <
 
 export const isModelsUpdatedEvent = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >(
   e: Table.ControlEvent<R, M>,
 ): e is Table.ModelsUpdatedEvent<M> => (e as Table.ModelsUpdatedEvent<M>).type === "modelsUpdated";
 
 export const isPlaceholdersActivatedEvent = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >(
   e: Table.ControlEvent<R, M>,
 ): e is Table.PlaceholdersActivatedEvent<M> =>
@@ -81,14 +81,14 @@ export const isPlaceholdersActivatedEvent = <
 
 export const isUpdateRowsEvent = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >(
   e: Table.ControlEvent<R, M>,
 ): e is Table.UpdateRowsEvent<R> => (e as Table.UpdateRowsEvent<R>).type === "updateRows";
 
 export const isModelsAddedEvent = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >(
   e: Table.ControlEvent<R, M>,
 ): e is Table.ModelsAddedEvent<M> => (e as Table.ModelsAddedEvent<M>).type === "modelsAdded";

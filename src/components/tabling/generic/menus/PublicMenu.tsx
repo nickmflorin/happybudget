@@ -5,7 +5,7 @@ import PublicToolbar from "./PublicToolbar";
 
 export type PublicMenuProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = Omit<
   MenuProps<Table.PublicMenuActionParams<R, M>, R, M>,
   "menuActionParams" | "savingChangesPortalId" | "saving" | "savingVisible"
@@ -15,7 +15,7 @@ export type PublicMenuProps<
 
 type InternalUnathenticatedMenuProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = Omit<
   InternalMenuProps<Table.PublicMenuActionParams<R, M>, R, M>,
   "menuActionParams" | "toolbar" | "hasDragColumn"
@@ -27,7 +27,7 @@ type InternalUnathenticatedMenuProps<
 
 const UnathenticatedMenu = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >(
   props: Omit<InternalUnathenticatedMenuProps<R, M>, "menuPortalId">,
 ) => (

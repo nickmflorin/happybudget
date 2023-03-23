@@ -1,7 +1,5 @@
 import React, { useMemo, useEffect } from "react";
 
-import classNames from "classnames";
-import { map, isNil, cloneDeep } from "lodash";
 import {
   EditableCallbackParams,
   CellClassParams,
@@ -30,6 +28,8 @@ import {
   MenuItemDef,
   GridOptions,
 } from "ag-grid-community";
+import classNames from "classnames";
+import { map, isNil, cloneDeep } from "lodash";
 import { AgGridReact, AgGridReactProps } from "@ag-grid-community/react";
 
 import { tabling, updateInArray, ui } from "lib";
@@ -87,7 +87,7 @@ type UseAgProps<R extends Table.RowData, RW extends Table.Row<R> = Table.BodyRow
 export interface GridProps<
   R extends Table.RowData,
   RW extends Table.Row<R> = Table.BodyRow<R>,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > extends UseAgProps<R> {
   readonly id: Table.GridId;
   readonly apis: Table.GridApis | null;
@@ -108,7 +108,7 @@ export interface GridProps<
 const Grid = <
   R extends Table.RowData,
   RW extends Table.Row<R> = Table.BodyRow<R>,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >({
   id,
   tableId,

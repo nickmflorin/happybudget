@@ -10,7 +10,7 @@ import Grid, { GridProps } from "./Grid";
 
 export interface AuthenticatedGridProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > extends GridProps<R, M> {
   readonly apis: Table.GridApis | null;
   readonly framework?: Table.Framework;
@@ -20,7 +20,7 @@ export interface AuthenticatedGridProps<
 
 const AuthenticatedGrid = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >({
   framework,
   ...props

@@ -1,6 +1,6 @@
 import { GridApi as RootGridApi, ColumnApi as RootColumnApi, GridOptions } from "ag-grid-community";
 
-import * as rows from "./rows";
+import * as rows from "../rows";
 
 export type GridApi<R extends rows.Row> = RootGridApi<R>;
 

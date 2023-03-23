@@ -12,7 +12,7 @@ import connectTableToStore, {
 
 export type ConnectedAuthenticatedTableInjectedProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = ConnectedTableInjectedProps<R, S> & {
   readonly onEvent: (e: Table.Event<R, M>) => void;
@@ -21,14 +21,14 @@ export type ConnectedAuthenticatedTableInjectedProps<
 
 export type ConnectAuthenticatedTableProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = ConnectTableProps<R, M, C, S>;
 
 type AuthenticatedStoreConfig<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   A extends Redux.AuthenticatedTableActionPayloadMap<
@@ -42,7 +42,7 @@ type AuthenticatedStoreConfig<
 type HOCProps<
   T extends ConnectedAuthenticatedTableInjectedProps<R, M, S>,
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > = Subtract<T, ConnectedAuthenticatedTableInjectedProps<R, M, S>> &
@@ -52,7 +52,7 @@ const connectTableToAuthenticatedStore =
   <
     T extends ConnectedAuthenticatedTableInjectedProps<R, M, S>,
     R extends Table.RowData,
-    M extends Model.RowHttpModel = Model.RowHttpModel,
+    M extends model.RowTypedApiModel = model.RowTypedApiModel,
     C extends Table.Context = Table.Context,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
     A extends Redux.AuthenticatedTableActionPayloadMap<

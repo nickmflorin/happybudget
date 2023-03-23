@@ -5,7 +5,7 @@ import BodyRowManager from "./base";
 abstract class EditableRowManager<
   RW extends Table.EditableRow<R>,
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   ARGS extends unknown[],
 > extends BodyRowManager<RW, R, M, ARGS> {
   mergeChangesWithRow = (row: RW, change: Table.RowChangeData<R, RW>): RW => {

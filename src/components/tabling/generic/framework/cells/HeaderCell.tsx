@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
 
+import { Column } from "ag-grid-community";
 import classNames from "classnames";
 import { isNil, find } from "lodash";
-import { Column } from "ag-grid-community";
 
 import { tabling, ui } from "lib";
 import { Icon, VerticalFlexCenter } from "components";
@@ -23,14 +23,17 @@ interface IHeaderCompParams {
 
 export interface HeaderCellProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > extends Omit<IHeaderCompParams, "column">,
     StandardComponentProps {
   onEdit?: (field: string, column: Table.BodyColumn<R, M>) => void;
   column: Table.RealColumn<R, M>;
 }
 
-const HeaderCell = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>({
+const HeaderCell = <
+  R extends Table.RowData,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
+>({
   column,
   displayName,
   className,

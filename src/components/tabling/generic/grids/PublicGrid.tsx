@@ -9,12 +9,15 @@ import Grid, { GridProps } from "./Grid";
 
 export interface PublicGridProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > extends GridProps<R, M> {
   readonly framework?: Table.Framework;
 }
 
-const PublicGrid = <R extends Table.RowData, M extends Model.RowHttpModel = Model.RowHttpModel>({
+const PublicGrid = <
+  R extends Table.RowData,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
+>({
   framework,
   ...props
 }: PublicGridProps<R, M>): JSX.Element => {

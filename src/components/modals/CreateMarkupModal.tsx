@@ -7,7 +7,7 @@ interface CreateMarkupModalProps<
   B extends Model.Budget | Model.Template,
   PARENT extends Model.Account | Model.SubAccount,
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   RSP extends Http.MarkupResponseTypes<B, PARENT> = Http.MarkupResponseTypes<B, PARENT>,
 > extends Omit<CreateModelModalProps<Model.Markup, RSP>, "children"> {
   readonly parentId: PARENT["id"];
@@ -23,7 +23,7 @@ const CreateMarkupModal = <
   B extends Model.Budget | Model.Template,
   PARENT extends Model.Account | Model.SubAccount,
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   RSP extends Http.MarkupResponseTypes<B, PARENT> = Http.MarkupResponseTypes<B, PARENT>,
 >({
   parentId,

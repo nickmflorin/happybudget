@@ -8,7 +8,7 @@ import LinkCell, { LinkCellProps } from "./LinkCell";
 
 const PhoneNumberCell = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   CL extends Table.DataColumn<R, M, string | null> = Table.DataColumn<R, M, string | null>,

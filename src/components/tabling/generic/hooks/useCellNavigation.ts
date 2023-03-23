@@ -1,11 +1,11 @@
-import { isNil, includes, filter, map } from "lodash";
 import { NavigateToNextCellParams, TabToNextCellParams } from "ag-grid-community";
+import { isNil, includes, filter, map } from "lodash";
 
 import { hooks, tabling } from "lib";
 
 export interface UseCellNavigationParams<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > {
   readonly apis: Table.GridApis | null;
   readonly columns: Table.Column<R, M>[];
@@ -84,7 +84,7 @@ const findNextNavigatableNodes = <R extends Table.RowData>(
 
 const useCellNavigation = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >(
   params: UseCellNavigationParams<R, M>,
 ): UseCellNavigationReturnType => {

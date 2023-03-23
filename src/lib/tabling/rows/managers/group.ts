@@ -10,7 +10,7 @@ type CreateGroupRowConfig = {
 
 class GroupRowManager<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > extends BodyRowManager<Table.GroupRow<R>, R, M, [Model.Group]> {
   constructor(config: Omit<BodyRowManagerConfig<Table.GroupRow<R>, R, M>, "rowType">) {
     super({ ...config, rowType: "group" });

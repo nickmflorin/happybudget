@@ -11,14 +11,14 @@ import Menu, { InternalMenuProps, MenuProps } from "./Menu";
 
 export type AuthenticatedMenuProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = Omit<MenuProps<Table.AuthenticatedMenuActionParams<R, M>, R, M>, "menuActionParams"> & {
   readonly columns: Table.DataColumn<R, M>[];
 };
 
 type InternalAuthenticatedMenuProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = Omit<
   InternalMenuProps<Table.AuthenticatedMenuActionParams<R, M>, R, M>,
   "menuActionParams" | "toolbar"
@@ -32,7 +32,7 @@ type InternalAuthenticatedMenuProps<
 
 const AuthenticatedMenu = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >(
   props: Omit<InternalAuthenticatedMenuProps<R, M>, "menuPortalId">,
 ) => (

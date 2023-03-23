@@ -20,7 +20,7 @@ export type RowManagerConfig<RW extends Table.Row<R>, R extends Table.RowData> =
 export type BodyRowManagerConfig<
   RW extends Table.BodyRow<R>,
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
 > = Pick<CreateRowConfig<RW, R>, "rowType"> & {
   readonly columns: Table.Column<R, M>[];
 };
@@ -43,7 +43,7 @@ export const createRow = <RW extends Table.Row<R>, R extends Table.RowData>(
 abstract class BodyRowManager<
   RW extends Table.BodyRow<R>,
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   ARGS extends unknown[],
 > {
   public rowType: RW["rowType"];

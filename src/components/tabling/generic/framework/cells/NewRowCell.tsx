@@ -6,7 +6,7 @@ import { IconButton } from "components/buttons";
 interface NewRowCellProps
   extends Table.CellProps<
     Table.RowData,
-    Model.RowHttpModel,
+    model.RowTypedApiModel,
     Table.Context,
     Redux.TableStore,
     null

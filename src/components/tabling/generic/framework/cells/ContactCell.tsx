@@ -3,15 +3,15 @@ import React, { useMemo } from "react";
 import classNames from "classnames";
 import { find, isNil } from "lodash";
 
+import * as store from "application/store";
 import { model } from "lib";
 import { Tag } from "components/tagging";
-import * as store from "application/store";
 
 import { Cell } from "./generic";
 
 interface ContactCellProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > extends Table.CellProps<R, M, C, S, number | null> {
@@ -20,7 +20,7 @@ interface ContactCellProps<
 
 const ContactCell = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 >({

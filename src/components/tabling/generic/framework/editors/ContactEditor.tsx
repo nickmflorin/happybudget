@@ -2,16 +2,16 @@ import { forwardRef, ForwardedRef } from "react";
 
 import { filter, isNil } from "lodash";
 
+import * as store from "application/store";
 import { tabling, model } from "lib";
 import { Icon } from "components";
 import { framework } from "components/tabling/generic";
-import * as store from "application/store";
 
 import { GenericModelMenuEditor } from "./generic";
 
 interface ContactEditorProps<
   R extends Table.RowData & { readonly contact: number | null },
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 > extends Table.EditorProps<R, M, C, S> {
@@ -21,7 +21,7 @@ interface ContactEditorProps<
 
 const ContactEditor = <
   R extends Table.RowData & { readonly contact: number | null },
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
 >(

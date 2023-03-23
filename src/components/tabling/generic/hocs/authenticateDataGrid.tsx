@@ -1,20 +1,5 @@
 import React, { useMemo, useRef, useState, useImperativeHandle } from "react";
 
-import hoistNonReactStatics from "hoist-non-react-statics";
-import {
-  map,
-  isNil,
-  includes,
-  find,
-  filter,
-  flatten,
-  reduce,
-  uniq,
-  isEqual,
-  difference,
-  findIndex,
-} from "lodash";
-import { Subtract } from "utility-types";
 import {
   CellKeyDownEvent,
   ProcessCellForExportParams,
@@ -36,20 +21,36 @@ import {
   RowDataUpdatedEvent,
 } from "ag-grid-community";
 import { FillOperationParams } from "ag-grid-community/dist/cjs/entities/gridOptions";
+import hoistNonReactStatics from "hoist-non-react-statics";
+import {
+  map,
+  isNil,
+  includes,
+  find,
+  filter,
+  flatten,
+  reduce,
+  uniq,
+  isEqual,
+  difference,
+  findIndex,
+} from "lodash";
+import { Subtract } from "utility-types";
 
 import { tabling, hooks, util } from "lib";
 
-import makeDataGrid, {
-  InjectedDataGridProps,
-  DataGridProps,
-  InternalDataGridProps,
-} from "./makeDataGrid";
 import {
   useCellNavigation,
   useAuthenticatedClipboard,
   useContextMenu,
   UseContextMenuParams,
 } from "../hooks";
+
+import makeDataGrid, {
+  InjectedDataGridProps,
+  DataGridProps,
+  InternalDataGridProps,
+} from "./makeDataGrid";
 
 type InjectedAuthenticatedDataGridProps = InjectedDataGridProps & {
   readonly processCellForClipboard: (params: ProcessCellForExportParams) => string;
@@ -72,7 +73,7 @@ type InjectedAuthenticatedDataGridProps = InjectedDataGridProps & {
 
 export type AuthenticateDataGridProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = UseContextMenuParams<R, M> &
   DataGridProps<R, M> & {
     readonly pinFirstColumn?: boolean;
@@ -81,7 +82,7 @@ export type AuthenticateDataGridProps<
 
 export type InternalAuthenticateDataGridProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = AuthenticateDataGridProps<R, M> &
   InternalDataGridProps<R, M> & {
     readonly grid: NonNullRef<Table.DataGridInstance>;
@@ -97,7 +98,7 @@ export type InternalAuthenticateDataGridProps<
 
 const getCellChangeForClear = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   RW extends Table.EditableRow<R> = Table.EditableRow<R>,
 >(
   row: RW,
@@ -136,7 +137,7 @@ const getCellChangeForClear = <
 
 const getTableChangesFromRangeClear = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >(
   api: Table.GridApi,
   columns: Table.RealColumn<R, M>[],
@@ -172,7 +173,7 @@ const getTableChangesFromRangeClear = <
 
 const getCellChangesFromEvent = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   RW extends Table.EditableRow<R> = Table.EditableRow<R>,
 >(
   columns: Table.RealColumn<R, M>[],
@@ -289,7 +290,7 @@ type HOCProps = Partial<Omit<InjectedAuthenticatedDataGridProps, "id">> &
 const authenticateDataGrid = <
   T extends HOCProps,
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >(
   Component: React.FunctionComponent<T>,
 ): React.FunctionComponent<Subtract<T, HOCProps> & InternalAuthenticateDataGridProps<R, M>> => {

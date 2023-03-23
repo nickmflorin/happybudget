@@ -9,7 +9,7 @@ import usePublicAttachments from "./usePublicAttachments";
 
 interface UseAttachmentsProps<
   R extends Tables.ActualRowData | Tables.SubAccountRowData | Tables.ContactRowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > {
   readonly table: Table.TableInstance<R, M>;
   readonly path: (id: number) => string;
@@ -38,7 +38,7 @@ type UseAttachmentsReturnType<
 
 const useAttachments = <
   R extends Tables.ActualRowData | Tables.SubAccountRowData | Tables.ContactRowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >(
   props: UseAttachmentsProps<R, M>,
 ): UseAttachmentsReturnType<R> => {

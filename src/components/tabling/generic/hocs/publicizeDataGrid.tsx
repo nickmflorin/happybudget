@@ -13,12 +13,13 @@ import { Subtract } from "utility-types";
 
 import { hooks, tabling } from "lib";
 
+import { useClipboard, useCellNavigation } from "../hooks";
+
 import makeDataGrid, {
   InjectedDataGridProps,
   DataGridProps,
   InternalDataGridProps,
 } from "./makeDataGrid";
-import { useClipboard, useCellNavigation } from "../hooks";
 
 type InjectedPublicDataGridProps = InjectedDataGridProps & {
   readonly processCellForClipboard: (params: ProcessCellForExportParams) => string;
@@ -29,12 +30,12 @@ type InjectedPublicDataGridProps = InjectedDataGridProps & {
 
 export type PublicizeDataGridProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = DataGridProps<R, M>;
 
 export type InternalPublicizeDataGridProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = PublicizeDataGridProps<R, M> &
   InternalDataGridProps<R, M> & {
     readonly grid: NonNullRef<Table.DataGridInstance>;
@@ -49,7 +50,7 @@ type HOCProps = Partial<Omit<InjectedPublicDataGridProps, "id">> &
 const publicizeDataGrid = <
   T extends HOCProps,
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 >(
   Component: React.FunctionComponent<T>,
 ): React.FunctionComponent<Subtract<T, HOCProps> & InternalPublicizeDataGridProps<R, M>> => {

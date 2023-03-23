@@ -7,7 +7,7 @@ import EditableRowManager from "./editable";
 
 type GetRowValue<
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   V extends Table.RawRowValue,
 > = (
   m: M,
@@ -15,7 +15,7 @@ type GetRowValue<
   original: (ci: Table.DataColumn<R, M>, mi: M) => V | undefined,
 ) => V | undefined;
 
-type CreateModelRowConfig<R extends Table.RowData, M extends Model.RowHttpModel> = {
+type CreateModelRowConfig<R extends Table.RowData, M extends model.RowTypedApiModel> = {
   readonly model: M;
   // Used solely for PDF purposes.
   readonly getRowValue?: GetRowValue<R, M, Table.RawRowValue> | undefined;
@@ -23,14 +23,14 @@ type CreateModelRowConfig<R extends Table.RowData, M extends Model.RowHttpModel>
 
 type ModelRowManagerConfig<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = Omit<BodyRowManagerConfig<Table.ModelRow<R>, R, M>, "rowType"> & {
   readonly getRowChildren?: (m: M) => number[];
 };
 
 class ModelRowManager<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 > extends EditableRowManager<Table.ModelRow<R>, R, M, [M, GetRowValue<R, M, any> | undefined]> {
   public getRowChildren: ((m: M) => number[]) | undefined;

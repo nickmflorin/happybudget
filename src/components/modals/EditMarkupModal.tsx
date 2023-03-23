@@ -15,7 +15,7 @@ interface EditMarkupModalProps<
   B extends Model.Budget | Model.Template,
   PARENT extends Model.Account | Model.SubAccount,
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   RSP extends Http.MarkupResponseTypes<B, PARENT> = Http.MarkupResponseTypes<B, PARENT>,
 > extends EditModelModalProps<Model.Markup, RSP> {
   readonly parentId: PARENT["id"];
@@ -28,7 +28,7 @@ const EditMarkupModal = <
   B extends Model.Budget | Model.Template,
   PARENT extends Model.Account | Model.SubAccount,
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
   RSP extends Http.MarkupResponseTypes<B, PARENT> = Http.MarkupResponseTypes<B, PARENT>,
 >({
   parentId,

@@ -4,7 +4,7 @@ import { GroupForm } from "components/forms";
 
 import { EditModelModal, EditModelModalProps, UpdateModelCallbacks } from "./generic";
 
-interface EditGroupModalProps<R extends Table.RowData, M extends Model.RowHttpModel>
+interface EditGroupModalProps<R extends Table.RowData, M extends model.RowTypedApiModel>
   extends EditModelModalProps<Model.Group> {
   readonly table: Table.TableInstance<R, M>;
   readonly parentId: number;
@@ -14,7 +14,7 @@ interface EditGroupModalProps<R extends Table.RowData, M extends Model.RowHttpMo
 const EditGroupModal = <
   MM extends Model.SimpleAccount | Model.SimpleSubAccount,
   R extends Table.RowData,
-  M extends Model.RowHttpModel,
+  M extends model.RowTypedApiModel,
 >({
   parentId,
   parentType,

@@ -10,7 +10,7 @@ import { View, Text } from "components/pdf";
 const isCallback = <
   RV,
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
 >(
   prop: Table.PdfOptionalCellCallback<RV, R, M, V>,
@@ -19,7 +19,7 @@ const isCallback = <
 const evaluateOptionalCallbackProp = <
   RV,
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
 >(
   prop: Table.PdfOptionalCellCallback<RV, R, M, V> | undefined,
@@ -33,7 +33,7 @@ const evaluateOptionalCallbackProp = <
 
 const evaluateClassName = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
 >(
   className: Table.PdfCellClassName<R, M, V>,
@@ -66,7 +66,7 @@ const evaluateClassName = <
 
 const evaluateCellStyle = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
 >(
   styleObj: Table.PdfCellStyle<R, M, V>,
@@ -89,7 +89,7 @@ const evaluateCellStyle = <
 
 export interface RowExplicitCellProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
 > {
   readonly style?: Table.PdfCellStyle<R, M, V>;
@@ -100,7 +100,7 @@ export interface RowExplicitCellProps<
 
 export interface CellProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
 > extends RowExplicitCellProps<R, M, V> {
   readonly column: Table.DataColumn<R, M, V>;
@@ -115,7 +115,7 @@ export interface CellProps<
 
 export interface PrivateCellProps<
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
 > extends CellProps<R, M, V> {
   readonly row?: Table.Row<R>;
@@ -125,7 +125,7 @@ export interface PrivateCellProps<
 
 const Cell = <
   R extends Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   V extends Table.RawRowValue = Table.RawRowValue,
 >(
   props: PrivateCellProps<R, M, V>,

@@ -26,15 +26,6 @@ type PathParams = Array<PathParam>;
 
 type V1Url = `v1/${string}/`;
 
-type Order = 1 | -1 | 0;
-type DefinitiveOrder = 1 | -1;
-type FieldOrder<F extends string = string> = {
-  readonly field: F;
-  readonly order: Order;
-};
-
-type Ordering<F extends string = string> = FieldOrder<F>[];
-
 type ListQuery = Omit<RawQuery, "ordering"> & {
   readonly ordering?: Ordering<string>;
   readonly ids?: number[];

@@ -10,6 +10,7 @@ export * from "./lookup";
 export * from "./ordering";
 export * from "./parsers";
 export * from "./reference";
+export * from "./schemas";
 export * from "./tabling";
 export * from "./tagging";
 export * from "./types";

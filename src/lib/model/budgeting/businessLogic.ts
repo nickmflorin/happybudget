@@ -1,43 +1,43 @@
 import { isNil, reduce, filter, includes } from "lodash";
 
-import { tabling } from "lib";
+import * as tabling from "../tabling";
 
-import * as models from "./models";
 import * as typeguards from "./typeguards";
+import * as types from "./types";
 
-type GroupObj<R extends Tables.BudgetRowData> = Table.GroupRow<R> | Model.Group;
+type GroupObj<R extends types.BudgetRowData> = tabling.GroupRow<R> | types.Group;
 
-type GroupChild<R extends Tables.BudgetRowData> =
-  | Table.DataRow<R>
-  | Model.Account
-  | Model.SubAccount
-  | Model.PdfAccount
-  | Model.PdfSubAccount;
+type GroupChild<R extends tabling.BudgetRowData> =
+  | tabling.DataRow<R>
+  | types.Account
+  | types.SubAccount
+  | types.PdfAccount
+  | types.PdfSubAccount;
 
-type WithActual<R extends Tables.BudgetRowData> =
-  | Table.DataRow<R>
-  | Model.Account
-  | Model.SubAccount
-  | Model.PdfAccount
-  | Model.PdfSubAccount
-  | Model.Budget
-  | Model.PdfBudget
-  | Model.Template;
+type WithActual<R extends tabling.BudgetRowData> =
+  | tabling.DataRow<R>
+  | types.Account
+  | types.SubAccount
+  | types.PdfAccount
+  | types.PdfSubAccount
+  | types.Budget
+  | types.PdfBudget
+  | types.Template;
 
-type WithEstimation<R extends Tables.BudgetRowData> = WithActual<R> | Model.Template;
+type WithEstimation<R extends tabling.BudgetRowData> = WithActual<R> | types.Template;
 
-const isGroupObj = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(
+const isGroupObj = <R extends tabling.BudgetRowData = tabling.BudgetRowData>(
   obj: WithEstimation<R> | GroupObj<R>,
 ): obj is GroupObj<R> =>
   (tabling.rows.isRow(obj) && tabling.rows.isGroupRow(obj)) ||
   (!tabling.rows.isRow(obj) && typeguards.isGroup(obj));
 
-export const nominalValue = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(
+export const nominalValue = <R extends tabling.BudgetRowData = tabling.BudgetRowData>(
   obj: WithEstimation<R>,
 ): number => (tabling.rows.isRow(obj) ? obj.data.nominal_value : obj.nominal_value);
 
 export const accumulatedMarkupContribution = <
-  R extends Tables.BudgetRowData = Tables.BudgetRowData,
+  R extends tabling.BudgetRowData = tabling.BudgetRowData,
 >(
   obj: WithEstimation<R>,
 ) =>
@@ -46,7 +46,7 @@ export const accumulatedMarkupContribution = <
     : obj.accumulated_markup_contribution;
 
 export const accumulatedFringeContribution = <
-  R extends Tables.BudgetRowData = Tables.BudgetRowData,
+  R extends tabling.BudgetRowData = tabling.BudgetRowData,
 >(
   obj: WithEstimation<R>,
 ) =>
@@ -54,7 +54,7 @@ export const accumulatedFringeContribution = <
     ? obj.data.accumulated_fringe_contribution
     : obj.accumulated_fringe_contribution;
 
-export const fringeContribution = <R extends Tables.BudgetRowData = Tables.BudgetRowData>(
+export const fringeContribution = <R extends tabling.BudgetRowData = tabling.BudgetRowData>(
   obj: WithEstimation<R>,
 ) =>
   // Only SubAccount(s) have a Fringe Contribution.
@@ -65,7 +65,7 @@ export const fringeContribution = <R extends Tables.BudgetRowData = Tables.Budge
     : 0.0;
 
 export const estimatedValue = <
-  R extends Tables.BudgetRowData = Tables.BudgetRowData,
+  R extends tabling.BudgetRowData = tabling.BudgetRowData,
   C extends GroupChild<R> = GroupChild<R>,
 >(
   obj: WithEstimation<R> | GroupObj<R>,
@@ -96,7 +96,7 @@ export const estimatedValue = <
 };
 
 export const actualValue = <
-  R extends Tables.BudgetRowData = Tables.BudgetRowData,
+  R extends tabling.BudgetRowData = tabling.BudgetRowData,
   C extends GroupChild<R> = GroupChild<R>,
 >(
   obj: WithEstimation<R> | GroupObj<R>,
@@ -121,7 +121,7 @@ export const actualValue = <
 };
 
 export const varianceValue = <
-  R extends Tables.BudgetRowData = Tables.BudgetRowData,
+  R extends tabling.BudgetRowData = tabling.BudgetRowData,
   C extends GroupChild<R> = GroupChild<R>,
 >(
   obj: WithEstimation<R> | GroupObj<R>,
@@ -130,18 +130,18 @@ export const varianceValue = <
   children?: C[],
 ): number => estimatedValue(obj, children) - actualValue(obj, children);
 
-export const contributionFromMarkups = <R extends Table.RowData = Tables.BudgetRowData>(
+export const contributionFromMarkups = <R extends tabling.RowData = tabling.BudgetRowData>(
   value: number,
-  markups: (Model.Markup | Table.MarkupRow<R>)[],
+  markups: (types.Markup | tabling.MarkupRow<R>)[],
 ): number => {
-  const unit = (m: Model.Markup | Table.MarkupRow<R>) =>
+  const unit = (m: types.Markup | tabling.MarkupRow<R>) =>
     tabling.rows.isRow(m) ? m.markupData.unit : m.unit;
   return reduce(
     filter(
       markups,
-      (m: Model.Markup | Table.MarkupRow<R>) => unit(m).id === models.MarkupUnits.percent.id,
+      (m: types.Markup | tabling.MarkupRow<R>) => unit(m).id === models.MarkupUnits.percent.id,
     ),
-    (curr: number, markup: Model.Markup | Table.MarkupRow<R>): number => {
+    (curr: number, markup: types.Markup | tabling.MarkupRow<R>): number => {
       const rate = tabling.rows.isRow(markup) ? markup.markupData.rate : markup.rate;
       if (!isNil(rate)) {
         return curr + rate * value;
@@ -154,11 +154,11 @@ export const contributionFromMarkups = <R extends Table.RowData = Tables.BudgetR
 
 export const contributionFromFringes = (
   value: number,
-  fringes: (Model.Fringe | Table.ModelRow<Tables.FringeRowData>)[],
+  fringes: (types.Fringe | tabling.ModelRow<tabling.FringeRowData>)[],
 ): number =>
   reduce(
     fringes,
-    (curr: number, fringe: Model.Fringe | Tables.FringeRow): number => {
+    (curr: number, fringe: types.Fringe | tabling.FringeRow): number => {
       const unit = tabling.rows.isRow(fringe) ? fringe.data.unit : fringe.unit;
       const rate = tabling.rows.isRow(fringe) ? fringe.data.rate : fringe.rate;
       const cutoff = tabling.rows.isRow(fringe) ? fringe.data.cutoff : fringe.cutoff;

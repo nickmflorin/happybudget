@@ -1,9 +1,11 @@
 import { ICellEditorParams } from "ag-grid-community";
 
+import * as model from "../../model";
+import * as columns from "../columns";
+import * as events from "../events";
+import * as rows from "../rows";
+
 import * as cells from "./cells";
-import * as columns from "./columns";
-import * as events from "./events";
-import * as rows from "./rows";
 import * as table from "./table";
 
 export interface AgEditorRef<
@@ -43,7 +45,7 @@ export interface AgEditorRef<
 
 export interface EditorProps<
   R extends rows.Row = rows.Row,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
   T = cells.CellValue<R, N>,
   C extends table.TableContext = table.TableContext,

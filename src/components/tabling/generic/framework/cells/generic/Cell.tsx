@@ -8,7 +8,7 @@ import { Icon } from "components";
 
 const Cell = <
   R extends Table.RowData = Table.RowData,
-  M extends Model.RowHttpModel = Model.RowHttpModel,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
   C extends Table.Context = Table.Context,
   S extends Redux.TableStore<R> = Redux.TableStore<R>,
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -67,7 +67,7 @@ const Cell = <
 type CellComponent = {
   <
     R extends Table.RowData,
-    M extends Model.RowHttpModel = Model.RowHttpModel,
+    M extends model.RowTypedApiModel = model.RowTypedApiModel,
     C extends Table.Context = Table.Context,
     S extends Redux.TableStore<R> = Redux.TableStore<R>,
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
