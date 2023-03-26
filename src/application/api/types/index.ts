@@ -5,33 +5,7 @@ export * from "./auth";
 export * from "./response";
 export * from "./payload";
 export * from "./query";
-
-export type LeadingSlash<T extends string = string, ADD extends boolean = true> = T extends ""
-  ? never
-  : ADD extends true
-  ? T extends `/${string}`
-    ? T
-    : `/${T}`
-  : T extends `/${infer P}`
-  ? LeadingSlash<P, false>
-  : T;
-
-export type TrailingSlash<T extends string = string, ADD extends boolean = true> = T extends ""
-  ? never
-  : ADD extends true
-  ? T extends `${string}/`
-    ? T
-    : `${T}/`
-  : T extends `${infer BASE extends `/${string}`}/`
-  ? TrailingSlash<BASE, false>
-  : T;
-
-export type ClientPath<T extends string = string> = TrailingSlash<LeadingSlash<T>, false>;
-
-export type HttpsDomain = `https://${string}`;
-export type HttpDomain = `http://${string}`;
-
-export type Domain = HttpsDomain | HttpDomain;
+export * from "./urls";
 
 export const HttpMethods = enumeratedLiterals(["GET", "POST", "PATCH", "DELETE"] as const);
 export type HttpMethod = EnumeratedLiteralType<typeof HttpMethods>;
@@ -49,20 +23,6 @@ export enum STATUS_CODES {
 }
 
 export type StatusCode = typeof STATUS_CODES[keyof typeof STATUS_CODES];
-
-type _ApiPaths<T extends string = string, M extends HttpMethod = HttpMethod> = {
-  GET: TrailingSlash<LeadingSlash<T>, false> | TrailingSlash<LeadingSlash<T>>;
-  POST: TrailingSlash<LeadingSlash<T>>;
-  PATCH: TrailingSlash<LeadingSlash<T>>;
-  DELETE: TrailingSlash<LeadingSlash<T>>;
-}[M];
-
-export type ApiPath<T extends string = string, M extends HttpMethod = HttpMethod> = _ApiPaths<
-  T extends `/v1/${infer V extends string}`
-    ? `/v1/${LeadingSlash<V, false>}`
-    : `/v1/${LeadingSlash<T, false>}`,
-  M
->;
 
 export type ApiFieldDetailContext = {
   readonly minimum: number;
@@ -186,8 +146,6 @@ export type ApiErrorResponse<T extends ErrorIndicators = errors.ApiErrorType> =
 export type ApiSuccessResponse<D extends ApiResponseBody = model.JsonObject> = {
   readonly data: D;
 };
-
-export type ModelRetrieveResponse<M extends model.ApiModel> = ApiSuccessResponse<M>;
 
 export type ModelListResponse<M extends model.ApiModel> = ApiSuccessResponse<M[]> & {
   readonly count: number;

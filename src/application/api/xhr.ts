@@ -2,8 +2,9 @@ import { ActualFileObject } from "filepond/types";
 
 import * as config from "application/config";
 
-import * as errors from "./deprecated/errors";
-import * as parsers from "./parsers";
+import * as errors from "../../api/deprecated/errors";
+import * as parsers from "../../api/deprecated/parsers";
+
 import { setRequestHeaders } from "./util/util";
 
 type XHRRequestOptions<R> = {

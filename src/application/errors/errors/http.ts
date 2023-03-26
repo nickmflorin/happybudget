@@ -1,6 +1,6 @@
 import { Required } from "utility-types";
 
-import { ApiDetail } from "api/types";
+import { ApiDetail } from "application/api/types";
 import { http, feedback } from "lib";
 
 import * as codes from "../codes";

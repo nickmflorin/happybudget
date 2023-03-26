@@ -4,6 +4,7 @@ import { logger } from "internal";
 
 import * as stringFormatters from "../formatters";
 import * as validators from "../validators";
+
 import * as types from "./types";
 
 /**
@@ -35,7 +36,7 @@ import * as types from "./types";
  * @returns {string[]}
  */
 export const getStringFormatParams = (value: string): string[] => {
-  const REGEX = /:([a-zA-Z]+[a-zA-Z0-9]+)/g;
+  const REGEX = /:([a-zA-Z]+[a-zA-Z0-9]?)/g;
   return Array.from(value.matchAll(REGEX)).map((i: RegExpMatchArray) => i[1]);
 };
 

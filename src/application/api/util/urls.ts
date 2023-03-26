@@ -23,6 +23,27 @@ export const getQueryParams = (url: string): Record<string, string> => {
   return queryParams;
 };
 
+export const getUrlPathParams = <U extends string>(value: U): types.UrlPathParams<U> => {
+  const REGEX = /\/:([a-zA-Z]+[a-zA-Z0-9]?)/g;
+  return Array.from(value.matchAll(REGEX)).map(
+    (i: RegExpMatchArray) => i[1],
+  ) as types.UrlPathParams<U>;
+};
+
+export const injectUrlPathParams = <U extends string, O extends types.UrlPathParamsObj<U>>(
+  url: U,
+  params: O,
+): types.UrlWithPathParams<U, O> => {
+  const paramNames = getUrlPathParams(url);
+  paramNames.forEach((p: types.UrlPathParams<U, []>[number]) => {
+    if (!url.includes(`:${p}`)) {
+      throw new Error(`Expected the url ${url} to contain a path parameter ${p} but it does not!`);
+    }
+    url = url.replace(`:${p}`, `${params[p]}`) as U;
+  });
+  return url as types.UrlWithPathParams<U, O>;
+};
+
 export const processRawQueryParams = (query: types.RawQuery = {}): types.ProcessedQuery =>
   Object.keys(query).reduce((prev: types.ProcessedQuery, key: string): types.ProcessedQuery => {
     const value = query[key];
@@ -70,6 +91,76 @@ export const addQueryParamsToUrl = (url: string, query: types.RawQuery = {}): st
     return url.split("?")[0] + "?" + urlParams.toString();
   }
   return url;
+};
+
+export const removeLeadingSlashes = <T extends string>(value: T): types.LeadingSlash<T, false> => {
+  let newValue = value;
+  while (newValue.length > 0 && newValue.startsWith("/")) {
+    newValue = newValue.slice(1) as T;
+  }
+  return newValue as types.LeadingSlash<T, false>;
+};
+
+export const removeTrailingSlashes = <T extends string>(
+  value: T,
+): types.TrailingSlash<T, false> => {
+  let newValue = value;
+  while (newValue.length > 0 && newValue.endsWith("/")) {
+    newValue = newValue.slice(0, -1) as T;
+  }
+  return newValue as types.TrailingSlash<T, false>;
+};
+
+export const constructPath = <O extends types.HttpPathOptions>(options: O): types.HttpPath<O> =>
+  options.basePath !== undefined
+    ? (`${removeTrailingSlashes(options.basePath)}/${removeLeadingSlashes(
+        options.path,
+      )}` as types.HttpPath<O>)
+    : (`/${removeLeadingSlashes(options.path)}` as types.HttpPath<O>);
+
+type ConstructPathUrlOptions = types.HttpPathOptions & {
+  readonly query?: types.RawQuery;
+};
+
+export const constructPathUrl = <O extends ConstructPathUrlOptions>(
+  options: O,
+): types.HttpPathUrl<O> =>
+  addQueryParamsToUrl(constructPath(options), options.query) as types.HttpPathUrl<O>;
+
+export const constructUri = <O extends types.HttpUriOptions>(options: O): types.HttpUri<O> =>
+  `${options.scheme}://${options.host}${
+    options.port !== undefined ? `:${options.port}` : ""
+  }` as types.HttpUri<O>;
+
+type ConstructUrlOptions = types.HttpUriOptions & {
+  readonly query?: types.RawQuery;
+};
+
+/**
+ * Constructs a URL that consists of the string components scheme,
+ * @param param0 C
+ * @returns
+ */
+export const constructUrl = <O extends ConstructUrlOptions>(options: O): types.HttpUrl<O> =>
+  addQueryParamsToUrl(constructUri(options), options.query) as types.HttpUrl<O>;
+
+const isConstructUriOptions = (
+  options: ConstructPathUrlOptions | ConstructUrlOptions,
+): options is ConstructUrlOptions =>
+  (options as ConstructUrlOptions).host !== undefined &&
+  (options as ConstructUrlOptions).scheme !== undefined;
+
+export const constructEndpoint = <O extends ConstructPathUrlOptions | ConstructUrlOptions>(
+  options: O,
+): O extends ConstructUrlOptions ? types.HttpUrl<O> : types.HttpPathUrl<O> => {
+  if (isConstructUriOptions(options)) {
+    return constructUrl(options) as O extends ConstructUrlOptions
+      ? types.HttpUrl<O>
+      : types.HttpPathUrl<O>;
+  }
+  return constructPathUrl(options) as O extends ConstructUrlOptions
+    ? types.HttpUrl<O>
+    : types.HttpPathUrl<O>;
 };
 
 /**

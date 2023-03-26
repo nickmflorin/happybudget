@@ -14,7 +14,7 @@ export const configure = () => {
   }
   const SENTRY_ENV = process.env.NEXT_PUBLIC_SENTRY_ENV;
   if (SENTRY_ENV === undefined) {
-    throw new Error("No SENTRY_ENV found in the environment.");
+    throw new TypeError("No SENTRY_ENV found in the environment.");
   }
   const SENTRY_ERROR_DATA_DEPTH_STRING = process.env.NEXT_PUBLIC_SENTRY_ERROR_DATA_DEPTH;
   const SENTRY_ERROR_DATA_DEPTH: number | null =

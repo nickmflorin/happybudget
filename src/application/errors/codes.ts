@@ -1,6 +1,7 @@
 import { type FieldError as RootFieldError } from "react-hook-form";
 
-import { enumeratedLiterals, EnumeratedLiteralType, http } from "lib";
+import * as api from "api";
+import { enumeratedLiterals, EnumeratedLiteralType } from "lib";
 
 import { ErrorTypes, ErrorType } from "./errorTypes";
 
@@ -46,18 +47,48 @@ export type ClientValidationError<T extends ClientValidationErrorCode = ClientVa
 export const UNKNOWN = "unknown" as const;
 export type UNKNOWN = typeof UNKNOWN;
 
+export const AuthErrorCodes = enumeratedLiterals([
+  "token_expired",
+  "token_not_valid",
+  "invalid_social_token",
+  "invalid_social_provider",
+  "account_not_verified",
+  "account_disabled",
+  "account_not_on_waitlist",
+  "account_not_authenticated",
+] as const);
+export type AuthErrorCode = EnumeratedLiteralType<typeof AuthErrorCodes>;
+
+export const PermissionErrorCodes = enumeratedLiterals([
+  "permission_error",
+  "product_permission_error",
+] as const);
+export type PermissionErrorCode = EnumeratedLiteralType<typeof PermissionErrorCodes>;
+
+export const BillingErrorCodes = enumeratedLiterals([
+  "stripe_request_error",
+  "checkout_error",
+  "checkout_session_inactive",
+] as const);
+export type BillingErrorCode = EnumeratedLiteralType<typeof BillingErrorCodes>;
+
 export const ApiFieldErrorCodes = enumeratedLiterals([
   "required",
   "invalid",
   "unique",
-  "min",
-  "max",
+  "email_does_not_exist",
+  "invalid_credentials",
+  "invalid_file_name",
+  "invalid_file_extension",
   UNKNOWN,
 ] as const);
 
 export type ApiFieldErrorCode = EnumeratedLiteralType<typeof ApiFieldErrorCodes>;
 
 export const ApiGlobalErrorCodes = enumeratedLiterals([
+  ...PermissionErrorCodes.__ALL__,
+  ...BillingErrorCodes.__ALL__,
+  ...AuthErrorCodes.__ALL__,
   UNKNOWN,
   /* Error code that is used to indicate that a PATH parameter in the URL is malformed.  Note that
      this should not be used in place of "not_found" in cases where the ID is a PATH parameter and
@@ -82,19 +113,21 @@ export type ApiErrorCode = EnumeratedLiteralType<typeof ApiErrorCodes>;
 export const NetworkErrorCodes = enumeratedLiterals(["network"] as const);
 export type NetworkErrorCode = EnumeratedLiteralType<typeof NetworkErrorCodes>;
 
-export const DEFAULT_STATUS_CODES: Partial<{ [key in ApiGlobalErrorCode]: http.StatusCode }> = {
-  [ApiErrorCodes.BAD_REQUEST]: http.STATUS_CODES.HTTP_400_BAD_REQUEST,
-  [ApiErrorCodes.UNAUTHORIZED]: http.STATUS_CODES.HTTP_401_UNAUTHORIZED,
-  [ApiErrorCodes.FORBIDDEN]: http.STATUS_CODES.HTTP_403_FORBIDDEN,
-  [ApiErrorCodes.NOT_FOUND]: http.STATUS_CODES.HTTP_404_NOT_FOUND,
-  [ApiErrorCodes.METHOD_NOT_ALLOWED]: http.STATUS_CODES.HTTP_405_METHOD_NOT_ALLOWED,
-  [ApiErrorCodes.INTERNAL_SERVER_ERROR]: http.STATUS_CODES.HTTP_500_INTERNAL_SERVER_ERROR,
+export const DEFAULT_STATUS_CODES: Partial<{ [key in ApiGlobalErrorCode]: api.StatusCode }> = {
+  [ApiErrorCodes.BAD_REQUEST]: api.STATUS_CODES.HTTP_400_BAD_REQUEST,
+  [ApiErrorCodes.UNAUTHORIZED]: api.STATUS_CODES.HTTP_401_UNAUTHORIZED,
+  [ApiErrorCodes.FORBIDDEN]: api.STATUS_CODES.HTTP_403_FORBIDDEN,
+  [ApiErrorCodes.NOT_FOUND]: api.STATUS_CODES.HTTP_404_NOT_FOUND,
+  [ApiErrorCodes.METHOD_NOT_ALLOWED]: api.STATUS_CODES.HTTP_405_METHOD_NOT_ALLOWED,
+  [ApiErrorCodes.INTERNAL_SERVER_ERROR]: api.STATUS_CODES.HTTP_500_INTERNAL_SERVER_ERROR,
 };
 
-export const getDefaultGlobalStatusCode = (errorCode: ApiGlobalErrorCode): http.StatusCode | null =>
+export const getDefaultGlobalStatusCode = (errorCode: ApiGlobalErrorCode): api.StatusCode | null =>
   DEFAULT_STATUS_CODES[errorCode] || null;
 
-export const getDefaultGlobalErrorCode = (statusCode: StatusCode): ApiGlobalErrorCode | null => {
+export const getDefaultGlobalErrorCode = (
+  statusCode: api.StatusCode,
+): ApiGlobalErrorCode | null => {
   let errorCode: ApiGlobalErrorCode;
   for (errorCode in DEFAULT_STATUS_CODES) {
     if (DEFAULT_STATUS_CODES[errorCode] === statusCode) {

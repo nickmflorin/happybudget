@@ -4,7 +4,7 @@ import { isNil } from "lodash";
 import * as config from "application/config";
 import { http } from "lib";
 
-import * as apiUtil from "../util/util";
+import * as apiUtil from "../../application/api/util/util";
 
 import * as middleware from "./middleware";
 

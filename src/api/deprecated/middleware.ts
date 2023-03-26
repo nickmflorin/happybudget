@@ -1,10 +1,10 @@
 import { AxiosError, AxiosRequestConfig } from "axios";
 import { isNil } from "lodash";
 
-import * as parsers from "../parsers";
-import * as util from "../util/util";
+import * as util from "../../application/api/util/util";
 
 import * as errors from "./errors";
+import * as parsers from "./parsers";
 
 export const HttpHeaderRequestMiddleware = (config: AxiosRequestConfig): AxiosRequestConfig => {
   config = config || {};

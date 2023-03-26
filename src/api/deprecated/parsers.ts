@@ -3,9 +3,9 @@ import { isNil, reduce } from "lodash";
 
 import { notifications } from "lib";
 
-import * as codes from "./deprecated/codes";
-import * as errors from "./deprecated/errors";
-import * as typeguards from "./deprecated/typeguards";
+import * as codes from "./codes";
+import * as errors from "./errors";
+import * as typeguards from "./typeguards";
 
 /* The majority of the time, our requests funnel through one of the ApiClient
    instances - which means that when an error occurs, the response will be an

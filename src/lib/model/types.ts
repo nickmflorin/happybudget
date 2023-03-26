@@ -66,7 +66,7 @@ export type ApiModelType = EnumeratedLiteralType<typeof ApiModelTypes>;
 /**
  * Represents a model that is returned from the HTTP API in JSON form.
  */
-export type ApiModel<T extends JsonObject = JsonObject> = Model<number, T>;
+export type ApiModel<T extends JsonObject | undefined = undefined> = Model<number, T>;
 
 /**
  * Represents a model that is returned from the HTTP API in JSON form that is attributed with a
@@ -74,7 +74,7 @@ export type ApiModel<T extends JsonObject = JsonObject> = Model<number, T>;
  */
 export type TypedApiModel<
   TP extends ApiModelType = ApiModelType,
-  T extends JsonObject = JsonObject,
+  T extends JsonObject | undefined = undefined,
 > = TP extends ApiModelType ? ApiModel<T & { readonly type: TP }> : never;
 
 export type ModelWithColor<M extends Model> = M & { color: ui.HexColor | null };

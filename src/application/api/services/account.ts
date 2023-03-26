@@ -1,25 +1,35 @@
+import { model } from "lib";
+
+import { client } from "../client";
+import * as types from "../types";
+
 import * as services from "./services";
 
-export const getAccount = services.retrieveService<Model.Account>((id: number) => ["accounts", id]);
-export const getAccountMarkups = services.detailListService<Model.Markup>((id: number) => [
-  "accounts",
-  id,
-  "markups",
-]);
-export const getAccountGroups = services.detailListService<Model.Group>((id: number) => [
-  "accounts",
-  id,
-  "groups",
-]);
-export const deleteAccount = services.deleteService((id: number) => ["accounts", id]);
-export const updateAccount = services.detailPatchService<
-  Partial<Http.AccountPayload>,
-  Model.Account
->((id: number) => ["accounts", id]);
-export const createAccountChild = services.detailPostService<
-  Http.SubAccountPayload,
-  Model.SubAccount
->((id: number) => ["accounts", id, "children"]);
+export const getAccount = client.createRetrieveService<"/accounts/:id", model.Account>(
+  "/accounts/:id",
+);
+
+export const getAccountMarkups = client.createListService<"/accounts/:id/markups", model.Markup>(
+  "/accounts/:id/markups",
+);
+
+export const getAccountGroups = client.createListService<"/accounts/:id/groups", model.Group>(
+  "/accounts/:id/groups",
+);
+
+export const deleteAccount = client.createDeleteService<"/accounts/:id/", never>("/accounts/:id/");
+
+export const updateAccount = client.createPatchService<
+  "/accounts/:id/",
+  model.Account,
+  Partial<types.AccountPayload>
+>("/accounts/:id/");
+
+export const createAccountChild = client.createPostService<
+  "/accounts/:id/children/",
+  model.SubAccount,
+  Partial<types.SubAccountPayload>
+>("/accounts/:id/children/");
 
 export type CreateAccountMarkup = {
   <B extends Model.BaseBudget>(
