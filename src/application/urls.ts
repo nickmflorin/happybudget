@@ -1,6 +1,8 @@
 import { isNil } from "lodash";
 import Cookies from "universal-cookie";
 
+import { model } from "lib";
+
 type DG<T1 extends string, T2 extends string> =
   | `${T1}s`
   | `${T2}s`
@@ -11,11 +13,11 @@ type BudgetDesignation = DG<"budget", "template">;
 type ParentDesignation = DG<"account", "subaccount">;
 
 type Budget = {
-  readonly domain?: Model.BudgetDomain | null;
+  readonly domain?: model.BudgetDomain | null;
   readonly id?: Id | null;
 };
 
-type ParentType = Model.Account["type"] | Model.SubAccount["type"];
+type ParentType = model.Account["type"] | model.SubAccount["type"];
 
 type Parent = {
   readonly type?: ParentType | null;
@@ -87,9 +89,9 @@ const withPublicPath = <U extends `/${string}`>(url: U, pub?: boolean | string):
     ? (`/pub/(.*)${url}` as PathOrPublic<U>)
     : url;
 
-const isBudgetDomain = (b?: Budget | Model.BudgetDomain | null): b is Model.BudgetDomain =>
+const isBudgetDomain = (b?: Budget | model.BudgetDomain | null): b is model.BudgetDomain =>
   !isNil(b) && typeof b === "string";
-const isBudget = (b?: Budget | Model.BudgetDomain | null): b is Budget =>
+const isBudget = (b?: Budget | model.BudgetDomain | null): b is Budget =>
   !isNil(b) && typeof b !== "string";
 
 const isParentType = (p?: Parent | ParentType | null): p is ParentType =>
@@ -99,7 +101,7 @@ const isParent = (p?: Parent | ParentType | null): p is Parent =>
 
 const budgetId = (b?: Budget | null): Id => (isNil(b) || isNil(b.id) ? AnyId : b.id);
 
-const budgetDesignation = (b?: Budget | Model.BudgetDomain | null): BudgetDesignation =>
+const budgetDesignation = (b?: Budget | model.BudgetDomain | null): BudgetDesignation =>
   isBudgetDomain(b) ? `${b}s` : isBudget(b) ? budgetDesignation(b.domain) : AnyBudgetDesignation;
 
 const parentId = (p?: Parent | null): Id => (isNil(p) || isNil(p.id) ? AnyId : p.id);
@@ -108,7 +110,7 @@ const parentDesignation = (p?: Parent | ParentType | null): ParentDesignation =>
   isParentType(p) ? `${p}s` : isParent(p) ? parentDesignation(p.type) : AnyParentDesignation;
 
 export const getBaseBudgetPath = (
-  b?: Budget | Model.BudgetDomain | null,
+  b?: Budget | model.BudgetDomain | null,
   pub?: boolean | string,
 ): PathOrPublic<BaseBudgetPath> => withPublicPath(`/${budgetDesignation(b)}`, pub);
 
@@ -151,8 +153,8 @@ export const getSubAccountPath = (
   getParentDetailPath(b, { id, type: "subaccount" }, pub) as PathOrPublic<SubAccountPath>;
 
 export const getUrl = <B extends "budgets" | "templates" = "budgets" | "templates">(
-  budget: Pick<Model.Budget, "id" | "domain"> | Pick<Model.Template, "id" | "domain">,
-  parent?: Pick<Model.Account, "id" | "type"> | Pick<Model.SubAccount, "id" | "type">,
+  budget: Pick<model.Budget, "id" | "domain"> | Pick<model.Template, "id" | "domain">,
+  parent?: Pick<model.Account, "id" | "type"> | Pick<model.SubAccount, "id" | "type">,
   tokenId?: string,
 ):
   | PathOrPublic<AccountsPath<B, number>>
@@ -171,13 +173,13 @@ export const getUrl = <B extends "budgets" | "templates" = "budgets" | "template
 
 export const getBudgetUrl = (
   id: number,
-  parent?: Pick<Model.Account, "id" | "type"> | Pick<Model.SubAccount, "id" | "type">,
+  parent?: Pick<model.Account, "id" | "type"> | Pick<model.SubAccount, "id" | "type">,
   tokenId?: string,
 ) => getUrl<"budgets">({ id, domain: "budget" }, parent, tokenId);
 
 export const getTemplateUrl = (
   id: number,
-  parent?: Pick<Model.Account, "id" | "type"> | Pick<Model.SubAccount, "id" | "type">,
+  parent?: Pick<model.Account, "id" | "type"> | Pick<model.SubAccount, "id" | "type">,
   tokenId?: string,
 ) => getUrl<"templates">({ id, domain: "template" }, parent, tokenId);
 
@@ -228,11 +230,11 @@ export const isTemplateRelatedUrl = (
   isAccountUrl(url, { domain: "template", id }, null, pub) ||
   isAccountsUrl(url, { domain: "template", id }, pub);
 
-const cookieParam = (domain: Model.BudgetDomain, tokenId?: string) =>
+const cookieParam = (domain: model.BudgetDomain, tokenId?: string) =>
   isNil(tokenId) ? `${domain}s-last-visited` : `${tokenId}-pub-${domain}s-last-visited`;
 
 const getLastVisitedCookies = (
-  domain: Model.BudgetDomain,
+  domain: model.BudgetDomain,
   tokenId?: string,
 ): Record<string, unknown> => {
   const cookies = new Cookies();
@@ -245,7 +247,7 @@ const getLastVisitedCookies = (
 };
 
 export const getLastVisited = (
-  domain: Model.BudgetDomain,
+  domain: model.BudgetDomain,
   id: number,
   tokenId?: string,
 ): string | null => {
@@ -264,8 +266,8 @@ export const getLastVisited = (
 };
 
 export const setLastVisited = (
-  budget: Model.Budget | Model.Template,
-  parent?: Model.Account | Model.SimpleAccount | Model.SubAccount | Model.SimpleSubAccount,
+  budget: model.Budget | model.Template,
+  parent?: model.Account | model.SimpleAccount | model.SubAccount | model.SimpleSubAccount,
   tokenId?: string,
 ): void => {
   const urlCookies = getLastVisitedCookies(budget.domain, tokenId);
