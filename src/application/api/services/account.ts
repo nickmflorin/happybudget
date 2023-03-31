@@ -3,118 +3,84 @@ import { model } from "lib";
 import { client } from "../client";
 import * as types from "../types";
 
-import * as services from "./services";
-
-export const getAccount = client.createRetrieveService<"/accounts/:id", model.Account>(
+export const getAccount = client.createParameterizedRetrieveService<"/accounts/:id", model.Account>(
   "/accounts/:id",
 );
 
-export const getAccountMarkups = client.createListService<"/accounts/:id/markups", model.Markup>(
+export const getAccountMarkups = client.createParameterizedListModelsService<
   "/accounts/:id/markups",
-);
+  model.Markup
+>("/accounts/:id/markups");
 
-export const getAccountGroups = client.createListService<"/accounts/:id/groups", model.Group>(
+export const getAccountGroups = client.createParameterizedListService<
   "/accounts/:id/groups",
+  model.Group
+>("/accounts/:id/groups");
+
+export const deleteAccount = client.createParameterizedDeleteService<"/accounts/:id/", never>(
+  "/accounts/:id/",
 );
 
-export const deleteAccount = client.createDeleteService<"/accounts/:id/", never>("/accounts/:id/");
-
-export const updateAccount = client.createPatchService<
+export const updateAccount = client.createParameterizedPatchService<
   "/accounts/:id/",
   model.Account,
   Partial<types.AccountPayload>
 >("/accounts/:id/");
 
-export const createAccountChild = client.createPostService<
+export const createAccountChild = client.createParameterizedPostService<
   "/accounts/:id/children/",
   model.SubAccount,
   Partial<types.SubAccountPayload>
 >("/accounts/:id/children/");
 
-export type CreateAccountMarkup = {
-  <B extends Model.BaseBudget>(
-    id: number,
-    payload: Http.MarkupPayload,
-    options?: Http.RequestOptions,
-  ): Promise<Http.AncestryResponse<B, Model.Account, Model.Markup>>;
-};
+export const createAccountMarkup = client.createParameterizedPostService<
+  "/accounts/:id/markups/",
+  types.AncestryResponse<model.Budget | model.Template, model.Account, model.Markup>,
+  Partial<types.MarkupPayload>
+>("/accounts/:id/markups/");
 
-export const createAccountMarkup = services.detailPostService((id: number) => [
-  "accounts",
-  id,
-  "markups",
-]) as CreateAccountMarkup;
+export const createAccountGroup = client.createParameterizedPostService<
+  "/accounts/:id/groups/",
+  model.Group,
+  types.GroupPayload
+>("/accounts/:id/groups/");
 
-export const createAccountGroup = services.detailPostService<Http.GroupPayload, Model.Group>(
-  (id: number) => ["accounts", id, "groups"],
-);
+export const getAccountChildren = client.createParameterizedListModelsService<
+  "/accounts/:id/children/",
+  model.SubAccount
+>("/accounts/:id/children/");
 
-type GetAccountChildren = {
-  <M extends Model.SubAccount | Model.SimpleSubAccount = Model.SubAccount>(
-    id: number,
-    query?: Http.ListQuery,
-    options?: Http.RequestOptions,
-  ): Promise<Http.ListResponse<M>>;
-};
+export const getAccountSimpleChildren = client.createParameterizedListModelsService<
+  "/accounts/:id/children/",
+  model.SimpleSubAccount
+>("/accounts/:id/children/", { query: { simple: true } });
 
-export const getAccountChildren = services.detailListService((id: number) => [
-  "accounts",
-  id,
-  "children",
-]) as GetAccountChildren;
+export const bulkUpdateAccountChildren = client.createParameterizedPatchService<
+  "/accounts/:id/bulk-update-children/",
+  types.ApiSuccessResponse<
+    types.AncestryListResponse<model.Budget | model.Template, model.Account, model.SubAccount>
+  >,
+  types.BulkUpdatePayload<types.AccountPayload>
+>("/accounts/:id/bulk-update-children/");
 
-type BulkUpdateAccountChildren = {
-  <B extends Model.BaseBudget>(
-    id: number,
-    payload: Http.BulkUpdatePayload<Http.AccountPayload>,
-    options?: Http.RequestOptions,
-  ): Promise<Http.AncestryListResponse<B, Model.Account, Model.SubAccount>>;
-};
+export const bulkDeleteAccountChildren = client.createParameterizedPatchService<
+  "/accounts/:id/bulk-delete-children/",
+  types.ApiSuccessResponse<
+    types.AncestryListResponse<model.Budget | model.Template, model.Account, model.SubAccount>
+  >,
+  types.BulkDeletePayload
+>("/accounts/:id/bulk-delete-children/");
 
-export const bulkUpdateAccountChildren = services.detailBulkUpdateService((id: number) => [
-  "accounts",
-  id,
-  "bulk-update-children",
-]) as BulkUpdateAccountChildren;
+export const bulkCreateAccountChildren = client.createParameterizedPatchService<
+  "/accounts/:id/bulk-create-children/",
+  types.ApiSuccessResponse<
+    types.AncestryListResponse<model.Budget | model.Template, model.Account, model.SubAccount>
+  >,
+  types.BulkCreatePayload<types.AccountPayload>
+>("/accounts/:id/bulk-create-children/");
 
-type BulkDeleteAccountChildren = {
-  <B extends Model.BaseBudget>(
-    id: number,
-    payload: Http.BulkDeletePayload,
-    options?: Http.RequestOptions,
-  ): Promise<Http.AncestryListResponse<B, Model.Account, Model.SubAccount>>;
-};
-
-export const bulkDeleteAccountChildren = services.detailBulkDeleteService((id: number) => [
-  "accounts",
-  id,
-  "bulk-delete-children",
-]) as BulkDeleteAccountChildren;
-
-type BulkCreateAccountChildren = {
-  <B extends Model.BaseBudget>(
-    id: number,
-    payload: Http.BulkCreatePayload<Http.AccountPayload>,
-    options?: Http.RequestOptions,
-  ): Promise<Http.AncestryListResponse<B, Model.Account, Model.SubAccount>>;
-};
-
-export const bulkCreateAccountChildren = services.detailBulkCreateService((id: number) => [
-  "accounts",
-  id,
-  "bulk-create-children",
-]) as BulkCreateAccountChildren;
-
-type BulkDeleteAccountMarkups = {
-  <B extends Model.BaseBudget>(
-    id: number,
-    payload: Http.BulkDeletePayload,
-    options?: Http.RequestOptions,
-  ): Promise<Http.ParentsResponse<B, Model.Account>>;
-};
-
-export const bulkDeleteAccountMarkups = services.detailBulkDeleteService((id: number) => [
-  "accounts",
-  id,
-  "bulk-delete-markups",
-]) as BulkDeleteAccountMarkups;
+export const bulkDeleteAccountMarkups = client.createParameterizedPatchService<
+  "/accounts/:id/bulk-delete-markups/",
+  types.ApiSuccessResponse<types.ParentsResponse<model.Budget | model.Template, model.Account>>,
+  types.BulkDeletePayload
+>("/accounts/:id/bulk-delete-markups/");

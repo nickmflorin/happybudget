@@ -1,37 +1,30 @@
-import { AxiosResponse } from "axios";
+import { model } from "lib";
 
-import { client } from "api";
+import { client } from "../client";
+import * as types from "../types";
 
-import * as services from "./services";
+export const register = client.createPostService<model.User, types.RegistrationPayload>(
+  "/users/register/",
+);
 
-export const register = services.postService<Http.RegistrationPayload, Model.User>([
-  "users",
-  "registration",
-]);
-
-export const searchUsers = async (
+export const searchUsers = (
   search: string,
-  query?: Http.ListQuery,
-  options?: Http.RequestOptions,
-): Promise<Http.ListResponse<Model.SimpleUser>> => {
-  const url = services.URL.v1("users");
-  return client.list<Model.SimpleUser>(url, { ...query, search }, options);
-};
+  query?: Omit<types.ApiModelListQuery<model.SimpleUser>, "search">,
+  options?: types.ClientRequestOptions<{ query: types.ApiModelListQuery<model.SimpleUser> }>,
+): Promise<types.ClientResponse<types.ModelListResponse<model.SimpleUser>>> =>
+  client.list<model.SimpleUser, types.ApiModelListQuery<model.SimpleUser>>("/users", {
+    ...options,
+    query: { ...query, search },
+  });
 
-export const updateActiveUser = services.patchService<
-  Partial<Http.UserPayload | FormData>,
-  Model.User
->(["users", "user"]);
+export const updateActiveUser = client.createPatchService<model.User, types.UserPayload>(
+  "/users/user/",
+);
 
-export const changeUserPassword = services.patchService<Http.ChangePasswordPayload, Model.User>([
-  "users",
-  "change-password",
-]);
+export const changeUserPassword = client.createPatchService<
+  model.User,
+  types.ChangePasswordPayload
+>("/users/change-password/");
 
-export const tempUploadImage = async (
-  data: FormData,
-  options?: Http.RequestOptions,
-): Promise<AxiosResponse<Http.FileUploadResponse>> => {
-  const url = services.URL.v1("io", "temp-upload-image");
-  return client.upload<Http.FileUploadResponse>(url, data, options);
-};
+export const tempUploadImage =
+  client.createUploadService<types.FileUploadResponse>("/io/temp-upload-image/");

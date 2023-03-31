@@ -1,42 +1,57 @@
-import * as services from "./services";
+import { model } from "lib";
 
-export const getContacts = services.listService<Model.Contact>(["contacts"]);
+import { client } from "../client";
+import * as types from "../types";
 
-export const getContact = services.retrieveService<Model.Contact>((id: number) => ["contacts", id]);
-export const updateContact = services.detailPatchService<
-  Partial<Http.ContactPayload>,
-  Model.Contact
->((id: number) => ["contacts", id]);
-export const deleteContact = services.deleteService((id: number) => ["contacts", id]);
-export const createContact = services.postService<Http.ContactPayload, Model.Contact>(["contacts"]);
-
-export const getContactAttachments = services.detailListService<Model.Attachment>((id: number) => [
-  "contacts",
-  id,
-  "attachments",
-]);
-export const deleteContactAttachment = services.detailDeleteService((id: number, objId: number) => [
-  "contacts",
-  objId,
-  "attachments",
-  id,
-]);
-export const uploadContactAttachment = services.detailPostService<
-  FormData,
-  { data: Model.Attachment[] }
->((id: number) => ["contacts", id, "attachments"]);
-export const getContactTaggedActuals = services.detailListService<Model.TaggedActual>(
-  (id: number) => ["contacts", id, "tagged-actuals"],
+export const getContacts = client.createListModelsService<model.Contact>("/contacts");
+export const getContact = client.createParameterizedRetrieveService<"/contacts/:id", model.Contact>(
+  "/contacts/:id",
 );
+export const updateContact = client.createParameterizedPatchService<
+  "/contacts/:id/",
+  model.Contact,
+  types.ContactPayload
+>("/contacts/:id/");
 
-export const bulkUpdateContacts = services.bulkUpdateService<
-  Http.ModelPayload<Model.Contact>,
-  Http.ChildListResponse<Model.Contact>
->(["contacts", "bulk-update"]);
+export const deleteContact =
+  client.createParameterizedDeleteService<"/contacts/:id/">("/contacts/:id/");
 
-export const bulkCreateContacts = services.bulkCreateService<
-  Http.ModelPayload<Model.Contact>,
-  Http.ChildListResponse<Model.Contact>
->(["contacts", "bulk-create"]);
+export const createContact = client.createParameterizedPostService<
+  "/contacts/",
+  model.Contact,
+  types.ContactPayload
+>("/contacts/");
 
-export const bulkDeleteContacts = services.bulkDeleteService<null>(["contacts", "bulk-delete"]);
+export const getContactAttachments = client.createParameterizedListModelsService<
+  "/contacts/:id/attachments",
+  model.Attachment
+>("/contacts/:id/attachments");
+
+export const deleteContactAttachment =
+  client.createParameterizedDeleteService<"/contacts/:contactId/attachments/:id/">(
+    "/contacts/:contactId/attachments/:id/",
+  );
+
+export const uploadContactAttachment = client.createParameterizedUploadService<
+  "/contacts/:id/attachments/",
+  { data: model.Attachment[] }
+>("/contacts/:id/attachments/");
+
+export const getContactTaggedActuals = client.createParameterizedListModelsService<
+  "/contacts/:id/tagged-actuals/",
+  model.TaggedActual
+>("/contacts/:id/tagged-actuals/");
+
+export const bulkUpdateContacts = client.createPatchService<
+  types.ChildListResponse<model.Contact>,
+  types.ModelPayload<model.Contact>
+>("/contacts/bulk-update/");
+
+export const bulkCreateContacts = client.createPatchService<
+  types.ChildListResponse<model.Contact>,
+  types.ModelPayload<model.Contact>
+>("/contacts/bulk-create/");
+
+export const bulkDeleteContacts = client.createPatchService<null, types.BulkDeletePayload>(
+  "/contacts/bulk-create/",
+);

@@ -1,94 +1,108 @@
-import { client, unauthenticatedClient, tokenClient } from "api";
+import { model } from "lib";
 
-import * as services from "./services";
+import { client } from "../client";
+import * as types from "../types";
 
 export const login = async (
   email: string,
   password: string,
-  options?: Http.RequestOptions,
-): Promise<Model.User> => {
-  const url = services.URL.v1("auth", "login");
-  return unauthenticatedClient.post<Model.User>(url, { email, password }, options);
-};
+  options?: Omit<types.ClientRequestOptions, "credentials" | "body">,
+): Promise<types.ClientResponse<model.User>> =>
+  client.post<model.User>("/auth/login/", {
+    ...options,
+    credentials: "omit",
+    body: { email, password },
+  });
 
 export const socialLogin = async (
-  payload: Http.SocialPayload,
-  options?: Http.RequestOptions,
-): Promise<Model.User> => {
-  const url = services.URL.v1("auth", "social-login");
-  return unauthenticatedClient.post<Model.User>(url, payload, options);
-};
+  body: types.SocialPayload,
+  options?: Omit<types.ClientRequestOptions, "credentials" | "body">,
+): Promise<types.ClientResponse<model.User>> =>
+  client.post<model.User>("/auth/social-login/", {
+    ...options,
+    credentials: "omit",
+    body,
+  });
 
-export const logout = async (): Promise<null> => {
-  const url = services.URL.v1("auth", "logout");
-  return client.post<null>(url);
-};
+export const logout = async (
+  options?: Omit<types.ClientRequestOptions, "credentials" | "body">,
+): Promise<types.ClientResponse<null>> => client.post<null>("/auth/logout/", options);
 
 export const validateAuthToken = async (
-  payload?: Http.AuthTokenValidationPayload,
-  options?: Http.RequestOptions,
-): Promise<Model.User> => {
-  const url = services.URL.v1("auth", "validate");
-  return tokenClient.post<Model.User>(url, payload || {}, options);
-};
+  payload?: types.AuthTokenValidationPayload,
+  options?: Omit<types.ClientRequestOptions, "credentials" | "body">,
+): Promise<types.ClientResponse<model.User>> =>
+  client.post<model.User>("/auth/validate/", { ...options, body: payload });
 
 export const validatePublicToken = async (
-  payload?: Http.PublicTokenValidationPayload,
-  options?: Http.RequestOptions,
-): Promise<{ readonly token_id: string }> => {
-  const url = services.URL.v1("auth", "validate-public");
-  return tokenClient.post<{ readonly token_id: string }>(url, payload || {}, options);
-};
+  payload?: types.PublicTokenValidationPayload,
+  options?: Omit<types.ClientRequestOptions, "credentials" | "body">,
+): Promise<types.ClientResponse<{ readonly token_id: string }>> =>
+  client.post<{ readonly token_id: string }>("/auth/validate-public/", {
+    ...options,
+    body: payload,
+  });
 
 export const validateEmailConfirmationToken = async (
   token: string,
-  options?: Http.RequestOptions,
-): Promise<Model.User> => {
-  const url = services.URL.v1("auth", "validate-email-verification-token");
-  return unauthenticatedClient.post<Model.User>(url, { token }, options);
-};
+  options?: Omit<types.ClientRequestOptions, "credentials" | "body">,
+): Promise<types.ClientResponse<model.User>> =>
+  client.post<model.User>("/auth/validate-email-verification-token/", {
+    ...options,
+    credentials: "omit",
+    body: { token },
+  });
 
 export const validatePasswordRecoveryToken = async (
   token: string,
-  options?: Http.RequestOptions,
-): Promise<Model.User> => {
-  const url = services.URL.v1("auth", "validate-password-recovery-token");
-  return unauthenticatedClient.post<Model.User>(url, { token }, options);
-};
+  options?: Omit<types.ClientRequestOptions, "credentials" | "body">,
+): Promise<types.ClientResponse<model.User>> =>
+  client.post<model.User>("/auth/validate-password-recovery-token/", {
+    ...options,
+    credentials: "omit",
+    body: { token },
+  });
 
-export const verifyEmail = async (id: number, options?: Http.RequestOptions): Promise<null> => {
-  const url = services.URL.v1("auth", "verify-email");
-  return unauthenticatedClient.post<null>(url, { user: id }, options);
-};
+export const verifyEmail = async (
+  id: number,
+  options?: Omit<types.ClientRequestOptions, "credentials" | "body">,
+): Promise<types.ClientResponse<null>> =>
+  client.post<null>("/auth/verify-email/", {
+    ...options,
+    credentials: "omit",
+    body: { user: id },
+  });
 
 export const recoverPassword = async (
   email: string,
-  options?: Http.RequestOptions,
-): Promise<null> => {
-  const url = services.URL.v1("auth", "recover-password");
-  return unauthenticatedClient.post<null>(url, { email }, options);
-};
+  options?: Omit<types.ClientRequestOptions, "credentials" | "body">,
+): Promise<types.ClientResponse<null>> =>
+  client.post<null>("/auth/recover-password/", {
+    ...options,
+    credentials: "omit",
+    body: { email },
+  });
 
 export const resetPassword = async (
-  payload: Http.ResetPasswordPayload,
-  options?: Http.RequestOptions,
-): Promise<Model.User> => {
-  const url = services.URL.v1("auth", "reset-password");
-  return unauthenticatedClient.post<Model.User>(url, payload, options);
-};
+  payload: types.ResetPasswordPayload,
+  options?: Omit<types.ClientRequestOptions, "credentials" | "body">,
+): Promise<types.ClientResponse<model.User>> =>
+  client.post<model.User>("/auth/reset-password/", {
+    ...options,
+    credentials: "omit",
+    body: payload,
+  });
 
-export const updatePublicToken = services.detailPatchService<
-  Partial<Omit<Http.PublicTokenPayload, "public_id">>,
-  Model.PublicToken
->((id: number) => ["auth", "public-tokens", id]);
+export const updatePublicToken = client.createParameterizedPatchService<
+  "/auth/public-tokens/:id/",
+  model.PublicToken,
+  types.PublicTokenPayload
+>("/auth/public-tokens/:id/");
 
-export const deletePublicToken = services.deleteService((id: number) => [
-  "auth",
-  "public-tokens",
-  id,
-]);
-export const getPublicToken = services.retrieveService<Model.PublicToken>((id: number) => [
-  "auth",
-  "public-tokens",
-  id,
-]);
+export const deletePublicToken =
+  client.createParameterizedDeleteService<"/auth/public-tokens/:id/">("/auth/public-tokens/:id/");
+
+export const getPublicToken = client.createParameterizedRetrieveService<
+  "/auth/public-tokens/:id/",
+  model.PublicToken
+>("/auth/public-tokens/:id/");

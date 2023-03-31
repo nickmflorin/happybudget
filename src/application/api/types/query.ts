@@ -32,15 +32,18 @@ export type RawQueryParamValue<F extends string = string> =
 export type RawQuery<F extends string = string> = Record<string, RawQueryParamValue<F>>;
 export type ProcessedQuery = Record<string, QueryParamValue>;
 
-export type ListQuery<F extends string = string> = {
-  readonly ordering?: Ordering<F>;
-  readonly ids?: number[];
-  readonly exclude?: number[];
-};
-
 export type ModelOrderableField<M extends model.ApiModel> = Exclude<keyof M, "id"> & string;
 
-export type ModelListQuery<M extends model.ApiModel> = ListQuery<ModelOrderableField<M>>;
+export type ListQuery = {
+  readonly search?: string;
+};
+
+export type ApiModelListQuery<M extends model.ApiModel = model.ApiModel> = ListQuery & {
+  readonly ordering?: Ordering<ModelOrderableField<M>>;
+  readonly ids?: number[];
+  readonly exclude?: number[];
+  readonly simple?: boolean;
+};
 
 function getQueryOrderingSchema<F extends string = string>(
   fields: F[],

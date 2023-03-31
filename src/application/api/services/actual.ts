@@ -1,24 +1,35 @@
-import * as services from "./services";
+import { model } from "lib";
 
-export const getActual = services.retrieveService<Model.Actual>((id: number) => ["actuals", id]);
-export const deleteActual = services.deleteService((id: number) => ["actuals", id]);
-export const updateActual = services.detailPatchService<Partial<Http.ActualPayload>, Model.Actual>(
-  (id: number) => ["actuals", id],
+import { client } from "../client";
+import * as types from "../types";
+
+export const getActual = client.createParameterizedRetrieveService<"/actuals/:id", model.Account>(
+  "/actuals/:id",
 );
-export const getActualAttachments = services.detailListService<Model.Attachment>((id: number) => [
-  "actuals",
-  id,
-  "attachments",
-]);
-export const deleteActualAttachment = services.detailDeleteService((id: number, objId: number) => [
-  "actuals",
-  objId,
-  "attachments",
-  id,
-]);
-export const uploadActualAttachment = services.detailPostService<
-  FormData,
-  { data: Model.Attachment[] }
->((id: number) => ["actuals", id, "attachments"]);
 
-export const getActualTypes = services.listService<Model.Tag>(["actuals", "types"]);
+export const getActualTypes = client.createListModelsService<model.Attachment>("/actuals/types/");
+
+export const getActualAttachments = client.createParameterizedListModelsService<
+  "/actuals/:id/attachments",
+  model.Attachment
+>("/actuals/:id/attachments");
+
+export const deleteActualAttachment = client.createParameterizedDeleteService<
+  "/actuals/:id/attachments/:attachmentId/",
+  never
+>("/actuals/:id/attachments/:attachmentId/");
+
+export const uploadActualAttachment = client.createParameterizedUploadService<
+  "/actuals/:id/attachments/",
+  { data: model.Attachment[] }
+>("/actuals/:id/attachments/");
+
+export const deleteActual = client.createParameterizedDeleteService<"/actuals/:id/", never>(
+  "/actuals/:id/",
+);
+
+export const updateActual = client.createParameterizedPatchService<
+  "/actuals/:id/",
+  model.Actual,
+  Partial<types.ActualPayload>
+>("/actuals/:id/");

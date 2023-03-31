@@ -1,8 +1,8 @@
 import { Required } from "utility-types";
 
-import { ApiDetail } from "application/api/types";
-import { http, feedback } from "lib";
+import { feedback } from "lib";
 
+import { ApiDetail, HttpMethod } from "../../api";
 import * as codes from "../codes";
 import * as errorTypes from "../errorTypes";
 import { ErrorMessageScopes, getErrorMessage, HTTP_MESSAGE, HTTP_USER_MESSAGE } from "../messages";
@@ -12,14 +12,14 @@ type HttpErrorBaseConfig<E extends errorTypes.HttpErrorType> = Readonly<{
   readonly message?: string;
   readonly userMessage?: string;
   readonly url: string;
-  readonly method: http.HttpMethod;
+  readonly method: HttpMethod;
 }>;
 
 export interface IBaseHttpError {
   readonly message: string;
   readonly userMessage: string;
   readonly url: string;
-  readonly method: http.HttpMethod;
+  readonly method: HttpMethod;
 }
 
 /**
@@ -49,7 +49,7 @@ abstract class BaseHttpError<E extends errorTypes.HttpErrorType>
 {
   public readonly userMessage: string;
   public readonly url: string;
-  public readonly method: http.HttpMethod;
+  public readonly method: HttpMethod;
 
   protected constructor(config: Required<HttpErrorBaseConfig<E>, "userMessage" | "message">) {
     super(config.message);

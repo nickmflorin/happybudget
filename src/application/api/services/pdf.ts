@@ -1,26 +1,27 @@
-import * as services from "./services";
+import { model } from "lib";
 
-export const getHeaderTemplates = services.listService<Model.SimpleHeaderTemplate>([
-  "pdf",
-  "header-templates",
-]);
+import { client } from "../client";
+import * as types from "../types";
 
-export const deleteHeaderTemplate = services.deleteService((id: number) => [
-  "pdf",
-  "header-templates",
-  id,
-]);
-export const updateHeaderTemplate = services.detailPatchService<
-  Partial<Http.HeaderTemplatePayload>,
-  Model.HeaderTemplate
->((id: number) => ["pdf", "header-templates", id]);
-export const getHeaderTemplate = services.retrieveService<Model.HeaderTemplate>((id: number) => [
-  "pdf",
-  "header-templates",
-  id,
-]);
+export const getHeaderTemplates =
+  client.createListModelsService<model.SimpleHeaderTemplate>("/pdf/header-templates");
 
-export const createHeaderTemplate = services.postService<
-  Http.HeaderTemplatePayload,
-  Model.HeaderTemplate
->(["pdf", "header-templates"]);
+export const deleteHeaderTemplate =
+  client.createParameterizedDeleteService<"/pdf/header-templates/:id/">(
+    "/pdf/header-templates/:id/",
+  );
+export const updateHeaderTemplate = client.createParameterizedPatchService<
+  "/pdf/header-templates/:id/",
+  model.HeaderTemplate,
+  types.HeaderTemplatePayload
+>("/pdf/header-templates/:id/");
+
+export const getHeaderTemplate = client.createParameterizedRetrieveService<
+  "/pdf/header-templates/:id/",
+  model.HeaderTemplate
+>("/pdf/header-templates/:id/");
+
+export const createHeaderTemplate = client.createPostService<
+  model.SimpleHeaderTemplate,
+  types.HeaderTemplatePayload
+>("/pdf/header-templates/");

@@ -1,8 +1,18 @@
-import * as services from "./services";
+import { model } from "lib";
 
-export const getFringe = services.retrieveService<Model.Fringe>((id: number) => ["fringes", id]);
-export const deleteFringe = services.deleteService((id: number) => ["fringes", id]);
-export const updateFringe = services.detailPatchService<Partial<Http.FringePayload>, Model.Fringe>(
-  (id: number) => ["fringes", id],
+import { client } from "../client";
+import * as types from "../types";
+
+export const getFringe = client.createParameterizedRetrieveService<"/fringes/:id", model.Fringe>(
+  "/fringes/:id",
 );
-export const getFringeColors = services.listService<string>(["fringes", "colors"]);
+export const updateFringe = client.createParameterizedPatchService<
+  "/fringes/:id/",
+  model.Fringe,
+  types.FringePayload
+>("/fringes/:id/");
+
+export const deleteFringe =
+  client.createParameterizedDeleteService<"/fringes/:id/">("/fringes/:id/");
+
+export const getFringeColors = client.createListService<string>("/fringes/colors");

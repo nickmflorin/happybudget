@@ -1,126 +1,104 @@
-import * as services from "./services";
+import { model } from "lib";
 
-export const getSubAccount = services.retrieveService<Model.SubAccount>((id: number) => [
-  "subaccounts",
-  id,
-]);
-export const getSubAccountMarkups = services.detailListService<Model.Markup>((id: number) => [
-  "subaccounts",
-  id,
-  "markups",
-]);
-export const getSubAccountGroups = services.detailListService<Model.Group>((id: number) => [
-  "subaccounts",
-  id,
-  "groups",
-]);
-export const deleteSubAccount = services.deleteService((id: number) => ["subaccounts", id]);
-export const updateSubAccount = services.detailPatchService<
-  Partial<Http.SubAccountPayload>,
-  Model.SubAccount
->((id: number) => ["subaccounts", id]);
-export const createSubAccountChild = services.detailPostService<
-  Http.SubAccountPayload,
-  Model.SubAccount
->((id: number) => ["subaccounts", id, "children"]);
+import { client } from "../client";
+import * as types from "../types";
 
-export const createSubAccountGroup = services.detailPostService<Http.GroupPayload, Model.Group>(
-  (id: number) => ["subaccounts", id, "groups"],
+export const getSubAccount = client.createParameterizedRetrieveService<
+  "/subaccounts/:id",
+  model.Account
+>("/subaccounts/:id");
+
+export const getSubAccountMarkups = client.createParameterizedListModelsService<
+  "/subaccounts/:id/markups",
+  model.Markup
+>("/subaccounts/:id/markups");
+
+export const getSubAccountGroups = client.createParameterizedListModelsService<
+  "/subaccounts/:id/groups",
+  model.Group
+>("/subaccounts/:id/groups");
+
+export const deleteSubAccount = client.createParameterizedDeleteService<"/subaccounts/:id/", never>(
+  "/subaccounts/:id/",
 );
 
-export type CreateSubAccountMarkup = {
-  <B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount>(
-    id: number,
-    payload: Http.MarkupPayload,
-    options?: Http.RequestOptions,
-  ): Promise<Http.AncestryResponse<B, P, Model.Markup>>;
-};
+export const updateSubAccount = client.createParameterizedPatchService<
+  "/subaccounts/:id/",
+  model.SubAccount,
+  Partial<types.SubAccountPayload>
+>("/subaccounts/:id/");
 
-export const createSubAccountMarkup = services.detailPostService((id: number) => [
-  "subaccounts",
-  id,
-  "markups",
-]) as CreateSubAccountMarkup;
+export const createSubAccountChild = client.createParameterizedPostService<
+  "/subaccounts/:id/children/",
+  model.SubAccount,
+  Partial<types.SubAccountPayload>
+>("/subaccounts/:id/children/");
 
-type GetSubAccountChildren = {
-  <M extends Model.SubAccount | Model.SimpleSubAccount = Model.SubAccount>(
-    id: number,
-    query?: Http.ListQuery,
-    options?: Http.RequestOptions,
-  ): Promise<Http.ListResponse<M>>;
-};
+export const createSubAccountMarkup = client.createParameterizedPostService<
+  "/subaccounts/:id/markups/",
+  types.AncestryResponse<model.Budget | model.Template, model.SubAccount, model.Markup>,
+  Partial<types.MarkupPayload>
+>("/subaccounts/:id/markups/");
 
-export const getSubAccountChildren = services.detailListService((id: number) => [
-  "subaccounts",
-  id,
-  "children",
-]) as GetSubAccountChildren;
+export const createSubAccountGroup = client.createParameterizedPostService<
+  "/subaccounts/:id/groups/",
+  model.Group,
+  types.GroupPayload
+>("/subaccounts/:id/groups/");
 
-export const getSubAccountUnits = services.listService<Model.Tag>(["subaccounts", "units"]);
+export const getSubAccountChildren = client.createParameterizedListModelsService<
+  "/subaccounts/:id/children/",
+  model.SubAccount
+>("/subaccounts/:id/children/");
 
-export const getSubAccountAttachments = services.detailListService<Model.Attachment>(
-  (id: number) => ["subaccounts", id, "attachments"],
-);
-export const deleteSubAccountAttachment = services.detailDeleteService(
-  (id: number, objId: number) => ["subaccounts", objId, "attachments", id],
-);
-export const uploadSubAccountAttachment = services.detailPostService<
-  FormData,
-  { data: Model.Attachment[] }
->((id: number) => ["subaccounts", id, "attachments"]);
+export const getSubAccountSimpleChildren = client.createParameterizedListModelsService<
+  "/subaccounts/:id/children/",
+  model.SubAccount
+>("/subaccounts/:id/children/", { query: { simple: true } });
 
-type BulkUpdateSubAccountChildren = {
-  <B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount>(
-    id: number,
-    payload: Http.BulkUpdatePayload<Http.SubAccountPayload>,
-    options?: Http.RequestOptions,
-  ): Promise<Http.AncestryListResponse<B, P, Model.SubAccount>>;
-};
+export const bulkUpdateSubAccountChildren = client.createParameterizedPatchService<
+  "/subaccounts/:id/bulk-update-children/",
+  types.ApiSuccessResponse<
+    types.AncestryListResponse<model.Budget | model.Template, model.SubAccount, model.SubAccount>
+  >,
+  types.BulkUpdatePayload<types.SubAccountPayload>
+>("/subaccounts/:id/bulk-update-children/");
 
-export const bulkUpdateSubAccountChildren = services.detailBulkUpdateService((id: number) => [
-  "subaccounts",
-  id,
-  "bulk-update-children",
-]) as BulkUpdateSubAccountChildren;
+export const bulkDeleteSubAccountChildren = client.createParameterizedPatchService<
+  "/subaccounts/:id/bulk-delete-children/",
+  types.ApiSuccessResponse<
+    types.AncestryListResponse<model.Budget | model.Template, model.SubAccount, model.SubAccount>
+  >,
+  types.BulkDeletePayload
+>("/subaccounts/:id/bulk-delete-children/");
 
-type BulkDeleteSubAccountChildren = {
-  <B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount>(
-    id: number,
-    payload: Http.BulkDeletePayload,
-    options?: Http.RequestOptions,
-  ): Promise<Http.AncestryListResponse<B, P, Model.SubAccount>>;
-};
+export const bulkCreateSubAccountChildren = client.createParameterizedPatchService<
+  "/subaccounts/:id/bulk-create-children/",
+  types.ApiSuccessResponse<
+    types.AncestryListResponse<model.Budget | model.Template, model.SubAccount, model.SubAccount>
+  >,
+  types.BulkCreatePayload<types.SubAccountPayload>
+>("/subaccounts/:id/bulk-create-children/");
 
-export const bulkDeleteSubAccountChildren = services.detailBulkDeleteService((id: number) => [
-  "subaccounts",
-  id,
-  "bulk-delete-children",
-]) as BulkDeleteSubAccountChildren;
+export const bulkDeleteSubAccountMarkups = client.createParameterizedPatchService<
+  "/subaccounts/:id/bulk-delete-markups/",
+  types.ApiSuccessResponse<types.ParentsResponse<model.Budget | model.Template, model.Account>>,
+  types.BulkDeletePayload
+>("/subaccounts/:id/bulk-delete-markups/");
 
-type BulkDeleteSubAccountMarkups = {
-  <B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount>(
-    id: number,
-    payload: Http.BulkDeletePayload,
-    options?: Http.RequestOptions,
-  ): Promise<Http.ParentsResponse<B, P>>;
-};
+export const getSubAccountUnits = client.createListModelsService<model.Tag>("/subaccounts/units");
 
-export const bulkDeleteSubAccountMarkups = services.detailBulkDeleteService((id: number) => [
-  "subaccounts",
-  id,
-  "bulk-delete-markups",
-]) as BulkDeleteSubAccountMarkups;
+export const getSubAccountAttachments = client.createParameterizedListModelsService<
+  "/subaccounts/:id/attachments",
+  model.Attachment
+>("/subaccounts/:id/attachments");
 
-type BulkCreateSubAccountChildren = {
-  <B extends Model.BaseBudget, P extends Model.Account | Model.SubAccount>(
-    id: number,
-    payload: Http.BulkCreatePayload<Http.SubAccountPayload>,
-    options?: Http.RequestOptions,
-  ): Promise<Http.AncestryListResponse<B, P, Model.SubAccount>>;
-};
+export const deleteSubAccountAttachment = client.createParameterizedDeleteService<
+  "/subaccounts/:id/attachments/:attachmentId/",
+  never
+>("/subaccounts/:id/attachments/:attachmentId/");
 
-export const bulkCreateSubAccountChildren = services.detailBulkCreateService((id: number) => [
-  "subaccounts",
-  id,
-  "bulk-create-children",
-]) as BulkCreateSubAccountChildren;
+export const uploadSubAccountAttachment = client.createParameterizedUploadService<
+  "/subaccounts/:id/attachments/",
+  { data: model.Attachment[] }
+>("/subaccounts/:id/attachments/");

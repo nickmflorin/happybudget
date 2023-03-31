@@ -1,7 +1,10 @@
 import { errors } from "application";
-import { model, enumeratedLiterals, EnumeratedLiteralType } from "lib";
+import { enumeratedLiterals, EnumeratedLiteralType } from "lib";
+
+import { ApiSuccessResponse } from "./response";
 
 export * from "./auth";
+export * from "./client";
 export * from "./response";
 export * from "./payload";
 export * from "./query";
@@ -20,6 +23,7 @@ export enum STATUS_CODES {
   HTTP_404_NOT_FOUND = 404,
   HTTP_405_METHOD_NOT_ALLOWED = 405,
   HTTP_500_INTERNAL_SERVER_ERROR = 500,
+  HTTP_503_SERVICE_UNAVAILABLE = 503,
 }
 
 export type StatusCode = typeof STATUS_CODES[keyof typeof STATUS_CODES];
@@ -65,8 +69,6 @@ export type ApiDetail<
   : T extends errors.ApiErrorType
   ? ApiGlobalDetail<C & errors.ApiGlobalErrorCode> | ApiFieldDetail<C & errors.ApiFieldErrorCode>
   : never;
-
-export type ApiResponseBody = model.JsonObject | model.JsonObject[];
 
 /**
  * Represents a form of the JSON body of a {@link Response} when an error occurs during a request
@@ -139,17 +141,6 @@ export type ApiErrorResponse<T extends ErrorIndicators = errors.ApiErrorType> =
     : T extends [errors.API_FIELD, infer C extends errors.ApiFieldErrorCode]
     ? ApiFieldErrorResponse<C>
     : never;
-
-/**
- * The form of the JSON body for responses rendered on the server when the request is successful.
- */
-export type ApiSuccessResponse<D extends ApiResponseBody = model.JsonObject> = {
-  readonly data: D;
-};
-
-export type ModelListResponse<M extends model.ApiModel> = ApiSuccessResponse<M[]> & {
-  readonly count: number;
-};
 
 /**
  * Represents the JSON body of a response that is *intentionally* rendered by the internal server.
@@ -272,11 +263,10 @@ export type ModelListResponse<M extends model.ApiModel> = ApiSuccessResponse<M[]
  * >>> ApiResponse<M, ["global", "not_found"]>
  */
 export type ApiResponse<
-  B extends ApiResponseBody,
-  S extends ApiSuccessResponse<B> | ErrorIndicators = ApiSuccessResponse<B>,
+  S extends ApiSuccessResponse | ErrorIndicators,
   E extends ErrorIndicators = ErrorIndicators,
-> = S extends ApiSuccessResponse<B>
+> = S extends ApiSuccessResponse
   ? S | ApiErrorResponse<E>
   : S extends ErrorIndicators
-  ? ApiSuccessResponse<B> | ApiErrorResponse<S>
+  ? ApiSuccessResponse | ApiErrorResponse<S>
   : never;

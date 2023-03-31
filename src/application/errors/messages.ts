@@ -1,10 +1,7 @@
-import { ApiFieldDetailContext, ApiFieldDetail } from "client/types";
-
 import { logger } from "internal";
-import { http, enumeratedLiteralsMap, EnumeratedLiteralType, formatters } from "lib";
+import { EnumeratedLiteralType, formatters, enumeratedLiterals, messages } from "lib";
 
-/* import * as http from "../http";
-   import { enumeratedLiteralsMap, EnumeratedLiteralType, messages, formatters } from "../util"; */
+import { ApiFieldDetailContext, ApiFieldDetail, HttpMethod } from "../api";
 
 import * as codes from "./codes";
 import * as errorTypes from "./errorTypes";
@@ -18,14 +15,14 @@ import * as errorTypes from "./errorTypes";
  * that are scoped for a user may be used for internal messages and logs if the internal message is
  * not defined.
  */
-export const ErrorMessageScopes = enumeratedLiteralsMap(["user", "internal"] as const);
+export const ErrorMessageScopes = enumeratedLiterals(["user", "internal"] as const);
 export type ErrorMessageScope = EnumeratedLiteralType<typeof ErrorMessageScopes>;
 
 export type ErrorMessageContext = ApiFieldDetailContext & {
   readonly code: codes.ErrorCode;
   readonly url: string;
   readonly status: number | string | codes.UNKNOWN;
-  readonly method: http.HttpMethod | codes.UNKNOWN;
+  readonly method: HttpMethod | codes.UNKNOWN;
   readonly reason: string;
   readonly details: ApiFieldDetail[];
   readonly field: string;
@@ -74,7 +71,7 @@ export const HTTP_MESSAGES: ErrorMessageDefaults = {
 const ErrorTypeMessages: { [key in errorTypes.ErrorType]: ErrorMessageDefaults } = {
   [errorTypes.ErrorTypes.NETWORK]: {
     userMessage: messages.Message("There was an error with the request."),
-    message: messages.Message("There was an unknown error."),
+    message: messages.Message("There was a network error."),
   },
   [errorTypes.ErrorTypes.FIELD]: {
     userMessage: messages.Message("There was an error with the request."),
@@ -103,6 +100,18 @@ const DefaultMessages: ErrorMessages = {
   [codes.ErrorCodes.INTERNAL_SERVER_ERROR]: {
     userMessage: messages.Message("There was an error with the request."),
     message: messages.Message("There was an internal server error."),
+  },
+  [codes.ErrorCodes.SERVICE_UNAVAILABLE]: {
+    userMessage: messages.Message("There was an error with the request."),
+    message: messages.Message("The service is unavailable."),
+  },
+  [codes.ErrorCodes.BODY_NOT_SERIALIZABLE]: {
+    userMessage: messages.Message("There was an error with the request."),
+    message: messages.Message("The response body was not serializable."),
+  },
+  [codes.ErrorCodes.BODY_NOT_PRESENT]: {
+    userMessage: messages.Message("There was an error with the request."),
+    message: messages.Message("The response body was not present."),
   },
   [codes.ErrorCodes.NOT_FOUND]: {
     userMessage: messages.Message("There was an error with the request."),
@@ -214,13 +223,13 @@ const _getMessageForScope = (
  * Usage
  * -----
  * getErrorMessage(codes.ApiGlobalErrorCodes.NOT_FOUND, {
- *   url: "https://corsha.com/api",
+ *   url: "https://api.happybudget.io/api",
  *   method: "GET",
  *   status: 404,
  *   reason: "The page could not be found."
  * })
  * >>> "GET [404] (code = "not_found") There was an error making a request to "
- *     "https://corsha.com/api: The page could not be found."
+ *     "https://api.happybudget.io/api: The page could not be found."
  */
 export const getErrorMessage = <C extends codes.ErrorCode>(
   code: C,

@@ -1,44 +1,24 @@
-import { errors } from "application";
 import { model } from "lib";
-
-import * as query from "./query";
-
-export type RawResponseValue = string | number | null;
-export type Response = { [key: string]: RawResponseValue | Response | Response[] };
 
 export type FileUploadResponse = {
   readonly fileUrl: string;
 };
 
-export type RawListResponse<T> = {
+export type ApiResponseBody = model.JsonObject | model.JsonObject[];
+
+/**
+ * The form of the JSON body for responses rendered on the server when the request is successful.
+ */
+export type ApiSuccessResponse<D extends ApiResponseBody = ApiResponseBody> = D;
+
+export type ListResponseIteree = model.JsonObject | model.JsonValue;
+
+export type ListResponse<M extends ListResponseIteree> = {
+  readonly data: M[];
   readonly count: number;
-  readonly data: T[];
-  readonly next?: string | null;
-  readonly previous?: string | null;
 };
 
-/* export type ListResponse<T> = Omit<RawListResponse<T>, "next" | "previous"> & {
-     readonly query: Http.ListQuery;
-   };
-   export type SuccessfulListResponse<T> = ListResponse<T>;
-   export type FailedListResponse<T> = Omit<ListResponse<T>, "count" | "data"> & {
-     readonly error: errors.HttpError;
-   };
-   export type RenderedListResponse<T> = SuccessfulListResponse<T> | FailedListResponse<T>; */
-
-/* export type DetailResponse<T extends model.ApiModel> = T;
-   export type SuccessfulDetailResponse<T extends model.ApiModel> = DetailResponse<T>;
-   export type FailedDetailResponse = {
-     readonly error: errors.HttpError;
-   }; */
-
-/* export type RenderedDetailResponse<T extends model.ApiModel> =
-     | SuccessfulDetailResponse<T>
-     | FailedDetailResponse; */
-
-/* export type FailedTableResponse = {
-     readonly error: errors.HttpError;
-   }; */
+export type ModelListResponse<M extends model.Model> = ListResponse<M>;
 
 export type TableResponse<M extends model.RowHttpModelType = model.RowHttpModelType> = {
   readonly models: M[];
@@ -46,14 +26,14 @@ export type TableResponse<M extends model.RowHttpModelType = model.RowHttpModelT
   readonly markups?: model.Markup[];
 };
 
-/* export type TableResponse<M extends model.RowHttpModelType = model.RowHttpModelType> =
-     | FailedTableResponse
-     | SuccessfulTableResponse<M>; */
-
-export type MarkupResponseTypes<
-  B extends model.BaseBudget,
-  PARENT extends model.Account | model.SubAccount,
-> = ParentChildResponse<B, model.Markup> | AncestryResponse<B, PARENT, model.Markup>;
+export type MarkupResponseType<
+  B extends model.Budget | model.Template = model.Budget | model.Template,
+  A extends model.Account | model.SubAccount = model.Account | model.SubAccount,
+> = B extends model.Budget | model.Template
+  ? A extends model.Account | model.SubAccount
+    ? ParentChildResponse<B, model.Markup> | AncestryResponse<B, A, model.Markup>
+    : never
+  : never;
 
 export type ReorderResponse = { data: number[] };
 

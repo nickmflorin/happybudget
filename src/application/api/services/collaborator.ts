@@ -1,7 +1,13 @@
-import * as services from "./services";
+import { model } from "lib";
 
-export const deleteCollaborator = services.deleteService((id: number) => ["collaborators", id]);
-export const updateCollaborator = services.detailPatchService<
-  Partial<Omit<Http.CollaboratorPayload, "user">>,
-  Model.Collaborator
->((id: number) => ["collaborators", id]);
+import { client } from "../client";
+import * as types from "../types";
+
+export const deleteCollaborator =
+  client.createParameterizedDeleteService<"/collaborators/:id/">("/collaborators/:id/");
+
+export const updateCollaborator = client.createParameterizedPatchService<
+  "/collaborators/:id/",
+  model.Collaborator,
+  types.CollaboratorPayload
+>("/collaborators/:id/");

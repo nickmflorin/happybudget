@@ -1,27 +1,24 @@
-import { client } from "api";
+import { model } from "lib";
 
-import * as services from "./services";
+import { client } from "../client";
+import * as types from "../types";
 
-export const getProducts = services.listService<Model.Product>(["billing", "products"]);
+export const getProducts = client.createListService<model.Product>("/billing/products");
 
-export const getSubscription = async (
-  options?: Http.RequestOptions,
-): Promise<{ subscription: Model.Subscription | null }> => {
-  const url = services.URL.v1("billing", "subscription");
-  return client.get<{ subscription: Model.Subscription | null }>(url, {}, options);
-};
+export const getSubscription = client.createGetService<{ subscription: model.Subscription }>(
+  "/billing/subscription",
+);
 
-export const createCheckoutSession = services.postService<
-  Http.CheckoutSessionPayload,
-  { redirect_url: string }
->(["billing", "checkout-session"]);
+export const createCheckoutSession = client.createPostService<
+  { redirect_url: string },
+  types.CheckoutSessionPayload
+>("/billing/checkout-session/");
 
-export const syncCheckoutSession = services.patchService<
-  Http.SyncCheckoutSessionPayload,
-  Model.User
->(["billing", "sync-checkout-session"]);
+export const syncCheckoutSession = client.createPostService<
+  model.User,
+  types.SyncCheckoutSessionPayload
+>("/billing/sync-checkout-session/");
 
-export const createPortalSession = services.postService<
-  Record<string, never>,
-  { redirect_url: string }
->(["billing", "portal-session"]);
+export const createPortalSession = client.createPostService<{ redirect_url: string }>(
+  "/billing/sync-checkout-session/",
+);

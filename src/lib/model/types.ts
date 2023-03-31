@@ -20,7 +20,7 @@ export type ID = string | number;
  * Used as the base representation for an entity that has an ID in the application.
  */
 export type Model<
-  I extends ID = number,
+  I extends ID = ID,
   T extends Record<string, unknown> | undefined = undefined,
 > = T extends undefined ? { readonly id: I } : { readonly id: I } & T;
 
@@ -75,7 +75,13 @@ export type ApiModel<T extends JsonObject | undefined = undefined> = Model<numbe
 export type TypedApiModel<
   TP extends ApiModelType = ApiModelType,
   T extends JsonObject | undefined = undefined,
-> = TP extends ApiModelType ? ApiModel<T & { readonly type: TP }> : never;
+> = TP extends ApiModelType
+  ? T extends undefined
+    ? ApiModel<{ readonly type: TP }>
+    : T extends JsonObject
+    ? ApiModel<T & { readonly type: TP }>
+    : never
+  : never;
 
 export type ModelWithColor<M extends Model> = M & { color: ui.HexColor | null };
 

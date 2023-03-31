@@ -1,7 +1,8 @@
 import { type FieldError as RootFieldError } from "react-hook-form";
 
-import * as api from "api";
 import { enumeratedLiterals, EnumeratedLiteralType } from "lib";
+
+import { STATUS_CODES, StatusCode } from "../api";
 
 import { ErrorTypes, ErrorType } from "./errorTypes";
 
@@ -90,16 +91,15 @@ export const ApiGlobalErrorCodes = enumeratedLiterals([
   ...BillingErrorCodes.__ALL__,
   ...AuthErrorCodes.__ALL__,
   UNKNOWN,
-  /* Error code that is used to indicate that a PATH parameter in the URL is malformed.  Note that
-     this should not be used in place of "not_found" in cases where the ID is a PATH parameter and
-     the associated object does not exist. */
-  "malformed_path_param",
   "not_found",
   "method_not_allowed",
   "internal_server_error",
   "bad_request",
   "unauthorized",
   "forbidden",
+  "service_unavailable",
+  "body_not_serializable",
+  "body_not_present",
 ] as const);
 
 export type ApiGlobalErrorCode = EnumeratedLiteralType<typeof ApiGlobalErrorCodes>;
@@ -113,21 +113,20 @@ export type ApiErrorCode = EnumeratedLiteralType<typeof ApiErrorCodes>;
 export const NetworkErrorCodes = enumeratedLiterals(["network"] as const);
 export type NetworkErrorCode = EnumeratedLiteralType<typeof NetworkErrorCodes>;
 
-export const DEFAULT_STATUS_CODES: Partial<{ [key in ApiGlobalErrorCode]: api.StatusCode }> = {
-  [ApiErrorCodes.BAD_REQUEST]: api.STATUS_CODES.HTTP_400_BAD_REQUEST,
-  [ApiErrorCodes.UNAUTHORIZED]: api.STATUS_CODES.HTTP_401_UNAUTHORIZED,
-  [ApiErrorCodes.FORBIDDEN]: api.STATUS_CODES.HTTP_403_FORBIDDEN,
-  [ApiErrorCodes.NOT_FOUND]: api.STATUS_CODES.HTTP_404_NOT_FOUND,
-  [ApiErrorCodes.METHOD_NOT_ALLOWED]: api.STATUS_CODES.HTTP_405_METHOD_NOT_ALLOWED,
-  [ApiErrorCodes.INTERNAL_SERVER_ERROR]: api.STATUS_CODES.HTTP_500_INTERNAL_SERVER_ERROR,
+export const DEFAULT_STATUS_CODES: Partial<{ [key in ApiGlobalErrorCode]: StatusCode }> = {
+  [ApiErrorCodes.BAD_REQUEST]: STATUS_CODES.HTTP_400_BAD_REQUEST,
+  [ApiErrorCodes.UNAUTHORIZED]: STATUS_CODES.HTTP_401_UNAUTHORIZED,
+  [ApiErrorCodes.FORBIDDEN]: STATUS_CODES.HTTP_403_FORBIDDEN,
+  [ApiErrorCodes.NOT_FOUND]: STATUS_CODES.HTTP_404_NOT_FOUND,
+  [ApiErrorCodes.METHOD_NOT_ALLOWED]: STATUS_CODES.HTTP_405_METHOD_NOT_ALLOWED,
+  [ApiErrorCodes.INTERNAL_SERVER_ERROR]: STATUS_CODES.HTTP_500_INTERNAL_SERVER_ERROR,
+  [ApiErrorCodes.SERVICE_UNAVAILABLE]: STATUS_CODES.HTTP_503_SERVICE_UNAVAILABLE,
 };
 
-export const getDefaultGlobalStatusCode = (errorCode: ApiGlobalErrorCode): api.StatusCode | null =>
+export const getDefaultGlobalStatusCode = (errorCode: ApiGlobalErrorCode): StatusCode | null =>
   DEFAULT_STATUS_CODES[errorCode] || null;
 
-export const getDefaultGlobalErrorCode = (
-  statusCode: api.StatusCode,
-): ApiGlobalErrorCode | null => {
+export const getDefaultGlobalErrorCode = (statusCode: StatusCode): ApiGlobalErrorCode | null => {
   let errorCode: ApiGlobalErrorCode;
   for (errorCode in DEFAULT_STATUS_CODES) {
     if (DEFAULT_STATUS_CODES[errorCode] === statusCode) {

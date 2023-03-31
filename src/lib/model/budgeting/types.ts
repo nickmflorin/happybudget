@@ -44,7 +44,29 @@ export const ActualImportSources = choice.Choices([
 ]);
 
 export const ParentTypes = enumeratedLiterals(["account", "subaccount", "budget"] as const);
-export type ParentType = EnumeratedLiteralType<typeof ParentTypes>;
+
+type _ChildrenModel = Account | SubAccount | SimpleAccount | SimpleSubAccount;
+
+export type ParentType<T extends _ChildrenModel | _ChildrenModel["type"] = _ChildrenModel["type"]> =
+  T extends _ChildrenModel
+    ? ParentType<T["type"]>
+    : T extends _ChildrenModel["type"]
+    ? {
+        account: "budget";
+        subaccount: "account" | "subaccount";
+      }[T]
+    : never;
+
+export type ParentModel<
+  T extends _ChildrenModel | _ChildrenModel["type"] = _ChildrenModel["type"],
+> = T extends _ChildrenModel
+  ? ParentModel<T["type"]>
+  : T extends _ChildrenModel["type"]
+  ? {
+      account: Budget | Template;
+      subaccount: Account | SubAccount;
+    }[T]
+  : never;
 
 export const BudgetDomains = enumeratedLiterals(["budget", "template"] as const);
 export type BudgetDomain = EnumeratedLiteralType<typeof BudgetDomains>;
@@ -178,19 +200,16 @@ export type Collaborator = types.TypedApiModel<
   }
 >;
 
-export type PdfBudget = types.TypedApiModel<
-  "pdf-budget",
-  {
-    readonly name: string;
-    readonly nominal_value: number;
-    readonly actual: number;
-    readonly accumulated_fringe_contribution: number;
-    readonly accumulated_markup_contribution: number;
-    readonly children: PdfAccount[];
-    readonly groups: Group[];
-    readonly children_markups: Markup[];
-  }
->;
+export interface PdfBudget extends types.TypedApiModel<"pdf-budget"> {
+  readonly name: string;
+  readonly nominal_value: number;
+  readonly actual: number;
+  readonly accumulated_fringe_contribution: number;
+  readonly accumulated_markup_contribution: number;
+  readonly children: PdfAccount[];
+  readonly groups: Group[];
+  readonly children_markups: Markup[];
+}
 
 export type Group = types.TypedApiModel<
   "group",
@@ -243,17 +262,14 @@ export type Account = LineMetrics &
     readonly ancestors?: [SimpleBudget | SimpleTemplate];
   };
 
-export type PdfAccount = types.RowTypedApiModel<
-  "pdf-account",
-  LineMetrics & {
-    readonly identifier: string | null;
-    readonly description: string | null;
-    readonly domain: BudgetDomain;
-    readonly children: PdfSubAccount[];
-    readonly groups: Group[];
-    readonly children_markups: Markup[];
-  }
->;
+export interface PdfAccount extends types.RowTypedApiModel<"pdf-account", LineMetrics> {
+  readonly identifier: string | null;
+  readonly description: string | null;
+  readonly domain: BudgetDomain;
+  readonly children: PdfSubAccount[];
+  readonly groups: Group[];
+  readonly children_markups: Markup[];
+}
 
 export type SubAccountMixin = LineMetrics & {
   readonly order: string;
@@ -284,17 +300,14 @@ export type SubAccount = SimpleSubAccount &
     ];
   };
 
-export type PdfSubAccount = types.RowTypedApiModel<
-  "pdf-subaccount",
-  SubAccountMixin & {
-    readonly domain: BudgetDomain;
-    readonly identifier: string | null;
-    readonly description: string | null;
-    readonly children: PdfSubAccount[];
-    readonly groups: Group[];
-    readonly children_markups: Markup[];
-  }
->;
+export interface PdfSubAccount extends types.RowTypedApiModel<"pdf-subaccount", SubAccountMixin> {
+  readonly domain: BudgetDomain;
+  readonly identifier: string | null;
+  readonly description: string | null;
+  readonly children: PdfSubAccount[];
+  readonly groups: Group[];
+  readonly children_markups: Markup[];
+}
 
 export type Ancestor =
   | SimpleBudget

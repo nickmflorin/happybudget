@@ -1,254 +1,208 @@
-import { client } from "api";
+import { model } from "lib";
 
-import * as services from "./services";
+import { client } from "../client";
+import * as types from "../types";
 
-type GetBudget = {
-  <B extends Model.BaseBudget>(id: number, options?: Http.RequestOptions): Promise<B>;
-};
+export const getBudget = client.createParameterizedRetrieveService<
+  "/budgets/:id",
+  model.Budget | model.Template
+>("/budgets/:id");
 
-export const getBudget = services.retrieveService((id: number) => ["budgets", id]) as GetBudget;
+/* TODO: This endpoint will eventually be refactored so that the budget and template payloads and
+   response types are treated separately - but for now they are the same. */
+export const updateBudget = client.createParameterizedPatchService<
+  "/budgets/:id/",
+  model.Budget | model.Template,
+  Partial<types.BudgetPayload> | Partial<types.TemplatePayload>
+>("/budgets/:id/");
 
-type UpdateBudget = {
-  <
-    B extends Model.BaseBudget,
-    P extends Http.BudgetPayload | Http.TemplatePayload = B extends Model.Budget
-      ? Http.BudgetPayload
-      : Http.TemplatePayload,
-  >(
-    id: number,
-    p: Partial<P>,
-    options?: Http.RequestOptions,
-  ): Promise<B>;
-};
+export const deleteBudget =
+  client.createParameterizedDeleteService<"/budgets/:id/">("/budgets/:id/");
 
-export const updateBudget = services.detailPatchService((id: number) => [
-  "budgets",
-  id,
-]) as UpdateBudget;
-export const deleteBudget = services.deleteService((id: number) => ["budgets", id]);
-export const createBudget = services.postService<Http.BudgetPayload, Model.UserBudget>(["budgets"]);
-export const createTemplate = services.postService<Http.TemplatePayload, Model.Template>([
-  "templates",
-]);
-export const createCommunityTemplate = services.postService<
-  Http.TemplatePayload | FormData,
-  Model.Template
->(["templates", "community"]);
-
-export const getBudgetPdf = services.retrieveService<Model.PdfBudget>((id: number) => [
-  "budgets",
-  id,
-  "pdf",
-]);
-export const getBudgets = services.listService<Model.SimpleBudget>(["budgets"]);
-export const getArchivedBudgets = services.listService<Model.SimpleBudget>(["budgets", "archived"]);
-export const getCollaboratingBudgets = services.listService<Model.SimpleCollaboratingBudget>([
-  "budgets",
-  "collaborating",
-]);
-export const getTemplates = services.listService<Model.SimpleTemplate>(["templates"]);
-export const getCommunityTemplates = services.listService<Model.SimpleTemplate>([
-  "templates",
-  "community",
-]);
-
-export const getBudgetChildren = services.detailListService<Model.Account>((id: number) => [
-  "budgets",
-  id,
-  "children",
-]);
-export const getBudgetMarkups = services.detailListService<Model.Markup>((id: number) => [
-  "budgets",
-  id,
-  "markups",
-]);
-export const getBudgetGroups = services.detailListService<Model.Group>((id: number) => [
-  "budgets",
-  id,
-  "groups",
-]);
-export const getBudgetActualOwners = services.detailListService<Model.ActualOwner>((id: number) => [
-  "budgets",
-  id,
-  "actual-owners",
-]);
-
-export const getFringes = services.detailListService<Model.Fringe>((id: number) => [
-  "budgets",
-  id,
-  "fringes",
-]);
-export const createFringe = services.detailPostService<Http.FringePayload, Model.Fringe>(
-  (id: number) => ["budgets", id, "fringes"],
+export const createBudget = client.createPostService<model.UserBudget, types.BudgetPayload>(
+  "/budgets/",
 );
 
-export const getCollaborators = services.detailListService<Model.Collaborator>((id: number) => [
-  "budgets",
-  id,
-  "collaborators",
-]);
-export const createCollaborator = services.detailPostService<
-  Http.CollaboratorPayload,
-  Model.Collaborator
->((id: number) => ["budgets", id, "collaborators"]);
-
-export const getActuals = services.detailListService<Model.Actual>((id: number) => [
-  "budgets",
-  id,
-  "actuals",
-]);
-export const createActual = services.detailPostService<Http.ActualPayload, Model.Actual>(
-  (id: number) => ["budgets", id, "actuals"],
+export const createTemplate = client.createPostService<model.Template, types.TemplatePayload>(
+  "/templates/",
 );
 
-export const createBudgetChild = services.detailPostService<Http.AccountPayload, Model.Account>(
-  (id: number) => ["budgets", id, "children"],
-);
+export const createCommunityTemplate = client.createPostService<
+  model.Template,
+  types.TemplatePayload | FormData
+>("/templates/community/");
 
-export const createBudgetGroup = services.detailPostService<Http.GroupPayload, Model.Group>(
-  (id: number) => ["budgets", id, "groups"],
-);
+export const getBudgetPdf = client.createParameterizedRetrieveService<
+  "/budgets/:id/pdf",
+  model.PdfBudget
+>("/budgets/:id/pdf");
 
-export const duplicateBudget = async <B extends Model.BaseBudget>(
-  id: number,
-  options?: Http.RequestOptions,
-): Promise<B> => {
-  const url = services.URL.v1("budgets", id, "duplicate");
-  return client.post<B>(url, {}, options);
-};
+export const getBudgets = client.createListModelsService<model.SimpleBudget>("/budgets");
 
-export const createBudgetPublicToken = services.detailPostService<
-  Http.PublicTokenPayload,
-  Model.PublicToken
->((id: number) => ["budgets", id, "public-token"]);
+export const getArchivedBudgets =
+  client.createListModelsService<model.SimpleBudget>("/budgets/archived");
 
-export type CreateBudgetMarkup = {
-  <B extends Model.BaseBudget>(
-    id: number,
-    payload: Http.MarkupPayload,
-    options?: Http.RequestOptions,
-  ): Promise<Http.ParentChildResponse<B, Model.Markup>>;
-};
+export const getCollaboratingBudgets =
+  client.createListModelsService<model.SimpleCollaboratingBudget>("/budgets/collaborating");
 
-export const createBudgetMarkup = services.detailPostService((id: number) => [
-  "budgets",
-  id,
-  "markups",
-]) as CreateBudgetMarkup;
+export const getTemplates = client.createListModelsService<model.SimpleTemplate>("/templates");
 
-type BulkDeleteBudgetMarkups = {
-  <B extends Model.BaseBudget>(
-    id: number,
-    payload: Http.BulkDeletePayload,
-    options?: Http.RequestOptions,
-  ): Promise<Http.ParentResponse<B>>;
-};
+export const getCommunityTemplates =
+  client.createListModelsService<model.SimpleTemplate>("/templates/community");
 
-export const bulkDeleteBudgetMarkups = services.detailBulkDeleteService((id: number) => [
-  "budgets",
-  id,
-  "bulk-delete-markups",
-]) as BulkDeleteBudgetMarkups;
+export const getBudgetChildren = client.createParameterizedListModelsService<
+  "/budgets/:id/children",
+  model.Account
+>("/budgets/:id/children");
 
-type BulkUpdateBudgetChildren = {
-  <B extends Model.BaseBudget>(
-    id: number,
-    payload: Http.BulkUpdatePayload<Http.AccountPayload>,
-    options?: Http.RequestOptions,
-  ): Promise<Http.ParentChildListResponse<B, Model.Account>>;
-};
+export const getBudgetSimpleChildren = client.createParameterizedListModelsService<
+  "/budgets/:id/children",
+  model.SimpleAccount
+>("/budgets/:id/children", { query: { simple: true } });
 
-export const bulkUpdateBudgetChildren = services.detailBulkUpdateService((id: number) => [
-  "budgets",
-  id,
-  "bulk-update-children",
-]) as BulkUpdateBudgetChildren;
+export const getBudgetMarkups = client.createParameterizedListModelsService<
+  "/budgets/:id/markups",
+  model.Markup
+>("/budgets/:id/markups");
 
-type BulkDeleteBudgetChildren = {
-  <B extends Model.BaseBudget>(
-    id: number,
-    payload: Http.BulkDeletePayload,
-    options?: Http.RequestOptions,
-  ): Promise<Http.ParentResponse<B>>;
-};
+export const getBudgetGroups = client.createParameterizedListModelsService<
+  "/budgets/:id/groups",
+  model.Group
+>("/budgets/:id/groups");
 
-export const bulkDeleteBudgetChildren = services.detailBulkDeleteService((id: number) => [
-  "budgets",
-  id,
-  "bulk-delete-children",
-]) as BulkDeleteBudgetChildren;
+export const getBudgetActualOwners = client.createParameterizedListModelsService<
+  "/budgets/:id/actual-owners",
+  model.ActualOwner
+>("/budgets/:id/actual-owners");
 
-type BulkCreateBudgetChildren = {
-  <B extends Model.BaseBudget>(
-    id: number,
-    payload: Http.BulkCreatePayload<Http.AccountPayload>,
-    options?: Http.RequestOptions,
-  ): Promise<Http.ParentChildListResponse<B, Model.Account>>;
-};
+export const getFringes = client.createParameterizedListModelsService<
+  "/budgets/:id/fringes",
+  model.Fringe
+>("/budgets/:id/fringes");
 
-export const bulkCreateBudgetChildren = services.detailBulkCreateService((id: number) => [
-  "budgets",
-  id,
-  "bulk-create-children",
-]) as BulkCreateBudgetChildren;
+export const getActuals = client.createParameterizedListModelsService<
+  "/budgets/:id/actuals",
+  model.Actual
+>("/budgets/:id/actuals");
 
-export const bulkUpdateActuals = services.detailBulkUpdateService<
-  Http.ActualPayload,
-  Http.ParentChildListResponse<Model.Budget, Model.Actual>
->((id: number) => ["budgets", id, "bulk-update-actuals"]);
+export const getCollaborators = client.createParameterizedListModelsService<
+  "/budgets/:id/collaborators",
+  model.Collaborator
+>("/budgets/:id/collaborators");
 
-export const bulkDeleteActuals = services.detailBulkDeleteService<
-  Http.ParentResponse<Model.Budget>
->((id: number) => ["budgets", id, "bulk-delete-actuals"]);
+export const createFringe = client.createParameterizedPostService<
+  "/budgets/:id/fringes/",
+  model.Fringe,
+  types.FringePayload
+>("/budgets/:id/fringes/");
 
-export const bulkImportActuals = services.detailPatchService<
-  Http.BulkImportActualsPayload,
-  Http.ParentChildListResponse<Model.Budget, Model.Actual>
->((id: number) => ["budgets", id, "bulk-import-actuals"]);
+export const createActual = client.createParameterizedPostService<
+  "/budgets/:id/actuals/",
+  model.Fringe,
+  types.ActualPayload
+>("/budgets/:id/actuals/");
 
-export const bulkCreateActuals = services.detailBulkCreateService<
-  Http.ActualPayload,
-  Http.ParentChildListResponse<Model.Budget, Model.Actual>
->((id: number) => ["budgets", id, "bulk-create-actuals"]);
+export const createBudgetChild = client.createParameterizedPostService<
+  "/budgets/:id/children/",
+  model.Account,
+  types.AccountPayload
+>("/budgets/:id/children/");
 
-type BulkUpdateFringes = {
-  <B extends Model.BaseBudget>(
-    id: number,
-    payload: Http.BulkUpdatePayload<Http.FringePayload>,
-    options?: Http.RequestOptions,
-  ): Promise<Http.ParentChildListResponse<B, Model.Fringe>>;
-};
+export const createBudgetGroup = client.createParameterizedPostService<
+  "/budgets/:id/groups/",
+  model.Group,
+  types.GroupPayload
+>("/budgets/:id/groups/");
 
-export const bulkUpdateFringes = services.detailBulkUpdateService((id: number) => [
-  "budgets",
-  id,
-  "bulk-update-fringes",
-]) as BulkUpdateFringes;
+export const createCollaborator = client.createParameterizedPostService<
+  "/budgets/:id/collaborators/",
+  model.Collaborator,
+  types.CollaboratorPayload
+>("/budgets/:id/collaborators/");
 
-type BulkDeleteFringes = {
-  <B extends Model.BaseBudget>(
-    id: number,
-    payload: Http.BulkDeletePayload,
-    options?: Http.RequestOptions,
-  ): Promise<Http.ParentResponse<B>>;
-};
+export const duplicateBudget = client.createParameterizedPostService<
+  "/budgets/:id/duplicate/",
+  model.Budget | model.Template
+>("/budgets/:id/duplicate/");
 
-export const bulkDeleteFringes = services.detailBulkDeleteService((id: number) => [
-  "budgets",
-  id,
-  "bulk-delete-fringes",
-]) as BulkDeleteFringes;
+export const createBudgetPublicToken = client.createParameterizedPostService<
+  "/budgets/:id/public-token/",
+  model.PublicToken,
+  types.PublicTokenPayload
+>("/budgets/:id/public-token/");
 
-type BulkCreateFringes = {
-  <B extends Model.BaseBudget>(
-    id: number,
-    payload: Http.BulkCreatePayload<Http.FringePayload>,
-    options?: Http.RequestOptions,
-  ): Promise<Http.ParentChildListResponse<B, Model.Fringe>>;
-};
+export const createBudgetMarkup = client.createParameterizedPostService<
+  "/budgets/:id/markups/",
+  | types.ParentChildResponse<model.Budget, model.Markup>
+  | types.ParentChildResponse<model.Template, model.Markup>
+>("/budgets/:id/markups/");
 
-export const bulkCreateFringes = services.detailBulkUpdateService((id: number) => [
-  "budgets",
-  id,
-  "bulk-create-fringes",
-]) as BulkCreateFringes;
+export const bulkDeleteBudgetMarkups = client.createParameterizedPatchService<
+  "/budgets/:id/bulk-delete-markups/",
+  types.ParentResponse<model.Budget> | types.ParentResponse<model.Template>,
+  types.BulkDeletePayload
+>("/budgets/:id/bulk-delete-markups/");
+
+export const bulkUpdateBudgetChildren = client.createParameterizedPatchService<
+  "/budgets/:id/bulk-update-children/",
+  | types.ParentChildListResponse<model.Budget, model.Account>
+  | types.ParentChildListResponse<model.Template, model.Account>,
+  types.BulkUpdatePayload<types.AccountPayload>
+>("/budgets/:id/bulk-update-children/");
+
+export const bulkDeleteBudgetChildren = client.createParameterizedPatchService<
+  "/budgets/:id/bulk-delete-children/",
+  types.ParentResponse<model.Budget> | types.ParentResponse<model.Template>,
+  types.BulkDeletePayload
+>("/budgets/:id/bulk-delete-children/");
+
+export const bulkCreateBudgetChildren = client.createParameterizedPatchService<
+  "/budgets/:id/bulk-create-children/",
+  | types.ParentChildListResponse<model.Budget, model.Account>
+  | types.ParentChildListResponse<model.Template, model.Account>,
+  types.BulkCreatePayload<types.AccountPayload>
+>("/budgets/:id/bulk-create-children/");
+
+export const bulkUpdateActuals = client.createParameterizedPatchService<
+  "/budgets/:id/bulk-update-actuals/",
+  types.ParentChildListResponse<model.Budget, model.Actual>,
+  types.BulkUpdatePayload<types.ActualPayload>
+>("/budgets/:id/bulk-update-actuals/");
+
+export const bulkDeleteActuals = client.createParameterizedPatchService<
+  "/budgets/:id/bulk-delete-actuals/",
+  types.ParentResponse<model.Budget>,
+  types.BulkDeletePayload
+>("/budgets/:id/bulk-delete-actuals/");
+
+export const bulkImportActuals = client.createParameterizedPatchService<
+  "/budgets/:id/bulk-import-actuals/",
+  types.ParentChildListResponse<model.Budget, model.Actual>,
+  types.BulkImportActualsPayload
+>("/budgets/:id/bulk-import-actuals/");
+
+export const bulkCreateActuals = client.createParameterizedPatchService<
+  "/budgets/:id/bulk-create-actuals/",
+  types.ParentChildListResponse<model.Budget, model.Actual>,
+  types.BulkCreatePayload<types.ActualPayload>
+>("/budgets/:id/bulk-create-actuals/");
+
+export const bulkUpdateFringes = client.createParameterizedPatchService<
+  "/budgets/:id/bulk-update-fringes/",
+  | types.ParentChildListResponse<model.Budget, model.Fringe>
+  | types.ParentChildListResponse<model.Template, model.Fringe>,
+  types.BulkUpdatePayload<types.FringePayload>
+>("/budgets/:id/bulk-update-fringes/");
+
+export const bulkDeleteFringes = client.createParameterizedPatchService<
+  "/budgets/:id/bulk-delete-fringes/",
+  types.ParentResponse<model.Budget> | types.ParentResponse<model.Template>,
+  types.BulkDeletePayload
+>("/budgets/:id/bulk-delete-fringes/");
+
+export const bulkCreateFringes = client.createParameterizedPatchService<
+  "/budgets/:id/bulk-create-fringes/",
+  | types.ParentChildListResponse<model.Budget, model.Fringe>
+  | types.ParentChildListResponse<model.Template, model.Fringe>,
+  types.BulkCreatePayload<types.FringePayload>
+>("/budgets/:id/bulk-create-fringes/");

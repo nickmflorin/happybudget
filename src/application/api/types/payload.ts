@@ -1,6 +1,21 @@
+import { ActualFileObject } from "filepond/types";
+
 import { model } from "lib";
 
-export type Payload = FormData | model.JsonObject;
+export type FilepondFile = ActualFileObject;
+export type PayloadData = Record<string, model.JsonValue | ArrayBuffer>;
+export type Payload<P extends PayloadData = PayloadData> = FormData | P;
+
+export const payloadIsFormData = <P extends PayloadData>(p: Payload<P>): p is FormData =>
+  p instanceof FormData;
+
+export type SingleFile = File | FilepondFile;
+export type UploadableFileProp = SingleFile | FileList | SingleFile[];
+
+export const isSingleFile = (f: UploadableFileProp): f is SingleFile =>
+  typeof f === "object" && (f as SingleFile).name !== undefined;
+
+export const isFiles = (f: UploadableFileProp): f is SingleFile[] => Array.isArray(f);
 
 export type AuthTokenValidationPayload = {
   readonly force_reload_from_stripe?: boolean;

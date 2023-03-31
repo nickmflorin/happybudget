@@ -25,3 +25,19 @@ export const stringIsInteger = (v: string): v is types.StringNumber =>
      will return true for cases where the integer in the string is preceeded by leading 0's
      (i.e. "005"). */
   !isNaN(Number(v)) && `${parseInt(v)}` == v;
+
+type AssertNotNull<T> = (value: T) => asserts value is NonNullable<T>;
+
+export const assertNotNull: AssertNotNull<unknown> = <T>(v: T) => {
+  if (v === null) {
+    throw new TypeError("Value should not be null!");
+  }
+};
+
+type AssertNull = (value: unknown) => asserts value is null;
+
+export const assertNull: AssertNull = (v: unknown): asserts v is null => {
+  if (v !== null) {
+    throw new TypeError("Value should be null!");
+  }
+};
