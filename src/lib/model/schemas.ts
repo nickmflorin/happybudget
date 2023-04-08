@@ -1,36 +1,29 @@
+import { toZod } from "tozod";
 import { z } from "zod";
 
-import { formatters } from "../util";
+import * as types from "./types";
 
-type IsObjectOfTypeOptions = {
-  readonly aware?: true;
-};
+export const ModelNumbericIdSchema = z.number().int().positive();
 
-type IsObjectOfTypeRT<P, O extends IsObjectOfTypeOptions> = O extends { readonly aware: true }
-  ? [true, P] | [false, z.ZodError<P>]
-  : P | false;
+export const ApiModelSchema = z.object({
+  id: ModelNumbericIdSchema,
+});
 
-export const isObjectOfType = <P, O extends IsObjectOfTypeOptions = IsObjectOfTypeOptions>(
-  obj: unknown,
-  schema: z.ZodSchema<P>,
-  options?: O,
-): IsObjectOfTypeRT<P, O> => {
-  const result = schema.safeParse(obj);
-  if (result.success) {
-    return (options?.aware === true ? [true, obj as P] : (obj as P)) as IsObjectOfTypeRT<P, O>;
-  } else if (options?.aware === true) {
-    return [false, result.error] as IsObjectOfTypeRT<P, O>;
-  }
-  return false as IsObjectOfTypeRT<P, O>;
-};
+export const TypedApiModelSchema = ApiModelSchema.extend({
+  type: z.enum(types.ApiModelTypes.__ALL__),
+});
 
-export const ensureObjectOfType = <P>(obj: unknown, schema: z.ZodSchema<P>): P => {
-  const [success, result] = isObjectOfType(obj, schema, { aware: true });
-  if (success) {
-    return result;
-  }
-  throw new TypeError(
-    "The object does not conform to the expected schema: \n" +
-      formatters.stringifyZodIssues(result.issues),
-  );
-};
+export const createTypedApiModelSchema = <M extends types.TypedApiModel>(
+  type: M["type"],
+  obj: (z.ZodObject<{
+    [k in keyof types.InferTypedApiModelData<M>]-?: toZod<types.InferTypedApiModelData<M>[k]>;
+  }> &
+    toZod<types.InferTypedApiModelData<M>>)["shape"],
+) =>
+  z
+    .object({
+      type: z.literal(type),
+      id: ModelNumbericIdSchema,
+    })
+    .extend(obj)
+    .strict();

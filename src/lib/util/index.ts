@@ -11,6 +11,7 @@ export * as parsers from "./parsers";
 export * as validators from "./validators";
 
 export * from "./arrays";
+export * from "./literals";
 export * from "./string";
 export * from "./types";
 export * from "./typeguards";

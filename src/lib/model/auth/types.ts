@@ -1,3 +1,4 @@
+import { JsonObject } from "../../schemas";
 import * as types from "../types";
 
 export type PublicToken = types.ApiModel<{
@@ -9,7 +10,7 @@ export type PublicToken = types.ApiModel<{
 
 export type PublicTypedApiModel<
   TP extends types.ApiModelType = types.ApiModelType,
-  T extends types.JsonObject = types.JsonObject,
+  T extends JsonObject = JsonObject,
 > = types.TypedApiModel<
   TP,
   T & {

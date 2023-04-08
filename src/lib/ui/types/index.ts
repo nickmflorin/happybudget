@@ -2,6 +2,7 @@ import { BasicIconProp } from "../icons";
 
 export * from "./props";
 export * from "./style";
+export * from "./schemas";
 
 export type Affix = BasicIconProp | JSX.Element;
 

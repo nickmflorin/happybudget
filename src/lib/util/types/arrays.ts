@@ -1,3 +1,5 @@
+export type SingleOrArray<T> = T | T[];
+
 export type NotArray<T> = T & Exclude<T, Array<unknown>>;
 
 export type InArray<T, X> =

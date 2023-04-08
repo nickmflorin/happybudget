@@ -3,6 +3,7 @@ export * from "./defaults";
 export * from "./http";
 export * from "./ids";
 export * from "./managers";
-export * from "./typeguards";
 export * from "./patterns";
+export * from "./schemas";
+export * from "./typeguards";
 export * from "./types";

@@ -1,4 +1,4 @@
-import { Required } from "utility-types";
+import { Required, Optional } from "utility-types";
 
 import { feedback } from "lib";
 
@@ -7,17 +7,24 @@ import * as codes from "../codes";
 import * as errorTypes from "../errorTypes";
 import { ErrorMessageScopes, getErrorMessage, HTTP_MESSAGE, HTTP_USER_MESSAGE } from "../messages";
 
-type HttpErrorBaseConfig<E extends errorTypes.HttpErrorType> = Readonly<{
-  readonly errorType: E;
-  readonly message?: string;
-  readonly userMessage?: string;
+import { ApplicationUserErrorConfig, ApplicationUserError, IApplicationUserError } from "./base";
+
+export type HttpErrorLogContext = {
   readonly url: string;
   readonly method: HttpMethod;
-}>;
+};
 
-export interface IBaseHttpError {
-  readonly message: string;
-  readonly userMessage: string;
+export type HttpErrorConfig<
+  E extends errorTypes.HttpErrorType,
+  C extends HttpErrorLogContext = HttpErrorLogContext,
+> = Required<ApplicationUserErrorConfig<E, C>, "message"> &
+  Readonly<{
+    readonly url: string;
+    readonly method: HttpMethod;
+  }>;
+
+export interface IHttpError<C extends HttpErrorLogContext = HttpErrorLogContext>
+  extends Required<IApplicationUserError<C>, "message"> {
   readonly url: string;
   readonly method: HttpMethod;
 }
@@ -27,10 +34,6 @@ export interface IBaseHttpError {
  * the server fails.
  *
  * @param {string} url The URL that the request was made to when the error occurred.
- *
- * @param {number} status
- *   For cases where the request failed but a {@link Response} was still received, the status code
- *   of that {@link Response}.
  *
  * @param {errorTypes.RequestMethodType} method
  *   The {@link errorTypes.RequestMethodType} of the request that was made.
@@ -43,20 +46,20 @@ export interface IBaseHttpError {
  *   The string representation of the {@link BaseHttpError} that should be used when, if
  *   contextually applicable, communicating the error to a user.
  */
-abstract class BaseHttpError<E extends errorTypes.HttpErrorType>
-  extends Error
-  implements IBaseHttpError
+abstract class AbstractHttpError<
+    E extends errorTypes.HttpErrorType,
+    C extends HttpErrorLogContext = HttpErrorLogContext,
+  >
+  extends ApplicationUserError<E, C>
+  implements IHttpError<C>
 {
-  public readonly userMessage: string;
   public readonly url: string;
   public readonly method: HttpMethod;
 
-  protected constructor(config: Required<HttpErrorBaseConfig<E>, "userMessage" | "message">) {
-    super(config.message);
+  protected constructor(config: HttpErrorConfig<E, C>) {
+    super(config);
     this.url = config.url;
     this.method = config.method;
-    this.userMessage = config.userMessage;
-    this.message = config.message;
   }
 }
 
@@ -64,9 +67,12 @@ abstract class BaseHttpError<E extends errorTypes.HttpErrorType>
  * A {@link NetworkError} is used to model an error that occurs when an HTTP request is made between
  * the client and server and a {@link Response} is not received.
  */
-export class NetworkError extends BaseHttpError<typeof errorTypes.HttpErrorTypes.NETWORK> {
+export class NetworkError extends AbstractHttpError<typeof errorTypes.HttpErrorTypes.NETWORK> {
   constructor(
-    config: Omit<HttpErrorBaseConfig<typeof errorTypes.HttpErrorTypes.NETWORK>, "errorType">,
+    config: Optional<
+      Omit<HttpErrorConfig<typeof errorTypes.HttpErrorTypes.NETWORK>, "errorType" | "logContext">,
+      "userMessage" | "message"
+    >,
   ) {
     super({
       userMessage: getErrorMessage(codes.NetworkErrorCodes.NETWORK, {
@@ -79,7 +85,12 @@ export class NetworkError extends BaseHttpError<typeof errorTypes.HttpErrorTypes
         reason: config.message || "There was a network error.",
       }),
       errorType: errorTypes.HttpErrorTypes.NETWORK,
+      logContext: { url: config.url, method: config.method },
     });
+  }
+
+  public get logContext() {
+    return { message: this.message, url: this.url, method: this.method };
   }
 
   public toFeedback = (): feedback.GlobalFeedback<typeof feedback.FeedbackTypes.ERROR> => ({
@@ -88,20 +99,19 @@ export class NetworkError extends BaseHttpError<typeof errorTypes.HttpErrorTypes
   });
 }
 
+type ApiLogErrorContext = HttpErrorLogContext & { readonly status: number };
+
 /**
  * An abstract base class that is used to model errors that occurs when an HTTP request is made
  * between the client and server and a {@link Response} is received.
  */
 export abstract class AbstractApiError<
   D extends typeof errorTypes.HttpErrorTypes.FIELD | typeof errorTypes.HttpErrorTypes.GLOBAL,
-> extends BaseHttpError<D> {
+  C extends ApiLogErrorContext = ApiLogErrorContext,
+> extends AbstractHttpError<D, C> {
   public readonly status: number;
 
-  constructor(
-    config: Required<HttpErrorBaseConfig<D>, "message" | "userMessage"> & {
-      readonly status: number;
-    },
-  ) {
+  constructor(config: HttpErrorConfig<D, C> & { readonly status: number }) {
     super(config);
     this.status = config.status;
   }
@@ -128,7 +138,10 @@ export class ApiFieldError extends AbstractApiError<typeof errorTypes.HttpErrorT
   constructor({
     message,
     ...config
-  }: Omit<HttpErrorBaseConfig<typeof errorTypes.HttpErrorTypes.FIELD>, "errorType"> & {
+  }: Optional<
+    Omit<HttpErrorConfig<typeof errorTypes.HttpErrorTypes.FIELD>, "errorType" | "logContext">,
+    "userMessage" | "message"
+  > & {
     readonly status: number;
     readonly errors: ApiDetail<typeof errorTypes.HttpErrorTypes.FIELD>[];
   }) {
@@ -175,6 +188,7 @@ export class ApiFieldError extends AbstractApiError<typeof errorTypes.HttpErrorT
         details: standardizedDetails,
       }),
       errorType: errorTypes.HttpErrorTypes.FIELD,
+      logContext: HttpContext,
     });
     /* The 'errors' on the ApiFieldError object will each correspond to a given field of the data
        that was submitted, and will be used to render feedback next to the individual fields of a
@@ -197,13 +211,27 @@ export class ApiFieldError extends AbstractApiError<typeof errorTypes.HttpErrorT
     );
 }
 
-export class ApiGlobalError extends AbstractApiError<typeof errorTypes.HttpErrorTypes.GLOBAL> {
+type ApiGlobalErrorLogContext = HttpErrorLogContext & {
+  readonly status: number;
+  readonly code: ApiDetail<typeof errorTypes.HttpErrorTypes.GLOBAL>["code"];
+};
+
+export class ApiGlobalError extends AbstractApiError<
+  typeof errorTypes.HttpErrorTypes.GLOBAL,
+  ApiGlobalErrorLogContext
+> {
   public code: ApiDetail<typeof errorTypes.HttpErrorTypes.GLOBAL>["code"];
 
   constructor({
     message,
     ...config
-  }: Omit<HttpErrorBaseConfig<typeof errorTypes.HttpErrorTypes.GLOBAL>, "errorType"> & {
+  }: Optional<
+    Omit<
+      HttpErrorConfig<typeof errorTypes.HttpErrorTypes.GLOBAL, ApiGlobalErrorLogContext>,
+      "errorType" | "logContext"
+    >,
+    "userMessage" | "message"
+  > & {
     readonly status: number;
     readonly code: ApiDetail<typeof errorTypes.HttpErrorTypes.GLOBAL>["code"];
   }) {
@@ -224,6 +252,10 @@ export class ApiGlobalError extends AbstractApiError<typeof errorTypes.HttpError
           }),
       }),
       errorType: errorTypes.HttpErrorTypes.GLOBAL,
+      logContext: {
+        ...HttpContext,
+        code: config.code,
+      },
     });
     this.code = config.code;
   }

@@ -80,6 +80,10 @@ const RESTRICTED_IMPORT_PATTERNS = [
     message: "Components must be imported from modules.",
   },
   {
+    group: ["application/*/*"],
+    message: "Imports from application must be imported as modules.",
+  },
+  {
     /* Importing from root level modules with relative imports (i.e. "../components" or "../lib")
        is not allowed as it can lead to circular imports. */
     group: INTERNAL_MODULES.reduce((prev, v) => [...prev, `../${v}`, `../*/${v}`], []),

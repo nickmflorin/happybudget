@@ -65,7 +65,7 @@ const isMultiAsync = <M extends Model.Model>(
 type UseMultiModelSelectReturnType<M extends Model.Model> = {
   readonly value: MultiValue<ModelSelectOption<M>> | undefined;
   // Only applicable for the async case.
-  readonly onResponse: (response: Http.ListResponse<M>) => void;
+  readonly onResponse: (response: Http.ApiListResponse<M>) => void;
 };
 
 export const useMultiModelSelect = <M extends Model.Model>(
@@ -78,7 +78,7 @@ export const useMultiModelSelect = <M extends Model.Model>(
     [props],
   );
 
-  return { value: convertedValue, onResponse: (rsp: Http.ListResponse<M>) => setData(rsp.data) };
+  return { value: convertedValue, onResponse: (rsp: Http.ApiListResponse<M>) => setData(rsp.data) };
 };
 
 type UseSingleModelSyncSelectProps<M extends Model.Model> = {
@@ -103,7 +103,7 @@ const isSingleAsync = <M extends Model.Model>(
 type UseSingleModelSelectReturnType<M extends Model.Model> = {
   readonly value: SingleValue<ModelSelectOption<M>> | undefined;
   // Only applicable for the async case.
-  readonly onResponse: (response: Http.ListResponse<M>) => void;
+  readonly onResponse: (response: Http.ApiListResponse<M>) => void;
 };
 
 export const useSingleModelSelect = <M extends Model.Model>(
@@ -115,5 +115,5 @@ export const useSingleModelSelect = <M extends Model.Model>(
     () => parseSingleModelSelectValues(isSingleAsync(props) ? data : props.options, props.value),
     [props],
   );
-  return { value: convertedValue, onResponse: (rsp: Http.ListResponse<M>) => setData(rsp.data) };
+  return { value: convertedValue, onResponse: (rsp: Http.ApiListResponse<M>) => setData(rsp.data) };
 };

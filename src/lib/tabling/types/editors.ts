@@ -1,5 +1,7 @@
 import { ICellEditorParams } from "ag-grid-community";
 
+import { store } from "application";
+
 import * as model from "../../model";
 import * as columns from "../columns";
 import * as events from "../events";
@@ -15,27 +17,17 @@ export interface AgEditorRef<
 > {
   // Should return the final value to the grid, the result of the editing
   getValue(): T;
-  /*
-  Gets called once after initialised.
-  If you return true, the editor will appear in a popup.
-  */
+  // Gets called once after initialised.  If you return true, the editor will appear in a popup.
   isPopup?(): boolean;
-  /*
-  Gets called once, only if isPopup() returns true. Return "over" if the
-  popup should cover the cell, or "under" if it should be positioned below
-  leaving the cell value visible. If this method is not present, the
-  default is "over".
-  */
+  /* Gets called once, only if isPopup() returns true. Return "over" if the popup should cover the
+     cell, or "under" if it should be positioned below leaving the cell value visible. If this
+     method is not present, the default is "over". */
   getPopupPosition?(): string;
-  /*
-  Gets called once before editing starts, to give editor a chance to
-  cancel the editing before it even starts.
-  */
+  /* Gets called once before editing starts, to give editor a chance to cancel the editing before it
+     even starts. */
   isCancelBeforeStart?(): boolean;
-  /*
-  Gets called once when editing is finished (eg if Enter is pressed).
-  If you return true, then the result of the edit will be ignored.
-  */
+  /* Gets called once when editing is finished (eg if Enter is pressed).  If you return true, then
+     the result of the edit will be ignored. */
   isCancelAfterEnd?(): boolean;
   // If doing full row edit, then gets called when tabbing into the cell.
   focusIn?(): boolean;
@@ -49,7 +41,7 @@ export interface EditorProps<
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
   T = cells.CellValue<R, N>,
   C extends table.TableContext = table.TableContext,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>,
+  S extends store.TableStore<R> = store.TableStore<R>,
 > extends Omit<ICellEditorParams<R, T>, "column"> {
   readonly tableContext: C;
   readonly table: table.TableInstance<R, M>;
@@ -59,7 +51,7 @@ export interface EditorProps<
   readonly columns: columns.DataColumn<R, M, N, T>[];
   readonly data: R;
   readonly rowIndex: number;
-  readonly selector: (state: Application.Store) => S;
+  readonly selector: (state: store.ApplicationStore) => S;
   readonly stopEditing: (suppressNavigateAfterEdit?: boolean) => void;
   /*
   When the cell editor finishes editing, the AG Grid callback (onCellDoneEditing) does not have any

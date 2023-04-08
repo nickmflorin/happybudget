@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 
+import * as api from "api";
 import classNames from "classnames";
 import { map } from "lodash";
 
-import * as api from "api";
 import { http } from "lib";
 import { Pagination, RenderOrSpinner, NoData } from "components";
 
@@ -33,7 +33,7 @@ const TaggedActuals = ({
     setResponseWasReceived(false);
     api
       .getContactTaggedActuals(contactId, { page_size: 5, page }, { cancelToken: getToken() })
-      .then((response: Http.ListResponse<Model.TaggedActual>) => {
+      .then((response: Http.ApiListResponse<Model.TaggedActual>) => {
         setTaggedActuals(response.data);
         setCount(response.count);
         setResponseWasReceived(true);

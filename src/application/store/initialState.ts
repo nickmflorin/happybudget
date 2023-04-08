@@ -1,26 +1,32 @@
-import { reduce, filter } from "lodash";
+import { model, tabling } from "lib";
 
-import { redux } from "lib";
+import * as api from "../api";
+import * as config from "../config";
 
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export const initialListResponseState: Redux.ListStore<any> = {
+import * as types from "./types";
+
+export const initialListResponseState = <
+  M extends api.ListResponseIteree,
+>(): types.ListStore<M> => ({
   loading: false,
-  data: [],
+  data: [] as M[],
   count: 0,
   responseWasReceived: false,
   error: null,
   query: {},
   invalidated: false,
-};
+});
 
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export const initialModelListResponseState: Redux.ModelListStore<any> = {
-  ...initialListResponseState,
-};
+export const initialApiModelListResponseState = <
+  M extends model.ApiModel,
+>(): types.ApiModelListStore<M> => ({
+  ...initialListResponseState<M>(),
+});
 
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export const initialAuthenticatedModelListResponseState: Redux.AuthenticatedModelListStore<any> = {
-  ...initialModelListResponseState,
+export const initialAuthenticatedApiModelListResponseState = <
+  M extends model.ApiModel,
+>(): types.AuthenticatedApiModelListStore<M> => ({
+  ...initialApiModelListResponseState<M>(),
   search: "",
   page: 1,
   pageSize: 10,
@@ -29,10 +35,9 @@ export const initialAuthenticatedModelListResponseState: Redux.AuthenticatedMode
   updating: { current: [], completed: [], failed: [] },
   ordering: [],
   error: null,
-};
+});
 
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export const initialTableState: Redux.TableStore<any> = {
+export const initialTableState = <R extends tabling.Row>(): types.TableStore<R> => ({
   data: [],
   loading: false,
   search: "",
@@ -41,51 +46,32 @@ export const initialTableState: Redux.TableStore<any> = {
   responseWasReceived: false,
   error: null,
   invalidated: false,
-};
+});
 
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export const initialDetailResponseState: Redux.ModelDetailStore<any> = {
+export const initialDetailResponseState = <
+  M extends model.ApiModel,
+>(): types.ApiModelDetailStore<M> => ({
   loading: false,
   data: null,
   error: null,
   invalidated: false,
-};
-
-const createModularApplicationState = <
-  S extends Application.AuthenticatedModuleStores | Application.PublicModuleStores,
->(
-  config: Application.ModuleConfig[],
-): S =>
-  reduce(
-    config,
-    (prev: S, moduleConfig: Application.ModuleConfig) => {
-      if (typeof moduleConfig.initialState === "function") {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-        return { ...prev, [moduleConfig.label]: moduleConfig.initialState() };
-      }
-      return { ...prev, [moduleConfig.label]: moduleConfig.initialState };
-    },
-    {} as S,
-  );
-
-const createPublicInitialState = (config: Application.StoreConfig): Application.PublicStore => ({
-  ...createModularApplicationState(
-    filter(config.modules, (c: Application.ModuleConfig) => c.isPublic === true),
-  ),
-  tokenId: config.tokenId,
 });
 
-const createApplicationInitialState = (config: Application.StoreConfig): Application.Store => ({
-  ...createModularApplicationState(
-    filter(config.modules, (c: Application.ModuleConfig) => c.isPublic !== true),
-  ),
-  user: config.user,
+export const createApplicationInitialState = (
+  storeConfig: types.StoreConfig,
+): types.ApplicationStore => ({
+  ...config.AUTH_MODULE_INITIAL_STATE,
+  user: storeConfig.user,
   loading: false,
   drawerOpen: false,
-  contacts: redux.initialAuthenticatedModelListResponseState,
-  filteredContacts: redux.initialAuthenticatedModelListResponseState,
+  contacts: initialAuthenticatedApiModelListResponseState<model.Contact>(),
+  filteredContacts: initialAuthenticatedApiModelListResponseState<model.Contact>(),
+  fringeColors: initialListResponseState<string>(),
+  subaccountUnits: initialApiModelListResponseState<model.SubAccountUnit>(),
+  actualTypes: initialApiModelListResponseState<model.ActualType>(),
   productPermissionModalOpen: false,
-  public: createPublicInitialState(config),
+  public: {
+    ...config.PUBLIC_MODULE_INITIAL_STATE,
+    tokenId: storeConfig.tokenId,
+  } as types.PublicStore,
 });
-
-export default createApplicationInitialState;

@@ -1,10 +1,22 @@
 import { createLogWriter as createBrowserLogWriter } from "@roarr/browser-log-writer";
 import { intersection } from "lodash";
-import { Roarr as Logger, MessageContext, Message } from "roarr";
+import {
+  Roarr as Logger,
+  type MessageContext as RoarrMessageContext,
+  type Message,
+  type TransformMessageFunction,
+} from "roarr";
 import { ulid } from "ulid";
 
 /* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
-import { ProductionEnvironments } from "lib/application/types";
+import { ProductionEnvironments } from "application/config/types";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { ApplicationError } from "application/errors/errors/base";
+
+export type LogMessageContext = Record<
+  string,
+  JsonValue | import("application/errors/errors").ApplicationError
+>;
 
 const RESTRICTED_LOG_CONTEXT = ["application", "environment", "productionEnv"] as const;
 
@@ -35,10 +47,28 @@ if (application === undefined) {
   throw new TypeError(`Detected invalid value '${application}' for npm_package_name.`);
 }
 
-export default Logger.child<MessageContext>((message: Message<MessageContext>) => {
+/**
+ * A {@link TransformMessageFunction} that includes context attributes of instances of
+ * {@link ApplicationError} that are embedded in the context provided to the log function.
+ */
+const messageContextErrorProcessor: TransformMessageFunction<LogMessageContext> = (
+  message: Message<LogMessageContext>,
+): Message<RoarrMessageContext> => ({
+  ...message,
+  context: Object.keys(message.context).reduce((prev: RoarrMessageContext, key: string) => {
+    const value: JsonValue | import("application/errors/errors").ApplicationError =
+      message.context[key];
+    if (value instanceof ApplicationError) {
+      return { ...prev, ...value.logContext };
+    }
+    return { ...prev, [key]: value };
+  }, {} as RoarrMessageContext),
+});
+
+export default Logger.child<LogMessageContext>(messageContextErrorProcessor).child(message => {
   const inter = intersection(Object.keys(message.context), RESTRICTED_LOG_CONTEXT);
   if (inter.length > 0) {
-    throw new Error(`The log context key(s) '${inter.join(", ")} are restricted.`);
+    throw new TypeError(`The log context key(s) '${inter.join(", ")} are restricted.`);
   }
   return {
     ...message,

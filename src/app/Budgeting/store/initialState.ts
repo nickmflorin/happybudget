@@ -36,7 +36,7 @@ export const initialBudgetState: Modules.Budget.Store = {
   analysis: initialAnalysisState,
   actuals: {
     ...redux.initialTableState,
-    owners: redux.initialAuthenticatedModelListResponseState,
+    owners: redux.initialAuthenticatedApiModelListResponseState,
   },
 };
 

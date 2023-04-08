@@ -1,7 +1,7 @@
+import * as api from "api";
 import { includes, isNil } from "lodash";
 import { combineReducers } from "redux";
 
-import * as api from "api";
 import { redux, budgeting, tabling, context } from "lib";
 import { SubAccountsTable, FringesTable, ActualsTable, AccountsTable } from "components/tabling";
 
@@ -23,9 +23,9 @@ const analysisReducer: Redux.Reducer<Modules.Budget.AnalysisStore> = (
     return { ...state, responseWasReceived: false };
   } else if (action.type === actions.analysis.responseAction.toString()) {
     const response: {
-      groups: Http.ListResponse<Model.Group>;
-      accounts: Http.ListResponse<Model.Account>;
-      actuals: Http.ListResponse<Model.Actual>;
+      groups: Http.ApiListResponse<Model.Group>;
+      accounts: Http.ApiListResponse<Model.Account>;
+      actuals: Http.ApiListResponse<Model.Actual>;
       error: api.RequestError | null;
     } = action.payload;
     return {
@@ -136,7 +136,7 @@ const genericReducer: Redux.Reducer<Modules.Budget.Store> = combineReducers({
       Model.ActualOwner,
       ActualsTableActionContext
     >({
-      initialState: redux.initialAuthenticatedModelListResponseState,
+      initialState: redux.initialAuthenticatedApiModelListResponseState,
       actions: {
         loading: actions.actuals.loadingActualOwnersAction,
         response: actions.actuals.responseActualOwnersAction,

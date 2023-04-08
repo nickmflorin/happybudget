@@ -1,4 +1,4 @@
-import * as api from "api";
+import { api } from "application";
 
 import * as model from "../../model";
 import * as rows from "../rows";
@@ -15,9 +15,5 @@ export type ShareConfig<
   readonly onCreated?: (token: model.PublicToken) => void;
   readonly onUpdated?: (token: model.PublicToken) => void;
   readonly onDeleted?: () => void;
-  readonly create: (
-    id: number,
-    payload: api.PublicTokenPayload,
-    options: Http.RequestOptions,
-  ) => Promise<model.PublicToken>;
+  readonly create: typeof api.createBudgetPublicToken
 };

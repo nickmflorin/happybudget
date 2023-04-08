@@ -1,7 +1,7 @@
+import * as api from "api";
 import { SagaIterator } from "redux-saga";
 import { put, all } from "redux-saga/effects";
 
-import * as api from "api";
 import { notifications, redux, http } from "lib";
 
 import * as actions from "../../actions/budget";
@@ -17,9 +17,9 @@ function* request(
   ];
   try {
     const [accounts, groups, actuals]: [
-      Http.ListResponse<Model.Account>,
-      Http.ListResponse<Model.Group>,
-      Http.ListResponse<Model.Actual>,
+      Http.ApiListResponse<Model.Account>,
+      Http.ApiListResponse<Model.Group>,
+      Http.ApiListResponse<Model.Actual>,
     ] = yield all(effects);
     yield put(
       actions.analysis.responseAction(

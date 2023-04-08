@@ -1,0 +1,105 @@
+import { type SagaIterator } from "redux-saga";
+import { spawn, take, cancel, call, debounce } from "redux-saga/effects";
+import { Optional } from "utility-types";
+
+import { model } from "lib";
+
+import * as api from "../../api";
+import * as types from "../types";
+
+export const convertContextTaskToTask = <
+  A extends types.Action<types.ActionPayload, C>,
+  C extends types.ActionContext = types.ActionContext<A>,
+>(
+  contextTask: types.ContextTask<A, C>,
+): types.Task<A> => {
+  function* task(action: A): SagaIterator {
+    yield call(contextTask, action.context);
+  }
+  return task;
+};
+
+export const createListSaga = <
+  T extends api.ListResponseIteree,
+  C extends types.ActionContext = types.ActionContext,
+>(
+  config: types.SagaConfig<types.ListTaskMap<C>, Pick<types.ListActionPayloadMap<T>, "request">, C>,
+) => {
+  function* requestSaga(): SagaIterator {
+    let lastTasks;
+    while (true) {
+      const action = yield take(config.actions.request.toString());
+      if (lastTasks) {
+        yield cancel(lastTasks);
+      }
+      lastTasks = yield call(config.tasks.request, action);
+    }
+  }
+  function* rootSaga(): SagaIterator {
+    yield spawn(requestSaga);
+  }
+  return rootSaga;
+};
+
+export const createApiModelListSaga = <
+  M extends model.ApiModel,
+  C extends types.ActionContext = types.ActionContext,
+>(
+  config: types.SagaConfig<
+    types.ModelListTaskMap<C>,
+    Pick<types.ApiModelListActionPayloadMap<M>, "request">,
+    C
+  >,
+) => {
+  function* requestSaga(): SagaIterator {
+    let lastTasks;
+    while (true) {
+      const action = yield take(config.actions.request.toString());
+      if (lastTasks) {
+        yield cancel(lastTasks);
+      }
+      lastTasks = yield call(config.tasks.request, action);
+    }
+  }
+  function* rootSaga(): SagaIterator {
+    yield spawn(requestSaga);
+  }
+  return rootSaga;
+};
+
+export const createAuthenticatedApiModelListSaga = <
+  M extends model.ApiModel,
+  C extends types.ActionContext = types.ActionContext,
+>(
+  config: types.SagaConfig<
+    types.ModelListTaskMap,
+    Optional<
+      Pick<types.AuthenticatedApiModelListActionPayloadMap<M>, "setSearch" | "request">,
+      "setSearch"
+    >,
+    C
+  >,
+) => {
+  function* requestSaga(): SagaIterator {
+    let lastTasks;
+    while (true) {
+      const action = yield take(config.actions.request.toString());
+      if (lastTasks) {
+        yield cancel(lastTasks);
+      }
+      lastTasks = yield call(config.tasks.request, action);
+    }
+  }
+
+  function* watchForSearchSaga(): SagaIterator {
+    if (config.actions.setSearch !== undefined) {
+      yield debounce(250, config.actions.setSearch.toString(), config.tasks.request);
+    }
+  }
+
+  function* rootSaga(): SagaIterator {
+    yield spawn(requestSaga);
+    yield spawn(watchForSearchSaga);
+  }
+  return rootSaga;
+};

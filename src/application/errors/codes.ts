@@ -4,7 +4,7 @@ import { enumeratedLiterals, EnumeratedLiteralType } from "lib";
 
 import { STATUS_CODES, StatusCode } from "../api";
 
-import { ErrorTypes, ErrorType } from "./errorTypes";
+import { CodedErrorType, CodedErrorTypes } from "./errorTypes";
 
 /**
  * Error codes that are used by the "react-hook-form" package to communicate client side validation
@@ -151,17 +151,17 @@ export type ErrorTypeCodes = {
 };
 
 export const ErrorTypeCodes: ErrorTypeCodes = {
-  [ErrorTypes.FIELD]: ApiFieldErrorCodes,
-  [ErrorTypes.GLOBAL]: ApiGlobalErrorCodes,
-  [ErrorTypes.CLIENT_VALIDATION]: ClientValidationErrorCodes,
-  [ErrorTypes.NETWORK]: NetworkErrorCodes,
+  [CodedErrorTypes.FIELD]: ApiFieldErrorCodes,
+  [CodedErrorTypes.GLOBAL]: ApiGlobalErrorCodes,
+  [CodedErrorTypes.CLIENT_VALIDATION]: ClientValidationErrorCodes,
+  [CodedErrorTypes.NETWORK]: NetworkErrorCodes,
 };
 
-export type ErrorCode<T extends ErrorType | undefined = undefined> = T extends undefined
+export type ErrorCode<T extends CodedErrorType | undefined = undefined> = T extends undefined
   ? EnumeratedLiteralType<typeof ErrorCodes>
   : EnumeratedLiteralType<ErrorTypeCodes[T & keyof ErrorTypeCodes]>;
 
-export const isErrorCode = <T extends ErrorType = ErrorType>(
+export const isErrorCode = <T extends CodedErrorType = CodedErrorType>(
   code: string,
   t: T,
 ): code is ErrorCode<T> => ErrorTypeCodes[t].contains(code);
@@ -172,17 +172,17 @@ export const isErrorCode = <T extends ErrorType = ErrorType>(
  * However, there are or may be codes that are associated with multiple error types.
  *
  * @param {ErrorCode} code
- * @returns {ErrorType[]}
+ * @returns {CodedErrorType[]}
  */
-export const getErrorTypes = (code: ErrorCode): ErrorType[] => {
-  const errorTypes: ErrorType[] = ErrorTypes.__ALL__
+export const getErrorTypes = (code: ErrorCode): CodedErrorType[] => {
+  const errorTypes: CodedErrorType[] = CodedErrorTypes.__ALL__
     .slice()
-    .reduce((prev: ErrorType[], curr: ErrorType) => {
+    .reduce((prev: CodedErrorType[], curr: CodedErrorType) => {
       if (isErrorCode(code, curr)) {
         return [...prev, curr];
       }
       return prev;
-    }, [] as Exclude<ErrorType, typeof ErrorTypes.NETWORK>[]);
+    }, [] as Exclude<CodedErrorType, typeof CodedErrorTypes.NETWORK>[]);
   if (errorTypes.length === 0) {
     throw new Error(
       `The code ${code} is not associated with an error type - this should not happen, and ` +

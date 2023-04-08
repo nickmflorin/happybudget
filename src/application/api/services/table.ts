@@ -14,7 +14,7 @@ export const getTableChildren = <
   parentId: number,
   parentType: P,
   options?: types.ClientRequestOptions<{ query: Q }>,
-): Promise<types.ClientResponse<types.ModelListResponse<M>, { query: Q }>> => {
+): Promise<types.ClientResponse<types.ApiListResponse<M>, { query: Q }>> => {
   const serviceMap = {
     budget: async (id: number, o?: types.ClientRequestOptions<{ query: Q }>) =>
       budget.getBudgetChildren(
@@ -33,7 +33,7 @@ export const getTableChildren = <
       ),
   };
   return serviceMap[parentType](parentId, options) as Promise<
-    types.ClientResponse<types.ModelListResponse<M>, { query: Q }>
+    types.ClientResponse<types.ApiListResponse<M>, { query: Q }>
   >;
 };
 
@@ -45,7 +45,7 @@ export const getTableSimpleChildren = <
   parentId: number,
   parentType: P,
   options?: types.ClientRequestOptions<{ query: Q }>,
-): Promise<types.ClientResponse<types.ModelListResponse<M>, { query: Q }>> => {
+): Promise<types.ClientResponse<types.ApiListResponse<M>, { query: Q }>> => {
   const serviceMap = {
     budget: async (id: number, o?: types.ClientRequestOptions<{ query: Q }>) =>
       budget.getBudgetSimpleChildren(
@@ -64,7 +64,7 @@ export const getTableSimpleChildren = <
       ),
   };
   return serviceMap[parentType](parentId, options) as Promise<
-    types.ClientResponse<types.ModelListResponse<M>, { query: Q }>
+    types.ClientResponse<types.ApiListResponse<M>, { query: Q }>
   >;
 };
 
@@ -105,7 +105,7 @@ export const getTableGroups = <
   parentId: number,
   parentType: P,
   options?: types.ClientRequestOptions<{ query: Q }>,
-): Promise<types.ClientResponse<types.ModelListResponse<model.Group>, { query: Q }>> => {
+): Promise<types.ClientResponse<types.ApiListResponse<model.Group>, { query: Q }>> => {
   const serviceMap = {
     budget: async (id: number, o?: types.ClientRequestOptions<{ query: Q }>) =>
       budget.getBudgetGroups(
@@ -124,7 +124,7 @@ export const getTableGroups = <
       ),
   };
   return serviceMap[parentType](parentId, options) as Promise<
-    types.ClientResponse<types.ModelListResponse<model.Group>, { query: Q }>
+    types.ClientResponse<types.ApiListResponse<model.Group>, { query: Q }>
   >;
 };
 

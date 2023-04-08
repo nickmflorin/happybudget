@@ -17,7 +17,7 @@ export interface EditAttachmentsProps {
     id: number,
     query?: Http.ListQuery,
     options?: Http.RequestOptions,
-  ) => Promise<Http.ListResponse<Model.Attachment>>;
+  ) => Promise<Http.ApiListResponse<Model.Attachment>>;
   readonly deleteAttachment: (
     id: number,
     objId: number,
@@ -39,7 +39,7 @@ const EditAttachments = (props: EditAttachmentsProps): JSX.Element => {
     setLoadingAttachments(true);
     props
       .listAttachments(props.modelId, {}, { cancelToken: cancelToken() })
-      .then((response: Http.ListResponse<Model.Attachment>) => setAttachments(response.data))
+      .then((response: Http.ApiListResponse<Model.Attachment>) => setAttachments(response.data))
       .catch((e: Error) => notifications.internal.handleRequestError(e))
       .finally(() => setLoadingAttachments(false));
   }, [props.modelId]);

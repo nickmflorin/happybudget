@@ -35,7 +35,7 @@ export const createAccountChild = client.createParameterizedPostService<
 
 export const createAccountMarkup = client.createParameterizedPostService<
   "/accounts/:id/markups/",
-  types.AncestryResponse<model.Budget | model.Template, model.Account, model.Markup>,
+  types.AncestryResponse<model.UserBudget | model.Template, model.Account, model.Markup>,
   Partial<types.MarkupPayload>
 >("/accounts/:id/markups/");
 
@@ -58,7 +58,7 @@ export const getAccountSimpleChildren = client.createParameterizedListModelsServ
 export const bulkUpdateAccountChildren = client.createParameterizedPatchService<
   "/accounts/:id/bulk-update-children/",
   types.ApiSuccessResponse<
-    types.AncestryListResponse<model.Budget | model.Template, model.Account, model.SubAccount>
+    types.AncestryListResponse<model.UserBudget | model.Template, model.Account, model.SubAccount>
   >,
   types.BulkUpdatePayload<types.AccountPayload>
 >("/accounts/:id/bulk-update-children/");
@@ -66,7 +66,7 @@ export const bulkUpdateAccountChildren = client.createParameterizedPatchService<
 export const bulkDeleteAccountChildren = client.createParameterizedPatchService<
   "/accounts/:id/bulk-delete-children/",
   types.ApiSuccessResponse<
-    types.AncestryListResponse<model.Budget | model.Template, model.Account, model.SubAccount>
+    types.AncestryListResponse<model.UserBudget | model.Template, model.Account, model.SubAccount>
   >,
   types.BulkDeletePayload
 >("/accounts/:id/bulk-delete-children/");
@@ -74,13 +74,13 @@ export const bulkDeleteAccountChildren = client.createParameterizedPatchService<
 export const bulkCreateAccountChildren = client.createParameterizedPatchService<
   "/accounts/:id/bulk-create-children/",
   types.ApiSuccessResponse<
-    types.AncestryListResponse<model.Budget | model.Template, model.Account, model.SubAccount>
+    types.AncestryListResponse<model.UserBudget | model.Template, model.Account, model.SubAccount>
   >,
   types.BulkCreatePayload<types.AccountPayload>
 >("/accounts/:id/bulk-create-children/");
 
 export const bulkDeleteAccountMarkups = client.createParameterizedPatchService<
   "/accounts/:id/bulk-delete-markups/",
-  types.ApiSuccessResponse<types.ParentsResponse<model.Budget | model.Template, model.Account>>,
+  types.ApiSuccessResponse<types.ParentsResponse<model.UserBudget | model.Template, model.Account>>,
   types.BulkDeletePayload
 >("/accounts/:id/bulk-delete-markups/");

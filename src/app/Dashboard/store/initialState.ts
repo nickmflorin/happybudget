@@ -2,7 +2,7 @@ import { redux } from "lib";
 
 const initialState: Modules.Dashboard.Store = {
   budgets: {
-    ...redux.initialAuthenticatedModelListResponseState,
+    ...redux.initialAuthenticatedApiModelListResponseState,
     pageSize: 100,
     ordering: [
       { field: "created_at", order: 0 },
@@ -11,7 +11,7 @@ const initialState: Modules.Dashboard.Store = {
     ],
   },
   collaborating: {
-    ...redux.initialAuthenticatedModelListResponseState,
+    ...redux.initialAuthenticatedApiModelListResponseState,
     pageSize: 100,
     ordering: [
       { field: "created_at", order: 0 },
@@ -20,7 +20,7 @@ const initialState: Modules.Dashboard.Store = {
     ],
   },
   archive: {
-    ...redux.initialAuthenticatedModelListResponseState,
+    ...redux.initialAuthenticatedApiModelListResponseState,
     pageSize: 100,
     ordering: [
       { field: "created_at", order: 0 },
@@ -29,7 +29,7 @@ const initialState: Modules.Dashboard.Store = {
     ],
   },
   templates: {
-    ...redux.initialAuthenticatedModelListResponseState,
+    ...redux.initialAuthenticatedApiModelListResponseState,
     pageSize: 100,
     ordering: [
       { field: "created_at", order: 0 },
@@ -38,7 +38,7 @@ const initialState: Modules.Dashboard.Store = {
     ],
   },
   community: {
-    ...redux.initialAuthenticatedModelListResponseState,
+    ...redux.initialAuthenticatedApiModelListResponseState,
     pageSize: 100,
     ordering: [
       { field: "created_at", order: 0 },

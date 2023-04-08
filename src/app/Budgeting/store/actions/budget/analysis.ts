@@ -8,7 +8,7 @@ export const requestAction = creator<
 >("analysis.Request");
 export const loadingAction = creator<boolean>("analysis.Loading");
 export const responseAction = creator<{
-  readonly groups: Http.ListResponse<Model.Group>;
-  readonly accounts: Http.ListResponse<Model.Account>;
-  readonly actuals: Http.ListResponse<Model.Actual>;
+  readonly groups: Http.ApiListResponse<Model.Group>;
+  readonly accounts: Http.ApiListResponse<Model.Account>;
+  readonly actuals: Http.ApiListResponse<Model.Actual>;
 }>("analysis.Response");

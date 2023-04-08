@@ -11,7 +11,7 @@ export const searchUsers = (
   search: string,
   query?: Omit<types.ApiModelListQuery<model.SimpleUser>, "search">,
   options?: types.ClientRequestOptions<{ query: types.ApiModelListQuery<model.SimpleUser> }>,
-): Promise<types.ClientResponse<types.ModelListResponse<model.SimpleUser>>> =>
+): Promise<types.ClientResponse<types.ApiListResponse<model.SimpleUser>>> =>
   client.list<model.SimpleUser, types.ApiModelListQuery<model.SimpleUser>>("/users", {
     ...options,
     query: { ...query, search },

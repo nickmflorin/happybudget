@@ -13,6 +13,12 @@ export type FieldOrder<F extends string = string> = {
 
 export type Ordering<F extends string = string> = FieldOrder<F>[];
 
+export type ModelOrderableField<M extends model.ApiModel> = Exclude<keyof M, "id"> & string;
+
+export type ModelFieldOrder<M extends model.ApiModel> = FieldOrder<ModelOrderableField<M>>;
+
+export type ModelOrdering<M extends model.ApiModel> = ModelFieldOrder<M>[];
+
 const FieldOrderSchema = z
   .object({
     field: z.string().nonempty().toLowerCase(),
@@ -32,17 +38,17 @@ export type RawQueryParamValue<F extends string = string> =
 export type RawQuery<F extends string = string> = Record<string, RawQueryParamValue<F>>;
 export type ProcessedQuery = Record<string, QueryParamValue>;
 
-export type ModelOrderableField<M extends model.ApiModel> = Exclude<keyof M, "id"> & string;
-
 export type ListQuery = {
   readonly search?: string;
 };
 
 export type ApiModelListQuery<M extends model.ApiModel = model.ApiModel> = ListQuery & {
-  readonly ordering?: Ordering<ModelOrderableField<M>>;
+  readonly ordering?: ModelOrdering<M>;
   readonly ids?: number[];
   readonly exclude?: number[];
   readonly simple?: boolean;
+  readonly page_size?: number;
+  readonly page?: number;
 };
 
 function getQueryOrderingSchema<F extends string = string>(

@@ -1,18 +1,8 @@
+import { Subtract } from "utility-types";
+
+import { JsonObject } from "../schemas";
 import * as ui from "../ui";
 import { enumeratedLiterals, EnumeratedLiteralType } from "../util";
-
-export type JsonValue =
-  | JsonObject
-  | JsonValue[]
-  | boolean
-  | number
-  | string
-  | readonly JsonValue[]
-  | null;
-
-export type JsonObject = {
-  [k: string]: JsonValue;
-};
 
 export type ID = string | number;
 
@@ -21,8 +11,12 @@ export type ID = string | number;
  */
 export type Model<
   I extends ID = ID,
-  T extends Record<string, unknown> | undefined = undefined,
-> = T extends undefined ? { readonly id: I } : { readonly id: I } & T;
+  T extends Record<string, unknown> | "__EMPTY__" = "__EMPTY__",
+> = T extends "__EMPTY__"
+  ? { readonly id: I }
+  : T extends Record<string, unknown>
+  ? { [key in "id" | keyof T]: key extends "id" ? I : key extends keyof T ? T[key] : never }
+  : never;
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export type ModelId<M> = M extends Model<infer I extends ID, any> ? I : never;
@@ -51,8 +45,12 @@ export type RowTypedApiModel<
   }
 >;
 
+export const ApiModelTagTypes = enumeratedLiterals(["subaccount-unit", "actual-type"] as const);
+export type ApiModelTagType = EnumeratedLiteralType<typeof ApiModelTagTypes>;
+
 export const ApiModelTypes = enumeratedLiterals([
   ...RowHttpModelTypes.__ALL__,
+  ...ApiModelTagTypes.__ALL__,
   "collaborator",
   "markup",
   "group",
@@ -66,7 +64,7 @@ export type ApiModelType = EnumeratedLiteralType<typeof ApiModelTypes>;
 /**
  * Represents a model that is returned from the HTTP API in JSON form.
  */
-export type ApiModel<T extends JsonObject | undefined = undefined> = Model<number, T>;
+export type ApiModel<T extends JsonObject | "__EMPTY__" = "__EMPTY__"> = Model<number, T>;
 
 /**
  * Represents a model that is returned from the HTTP API in JSON form that is attributed with a
@@ -74,13 +72,19 @@ export type ApiModel<T extends JsonObject | undefined = undefined> = Model<numbe
  */
 export type TypedApiModel<
   TP extends ApiModelType = ApiModelType,
-  T extends JsonObject | undefined = undefined,
+  T extends JsonObject | "__EMPTY__" = "__EMPTY__",
 > = TP extends ApiModelType
-  ? T extends undefined
+  ? "__EMPTY__" extends T
     ? ApiModel<{ readonly type: TP }>
-    : T extends JsonObject
-    ? ApiModel<T & { readonly type: TP }>
-    : never
+    : ApiModel<{ readonly type: TP } & T>
+  : never;
+
+export type AnyTypedApiModel<D extends JsonObject = JsonObject> = TypedApiModel<ApiModelType, D>;
+
+export type BaseTypedApiModel = { readonly id: number; readonly type: ApiModelType };
+
+export type InferTypedApiModelData<M> = M extends BaseTypedApiModel
+  ? Subtract<M, BaseTypedApiModel>
   : never;
 
 export type ModelWithColor<M extends Model> = M & { color: ui.HexColor | null };

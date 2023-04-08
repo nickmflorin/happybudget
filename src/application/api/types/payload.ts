@@ -3,7 +3,7 @@ import { ActualFileObject } from "filepond/types";
 import { model } from "lib";
 
 export type FilepondFile = ActualFileObject;
-export type PayloadData = Record<string, model.JsonValue | ArrayBuffer>;
+export type PayloadData = Record<string, JsonValue | ArrayBuffer>;
 export type Payload<P extends PayloadData = PayloadData> = FormData | P;
 
 export const payloadIsFormData = <P extends PayloadData>(p: Payload<P>): p is FormData =>
@@ -189,11 +189,11 @@ export type ContactPayload = {
   readonly last_name: model.Contact["last_name"];
 };
 
-export type BulkCreatePayload<T extends model.JsonObject> = { data: Partial<T>[] };
-export type ModelBulkUpdatePayload<T extends model.JsonObject> = Partial<T> & {
+export type BulkCreatePayload<T extends PayloadData> = { data: Partial<T>[] };
+export type ModelBulkUpdatePayload<T extends PayloadData> = Partial<T> & {
   readonly id: number;
 };
-export type BulkUpdatePayload<T extends model.JsonObject> = { data: ModelBulkUpdatePayload<T>[] };
+export type BulkUpdatePayload<T extends PayloadData> = { data: ModelBulkUpdatePayload<T>[] };
 export type BulkDeletePayload = { ids: number[] };
 
 export type CheckoutSessionPayload = {

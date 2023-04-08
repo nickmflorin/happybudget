@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 import { errors } from "application";
 
 import * as payload from "./payload";
@@ -52,61 +54,53 @@ export type ClientStaticRequestOptions<D extends ClientRequestData = ClientReque
   readonly credentials?: RequestCredentials;
 };
 
-/**
- * Options that are dynamically provided when a requesting method on the {@link HttpClient}  is
- * called, not including options that are native to the fetch's {@link Request} object.  These
- * options are used for context in the {@link HttpClient}  such that it can control the behavior of
- * the method return.
- *
- * The properties of this type affect how the requesting methods on the {@link HttpClient} will
- * return, and those configurations and the corresponding return form are detailed as follows:
- *
- * @property {boolean} strict
- *   Controls whether or not the requesting method on the {@link HttpClient} should throw errors
- *   that occur during the request, or include them as a part of the requesting method's return.
- *
- * @property {boolean} json
- *   Controls whether or not the requesting method on the {@link HttpClient} should return responses
- *   from successful HTTP requests as a JSON response body or the raw {@link Response} object.
- */
-export type ClientRequestOptions<D extends ClientRequestData = ClientRequestData> =
-  ClientStaticRequestOptions<D> & {
-    readonly onProgress?: (current: number, total: number) => void;
-  };
+export type ClientRequestOptions<
+  S extends response.ApiResponseBody | null = response.ApiResponseBody,
+  D extends ClientRequestData = ClientRequestData,
+> = ClientStaticRequestOptions<D> & {
+  readonly onProgress?: (current: number, total: number) => void;
+  readonly schema?: z.ZodType<S>;
+};
 
 export type ClientStrictResponse<
-  S extends response.ApiResponseBody | null,
+  S extends response.ApiResponseBody | null = response.ApiResponseBody,
   D extends ClientRequestData = ClientRequestData,
-> = WithClientMeta<S, D>;
+> = WithClientMeta<{ response: S }, D>;
 
 export type ClientResponse<
-  S extends response.ApiResponseBody | null,
+  S extends response.ApiResponseBody | null = response.ApiResponseBody,
   D extends ClientRequestData = ClientRequestData,
 > = ClientSuccessResponse<S, D> | ClientFailedResponse<D>;
 
 export type ClientVariableResponse<
-  S extends response.ApiResponseBody | null,
+  S extends response.ApiResponseBody | null = response.ApiResponseBody,
   D extends ClientRequestData = ClientRequestData,
   STRICT extends boolean = false,
 > = STRICT extends true ? ClientStrictResponse<S, D> : ClientResponse<S, D>;
 
-export type ServiceOptions<D extends ClientRequestData = ClientRequestData> = {
+export type ServiceOptions<
+  S extends response.ApiResponseBody | null = response.ApiResponseBody,
+  D extends ClientRequestData = ClientRequestData,
+> = {
   readonly query?: D["query"] | undefined;
+  readonly schema?: z.ZodType<S>;
 };
 
 export type Service<
-  S extends response.ApiResponseBody | null,
+  S extends response.ApiResponseBody | null = response.ApiResponseBody,
   D extends ClientRequestData = ClientRequestData,
-> = (options?: ClientRequestOptions<D>) => Promise<ClientResponse<S, D>>;
+  SCH extends response.ApiResponseBody | null = S,
+> = (options?: ClientRequestOptions<SCH, D>) => Promise<ClientResponse<S, D>>;
 
 export type ParameterizedService<
   M extends HttpMethod,
   U extends urls.RequestPath<string, M> | Record<string, urls.UrlPathParam>,
-  S extends response.ApiResponseBody | null,
+  S extends response.ApiResponseBody | null = response.ApiResponseBody,
   D extends ClientRequestData = ClientRequestData,
+  SCH extends response.ApiResponseBody | null = S,
 > = (
   params: U extends urls.RequestPath<string, M>
     ? urls.UrlPathParamsObj<U>
     : Record<string, urls.UrlPathParam>,
-  options?: ClientRequestOptions<D>,
+  options?: ClientRequestOptions<SCH, D>,
 ) => Promise<ClientResponse<S, D>>;

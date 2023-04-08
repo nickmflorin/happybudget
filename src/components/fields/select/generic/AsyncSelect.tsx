@@ -15,7 +15,7 @@ import { useSelectRef } from "./Select";
 export type AsyncSelectProps<
   O extends SelectOption,
   M extends boolean = false,
-  RSP extends Http.ListResponse<unknown> = Http.ListResponse<unknown>,
+  RSP extends Http.ApiListResponse<unknown> = Http.ApiListResponse<unknown>,
   G extends SelectGroupBase<O> = SelectGroupBase<O>,
 > = Omit<
   AsyncProps<O, M, G>,
@@ -38,7 +38,7 @@ export type AsyncSelectProps<
 const AsyncSelect = <
   O extends SelectOption,
   M extends boolean = false,
-  RSP extends Http.ListResponse<unknown> = Http.ListResponse<unknown>,
+  RSP extends Http.ApiListResponse<unknown> = Http.ApiListResponse<unknown>,
   G extends SelectGroupBase<O> = SelectGroupBase<O>,
 >({
   borderless,

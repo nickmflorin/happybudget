@@ -1,6 +1,6 @@
+import * as api from "api";
 import { CancelToken } from "axios";
 
-import * as api from "api";
 import { http } from "lib";
 
 import { useModel, ModelHookOptions } from "../hooks";
@@ -18,7 +18,7 @@ export const useGroup = (
   useModel(id, { ...options, request: api.getGroup });
 
 export const useGroupColors = (
-  options?: Omit<http.ApiHookOptions<Http.ListResponse<string>>, "request">,
+  options?: Omit<http.ApiHookOptions<Http.ApiListResponse<string>>, "request">,
 ): [string[], boolean, Error | null] => {
   const [response, error, loading] = http.useApiHook({
     ...options,
@@ -28,7 +28,7 @@ export const useGroupColors = (
 };
 
 export const useFringeColors = (
-  options?: Omit<http.ApiHookOptions<Http.ListResponse<string>>, "request">,
+  options?: Omit<http.ApiHookOptions<Http.ApiListResponse<string>>, "request">,
 ): [string[], boolean, Error | null] => {
   const [response, error, loading] = http.useApiHook({
     ...options,

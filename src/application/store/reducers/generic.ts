@@ -1,20 +1,20 @@
-import { filter, includes, reduce, uniq } from "lodash";
+import { notifications, model } from "lib";
 
-import { notifications } from "lib";
+import * as types from "../types";
 
 export const identityReducer =
-  <S, C extends Redux.ActionContext = Redux.ActionContext>(initialState: S): Redux.Reducer<S, C> =>
+  <S, A extends types.Action = types.Action>(initialState: S): types.Reducer<S, A> =>
   (st: S = initialState) =>
     st;
 
 export const identityReducerWithDefinedState = <S>(st: S) => st;
 
-export const modelListActionReducer = <M extends Model.Model = Model.Model>(
-  st: Redux.ModelListActionStore<M> = { current: [], completed: [], failed: [] },
-  action: Redux.ModelListActionAction<M>,
-): Redux.ModelListActionStore<M> => {
+export const modelListActionReducer = <M extends model.Model = model.Model>(
+  st: types.ModelListActionStore<M> = { current: [], completed: [], failed: [] },
+  action: types.ModelListActionAction<M>,
+): types.ModelListActionStore<M> => {
   if (action.value === true) {
-    if (!includes(st.current, action.id)) {
+    if (!st.current.includes(action.id)) {
       return { ...st, current: [...st.current, action.id] };
     }
     notifications.internal.inconsistentStateError({
@@ -23,10 +23,10 @@ export const modelListActionReducer = <M extends Model.Model = Model.Model>(
     });
     return st;
   } else {
-    if (includes(st.current, action.id)) {
+    if (st.current.includes(action.id)) {
       return {
         ...st,
-        current: filter(st.current, (id: M["id"]) => id !== action.id),
+        current: st.current.filter((id: M["id"]) => id !== action.id),
         failed: action.success === false ? [...st.failed, action.id] : st.failed,
         completed: action.success !== false ? [...st.completed, action.id] : st.completed,
       };
@@ -39,114 +39,11 @@ export const modelListActionReducer = <M extends Model.Model = Model.Model>(
   }
 };
 
-export type SelectAction<M extends Model.Model> = Redux.BasicAction<
-  SingleOrArray<M["id"]>,
-  "SELECT"
->;
-export type DeselectAction<M extends Model.Model> = Redux.BasicAction<
-  SingleOrArray<M["id"]>,
-  "DESELECT"
->;
-export type ToggleAction<M extends Model.Model> = Redux.BasicAction<
-  SingleOrArray<M["id"]>,
-  "TOGGLE"
->;
-export type SelectionAction<M extends Model.Model> =
-  | SelectAction<M>
-  | DeselectAction<M>
-  | ToggleAction<M>;
-
-export type SelectionState<M extends Model.Model> = M["id"][];
-
-export type SelectionHandlers<M extends Model.Model> = {
-  readonly select: (s: SelectionState<M>, id: SingleOrArray<M["id"]>) => SelectionState<M>;
-  readonly deselect: (s: SelectionState<M>, id: SingleOrArray<M["id"]>) => SelectionState<M>;
-  readonly toggle: (s: SelectionState<M>, id: SingleOrArray<M["id"]>) => SelectionState<M>;
-};
-
-export const createSelectionHandlers = <M extends Model.Model>(
-  mode: ModelSelectionMode,
-): SelectionHandlers<M> => {
-  type S = SelectionState<M>;
-
-  const select = (s: S, id: SingleOrArray<M["id"]>): S => {
-    if (Array.isArray(id)) {
-      return reduce(id, (prev: S, i: M["id"]) => select(prev, i), s);
-    } else if (includes(s, id)) {
-      console.warn(`Model ${id} is already in the selected state.`);
-      return s;
-    } else if (mode === "multiple") {
-      return [...s, id];
-    } else {
-      return [id];
-    }
-  };
-
-  const deselect = (s: S, id: SingleOrArray<M["id"]>): S => {
-    if (Array.isArray(id)) {
-      return reduce(id, (prev: S, i: M["id"]) => deselect(prev, i), s);
-    } else if (!includes(s, id)) {
-      console.warn(`Model ${id} is not in the selected state.`);
-      return s;
-    } else if (mode === "multiple") {
-      return filter(s, (i: M["id"]) => i !== id);
-    } else {
-      return [];
-    }
-  };
-
-  const toggle = (s: S, id: SingleOrArray<M["id"]>): S => {
-    if (Array.isArray(id)) {
-      return reduce(id, (prev: S, i: M["id"]) => toggle(prev, i), s);
-    } else if (!includes(s, id)) {
-      return select(s, id);
-    } else {
-      return deselect(s, id);
-    }
-  };
-
-  return { select, deselect, toggle };
-};
-
-export const createSelectionReducer = <M extends Model.Model>(
-  mode: ModelSelectionMode,
-  initialState: SelectionState<M>,
-): Redux.BasicReducer<M["id"][], SelectionAction<M>> => {
-  const handlers = createSelectionHandlers<M>(mode);
-  return (state: M["id"][] = initialState, action: SelectionAction<M>) => {
-    const ids = uniq(Array.isArray(action.payload) ? action.payload : [action.payload]);
-    if (action.type === "SELECT") {
-      return handlers.select(state, ids);
-    } else if (action.type === "DESELECT") {
-      return handlers.deselect(state, ids);
-    } else if (action.type === "TOGGLE") {
-      return handlers.toggle(state, ids);
-    }
-    return state;
-  };
-};
-
-export const withActionsOnly = <
-  S,
-  C extends Redux.ActionContext = Redux.ActionContext,
-  A extends Redux.AnyPayloadAction<C> = Redux.AnyPayloadAction<C>,
->(
-  reducer: Redux.Reducer<S, C, A>,
-  initialState: S,
-  actions: (Redux.AnyPayloadActionCreator<C> | string)[],
-): Redux.Reducer<S, C, A> => {
-  const actionNames = reduce(
-    actions,
-    (curr: string[], a: Redux.AnyPayloadActionCreator<C> | string) =>
-      typeof a === "string" ? [...curr, a] : [...curr, a.toString()],
-    [],
-  );
-  /*
-	We have to force coerce to R since the form of the reducer may differ based
-  on the optional s? parameter and included initialState initializer:
-	(1) (s: S | undefined = initialState, a: A) => S
-	(2) (s: S, a: A) => S
-	*/
-  return (s: S | undefined = initialState, a: A): S =>
-    !includes(actionNames, a.type) ? s : reducer(s, a);
-};
+export const withActionsOnly =
+  <S, A extends types.BasicAction = types.BasicAction>(
+    reducer: types.BasicReducer<S, A>,
+    initialState: S,
+    actions: A["type"][],
+  ): types.BasicReducer<S, A> =>
+  (s: S | undefined = initialState, a: A): S =>
+    !actions.includes(a.type) ? s : reducer(s, a);

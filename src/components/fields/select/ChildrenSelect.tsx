@@ -1,8 +1,8 @@
 import React from "react";
 
+import * as api from "api";
 import { map } from "lodash";
 
-import * as api from "api";
 import { http, ui } from "lib";
 
 import { options, multivalue, MultiModelAsyncSelect, MultiModelAsyncSelectProps } from "./generic";
@@ -28,7 +28,7 @@ const ChildrenSelect = <M extends Model.SimpleAccount | Model.SimpleSubAccount>(
       isSearchable={false}
       components={{ Option: options.EntityTextOption, MultiValue: multivalue.EntityTextMultiValue }}
       noOptionsMessage={() => "No accounts found."}
-      processResponse={(rsp: Http.ListResponse<M>) =>
+      processResponse={(rsp: Http.ApiListResponse<M>) =>
         map(rsp.data, (d: M) => ui.select.toModelSelectOption(d))
       }
       loadOptions={() =>

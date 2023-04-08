@@ -1,14 +1,14 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 
+import * as api from "api";
 import classNames from "classnames";
 import { isNil, map, filter } from "lodash";
 
-import * as api from "api";
+import * as store from "application/store";
 import { ui, tabling, pdf, util, http } from "lib";
 import { ExportActualsPdfForm } from "components/forms";
 import { PreviewModal } from "components/modals";
 import { ActualsTable } from "components/tabling";
-import * as store from "application/store";
 
 import ActualsPdf from "./ActualsPdf";
 
@@ -87,7 +87,7 @@ const ActualsPreviewModal = ({
     if (props.open === true) {
       api
         .getActuals(budgetId, {}, { cancelToken: getToken() })
-        .then((response: Http.ListResponse<M>) => {
+        .then((response: Http.ApiListResponse<M>) => {
           setActuals(response.data);
           /* Since @react-pdf blocks the entire UI thread (which is ridiculous),
 						 this is usually not desirable as rendering large PDF's once the

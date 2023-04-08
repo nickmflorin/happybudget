@@ -1,5 +1,6 @@
-import { find, isNil } from "lodash";
+import { find } from "lodash";
 
+import { store } from "application";
 import { logger } from "internal";
 import { model, notifications } from "lib";
 
@@ -166,8 +167,8 @@ export const getModel = <M extends types.Model>(
 ): M | null => {
   const predicate = typeof id === "function" ? id : (m: M) => m.id === id;
   const model: M | undefined = find(ms, predicate);
-  if (isNil(model)) {
-    if (!isNil(options?.onMissing) && options?.warnOnMissing !== false) {
+  if (model === undefined) {
+    if (options?.onMissing !== undefined && options?.warnOnMissing !== false) {
       options?.onMissing({
         ref: reference.modelStringReference(ms, options),
         lookup: id,
@@ -192,10 +193,10 @@ export const getModels = <M extends types.Model>(
 ): M[] =>
   ids
     .map((id: ModelLookup<M>) => getModel(ms, id, options))
-    .filter((m: M | null) => !isNil(m)) as M[];
+    .filter((m: M | null) => m !== undefined) as M[];
 
 export type GetReduxModelOptions<M extends types.Model> = Omit<GetModelOptions<M>, "onMissing"> & {
-  readonly action?: Redux.Action;
+  readonly action?: store.Action;
   readonly warningData?: Record<string, unknown>;
 };
 

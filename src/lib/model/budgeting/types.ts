@@ -14,6 +14,7 @@ export const CollaboratorAccessTypeNames = enumeratedLiterals([
   "Editor",
 ] as const);
 export type CollaboratorAccessTypeName = EnumeratedLiteralType<typeof CollaboratorAccessTypeNames>;
+
 export const CollaboratorAccessTypeSlugs = enumeratedLiterals([
   "view_only",
   "owner",
@@ -22,26 +23,26 @@ export const CollaboratorAccessTypeSlugs = enumeratedLiterals([
 export type CollaboratorAccessTypeSlug = EnumeratedLiteralType<typeof CollaboratorAccessTypeSlugs>;
 
 export type CollaboratorAccessType =
-  | choice.IChoice<0, "View Only", "view_only">
-  | choice.IChoice<1, "Editor", "editor">
-  | choice.IChoice<2, "Owner", "owner">;
+  | choice.Choice<0, "View Only", "view_only">
+  | choice.Choice<1, "Editor", "editor">
+  | choice.Choice<2, "Owner", "owner">;
 
-export const CollaboratorAccessTypes = choice.Choices([
-  choice.Choice(0, CollaboratorAccessTypeNames.VIEW_ONLY, CollaboratorAccessTypeSlugs.VIEW_ONLY),
-  choice.Choice(1, CollaboratorAccessTypeNames.EDITOR, CollaboratorAccessTypeSlugs.EDITOR),
-  choice.Choice(2, CollaboratorAccessTypeNames.OWNER, CollaboratorAccessTypeSlugs.OWNER),
-]);
+export const CollaboratorAccessTypes = choice.choices([
+  choice.choice(0, CollaboratorAccessTypeNames.VIEW_ONLY, CollaboratorAccessTypeSlugs.VIEW_ONLY),
+  choice.choice(1, CollaboratorAccessTypeNames.EDITOR, CollaboratorAccessTypeSlugs.EDITOR),
+  choice.choice(2, CollaboratorAccessTypeNames.OWNER, CollaboratorAccessTypeSlugs.OWNER),
+] as const);
 
 export const ActualImportSourceNames = enumeratedLiterals(["Bank Account"] as const);
 export type ActualImportSourceName = EnumeratedLiteralType<typeof ActualImportSourceNames>;
 export const ActualImportSourceSlugs = enumeratedLiterals(["bank_account"] as const);
 export type ActualImportSourceSlug = EnumeratedLiteralType<typeof ActualImportSourceSlugs>;
 
-export type ActualImportSource = choice.IChoice<0, "Bank Account", "bank_account">;
+export type ActualImportSource = choice.Choice<0, "Bank Account", "bank_account">;
 
-export const ActualImportSources = choice.Choices([
-  choice.Choice(0, ActualImportSourceNames.BANK_ACCOUNT, ActualImportSourceSlugs.BANK_ACCOUNT),
-]);
+export const ActualImportSources = choice.choices([
+  choice.choice(0, ActualImportSourceNames.BANK_ACCOUNT, ActualImportSourceSlugs.BANK_ACCOUNT),
+] as const);
 
 export const ParentTypes = enumeratedLiterals(["account", "subaccount", "budget"] as const);
 
@@ -71,33 +72,17 @@ export type ParentModel<
 export const BudgetDomains = enumeratedLiterals(["budget", "template"] as const);
 export type BudgetDomain = EnumeratedLiteralType<typeof BudgetDomains>;
 
-export const MarkupUnitNames = enumeratedLiterals(["percent", "flat"] as const);
-export type MarkupUnitName = EnumeratedLiteralType<typeof MarkupUnitNames>;
-export const MarkupUnitSlugs = enumeratedLiterals(["percent", "flat"] as const);
-export type MarkupUnitSlug = EnumeratedLiteralType<typeof MarkupUnitSlugs>;
-
-export type MarkupUnit =
-  | choice.IChoice<0, "Percent", "percent">
-  | choice.IChoice<1, "Flat", "flat">;
-
-export const MarkupUnits = choice.Choices([
-  choice.Choice(0, MarkupUnitNames.PERCENT, MarkupUnitSlugs.PERCENT),
-  choice.Choice(1, MarkupUnitNames.FLAT, MarkupUnitSlugs.FLAT),
-]);
-
 export const FringeUnitNames = enumeratedLiterals(["percent", "flat"] as const);
 export type FringeUnitName = EnumeratedLiteralType<typeof FringeUnitNames>;
 export const FringeUnitSlugs = enumeratedLiterals(["percent", "flat"] as const);
 export type FringeUnitSlug = EnumeratedLiteralType<typeof FringeUnitSlugs>;
 
-export type FringeUnit =
-  | choice.IChoice<0, "Percent", "percent">
-  | choice.IChoice<1, "Flat", "flat">;
+export type FringeUnit = choice.Choice<0, "Percent", "percent"> | choice.Choice<1, "Flat", "flat">;
 
-export const FringeUnits = choice.Choices([
-  choice.Choice(0, FringeUnitNames.PERCENT, FringeUnitSlugs.PERCENT),
-  choice.Choice(1, FringeUnitNames.FLAT, FringeUnitSlugs.FLAT),
-]);
+export const FringeUnits = choice.choices([
+  choice.choice(0, FringeUnitNames.PERCENT, FringeUnitSlugs.PERCENT),
+  choice.choice(1, FringeUnitNames.FLAT, FringeUnitSlugs.FLAT),
+] as const);
 
 export type Fringe = types.RowTypedApiModel<
   "fringe",
@@ -110,6 +95,19 @@ export type Fringe = types.RowTypedApiModel<
     readonly unit: FringeUnit | null;
   }
 >;
+
+export const MarkupUnitNames = enumeratedLiterals(["Percent", "Flat"] as const);
+export type MarkupUnitName = EnumeratedLiteralType<typeof MarkupUnitNames>;
+
+export const MarkupUnitSlugs = enumeratedLiterals(["percent", "flat"] as const);
+export type MarkupUnitSlug = EnumeratedLiteralType<typeof MarkupUnitSlugs>;
+
+export type MarkupUnit = choice.Choice<0, "Percent", "percent"> | choice.Choice<1, "Flat", "flat">;
+
+export const MarkupUnits = choice.choices([
+  choice.choice(0, MarkupUnitNames.PERCENT, MarkupUnitSlugs.PERCENT),
+  choice.choice(1, MarkupUnitNames.FLAT, MarkupUnitSlugs.FLAT),
+] as const);
 
 export type SimpleMarkup = types.TypedApiModel<
   "markup",
@@ -125,13 +123,13 @@ export type UnknownMarkup = SimpleMarkup & {
 };
 
 export type FlatMarkup = Omit<UnknownMarkup, "unit"> & {
-  readonly unit: choice.IChoice<1, "Flat", "flat">;
+  readonly unit: choice.Choice<1, "Flat", "flat">;
   readonly actual: number;
 };
 
 export type PercentMarkup = Omit<UnknownMarkup, "unit"> & {
   readonly children: number[];
-  readonly unit: choice.IChoice<0, "Percent", "percent">;
+  readonly unit: choice.Choice<0, "Percent", "percent">;
   readonly actual: number;
 };
 
@@ -228,28 +226,22 @@ export type LineMetrics = {
   readonly accumulated_markup_contribution: number;
 };
 
-export type SimpleAccount = Omit<
-  types.RowTypedApiModel<
-    "account",
-    {
-      readonly identifier: string | null;
-      readonly description: string | null;
-      readonly domain: BudgetDomain;
-    }
-  >,
-  "order"
+export type SimpleAccount = types.TypedApiModel<
+  "account",
+  {
+    readonly identifier: string | null;
+    readonly description: string | null;
+    readonly domain: BudgetDomain;
+  }
 >;
 
-export type SimpleSubAccount = Omit<
-  types.RowTypedApiModel<
-    "subaccount",
-    {
-      readonly identifier: string | null;
-      readonly description: string | null;
-      readonly domain: BudgetDomain;
-    }
-  >,
-  "order"
+export type SimpleSubAccount = types.TypedApiModel<
+"subaccount",
+{
+  readonly identifier: string | null;
+  readonly description: string | null;
+  readonly domain: BudgetDomain;
+}
 >;
 
 export type Account = LineMetrics &
@@ -271,13 +263,15 @@ export interface PdfAccount extends types.RowTypedApiModel<"pdf-account", LineMe
   readonly children_markups: Markup[];
 }
 
+export type SubAccountUnit = tagging.Tag<typeof types.ApiModelTagTypes.SUBACCOUNT_UNIT>;
+
 export type SubAccountMixin = LineMetrics & {
   readonly order: string;
   readonly fringe_contribution: number;
   readonly quantity: number | null;
   readonly rate: number | null;
   readonly multiplier: number | null;
-  readonly unit: tagging.Tag | null;
+  readonly unit: SubAccountUnit | null;
   // Only applicable for non-Template cases.
   readonly contact?: number | null;
 };
@@ -328,7 +322,9 @@ export type TaggedActual = types.TypedApiModel<
   }
 >;
 
-export type Actual = types.TypedApiModel<
+export type ActualType = tagging.Tag<typeof types.ApiModelTagTypes.ACTUAL_TYPE>;
+
+export type Actual = types.RowTypedApiModel<
   "actual",
   {
     readonly contact: number | null;
@@ -338,7 +334,7 @@ export type Actual = types.TypedApiModel<
     readonly date: string | null;
     readonly payment_id: string | null;
     readonly value: number | null;
-    readonly actual_type: tagging.Tag | null;
+    readonly actual_type: ActualType | null;
     readonly attachments: attachment.SimpleAttachment[];
     readonly owner: ActualOwner | null;
   }

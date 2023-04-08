@@ -139,7 +139,7 @@ export const withMultiModelSelect = <
 };
 
 export type ModelAsyncSelectInjectedProps<M extends Model.Model> = {
-  readonly processResponse: (response: Http.ListResponse<M>) => ModelSelectOption<M>[];
+  readonly processResponse: (response: Http.ApiListResponse<M>) => ModelSelectOption<M>[];
 };
 
 export const withModelAsyncSelect = <
@@ -154,7 +154,7 @@ export const withModelAsyncSelect = <
     <Component
       defaultOptions={true}
       {...(props as T)}
-      processResponse={(rsp: Http.ListResponse<M>) =>
+      processResponse={(rsp: Http.ApiListResponse<M>) =>
         map(rsp.data, (d: M) => ui.select.toModelSelectOption(d))
       }
     />
@@ -212,12 +212,12 @@ export const withMultiModelSyncSelect = <
 export type MultiModelAsyncSelectInjectedProps<M extends Model.Model> =
   ModelAsyncSelectInjectedProps<M> & {
     readonly value: MultiValue<ModelSelectOption<M>> | undefined;
-    readonly onResponse: (response: Http.ListResponse<M>) => void;
+    readonly onResponse: (response: Http.ApiListResponse<M>) => void;
   };
 
 export type WithMultiModelAsyncSelectProps<M extends Model.Model> = {
   readonly value?: M["id"][];
-  readonly onResponse?: (response: Http.ListResponse<M>) => void;
+  readonly onResponse?: (response: Http.ApiListResponse<M>) => void;
 };
 
 export const withMultiModelAsyncSelect = <
@@ -242,7 +242,7 @@ export const withMultiModelAsyncSelect = <
         defaultOptions={true}
         {...(props as T)}
         value={value}
-        onResponse={(rsp: Http.ListResponse<M>) => {
+        onResponse={(rsp: Http.ApiListResponse<M>) => {
           onResponse(rsp);
           props.onResponse?.(rsp);
         }}
@@ -255,12 +255,12 @@ export const withMultiModelAsyncSelect = <
 export type SingleModelAsyncSelectInjectedProps<M extends Model.Model> =
   ModelAsyncSelectInjectedProps<M> & {
     readonly value: SingleValue<ModelSelectOption<M>>;
-    readonly onResponse: (response: Http.ListResponse<M>) => void;
+    readonly onResponse: (response: Http.ApiListResponse<M>) => void;
   };
 
 export type WithSingleModelAsyncSelectProps<M extends Model.Model> = {
   readonly value?: M["id"] | null;
-  readonly onResponse?: (response: Http.ListResponse<M>) => void;
+  readonly onResponse?: (response: Http.ApiListResponse<M>) => void;
 };
 
 export const withSingleModelAsyncSelect = <
@@ -285,7 +285,7 @@ export const withSingleModelAsyncSelect = <
         defaultOptions={true}
         {...(props as T)}
         value={value}
-        onResponse={(rsp: Http.ListResponse<M>) => {
+        onResponse={(rsp: Http.ApiListResponse<M>) => {
           onResponse(rsp);
           props.onResponse?.(rsp);
         }}

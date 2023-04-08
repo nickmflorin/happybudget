@@ -30,7 +30,6 @@
     "tsc:watch": "tsc -w"
   },
   "dependencies": {
-    "ag-grid-community": "~29.1.0",
     "@ag-grid-community/react": "~29.1.0",
     "@ag-grid-enterprise/clipboard": "~29.1.0",
     "@ag-grid-enterprise/menu": "~29.1.0",
@@ -101,6 +100,7 @@
     "sass": "^1.59.2",
     "semver": "^7.3.8",
     "swr": "^2.1.0",
+    "tozod": "^3.0.0",
     "ulid": "^2.3.0",
     "universal-cookie": "^4.0.4",
     "url-join": "^5.0.0",
@@ -150,6 +150,7 @@
     "prettier": "2.7.1",
     "react-syntax-highlighter": "^15.5.0",
     "react-test-renderer": "^18.2.0",
+    "redux-devtools-extension": "^2.13.9",
     "sass-true": "^7.0.0",
     "stylelint": "^14.16.0",
     "stylelint-config-prettier": "^9.0.4",

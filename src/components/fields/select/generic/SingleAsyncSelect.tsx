@@ -4,13 +4,13 @@ import AsyncSelect, { AsyncSelectProps } from "./AsyncSelect";
 
 export type SingleAsyncSelectProps<
   O extends SelectOption,
-  RSP extends Http.ListResponse<unknown> = Http.ListResponse<unknown>,
+  RSP extends Http.ApiListResponse<unknown> = Http.ApiListResponse<unknown>,
   G extends SelectGroupBase<O> = SelectGroupBase<O>,
 > = Omit<AsyncSelectProps<O, false, RSP, G>, "isMulti">;
 
 const SingleAsyncSelect = <
   O extends SelectOption,
-  RSP extends Http.ListResponse<unknown> = Http.ListResponse<unknown>,
+  RSP extends Http.ApiListResponse<unknown> = Http.ApiListResponse<unknown>,
   G extends SelectGroupBase<O> = SelectGroupBase<O>,
 >(
   props: SingleAsyncSelectProps<O, RSP, G>,

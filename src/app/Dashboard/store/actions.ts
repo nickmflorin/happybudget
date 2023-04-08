@@ -13,7 +13,7 @@ export const loadingBudgetsAction = redux.actions.createAction<boolean>(
   "dashboard.budgets.Loading",
 );
 export const responsePermissionedBudgetsAction = redux.actions.createAction<
-  Http.ListResponse<Model.SimpleBudget>
+  Http.ApiListResponse<Model.SimpleBudget>
 >("dashboard.budgets.ResponsePermissioned");
 export const responseBudgetsAction = redux.actions.createAction<
   Http.RenderedListResponse<Model.SimpleBudget>
@@ -47,7 +47,7 @@ export const loadingArchiveAction = redux.actions.createAction<boolean>(
   "dashboard.archive.Loading",
 );
 export const responsePermissionedArchiveAction = redux.actions.createAction<
-  Http.ListResponse<Model.SimpleBudget>
+  Http.ApiListResponse<Model.SimpleBudget>
 >("dashboard.archive.ResponsePermissioned");
 export const responseArchiveAction = redux.actions.createAction<
   Http.RenderedListResponse<Model.SimpleBudget>

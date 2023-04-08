@@ -4,7 +4,6 @@ import { ColSpanParams as RootColSpanParams, ColDef } from "ag-grid-community";
 import * as model from "../../model";
 import { enumeratedLiterals, EnumeratedLiteralType } from "../../util";
 import * as events from "../events";
-import * as redux from "../redux";
 import * as rows from "../rows";
 import * as types from "../types";
 
@@ -39,11 +38,10 @@ export interface ColumnDataType {
   readonly headerOverrides?: Omit<Partial<ColumnDataType>, "id" | "icon" | "pdfOverrides">;
 }
 
-export type ColumnFieldName<R extends rows.Row = rows.Row> = Exclude<keyof rows.RowData<R>, "id"> &
-  string;
+export type ColumnFieldName<R extends rows.Row = rows.Row> = keyof rows.RowData<R> & string;
 
 export type ColSpanParams<
-  R extends rows.Row = rows.Row<rows.BodyRowType>,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = RootColSpanParams<R> & {
   readonly columns: RealColumn<R, M>[];
@@ -97,7 +95,7 @@ export type HiddenColumns = { [key: string]: boolean };
    }; */
 
 export type ColumnCallbackParams<R extends rows.Row = rows.Row> = {
-  readonly row: rows.Row<rows.BodyRowType, rows.RowData<R>>;
+  readonly row: rows.RowSubType<R, rows.BodyRowType>;
 };
 
 export type BaseColumn<
@@ -115,12 +113,12 @@ export type RealColumnMixin<
 > = {
   readonly index?: number;
   readonly cellRenderer?: string | Partial<types.GridSet<string>>;
-  readonly cellClass?: types.CellClassName<rows.Row<R, rows.BodyRowType>, N, T>;
+  readonly cellClass?: types.CellClassName<rows.RowSubType<R, rows.BodyRowType>, N, T>;
   readonly footer?: FooterColumn<R, M>;
   readonly colSpan?: (params: ColSpanParams<R, M>) => number;
   readonly onCellFocus?: (params: types.CellFocusedParams<R, M>) => void;
   readonly onCellUnfocus?: (params: types.CellFocusedParams<R, M>) => void;
-  readonly onCellDoubleClicked?: (row: rows.Row<"model", rows.RowData<R>>) => void;
+  readonly onCellDoubleClicked?: (row: rows.RowSubType<R, "model">) => void;
 };
 
 export type ModelColumnMixin<
@@ -191,7 +189,7 @@ export type DataColumnMixin<
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends ColumnFieldName<R> = ColumnFieldName<R>,
   T = types.CellValue<R, N>,
-> = {
+> = ModelColumnMixin<R, M, N, T> & {
   // This field will be used to pull data from the Markup model if applicable.
   readonly markupField?: keyof model.Markup;
   // This field will be used to pull data from the Group model if applicable.
@@ -210,10 +208,10 @@ export type DataColumnMixin<
   readonly isApplicableForModel?: ModelColumnMixin<R, M, N, T>["isApplicableForModel"];
   readonly isApplicableForRowType?: ModelColumnMixin<R, M, N, T>["isApplicableForRowType"];
   readonly valueGetter?: (
-    row: rows.Row<rows.BodyRowType, rows.RowData<R>>,
-    rows: rows.Row<rows.BodyRowType, rows.RowData<R>>[],
+    row: rows.RowSubType<R, rows.BodyRowType>,
+    rows: rows.RowSubType<R, rows.BodyRowType>[],
   ) => T;
-  readonly getHttpValue?: (value: T) => model.JsonValue;
+  readonly getHttpValue?: (value: T) => JsonValue;
   readonly processCellForCSV?: (row: R) => string | number;
   readonly processCellForClipboard?: (row: R) => string | number;
   // PDF Column Properties
@@ -227,10 +225,10 @@ export type DataColumnMixin<
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   readonly pdfFormatter?: NativeFormatter<any>;
   readonly pdfValueGetter?: (
-    r: rows.Row<R, rows.BodyRowType>,
-    rows: rows.Row<R, rows.BodyRowType>[],
+    r: rows.RowSubType<R, rows.BodyRowType>,
+    rows: rows.RowSubType<R, rows.BodyRowType>[],
   ) => T;
-  readonly pdfFooterValueGetter?: T | ((rows: rows.Row<R, rows.BodyRowType>[]) => T);
+  readonly pdfFooterValueGetter?: T | ((rows: rows.RowSubType<R, rows.BodyRowType>[]) => T);
   /* NOTE: This only applies for the individual Account tables, not the the overall Accounts */
   readonly pdfChildFooter?: (s: M) => PdfFooterColumn<R, N, T>;
 };
@@ -261,10 +259,10 @@ export type BodyColumn<
     readonly parseIntoFields?: (value: T) => ParsedColumnField<R, N, T>[];
     readonly onDataChange?: (
       id: rows.RowId<"model">,
-      event: events.CellChange<rows.Row<R, "model">, ColumnFieldName<rows.Row<R, "model">>>,
+      event: events.CellChange<rows.RowSubType<R, "model">, ColumnFieldName<R>>,
     ) => void;
     readonly refreshColumns?: (
-      change: events.CellChange<rows.Row<R, "model">, ColumnFieldName<rows.Row<R, "model">>>,
+      change: events.CellChange<rows.RowSubType<R, "model">, ColumnFieldName<R>>,
     ) => string[];
   };
 
@@ -313,7 +311,7 @@ export interface FooterColumn<
   N extends ColumnFieldName<R> = ColumnFieldName<R>,
   T = types.CellValue<R, N>,
 > extends Pick<DataColumn<R, M, N, T>, "colSpan"> {
-  readonly cellStyle?: types.CellStyle<rows.Row<R, rows.BodyRowType>, N, T>;
+  readonly cellStyle?: types.CellStyle<rows.RowSubType<R, rows.BodyRowType>, N, T>;
 }
 
 export type ColumnVisibilityChange = {

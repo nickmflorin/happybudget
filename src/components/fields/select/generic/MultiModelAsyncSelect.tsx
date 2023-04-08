@@ -7,7 +7,7 @@ type BaseProps<
   M extends Model.Model,
   G extends SelectGroupBase<ModelSelectOption<M>> = SelectGroupBase<ModelSelectOption<M>>,
 > = Omit<
-  MultiAsyncSelectProps<ModelSelectOption<M>, Http.ListResponse<M>, G>,
+  MultiAsyncSelectProps<ModelSelectOption<M>, Http.ApiListResponse<M>, G>,
   "getOptionLabel" | "getOptionValue" | "onChange" | "options" | "value"
 >;
 

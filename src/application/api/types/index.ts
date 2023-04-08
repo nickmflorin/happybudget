@@ -5,9 +5,10 @@ import { ApiSuccessResponse } from "./response";
 
 export * from "./auth";
 export * from "./client";
-export * from "./response";
 export * from "./payload";
 export * from "./query";
+export * from "./response";
+export * from "./schemas";
 export * from "./urls";
 
 export const HttpMethods = enumeratedLiterals(["GET", "POST", "PATCH", "DELETE"] as const);
@@ -194,7 +195,7 @@ export type ApiErrorResponse<T extends ErrorIndicators = errors.ApiErrorType> =
  *
  * >>> ApiResponse
  *
- * Meaning: Either a successful response with a generic JSON body, { data: JsonObject }, or any
+ * Meaning: Either a successful response with a generic JSON body, { data: Json }, or any
  *          expected error response body.
  * Expanded:
  *   - ApiSuccessResponse | ApiErrorResponse

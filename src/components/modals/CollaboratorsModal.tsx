@@ -1,9 +1,9 @@
 import { useEffect, useState, useMemo } from "react";
 
+import * as api from "api";
 import classNames from "classnames";
 import { map, filter } from "lodash";
 
-import * as api from "api";
 import { ui, http, model, redux, util } from "lib";
 import { PrimaryButton } from "components/buttons";
 import { CollaboratorsList } from "components/collaboration";
@@ -36,7 +36,7 @@ const CollaboratorsModal = ({ budgetId, ...props }: CollaboratorsModalProps): JS
     modal.current.setLoading(true);
     api
       .getCollaborators(budgetId, {}, { cancelToken: cancelToken() })
-      .then((response: Http.ListResponse<Model.Collaborator>) => {
+      .then((response: Http.ApiListResponse<Model.Collaborator>) => {
         modal.current.setLoading(false);
         setCollaborators(response.data);
       })

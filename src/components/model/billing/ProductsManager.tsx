@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useMemo } from "react";
 
+import * as api from "api";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import * as api from "api";
+import * as store from "application/store";
 import { notifications, model, util } from "lib";
 import { Separator, RenderOrSpinner } from "components";
 import { PrimaryButton } from "components/buttons";
 import { Tag } from "components/tagging";
-import * as store from "application/store";
 
 import Product from "./Product";
 import ProductsList from "./ProductsList";
@@ -36,7 +36,7 @@ const ProductsManager = ({
     setLoading(true);
     api
       .getProducts()
-      .then((response: Http.ListResponse<Model.Product>) => setProducts(response.data))
+      .then((response: Http.ApiListResponse<Model.Product>) => setProducts(response.data))
       .catch((e: Error) => notifications.ui.banner.handleRequestError(e))
       .finally(() => setLoading(false));
   }, []);

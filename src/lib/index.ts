@@ -5,5 +5,6 @@ export * as model from "./model";
 export * as notifications from "./notifications";
 export * as pdf from "./pdf";
 export * as tabling from "./tabling";
+export * as schemas from "./schemas";
 export * as ui from "./ui";
 export * from "./util";

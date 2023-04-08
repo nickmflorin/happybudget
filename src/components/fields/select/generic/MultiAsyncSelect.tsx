@@ -3,13 +3,13 @@ import { MultiValue } from "./multivalue";
 
 export type MultiAsyncSelectProps<
   O extends SelectOption,
-  RSP extends Http.ListResponse<unknown> = Http.ListResponse<unknown>,
+  RSP extends Http.ApiListResponse<unknown> = Http.ApiListResponse<unknown>,
   G extends SelectGroupBase<O> = SelectGroupBase<O>,
 > = Omit<AsyncSelectProps<O, true, RSP, G>, "isMulti">;
 
 const MultiAsyncSelect = <
   O,
-  RSP extends Http.ListResponse<unknown> = Http.ListResponse<unknown>,
+  RSP extends Http.ApiListResponse<unknown> = Http.ApiListResponse<unknown>,
   G extends SelectGroupBase<O> = SelectGroupBase<O>,
 >(
   props: MultiAsyncSelectProps<O, RSP, G>,

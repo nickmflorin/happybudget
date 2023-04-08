@@ -1,10 +1,12 @@
 import * as arrays from "./arrays";
 import * as strings from "./strings";
 
+export type LiteralsAccessor<V extends string> = strings.SpacesToUnderscores<
+  strings.HyphensToUnderscores<Uppercase<V>>
+>;
+
 export type EnumeratedLiteralsConstants<V extends readonly VI[], VI extends string = string> = {
-  [key in keyof V & string as strings.SpacesToUnderscores<
-    strings.HyphensToUnderscores<Uppercase<V[key] & string>>
-  >]: V[key];
+  [key in keyof V & string as LiteralsAccessor<V[key] & string>]: V[key];
 };
 
 /**

@@ -1,74 +1,80 @@
-import * as api from "api";
-import { model, tabling } from "lib";
+import { model } from "lib";
 
-export type ActionPayloadMap = Record<string, ActionPayload>;
+import * as api from "../../api";
 
-export type ActionContext = {
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+export type ActionPayloadMap<P = any> = Record<string, P>;
+
+type _ActionContext = {
   readonly publicTokenId?: string;
   readonly errorMessage?: string;
 };
 
-export type WithActionContext<T> = T extends null ? ActionContext : T & ActionContext;
-
-export type ActionPayload =
-  | Record<string, unknown>
-  | string
-  | number
-  | null
-  | boolean
-  | ActionPayload[];
-
-export type InferAction<CREATOR> = CREATOR extends ActionCreator<infer P, infer C>
-  ? Action<P, C>
+export type ActionContext<T extends Action | undefined = undefined> = T extends Action<
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  any,
+  infer C extends _ActionContext
+>
+  ? C
+  : T extends undefined
+  ? _ActionContext
   : never;
 
-export type BasicAction<P extends ActionPayload = ActionPayload, T extends string = string> = {
-  readonly payload: P;
-  readonly type: T;
-};
+export type WithActionContext<T> = T extends null ? ActionContext : T & ActionContext;
+
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+export type BasicAction<P, T extends string = string> = P extends any
+  ? {
+      readonly payload: P;
+      readonly type: T;
+    }
+  : never;
 
 export type Action<
-  P extends ActionPayload = ActionPayload,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  P = any,
   C extends ActionContext = ActionContext,
   T extends string = string,
-> = BasicAction<P, T> & {
-  readonly context: C;
-  readonly label: string | null;
-  readonly user?: model.User | null;
-};
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+> = P extends any
+  ? {
+      readonly payload: P;
+      readonly context: C;
+      readonly user?: model.User | null;
+      readonly type: T;
+    }
+  : never;
 
-/* export type AnyPayloadAction<
-     C extends ActionContext = ActionContext,
-     T extends string = string,
-   > = Action<ActionPayload, C, T>; */
-
-export type ActionCreator<
-  P extends ActionPayload = ActionPayload,
+export type ActionFromPayloadMap<
+  M extends ActionPayloadMap,
   C extends ActionContext = ActionContext,
-> = {
-  readonly type: string;
-  readonly label: string | null;
-  readonly toString: () => string;
-  (p: P, ctx: Omit<C, "publicTokenId">): Action<P>;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+> = M[keyof M] extends any ? Action<M[keyof M], C> : never;
+
+type ActionCreatorFn<P, C extends ActionContext = ActionContext, T extends string = string> = {
+  <Pi extends P = P, Ci extends C = C>(p: Pi, ctx: Omit<Ci, "publicTokenId">): Action<Pi, Ci, T>;
 };
+
+export type ActionCreator<P, C extends ActionContext = ActionContext, T extends string = string> = {
+  readonly type: T;
+  readonly toString: () => T;
+} & ActionCreatorFn<P, C, T>;
+
+export type ActionTypeMap<S extends ActionPayloadMap> = { [key in keyof S & string]: string };
 
 export type ActionCreatorMap<
-  S extends ActionPayloadMap,
+  S extends ActionPayloadMap = ActionPayloadMap,
   C extends ActionContext = ActionContext,
+  MAP extends ActionTypeMap<S> = ActionTypeMap<S>,
 > = {
-  [K in keyof S]-?: ActionCreator<S[K], C>;
+  [K in keyof S & string]: ActionCreator<S[K], C, MAP[K]>;
 };
 
 export type RequestActionPayload = null | { force: true };
-export type TableRequestActionPayload = { ids: number[] } | RequestActionPayload;
 export type UpdateOrderingPayload<F extends string = string> = { field: F; order: api.Order };
 
 export type RequestAction<C extends ActionContext = ActionContext> = Action<
   RequestActionPayload,
-  C
->;
-export type TableRequestAction<C extends ActionContext = ActionContext> = Action<
-  TableRequestActionPayload,
   C
 >;
 
@@ -76,27 +82,18 @@ export type RequestActionCreator<C extends ActionContext = ActionContext> = Acti
   RequestActionPayload,
   C
 >;
-export type TableRequestActionCreator<C extends ActionContext = ActionContext> = ActionCreator<
-  TableRequestActionPayload,
-  C
->;
 
-/* export type AnyPayloadActionCreator<C extends ActionContext = ActionContext> = ActionCreator<
-     ActionPayload,
-     C
-   >; */
-
-export type ModelListActionPayloadMap<M extends model.ApiModel> = ListActionPayloadMap<M>;
+export type ApiModelListActionPayloadMap<M extends model.ApiModel> = ListActionPayloadMap<M>;
 
 export type ModelListActionCreatorMap<
   M extends model.ApiModel,
   C extends ActionContext = ActionContext,
-> = Omit<ActionCreatorMap<ModelListActionPayloadMap<M>, C>, "request"> & {
+> = Omit<ActionCreatorMap<ApiModelListActionPayloadMap<M>, C>, "request"> & {
   readonly request: RequestActionCreator<C>;
 };
 
-export type AuthenticatedModelListActionPayloadMap<M extends model.ApiModel> =
-  ModelListActionPayloadMap<M> & {
+export type AuthenticatedApiModelListActionPayloadMap<M extends model.ApiModel> =
+  ApiModelListActionPayloadMap<M> & {
     readonly updating: ModelListActionAction;
     readonly creating: boolean;
     readonly removeFromState: number;
@@ -108,54 +105,16 @@ export type AuthenticatedModelListActionPayloadMap<M extends model.ApiModel> =
     readonly updateOrdering: UpdateOrderingPayload<string>;
   };
 
-export type AuthenticatedModelListActionCreatorMap<
+export type AuthenticatedApiModelListActionCreatorMap<
   M extends model.ApiModel,
   C extends ActionContext = ActionContext,
-> = Omit<ActionCreatorMap<AuthenticatedModelListActionPayloadMap<M>, C>, "request"> & {
+> = Omit<ActionCreatorMap<AuthenticatedApiModelListActionPayloadMap<M>, C>, "request"> & {
   readonly request: RequestActionCreator<C>;
 };
 
-export type TableActionPayloadMap<M extends model.RowTypedApiModel = model.RowTypedApiModel> = {
-  readonly request: TableRequestActionPayload;
-  readonly loading: boolean;
-  // readonly response: Http.TableResponse<M>;
-  readonly setSearch: string;
-  readonly invalidate: null;
-};
-
-export type TableActionCreatorMap<
-  M extends model.RowTypedApiModel,
-  C extends ActionContext = ActionContext,
-> = Optional<ActionCreatorMap<TableActionPayloadMap<M>, C>, "invalidate">;
-
-export type AuthenticatedTableActionPayloadMap<
-  R extends tabling.Row,
-  M extends model.RowTypedApiModel = model.RowTypedApiModel,
-> = TableActionPayloadMap<M> & {
-  readonly handleEvent: tabling.TableEvent<R>;
-};
-
-export type AuthenticatedTableActionCreatorMap<
-  R extends tabling.Row,
-  M extends model.RowTypedApiModel,
-  C extends ActionContext = ActionContext,
-> = Optional<ActionCreatorMap<AuthenticatedTableActionPayloadMap<R, M>, C>, "invalidate">;
-
-export type UserMetricsActionPayload =
-  | UserMetricsIncrementByPayload
-  | UserMetricsDecrementByPayload
-  | UserMetricsChangePayload
-  | UserMetricsValuePayload;
-
-export type UserMetricsAction =
-  | Action<UserMetricsIncrementByPayload>
-  | Action<UserMetricsDecrementByPayload>
-  | Action<UserMetricsChangePayload>
-  | Action<UserMetricsValuePayload>;
-
 export type ModelDetailActionPayloadMap<M extends model.ApiModel> = {
   readonly loading: boolean;
-  // readonly response: Http.RenderedDetailResponse<M>;
+  readonly response: api.ClientResponse<api.ApiSuccessResponse<M>>;
   readonly updateInState: UpdateModelPayload<M>;
   readonly invalidate: null;
 };
@@ -163,26 +122,6 @@ export type ModelDetailActionPayloadMap<M extends model.ApiModel> = {
 export type UpdateModelPayload<T extends model.Model> = {
   id: T["id"];
   data: Partial<T>;
-};
-
-export type UserMetricsIncrementByPayload = {
-  readonly incrementBy: number;
-  readonly metric: keyof model.User["metrics"];
-};
-
-export type UserMetricsDecrementByPayload = {
-  readonly decrementBy: number;
-  readonly metric: keyof model.User["metrics"];
-};
-
-export type UserMetricsChangePayload = {
-  readonly change: "increment" | "decrement";
-  readonly metric: keyof model.User["metrics"];
-};
-
-export type UserMetricsValuePayload = {
-  readonly value: number;
-  readonly metric: keyof model.User["metrics"];
 };
 
 export type ModelListActionCompleteAction<M extends model.Model = model.Model> = {
@@ -200,17 +139,19 @@ export type ModelListActionAction<M extends model.Model = model.Model> =
   | ModelListActionStartAction<M>
   | ModelListActionCompleteAction<M>;
 
-export type ListActionPayloadMap<T> = {
+export type ListActionPayloadMap<T extends api.ListResponseIteree> = {
   readonly request: RequestActionPayload;
   readonly loading: boolean;
   readonly invalidate: boolean;
-  // readonly response: Http.RenderedListResponse<T>;
+  readonly response: api.ClientResponse<api.ApiListResponse<T>>;
 };
 
-export type ListActionCreatorMap<T, C extends ActionContext = ActionContext> = Omit<
-  ActionCreatorMap<ListActionPayloadMap<T>, C>,
-  "request"
-> & { readonly request: RequestActionCreator<C> };
+export type ListActionCreatorMap<
+  T extends api.ListResponseIteree,
+  C extends ActionContext = ActionContext,
+> = Omit<ActionCreatorMap<ListActionPayloadMap<T>, C>, "request"> & {
+  readonly request: RequestActionCreator<C>;
+};
 
 export type HttpUpdateModelPayload<T extends model.Model, P> = {
   id: T["id"];

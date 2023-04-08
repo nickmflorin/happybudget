@@ -1,10 +1,13 @@
+import { config } from "application";
+
 import { initialState, rootReducer, rootSaga } from "./store";
 
-const Config: Application.ModuleConfig<Modules.Dashboard.Store> = {
+const Config = config.moduleConfig({
   rootReducer: rootReducer,
   rootSaga: rootSaga,
   initialState: initialState,
-  label: "dashboard",
-};
+  label: "dashboard" as const,
+  isPublic: false,
+});
 
 export default Config;

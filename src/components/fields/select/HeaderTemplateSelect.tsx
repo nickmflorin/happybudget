@@ -1,8 +1,8 @@
 import { useEffect, useState, useImperativeHandle, useMemo } from "react";
 
+import * as api from "api";
 import { filter } from "lodash";
 
-import * as api from "api";
 import { http, ui } from "lib";
 
 import { SingleModelSyncSelect, SingleModelSyncSelectProps } from "./generic";
@@ -39,7 +39,7 @@ const HeaderTemplateSelect = ({ onDeleted, ...props }: HeaderTemplateSelectProps
   useEffect(() => {
     api
       .getHeaderTemplates({}, { cancelToken: cancelToken() })
-      .then((rsp: Http.ListResponse<Model.SimpleHeaderTemplate>) => {
+      .then((rsp: Http.ApiListResponse<Model.SimpleHeaderTemplate>) => {
         setLoading(false);
         setOptions(rsp.data);
       })

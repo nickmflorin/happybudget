@@ -25,8 +25,18 @@ export type ApiErrorType = EnumeratedLiteralType<typeof ApiErrorTypes>;
 export const HttpErrorTypes = enumeratedLiterals([...ApiErrorTypes.__ALL__, "network"] as const);
 export type HttpErrorType = EnumeratedLiteralType<typeof HttpErrorTypes>;
 
-export const ErrorTypes = enumeratedLiterals([
+export const CodedErrorTypes = enumeratedLiterals([
   "client-validation",
   ...HttpErrorTypes.__ALL__,
 ] as const);
+
+export type CodedErrorType = EnumeratedLiteralType<typeof CodedErrorTypes>;
+
+export const ErrorTypes = enumeratedLiterals([
+  ...CodedErrorTypes.__ALL__,
+  "malformed-data",
+  "file-loading",
+  "filename",
+] as const);
+
 export type ErrorType = EnumeratedLiteralType<typeof ErrorTypes>;

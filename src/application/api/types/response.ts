@@ -1,39 +1,36 @@
-import { model } from "lib";
+import { model, schemas } from "lib";
 
 export type FileUploadResponse = {
   readonly fileUrl: string;
 };
 
-export type ApiResponseBody = model.JsonObject | model.JsonObject[];
+export type ApiResponseBody = schemas.Json;
 
 /**
  * The form of the JSON body for responses rendered on the server when the request is successful.
  */
 export type ApiSuccessResponse<D extends ApiResponseBody = ApiResponseBody> = D;
 
-export type ListResponseIteree = model.JsonObject | model.JsonValue;
+export type ListResponseIteree = schemas.Json;
 
-export type ListResponse<M extends ListResponseIteree> = {
+export type ApiListResponse<M extends ListResponseIteree> = {
   readonly data: M[];
   readonly count: number;
-};
-
-export type ModelListResponse<M extends model.Model> = ListResponse<M>;
-
-export type TableResponse<M extends model.RowHttpModelType = model.RowHttpModelType> = {
-  readonly models: M[];
-  readonly groups?: model.Group[];
-  readonly markups?: model.Markup[];
 };
 
 export type MarkupResponseType<
   B extends model.Budget | model.Template = model.Budget | model.Template,
   A extends model.Account | model.SubAccount = model.Account | model.SubAccount,
-> = B extends model.Budget | model.Template
-  ? A extends model.Account | model.SubAccount
-    ? ParentChildResponse<B, model.Markup> | AncestryResponse<B, A, model.Markup>
-    : never
-  : never;
+> = ParentChildResponse<B, model.Markup> | AncestryResponse<B, A, model.Markup>;
+
+export const markupResponseTypeIsAncestry = <
+  B extends model.Budget | model.Template = model.Budget | model.Template,
+  A extends model.Account | model.SubAccount = model.Account | model.SubAccount,
+>(
+  response: MarkupResponseType<B, A>,
+): response is AncestryResponse<B, A, model.Markup> =>
+  (response as AncestryResponse<B, A, model.Markup>).parent !== undefined &&
+  (response as AncestryResponse<B, A, model.Markup>).budget !== undefined;
 
 export type ReorderResponse = { data: number[] };
 

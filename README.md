@@ -350,23 +350,33 @@ There are 3 distinct environments that the application runs in, with the current
 dictated by the `NODE_ENV` environment variable:
 
 | Environment (`NODE_ENV`) | Default Environment File | Override Environment File | Overridden by `.env.local` |
-| :----------------------: | :----------------------: | :-----------------------: | :------------------------: |
+|:------------------------:|:------------------------:|:-------------------------:|:--------------------------:|
 |      `development`       |    `.env.development`    | `.env.development.local`  |            Yes             |
 |       `production`       |    `.env.production`     |  `.env.production.local`  |            Yes             |
 |          `test`          |       `.env.test`        |            N/A            |             No             |
 
-For each environment, the default environment file specifies defaults that the environment variable
-will have for the file's associated environment. These files should be committed to source control.
+Additionally, there is a third environment file, `.env`, that contains environment variables that
+define environment variables for _all_ environments.
+
+For each environment the default environment file specifies defaults that the environment variable
+will have for the file's associated environment. These files should _always_ be committed to source
+control.
 
 When the environment is `development`, the default environment variables will be loaded from
 `.env.development`. Similarly, when the environment is `production`, the default environment
-variables will be loaded from `.env.production` and when the environment is `test`, the default
-environment variables will be loaded from `.env.test`.
+variables will be loaded from `.env.production`. Finally, when the environment is `test`, the
+default environment variables will be loaded from `.env.test`. In each case, any environment
+variables defined in the environment specific file, `.env.${NODE_ENV}`, will override those defined
+in the global environment variable file, `.env`.
 
-When overriding the default environment variables for a given environment is required, a
-`.env.local` file is used. The environment variables defined in this file will override the default
-environment variables _only when in a `production` or `development` environment_. If the environment
-is `test`, the environment variables in `.env.local` will not be loaded.
+### Local Overrides
+
+It is often necessary that the environment variables for any given environment be overridden, either
+locally in development or on a server. When overriding the default environment variables for a given
+environment is required, a `.env.local` file is used. The environment variables defined in this file
+will override the default environment variables _only when in a `production` or `development`
+environment_. If the environment is `test`, the environment variables in `.env.local` will not be
+loaded.
 
 Note that if you would like to override the environment variables for just a single environment, a
 corresponding `.env.development.local` or `.env.production.local` file can be used. Each of these
@@ -379,33 +389,22 @@ For further documentation regarding the environment configuration, please see th
 
 The environment variables that are currently used in the application are documented as follows:
 
-|                    Name                     |        Development Default         | Production Default | Test Default |
-| :-----------------------------------------: | :--------------------------------: | :----------------: | :----------: |
-|                 `ROARR_LOG`                 |               `true`               |       `true`       |     N/A      |
-|       `NEXT_PUBLIC_ROARR_BROWSER_LOG`       |               `true`               |      `false`       |     N/A      |
-|          `NEXT_PUBLIC_TABLE_DEBUG`          |              `false`               |        N/A         |     N/A      |
-|          `NEXT_PUBLIC_API_DOMAIN`           | `http://local.happybudget.io:8000` |        N/A         |     N/A      |
-|          `NEXT_PUBLIC_APP_DOMAIN`           | `http://local.happybudget.io:3000` |        N/A         |     N/A      |
-|        `NEXT_PUBLIC_PRODUCTION_ENV`         |              `local`               |        N/A         |     N/A      |
-|        `NEXT_PUBLIC_BILLING_ENABLED`        |              `false`               |      `false`       |     N/A      |
-| `NEXT_PUBLIC_SOCIAL_AUTHENTICATION_ENABLED` |              `false`               |      `false`       |     N/A      |
-|          `NEXT_PUBLIC_AG_GRID_KEY`          |             `<token>`              |     `<token>`      |     N/A      |
 
-#### General
-
-1. `ROARR_LOG`
-
-   Controls whether or not logs are emitted on the server.
-
-2. `NEXT_PUBLIC_ROARR_BROWSER_LOG`
-
-   Controls whether or not logs are emitted in the browser.
-
-3. `NEXT_PUBLIC_TABLE_DEBUG`
-
-   Controls whether or not AG Grid tables are rendered in "debug" mode. For more information about
-   "debug" mode, please refer
-   [to the AG Grid documentation](https://www.ag-grid.com/react-data-grid/grid-options/#reference-miscellaneous-debug).
+| Name                                                     | Base Default |    Dev Default     |   Prod Default    | Test Default |
+|----------------------------------------------------------|:------------:|:------------------:|:-----------------:|:------------:|
+|                                                          |    `.env`    | `.env.development` | `.env.production` | `.env.test`  |
+| `ROARR_LOG`                                              |     N/A      |       `true`       |      `true`       |     N/A      |
+| Controls whether or not logs are emitted on the server.  |              |                    |                   |              |
+| `NEXT_PUBLIC_ROARR_BROWSER_LOG`                          |     N/A      |       `true`       |      `false`      |     N/A      |
+| Controls whether or not logs are emitted in the browser. |              |                    |                   |              |
+| `NEXT_PUBLIC_TABLE_DEBUG`                                |     N/A      |      `false`       |        N/A        |     N/A      |
+| Controls whether or not AG Grid tables are rendered in "debug" mode. For more information about "debug" mode, please refer [to the AG Grid documentation](https://www.ag-grid.com/react-data-grid/grid-options#reference-miscellaneous-debug). | | | |
+| `NEXT_PUBLIC_API_DOMAIN`                                 | N/A          | `http://local.happybudget.io:8000` |        N/A        | N/A          |
+| `NEXT_PUBLIC_APP_DOMAIN`                                 | N/A          | `http://local.happybudget.io:3000` |        N/A        | N/A          |
+| `NEXT_PUBLIC_PRODUCTION_ENV`                             | N/A          | `local`                            |        N/A        | N/A          |
+| `NEXT_PUBLIC_BILLING_ENABLED`                            | N/A          | `false`                            |      `false`      | N/A          |
+| `NEXT_PUBLIC_SOCIAL_AUTHENTICATION_ENABLED`              | N/A          | `false`                            |      `false`      | N/A          |
+| `NEXT_PUBLIC_AG_GRID_KEY`                                | N/A          | `<token>`                          |     `<token>`     | N/A          |
 
 ## Package Installs
 

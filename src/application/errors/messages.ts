@@ -68,7 +68,7 @@ export const HTTP_MESSAGES: ErrorMessageDefaults = {
   message: HTTP_MESSAGE,
 };
 
-const ErrorTypeMessages: { [key in errorTypes.ErrorType]: ErrorMessageDefaults } = {
+const ErrorTypeMessages: { [key in errorTypes.CodedErrorType]: ErrorMessageDefaults } = {
   [errorTypes.ErrorTypes.NETWORK]: {
     userMessage: messages.Message("There was an error with the request."),
     message: messages.Message("There was a network error."),

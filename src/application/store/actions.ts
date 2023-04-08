@@ -1,119 +1,149 @@
-import { isNil } from "lodash";
-
 import { model } from "lib";
+
+import * as api from "../api";
 
 import * as types from "./types";
 
-type ActionCreatorConfig<
-  P extends types.ActionPayload,
-  C extends types.ActionContext = types.ActionContext,
-> = {
-  readonly ctx?: Pick<C, "errorMessage">;
+type ActionCreatorConfig = {
+  readonly ctx?: Pick<types.ActionContext, "errorMessage">;
   readonly label?: string;
-  readonly prefix?: string;
-  readonly prepareAction?: (p: P) => Omit<types.Action<P>, "type">;
 };
 
 /**
- * Modified version of @redux.js/toolkit's `createAction` method that uses an
- * action creator that attaches custom context to the action object and an
- * optionally provided label.
+ * Modified version of @redux.js/toolkit's `createAction` method that uses an action creator that
+ * attaches custom context to the action object and an optionally provided label.
  */
-export const createAction = <
-  P extends types.ActionPayload,
-  C extends types.ActionContext = types.ActionContext,
->(
-  type: string,
-  config?: ActionCreatorConfig<P, C>,
-): types.ActionCreator<P, C> => {
-  const actionType = !isNil(config?.prefix)
-    ? `${config?.prefix as string}.${type}`
-    : !isNil(config?.label)
-    ? `${config?.label as string}.${type}`
-    : type;
-
-  function actionCreator(payload: P, dynamicContext: Omit<C, "publicTokenId">): types.Action<P> {
-    let pyload = payload;
-    if (config?.prepareAction) {
-      const prepared = config?.prepareAction(payload);
-      if (!prepared) {
-        throw new Error("prepareAction did not return an object");
-      }
-      pyload = prepared.payload;
+export const createAction =
+  <P, C extends types.ActionContext = types.ActionContext>(config?: ActionCreatorConfig) =>
+  <T extends string>(type: T): types.ActionCreator<P, C, T> => {
+    function actionCreator<Pi extends P = P, Ci extends C = C>(
+      payload: Pi,
+      dynamicContext: Omit<Ci, "publicTokenId">,
+    ): types.Action<Pi, Ci, T> {
+      /* Priority should always be given to context that is included when the action is dispatched,
+         versus the context that is used to initialize the ActionCreator - which is provided as a
+         configuration. */
+      return {
+        type,
+        payload,
+        context: { ...config?.ctx, ...dynamicContext } as Ci,
+      } as types.Action<Pi, Ci, T>;
     }
-    /*
-		Priority should always be given to context that is included when the action
-		is dispatched, versus the context that is used to initialize the
-		ActionCreator - which is provided as a configuration.
-		*/
-    return {
-      type: actionType,
-      payload: pyload,
-      label: config?.label || null,
-      context: { ...config?.ctx, ...dynamicContext },
-    };
-  }
-  actionCreator.label = config?.label || null;
-  actionCreator.toString = () => `${actionType}`;
-  actionCreator.type = actionType;
-  return actionCreator;
-};
+    actionCreator.toString = () => type;
+    actionCreator.type = type;
+    return actionCreator as types.ActionCreator<P, C, T>;
+  };
 
-/**
- * An ActionCreator factory that returns a function that creates actions with
- * the provided configuration.  This should be used when many actions are to
- * be created with the same configuration.
- */
-export const createActionCreator =
-  <C extends types.ActionContext = types.ActionContext>(
-    config?: ActionCreatorConfig<types.ActionPayload, C>,
-  ): {
-    <PR extends types.ActionPayload, CR extends types.ActionContext = types.ActionContext>(
-      type: string,
-      config?: ActionCreatorConfig<PR, CR>,
-    ): types.ActionCreator<PR, CR>;
-  } =>
-  <PR extends types.ActionPayload, CR extends types.ActionContext = types.ActionContext>(
-    type: string,
-    c?: ActionCreatorConfig<PR, CR>,
-  ) =>
-    // Dynamic configuration should override static configuration.
-    createAction<PR, CR>(type, { ...config, ...c });
-
-export const setApplicationLoadingAction = createAction<boolean>("SetApplicationLoading");
-export const setApplicationDrawerAction = createAction<boolean | "TOGGLE">("SetApplicationDrawer");
-
-export const updateLoggedInUserMetricsAction =
-  createAction<types.UserMetricsActionPayload>("user.UpdateMetrics");
-export const updateLoggedInUserAction = createAction<model.User>("user.UpdateInState");
-export const clearLoggedInUserAction = createAction<null>("user.Clear");
-export const setProductPermissionModalOpenAction = createAction<boolean>(
+export const setApplicationLoadingAction = createAction<boolean>()("SetApplicationLoading");
+export const setApplicationDrawerAction = createAction<boolean | "TOGGLE">()(
+  "SetApplicationDrawer",
+);
+export const setProductPermissionModalOpenAction = createAction<boolean>()(
   "SetProductPermissionModalOpen",
 );
 
-export const requestContactsAction = createAction<types.RequestActionPayload>("contacts.Request");
-export const loadingContactsAction = createAction<boolean>("contacts.Loading");
+export const requestContactsAction = createAction<types.RequestActionPayload>()("contacts.Request");
+
+export const loadingContactsAction = createAction<boolean>()("contacts.Loading");
+
 export const responseContactsAction =
-  createAction<Http.RenderedListResponse<model.Contact>>("contacts.Response");
-export const removeContactFromStateAction = createAction<number>("user.contacts.RemoveFromState");
-export const updateContactInStateAction = createAction<types.UpdateModelPayload<model.Contact>>(
+  createAction<api.ClientResponse<api.ApiListResponse<model.Contact>>>()("contacts.Response");
+
+export const removeContactFromStateAction = createAction<number>()("user.contacts.RemoveFromState");
+
+export const updateContactInStateAction = createAction<types.UpdateModelPayload<model.Contact>>()(
   "user.contacts.UpdateInState",
 );
-export const addContactToStateAction = createAction<model.Contact>("user.contacts.AddToState");
-export const setContactsSearchAction = createAction<string>("user.contacts.SetSearch");
-export const requestFilteredContactsAction = createAction<types.RequestActionPayload>(
+export const addContactToStateAction = createAction<model.Contact>()("user.contacts.AddToState");
+
+export const setContactsSearchAction = createAction<string>()("user.contacts.SetSearch");
+
+export const requestFilteredContactsAction = createAction<types.RequestActionPayload>()(
   "user.contacts.RequestFiltered",
 );
-export const loadingFilteredContactsAction = createAction<boolean>("user.contacts.LoadingFiltered");
+export const loadingFilteredContactsAction = createAction<boolean>()(
+  "user.contacts.LoadingFiltered",
+);
+
 export const responseFilteredContactsAction = createAction<
-  Http.RenderedListResponse<model.Contact>
->("user.contacts.ResponseFiltered");
-export const responseSubAccountUnitsAction = createAction<Http.RenderedListResponse<model.Tag>>(
-  "budget.subaccountunits.Response",
-);
-export const responseFringeColorsAction = createAction<Http.RenderedListResponse<string>>(
-  "budget.fringecolors.Response",
-);
-export const responseActualTypesAction = createAction<Http.RenderedListResponse<model.Tag>>(
-  "budget.actualstypes.Response",
-);
+  api.ClientResponse<api.ApiListResponse<model.Contact>>
+>()("user.contacts.ResponseFiltered");
+
+export const responseSubAccountUnitsAction = createAction<
+  api.ClientResponse<api.ApiListResponse<model.SubAccountUnit>>
+>()("budget.subaccountunits.Response");
+
+export const responseFringeColorsAction = createAction<
+  api.ClientResponse<api.ApiListResponse<string>>
+>()("budget.fringecolors.Response");
+
+export const responseActualTypesAction = createAction<
+  api.ClientResponse<api.ApiListResponse<model.ActualType>>
+>()("budget.actualstypes.Response");
+
+export type UserMetricsIncrementByPayload = {
+  readonly incrementBy: number;
+  readonly metric: keyof model.User["metrics"];
+};
+
+export type UserMetricsDecrementByPayload = {
+  readonly decrementBy: number;
+  readonly metric: keyof model.User["metrics"];
+};
+
+export type UserMetricsChangePayload = {
+  readonly change: "increment" | "decrement";
+  readonly metric: keyof model.User["metrics"];
+};
+
+export type UserMetricsValuePayload = {
+  readonly value: number;
+  readonly metric: keyof model.User["metrics"];
+};
+
+export type UserMetricsActionPayload =
+  | UserMetricsIncrementByPayload
+  | UserMetricsDecrementByPayload
+  | UserMetricsChangePayload
+  | UserMetricsValuePayload;
+
+export type UserMetricsAction =
+  | types.Action<UserMetricsIncrementByPayload>
+  | types.Action<UserMetricsDecrementByPayload>
+  | types.Action<UserMetricsChangePayload>
+  | types.Action<UserMetricsValuePayload>;
+
+export type UpdateUserAction = types.Action<model.User>;
+export type ClearUserAction = types.Action<null>;
+export type UserAction = UpdateUserAction | UserMetricsAction | ClearUserAction;
+
+export const updateLoggedInUserMetricsAction =
+  createAction<UserMetricsActionPayload>()("user.UpdateMetrics");
+
+export const updateLoggedInUserAction = createAction<model.User>()("user.UpdateInState");
+
+export const clearLoggedInUserAction = createAction<null>()("user.Clear");
+
+export const isUserMetricsValueAction = (
+  a: UserMetricsAction,
+): a is types.Action<UserMetricsValuePayload> =>
+  (a as types.Action<UserMetricsValuePayload>).payload.value !== undefined;
+
+export const isUserMetricsChangeAction = (
+  a: UserMetricsAction,
+): a is types.Action<UserMetricsChangePayload> =>
+  (a as types.Action<UserMetricsChangePayload>).payload.change !== undefined;
+
+export const isUserMetricsIncrementByAction = (
+  a: UserMetricsAction,
+): a is types.Action<UserMetricsIncrementByPayload> =>
+  (a as types.Action<UserMetricsIncrementByPayload>).payload.incrementBy !== undefined;
+
+export const isUpdateUserAction = (a: UserAction): a is UpdateUserAction =>
+  a.type === updateLoggedInUserAction.toString();
+
+export const isUserMetricsAction = (a: UserAction): a is UserMetricsAction =>
+  a.type === updateLoggedInUserMetricsAction.toString();
+
+export const isUserClearAction = (a: UserAction): a is UserMetricsAction =>
+  a.type === clearLoggedInUserAction.toString();

@@ -1,7 +1,7 @@
+import * as api from "api";
 import { SagaIterator } from "redux-saga";
 import { all, put, select, call } from "redux-saga/effects";
 
-import * as api from "api";
 import { notifications, http } from "lib";
 
 import * as actions from "./actions";
@@ -15,7 +15,7 @@ export function* getBudgetsTask(action: Redux.Action<null>): SagaIterator {
   }));
   yield put(actions.loadingBudgetsAction(true, {}));
   try {
-    const response: Http.ListResponse<Model.SimpleBudget> = yield http.request(
+    const response: Http.ApiListResponse<Model.SimpleBudget> = yield http.request(
       api.getBudgets,
       action.context,
       query,
@@ -32,7 +32,7 @@ export function* getBudgetsTask(action: Redux.Action<null>): SagaIterator {
 export function* getBudgetsPermissioningTask(action: Redux.Action<null>): SagaIterator {
   yield put(actions.loadingBudgetsAction(true, {}));
   try {
-    const response: Http.ListResponse<Model.SimpleBudget> = yield http.request(
+    const response: Http.ApiListResponse<Model.SimpleBudget> = yield http.request(
       api.getBudgets,
       action.context,
       {},
@@ -55,7 +55,7 @@ export function* getArchiveTask(action: Redux.Action<null>): SagaIterator {
   }));
   yield put(actions.loadingArchiveAction(true, {}));
   try {
-    const response: Http.ListResponse<Model.SimpleBudget> = yield http.request(
+    const response: Http.ApiListResponse<Model.SimpleBudget> = yield http.request(
       api.getArchivedBudgets,
       action.context,
       query,
@@ -72,7 +72,7 @@ export function* getArchiveTask(action: Redux.Action<null>): SagaIterator {
 export function* getArchivePermissioningTask(action: Redux.Action<null>): SagaIterator {
   yield put(actions.loadingArchiveAction(true, {}));
   try {
-    const response: Http.ListResponse<Model.SimpleBudget> = yield http.request(
+    const response: Http.ApiListResponse<Model.SimpleBudget> = yield http.request(
       api.getArchivedBudgets,
       action.context,
       {},
@@ -95,7 +95,7 @@ export function* getCollaboratingTask(action: Redux.Action<null>): SagaIterator 
   }));
   yield put(actions.loadingCollaboratingAction(true, {}));
   try {
-    const response: Http.ListResponse<Model.SimpleCollaboratingBudget> = yield http.request(
+    const response: Http.ApiListResponse<Model.SimpleCollaboratingBudget> = yield http.request(
       api.getCollaboratingBudgets,
       action.context,
       query,
@@ -118,7 +118,7 @@ export function* getTemplatesTask(action: Redux.Action<null>): SagaIterator {
   }));
   yield put(actions.loadingTemplatesAction(true, {}));
   try {
-    const response: Http.ListResponse<Model.SimpleTemplate> = yield http.request(
+    const response: Http.ApiListResponse<Model.SimpleTemplate> = yield http.request(
       api.getTemplates,
       action.context,
       query,
@@ -141,7 +141,7 @@ export function* getCommunityTask(action: Redux.Action<null>): SagaIterator {
   }));
   yield put(actions.loadingCommunityAction(true, {}));
   try {
-    const response: Http.ListResponse<Model.SimpleTemplate> = yield http.request(
+    const response: Http.ApiListResponse<Model.SimpleTemplate> = yield http.request(
       api.getCommunityTemplates,
       action.context,
       query,

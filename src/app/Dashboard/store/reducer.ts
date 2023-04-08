@@ -71,7 +71,7 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
   archive: createBudgetsReducer("archive"),
   collaborating:
     redux.reducers.createAuthenticatedModelListReducer<Model.SimpleCollaboratingBudget>({
-      initialState: redux.initialAuthenticatedModelListResponseState,
+      initialState: redux.initialAuthenticatedApiModelListResponseState,
       actions: {
         request: actions.requestCollaboratingAction,
         response: actions.responseCollaboratingAction,
@@ -96,7 +96,7 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
     initialState: redux.initialTableState,
   }),
   templates: redux.reducers.createAuthenticatedModelListReducer<Model.SimpleTemplate>({
-    initialState: redux.initialAuthenticatedModelListResponseState,
+    initialState: redux.initialAuthenticatedApiModelListResponseState,
     actions: {
       request: actions.requestTemplatesAction,
       response: actions.responseTemplatesAction,
@@ -110,7 +110,7 @@ const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
     },
   }),
   community: redux.reducers.createAuthenticatedModelListReducer<Model.SimpleTemplate>({
-    initialState: redux.initialAuthenticatedModelListResponseState,
+    initialState: redux.initialAuthenticatedApiModelListResponseState,
     actions: {
       request: actions.requestCommunityAction,
       response: actions.responseCommunityAction,

@@ -1,6 +1,6 @@
 import { UploadFile as RootUploadFile } from "antd/lib/upload/interface";
 
-import { FileUploadResponse } from "api";
+import { api } from "application";
 
 export type FileWithExtension<N extends string = string, E extends string = string> = `${N}.${E}`;
 
@@ -8,7 +8,7 @@ export type CSVRow = (string | number | null | undefined)[];
 export type CSVData = CSVRow[];
 
 export type UploadError = Error | string;
-export type UploadFile = RootUploadFile<FileUploadResponse>;
+export type UploadFile = RootUploadFile<api.FileUploadResponse>;
 
 export type UploadImageParamsNoImage = {
   loading: boolean;

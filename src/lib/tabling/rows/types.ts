@@ -7,21 +7,21 @@ import { FooterGridId, ClassName } from "../types";
 
 export type EditRowActionBehavior = "expand" | "edit";
 
-export type GetRowStyle<R extends Row<BodyRowType> = Row<BodyRowType>> = (
+export type GetRowStyle<R extends RowOfType<BodyRowType> = RowOfType<BodyRowType>> = (
   params: RowClassParams<R>,
 ) => ui.Style | null | undefined;
 
-export type RowClassName<R extends Row<BodyRowType> = Row<BodyRowType>> = ClassName<
+export type RowClassName<R extends RowOfType<BodyRowType> = RowOfType<BodyRowType>> = ClassName<
   RowClassParams<R>
 >;
 
-export type GetRowClassName<R extends Row<BodyRowType> = Row<BodyRowType>> = (
+export type GetRowClassName<R extends RowOfType<BodyRowType> = RowOfType<BodyRowType>> = (
   params: RowClassParams<R>,
 ) => RowClassName<R>;
 
 export interface RowColorDef {
-  readonly backgroundColor?: string;
-  readonly color?: string;
+  readonly backgroundColor?: ui.HexColor;
+  readonly color?: ui.HexColor;
 }
 
 export const DataRowTypes = enumeratedLiterals(["placeholder", "model"] as const);
@@ -81,15 +81,41 @@ export type RowGridId<T extends RowType = RowType> = T extends RowType
     }[T]
   : never;
 
-type BaseRow<T extends RowType = RowType> = T extends RowType
+/**
+ * The base representation of a {@link Row} in the application that rows of all types extend.
+ *
+ * @type {BaseRow}
+ *
+ * @param {RowType} T The row type classification of the row.
+ *
+ * @param {RowData} D
+ *   The row data associated with the row. This is the same for rows of all row types that form the
+ *   union of {@link Row<D>}.
+ *
+ *   Note: While many row type classifications are not associated with a 'data' field, the row data
+ *   {@link RowData} defined by {@link D} is stored as a private member field, '__dataType__' on all
+ *   row type classifications.  This allows each row type classification of {@link Row<D>} to have a
+ *   reference to the data type, {@link D}.
+ *
+ * @member {RowId<T>} id
+ *   The ID of the row.  The form of this parameter depends on the type of the row.
+ *
+ * @member {RowGridId<T>} gridId
+ *   The ID of the grid that the row is associated with.  The form of this parameter depends on the
+ *   type of the row.
+ *
+ * @member {T} rowType The type classification of the row.
+ */
+export type BaseRow<T extends RowType = RowType, D extends RowData = RowData> = T extends RowType
   ? {
       readonly id: RowId<T>;
       readonly gridId: RowGridId<T>;
       readonly rowType: T;
+      readonly __dataType__: D;
     }
   : never;
 
-export type ModelRow<D extends RowData = RowData> = BaseRow<"model"> & {
+export type ModelRow<D extends RowData = RowData> = BaseRow<"model", D> & {
   readonly children: number[];
   readonly order: string;
   // This field is primarily used for logging purposes.
@@ -97,70 +123,46 @@ export type ModelRow<D extends RowData = RowData> = BaseRow<"model"> & {
   readonly data: D;
 };
 
-export type MarkupRow = BaseRow<"markup"> & {
+export type MarkupRow<D extends RowData = RowData> = BaseRow<"markup", D> & {
   readonly children: number[];
   readonly data: model.Markup;
 };
 
-export type GroupRow = BaseRow<"group"> & {
+export type GroupRow<D extends RowData = RowData> = BaseRow<"group", D> & {
   readonly children: number[];
   readonly data: model.Group;
 };
 
-export type PlaceholderRow<D extends RowData = RowData> = BaseRow<"placeholder"> & {
+export type PlaceholderRow<D extends RowData = RowData> = BaseRow<"placeholder", D> & {
   readonly children: number[];
   readonly data: D;
 };
 
-export type FooterRow = BaseRow<"footer">;
-export type PageRow = BaseRow<"page">;
+export type FooterRow<D extends RowData = RowData> = BaseRow<"footer", D>;
+export type PageRow<D extends RowData = RowData> = BaseRow<"page", D>;
 
 export type RowData<R extends Row | undefined = undefined> = R extends undefined
   ? Record<string, unknown>
-  : R extends { _dataType: infer D }
+  : R extends { __dataType__: infer D extends RowData }
   ? D
   : never;
 
-type _ReconstructRow<T extends Row, D extends RowType> = T extends {
-  _dataType: infer Di extends RowData;
-}
-  ? _Row<D, Di>
-  : never;
-
-type PhantomRowType<Type, Data> = { _dataType: Type } & Data;
-
-type _Row<
-  T extends RowType = RowType,
-  D extends Record<string, unknown> = Record<string, unknown>,
-> = T extends RowType
+type _Row<T extends RowType, D extends RowData> = T extends RowType
   ? {
-      model: PhantomRowType<D, ModelRow<D>>;
-      markup: PhantomRowType<D, MarkupRow>;
-      group: PhantomRowType<D, GroupRow>;
-      placeholder: PhantomRowType<D, PlaceholderRow<D>>;
-      footer: PhantomRowType<D, FooterRow>;
-      page: PhantomRowType<D, PageRow>;
+      model: ModelRow<D>;
+      markup: MarkupRow<D>;
+      group: GroupRow<D>;
+      placeholder: PlaceholderRow<D>;
+      footer: FooterRow<D>;
+      page: PageRow<D>;
     }[T]
   : never;
 
-export type Row<
-  T extends RowType | Record<string, unknown> | Row | "__NEVER__" = "__NEVER__",
-  D extends RowType | Record<string, unknown> | "__NEVER__" = "__NEVER__",
-> = T extends "__NEVER__"
-  ? D extends "__NEVER__"
-    ? _Row
-    : never
-  : T extends RowType
-  ? D extends Record<string, unknown>
-    ? _Row<T, D>
-    : _Row<T, Record<string, unknown>>
-  : T extends Row
-  ? D extends RowType
-    ? _ReconstructRow<T, D>
-    : never
-  : T extends Record<string, unknown>
-  ? Row<RowType, T>
-  : never;
+export type Row<D extends RowData = RowData> = _Row<RowType, D>;
+
+export type RowOfType<T extends RowType, D extends RowData = RowData> = _Row<T, D>;
+
+export type RowSubType<R extends Row, T extends RowType> = _Row<T, R["__dataType__"]>;
 
 export type RowNameLabelType = number | string | null;
 
@@ -168,14 +170,14 @@ export type RowStringGetter<R extends Row> =
   | RowNameLabelType
   | FnWithTypedArgs<RowNameLabelType, [R]>;
 
-export type RowWithColor<D extends RowData> = Row<"model", D & { color: ui.HexColor | null }>;
+export type RowWithColor<D extends RowData> = RowOfType<"model", D & { color: ui.HexColor | null }>;
 
-export type RowWithName<D extends RowData> = Row<"model", D & { name: string | null }>;
+export type RowWithName<D extends RowData> = RowOfType<"model", D & { name: string | null }>;
 
 export type RowWithDescription<D extends RowData> =
-  | Row<"model", D & { description: string | null }>
-  | Row<"markup", D>;
+  | RowOfType<"model", D & { description: string | null }>
+  | RowOfType<"markup", D>;
 
 export type RowWithIdentifier<D extends RowData> =
-  | Row<"model", D & { identifier: string | null }>
-  | Row<"markup", D>;
+  | RowOfType<"model", D & { identifier: string | null }>
+  | RowOfType<"markup", D>;

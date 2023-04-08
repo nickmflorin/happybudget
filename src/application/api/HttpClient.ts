@@ -1,6 +1,6 @@
 import { errors } from "application";
 import { logger } from "internal";
-import { model, assertNull, assertNotNull, parsers } from "lib";
+import { model, assertNull, assertNotNullOrUndefined, parsers } from "lib";
 
 import * as schemas from "./schemas";
 import * as types from "./types";
@@ -44,10 +44,13 @@ type BodyOrError<S extends types.ApiResponseBody | null> = Promise<
   { error: errors.ApiError; body: null } | { body: S; error: null }
 >;
 
-const mergeWithServiceOptions = <D extends types.ClientRequestData = types.ClientRequestData>(
-  serviceOptions?: types.ServiceOptions<D>,
-  options?: types.ClientRequestOptions<D>,
-): types.ClientRequestOptions<D> => {
+const mergeWithServiceOptions = <
+  S extends types.ApiResponseBody | null,
+  D extends types.ClientRequestData = types.ClientRequestData,
+>(
+  serviceOptions?: types.ServiceOptions<S, D>,
+  options?: types.ClientRequestOptions<S, D>,
+): types.ClientRequestOptions<S, D> => {
   type Q = D extends { readonly query: infer Qi extends types.RawQuery } ? Qi : types.RawQuery;
 
   const serviceQuery = (serviceOptions?.query as Q) || ({} as Q);
@@ -241,7 +244,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
        returned - in the case that the reasons for which the body is malformed can be determined -
        or simply null if those reasons cannot be determined.
        */
-    assertNotNull(body);
+    assertNotNullOrUndefined(body);
     const parsedError = this.parseResponseBodyError(body, params);
     /* If the parsed error is a string or null, the error response body could not be parsed
        properly.  In the case that there is enough information to infer a relevant error message
@@ -269,10 +272,11 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
 
   private constructUrl = <
     M extends types.HttpMethod,
+    S extends types.ApiResponseBody | null,
     D extends types.ClientRequestData = types.ClientRequestData,
   >(
     path: types.RequestPath<string, M>,
-    options?: types.ClientRequestOptions<D>,
+    options?: types.ClientRequestOptions<S, D>,
   ): string =>
     constructEndpoint({
       host: this.host,
@@ -288,7 +292,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
     D extends types.ClientRequestData = types.ClientRequestData,
   >(
     params: types.ClientParams,
-    options?: types.ClientRequestOptions<D>,
+    options?: types.ClientRequestOptions<S, D>,
   ): Promise<BodyOrError<S>> => {
     if (params.response.body === null) {
       logger.error(
@@ -375,7 +379,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
     D extends types.ClientRequestData = types.ClientRequestData,
   >(
     params: types.ClientParams,
-    options?: types.ClientRequestOptions<D>,
+    options?: types.ClientRequestOptions<S, D>,
   ): Promise<BodyOrError<S>> => {
     if (!params.response.ok) {
       // Here, the server returned a response - but the response had a 4xx or 5xx status code.
@@ -393,7 +397,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
     path: types.RequestPath<string, M>,
     method: types.HttpMethod,
     strict: STRICT,
-    options?: types.ClientRequestOptions<D>,
+    options?: types.ClientRequestOptions<S, D>,
   ): Promise<types.ClientVariableResponse<S, D, STRICT>> => {
     let response: Response | null = null;
     let body: S | null = null;
@@ -445,13 +449,13 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
         STRICT
       >;
     }
-    assertNotNull(body);
+    assertNotNullOrUndefined(body);
     /* If the calling logic provides the 'strict' flag, it is expecting that the return of the
-         HttpClient method does not nest the response next to an 'error' field, since the error
-         would have been thrown. */
+       HttpClient method does not nest the response next to an 'error' field, since the error
+       would have been thrown. */
     if (strict) {
       return {
-        ...body,
+        response: body,
         requestMeta: { query: options?.query },
       } as types.ClientVariableResponse<S, D, STRICT>;
     }
@@ -471,7 +475,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
    *
    * @param {types.RequestPath<string, "GET">} path The path to send the GET request.
    *
-   * @param {types.ClientRequestOptions<{ query: Q }>} options
+   * @param {types.ClientRequestOptions<S, { query: Q }>} options
    * 	 The options for the request.  These options will override any options that were provided
    *   during the configuration of the {@link HttpClient} instance.
    *
@@ -486,7 +490,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
    */
   public get = async <S extends types.ApiResponseBody, Q extends types.RawQuery = types.RawQuery>(
     path: types.RequestPath<string, "GET">,
-    options?: types.ClientRequestOptions<{ query: Q }>,
+    options?: types.ClientRequestOptions<S, { query: Q }>,
   ): Promise<types.ClientResponse<S, { query: Q }>> =>
     this.request<"GET", S, { query: Q }, false>(path, types.HttpMethods.GET, false, options);
 
@@ -499,7 +503,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
    *
    * @param {types.RequestPath<string, "GET">} path The path to send the GET request.
    *
-   * @param {types.ClientRequestOptions<{ query: Q }>} options
+   * @param {types.ClientRequestOptions<S, { query: Q }>} options
    * 	 The options for the request.  These options will override any options that were provided
    *   during the configuration of the {@link HttpClient} instance.
    *
@@ -516,7 +520,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
     Q extends types.RawQuery = types.RawQuery,
   >(
     path: types.RequestPath<string, "GET">,
-    options?: types.ClientRequestOptions<{ query: Q }>,
+    options?: types.ClientRequestOptions<S, { query: Q }>,
   ): Promise<types.ClientStrictResponse<S, { query: Q }>> =>
     this.request<"GET", S, { query: Q }, true>(path, types.HttpMethods.GET, true, options);
 
@@ -527,7 +531,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
       Q extends types.RawQuery = types.RawQuery,
     >(
       urlPattern: U,
-      opts?: types.ServiceOptions<{ query: Q }>,
+      opts?: types.ServiceOptions<S, { query: Q }>,
     ): types.ParameterizedService<"GET", U, S, { query: Q }> =>
     (params, options?) =>
       this.get<S, Q>(
@@ -538,7 +542,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
   public createGetService =
     <S extends types.ApiResponseBody, Q extends types.RawQuery = types.RawQuery>(
       url: types.RequestPath<string, "GET">,
-      opts?: types.ServiceOptions<{ query: Q }>,
+      opts?: types.ServiceOptions<S, { query: Q }>,
     ): types.Service<S, { query: Q }> =>
     (options?) =>
       this.get<S, Q>(url, mergeWithServiceOptions(opts, options));
@@ -549,7 +553,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
    *
    * @param {types.RequestPath<string, "GET">} path The path to send the GET request.
    *
-   * @param {types.ClientRequestOptions<{ query: Q }>} options
+   * @param {types.ClientRequestOptions<M, { query: Q }>} options
    * 	 The options for the request.  These options will override any options that were provided
    *   during the configuration of the {@link HttpClient} instance.
    *
@@ -564,7 +568,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
    */
   public retrieve = async <M extends model.Model, Q extends types.RawQuery = types.RawQuery>(
     path: types.RequestPath<string, "GET">,
-    options?: types.ClientRequestOptions<{ query: Q }>,
+    options?: types.ClientRequestOptions<M, { query: Q }>,
   ): Promise<types.ClientResponse<M, { query: Q }>> =>
     this.get<types.ApiSuccessResponse<M>, Q>(path, options);
 
@@ -575,7 +579,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
       Q extends types.RawQuery = types.RawQuery,
     >(
       urlPattern: U,
-      opts?: types.ServiceOptions<{ query: Q }>,
+      opts?: types.ServiceOptions<M, { query: Q }>,
     ): types.ParameterizedService<"GET", U, M, { query: Q }> =>
     async (params, options?) =>
       this.retrieve<M, Q>(
@@ -590,13 +594,13 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
    *
    * @param {types.RequestPath<string, "GET">} path The path to send the GET request.
    *
-   * @param {types.ClientRequestOptions<{ query: Q }>} options
+   * @param {types.ClientRequestOptions<M, { query: Q }>} options
    * 	 The options for the request.  These options will override any options that were provided
    *   during the configuration of the {@link HttpClient} instance.
    *
    *   @see {types.ClientRequestOptions}
    *
-   * @returns {Promise<types.ClientResponse<M[], { query: Q }>>}
+   * @returns {Promise<types.ClientResponse<types.ApiListResponse<M>, { query: Q }>>}
    *   A {@link Promise} whose contents contain the JSON serialized response body, {@link M[]}, in
    *   the case that the request succeeded, or an instance of an error, {@link errors.HttpError},
    *   in the case that the request failed.
@@ -608,9 +612,15 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
     Q extends types.ListQuery = types.ListQuery,
   >(
     path: types.RequestPath<string, "GET">,
-    options?: types.ClientRequestOptions<{ query: Q }>,
-  ): Promise<types.ClientResponse<types.ListResponse<M>, { query: Q }>> =>
-    this.get<types.ListResponse<M>, Q>(path, options);
+    options?: types.ClientRequestOptions<M, { query: Q }>,
+  ): Promise<types.ClientResponse<types.ApiListResponse<M>, { query: Q }>> =>
+    this.get<types.ApiListResponse<M>, Q>(path, {
+      ...options,
+      schema:
+        options?.schema !== undefined
+          ? types.createApiListResponseSchema<M>(options.schema)
+          : undefined,
+    });
 
   public createParameterizedListService =
     <
@@ -619,8 +629,8 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
       Q extends types.ListQuery = types.ListQuery,
     >(
       urlPattern: U,
-      opts?: types.ServiceOptions<{ query: Q }>,
-    ): types.ParameterizedService<"GET", U, types.ListResponse<M>, { query: Q }> =>
+      opts?: types.ServiceOptions<M, { query: Q }>,
+    ): types.ParameterizedService<"GET", U, types.ApiListResponse<M>, { query: Q }, M> =>
     async (params, options?) =>
       this.list<M, Q>(
         injectUrlPathParams(urlPattern, params) as types.RequestPath<string, "GET">,
@@ -630,8 +640,8 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
   public createListService =
     <M extends types.ListResponseIteree, Q extends types.ListQuery = types.ListQuery>(
       url: types.RequestPath<string, "GET">,
-      opts?: types.ServiceOptions<{ query: Q }>,
-    ): types.Service<types.ListResponse<M>, { query: Q }> =>
+      opts?: types.ServiceOptions<M, { query: Q }>,
+    ): types.Service<types.ApiListResponse<M>, { query: Q }, M> =>
     async (options?) =>
       this.list<M, Q>(url, mergeWithServiceOptions(opts, options));
 
@@ -642,13 +652,13 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
    *
    * @param {types.RequestPath<string, "GET">} path The path to send the GET request.
    *
-   * @param {types.ClientRequestOptions<{ query: Q }>} options
+   * @param {types.ClientRequestOptions<M, { query: Q }>} options
    * 	 The options for the request.  These options will override any options that were provided
    *   during the configuration of the {@link HttpClient} instance.
    *
    *   @see {types.ClientRequestOptions}
    *
-   * @returns {Promise<types.ClientResponse<M[], { query: Q }>>}
+   * @returns {Promise<types.ClientResponse<M, { query: Q }>>}
    *   A {@link Promise} whose contents contain the JSON serialized response body, {@link M[]}, in
    *   the case that the request succeeded, or an instance of an error, {@link errors.HttpError},
    *   in the case that the request failed.
@@ -660,9 +670,15 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
     Q extends types.ApiModelListQuery<M> = types.ApiModelListQuery<M>,
   >(
     path: types.RequestPath<string, "GET">,
-    options?: types.ClientRequestOptions<{ query: Q }>,
-  ): Promise<types.ClientResponse<types.ModelListResponse<M>, { query: Q }>> =>
-    this.get<types.ModelListResponse<M>, Q>(path, options);
+    options?: types.ClientRequestOptions<M, { query: Q }>,
+  ): Promise<types.ClientResponse<types.ApiListResponse<M>, { query: Q }>> =>
+    this.get<types.ApiListResponse<M>, Q>(path, {
+      ...options,
+      schema:
+        options?.schema !== undefined
+          ? types.createApiListResponseSchema<M>(options.schema)
+          : undefined,
+    });
 
   public createParameterizedListModelsService =
     <
@@ -671,8 +687,8 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
       Q extends types.ApiModelListQuery<M> = types.ApiModelListQuery<M>,
     >(
       urlPattern: U,
-      opts?: types.ServiceOptions<{ query: Q }>,
-    ): types.ParameterizedService<"GET", U, types.ModelListResponse<M>, { query: Q }> =>
+      opts?: types.ServiceOptions<M, { query: Q }>,
+    ): types.ParameterizedService<"GET", U, types.ApiListResponse<M>, { query: Q }, M> =>
     async (params, options?) =>
       this.listModels<M, Q>(
         injectUrlPathParams(urlPattern, params) as types.RequestPath<string, "GET">,
@@ -682,8 +698,8 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
   public createListModelsService =
     <M extends model.ApiModel, Q extends types.ApiModelListQuery<M> = types.ApiModelListQuery<M>>(
       url: types.RequestPath<string, "GET">,
-      opts?: types.ServiceOptions<{ query: Q }>,
-    ): types.Service<types.ModelListResponse<M>, { query: Q }> =>
+      opts?: types.ServiceOptions<M, { query: Q }>,
+    ): types.Service<types.ApiListResponse<M>, { query: Q }, M> =>
     async (options?) =>
       this.listModels<M, Q>(url, mergeWithServiceOptions(opts, options));
 
@@ -696,7 +712,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
    *
    * @param {types.RequestPath<string, "POST">} path The path to send the POST request.
    *
-   * @param {types.ClientRequestOptions<{ body: P }>} options
+   * @param {types.ClientRequestOptions<S, { body: P }>} options
    * 	 The options for the request.  These options will override any options that were provided
    *   during the configuration of the {@link HttpClient} instance.
    *
@@ -714,7 +730,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
     P extends types.Payload = types.Payload,
   >(
     path: types.RequestPath<string, "POST">,
-    options?: types.ClientRequestOptions<{ body: P }>,
+    options?: types.ClientRequestOptions<S, { body: P }>,
   ): Promise<types.ClientResponse<S, { body: P }>> =>
     this.request<"POST", S, { body: P }, false>(path, types.HttpMethods.POST, false, options);
 
@@ -727,7 +743,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
    *
    * @param {types.RequestPath<string, "POST">} path The path to send the GET request.
    *
-   * @param {types.ClientRequestOptions<{ body: P }>} options
+   * @param {types.ClientRequestOptions<S, { body: P }>} options
    * 	 The options for the request.  These options will override any options that were provided
    *   during the configuration of the {@link HttpClient} instance.
    *
@@ -744,14 +760,14 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
     P extends types.Payload = types.Payload,
   >(
     path: types.RequestPath<string, "POST">,
-    options?: types.ClientRequestOptions<{ body: P }>,
+    options?: types.ClientRequestOptions<S, { body: P }>,
   ): Promise<types.ClientStrictResponse<S, { body: P }>> =>
     this.request<"POST", S, { body: P }, true>(path, types.HttpMethods.GET, true, options);
 
   public createPostService =
     <S extends types.ApiResponseBody | null, P extends types.Payload = types.Payload>(
       url: types.RequestPath<string, "POST">,
-      opts?: types.ServiceOptions<{ body: P }>,
+      opts?: types.ServiceOptions<S, { body: P }>,
     ): types.Service<S, { body: P }> =>
     async (options?) =>
       this.post<S, P>(url, mergeWithServiceOptions(opts, options));
@@ -763,7 +779,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
       P extends types.Payload = types.Payload,
     >(
       urlPattern: U,
-      opts?: types.ServiceOptions<{ body: P }>,
+      opts?: types.ServiceOptions<S, { body: P }>,
     ): types.ParameterizedService<"POST", U, S, { body: P }> =>
     async (params, options?) =>
       this.post<S, P>(
@@ -780,7 +796,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
    *
    * @param {types.RequestPath<string, "POST">} path The path to send the POST request.
    *
-   * @param {types.ClientRequestOptions} options
+   * @param {Omit<types.ClientRequestOptions<S, { body: FormData }>, "body">} options
    * 	 The options for the request.  These options will override any options that were provided
    *   during the configuration of the {@link HttpClient} instance.
    *
@@ -796,7 +812,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
   public upload = <S extends types.ApiResponseBody | null>(
     path: types.RequestPath<string, "POST">,
     file: File | types.FilepondFile | (File | types.FilepondFile)[] | FileList,
-    options?: Omit<types.ClientRequestOptions<{ body: FormData }>, "body">,
+    options?: Omit<types.ClientRequestOptions<S, { body: FormData }>, "body">,
   ): Promise<types.ClientResponse<S, { body: FormData }>> => {
     const formData = new FormData();
     if (types.isSingleFile(file)) {
@@ -817,19 +833,19 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
     <S extends types.ApiResponseBody | null>(url: types.RequestPath<string, "POST">) =>
     async (
       file: File | types.FilepondFile | (File | types.FilepondFile)[] | FileList,
-      options?: Omit<types.ClientRequestOptions<{ body: FormData }>, "body">,
+      options?: Omit<types.ClientRequestOptions<S, { body: FormData }>, "body">,
     ): Promise<types.ClientResponse<S, { body: FormData }>> =>
       this.upload<S>(url, file, options);
 
   public createParameterizedUploadService =
     <U extends types.RequestPath<string, "POST">, S extends types.ApiResponseBody | null>(
       urlPattern: U,
-      opts?: types.ServiceOptions<{ body: FormData }>,
+      opts?: types.ServiceOptions<S, { body: FormData }>,
     ) =>
     async (
       params: types.UrlPathParamsObj<U>,
       file: File | types.FilepondFile | (File | types.FilepondFile)[] | FileList,
-      options?: Omit<types.ClientRequestOptions<{ body: FormData }>, "body">,
+      options?: Omit<types.ClientRequestOptions<S, { body: FormData }>, "body">,
     ): Promise<types.ClientResponse<S, { body: FormData }>> =>
       this.upload<S>(
         injectUrlPathParams(urlPattern, params) as types.RequestPath<string, "POST">,
@@ -846,7 +862,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
    *
    * @param {types.RequestPath<string, "DELETE">} path The path to send the DELETE request.
    *
-   * @param {types.ClientRequestOptions} options
+   * @param {types.ClientRequestOptions<S>} options
    * 	 The options for the request.  These options will override any options that were provided
    *   during the configuration of the {@link HttpClient} instance.
    *
@@ -861,7 +877,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
    */
   public delete = async <S extends types.ApiResponseBody | null = null>(
     path: types.RequestPath<string, "DELETE">,
-    options?: types.ClientRequestOptions,
+    options?: types.ClientRequestOptions<S>,
   ): Promise<types.ClientResponse<S>> =>
     this.request<"DELETE", S, types.ClientRequestData, false>(
       path,
@@ -879,7 +895,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
    *
    * @param {types.RequestPath<string, "DELETE">} path The path to send the DELETE request.
    *
-   * @param {types.ClientRequestOptions} options
+   * @param {types.ClientRequestOptions<S>} options
    * 	 The options for the request.  These options will override any options that were provided
    *   during the configuration of the {@link HttpClient} instance.
    *
@@ -893,7 +909,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
    */
   public deleteStrict = async <S extends types.ApiResponseBody | null = null>(
     path: types.RequestPath<string, "DELETE">,
-    options?: types.ClientRequestOptions,
+    options?: types.ClientRequestOptions<S>,
   ): Promise<types.ClientStrictResponse<S>> =>
     this.request<"DELETE", S, types.ClientRequestData, true>(
       path,
@@ -903,12 +919,9 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
     );
 
   public createParameterizedDeleteService =
-    <
-      U extends types.RequestPath<string, "DELETE">,
-      S extends types.ApiResponseBody | null = null,
-    >(
+    <U extends types.RequestPath<string, "DELETE">, S extends types.ApiResponseBody | null = null>(
       urlPattern: U,
-      opts?: types.ServiceOptions,
+      opts?: types.ServiceOptions<S>,
     ): types.ParameterizedService<"DELETE", U, S, types.ClientRequestData> =>
     async (params, options?) =>
       this.delete<S>(
@@ -925,7 +938,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
    *
    * @param {types.RequestPath<string, "PATCH">} path The path to send the PATCH request.
    *
-   * @param {types.ClientRequestOptions<{ body: P }>} options
+   * @param {types.ClientRequestOptions<S, { body: P }>} options
    * 	 The options for the request.  These options will override any options that were provided
    *   during the configuration of the {@link HttpClient} instance.
    *
@@ -943,7 +956,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
     P extends types.Payload = types.Payload,
   >(
     path: types.RequestPath<string, "PATCH">,
-    options?: types.ClientRequestOptions<{ body: P }>,
+    options?: types.ClientRequestOptions<S, { body: P }>,
   ): Promise<types.ClientResponse<S, { body: P }>> =>
     this.request<"PATCH", S, { body: P }, false>(path, types.HttpMethods.PATCH, false, options);
 
@@ -956,7 +969,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
    *
    * @param {types.RequestPath<string, "PATCH">} path The path to send the GET request.
    *
-   * @param {types.ClientRequestOptions<{ body: P }>} options
+   * @param {types.ClientRequestOptions<S, { body: P }>} options
    * 	 The options for the request.  These options will override any options that were provided
    *   during the configuration of the {@link HttpClient} instance.
    *
@@ -973,7 +986,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
     P extends types.Payload = types.Payload,
   >(
     path: types.RequestPath<string, "PATCH">,
-    options?: types.ClientRequestOptions<{ body: P }>,
+    options?: types.ClientRequestOptions<S, { body: P }>,
   ): Promise<types.ClientStrictResponse<S, { body: P }>> =>
     this.request<"PATCH", S, { body: P }, true>(path, types.HttpMethods.GET, true, options);
 
@@ -984,7 +997,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
       P extends types.Payload = types.Payload,
     >(
       urlPattern: U,
-      opts?: types.ServiceOptions<{ body: P }>,
+      opts?: types.ServiceOptions<S, { body: P }>,
     ): types.ParameterizedService<"PATCH", U, S, { body: P }> =>
     async (params, options?) =>
       this.patch<S, P>(
@@ -993,12 +1006,9 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
       );
 
   public createPatchService =
-    <
-      S extends types.ApiResponseBody | null,
-      P extends types.Payload = types.Payload,
-    >(
+    <S extends types.ApiResponseBody | null, P extends types.Payload = types.Payload>(
       url: types.RequestPath<string, "PATCH">,
-      opts?: types.ServiceOptions<{ body: P }>,
+      opts?: types.ServiceOptions<S, { body: P }>,
     ): types.Service<S, { body: P }> =>
     async (options?) =>
       this.patch<S, P>(url, mergeWithServiceOptions(opts, options));

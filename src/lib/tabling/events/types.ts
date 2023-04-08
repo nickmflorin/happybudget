@@ -1,10 +1,9 @@
 import { SyntheticEvent } from "react";
 
-import * as api from "api";
-import { store } from "application";
+import { store, api } from "application";
 
 import * as model from "../../model";
-import { enumeratedLiterals, EnumeratedLiteralType } from "../../util";
+import { enumeratedLiterals, EnumeratedLiteralType, SingleOrArray } from "../../util";
 import * as columns from "../columns";
 import * as rows from "../rows";
 import * as types from "../types";
@@ -20,7 +19,7 @@ export const EventForms = enumeratedLiterals(["change", "control", "meta"] as co
 
 export type EventForm = EnumeratedLiteralType<typeof EventForms>;
 
-export type EventFormFromId<T extends EventId> = T extends ControlEventId
+export type EventFormFromId<T extends TableEventId> = T extends ControlEventId
   ? "control"
   : T extends ChangeEventId
   ? "change"
@@ -58,8 +57,11 @@ export type TraversibleEventId = EnumeratedLiteralType<typeof TraversibleEventId
  */
 export const ChangeEventIds = enumeratedLiterals([
   ...TraversibleEventIds.__ALL__,
-  "rowAdd",
+  "rowAddData",
+  "rowAddIndex",
+  "rowAddCount",
   "groupAdd",
+  "groupUpdate",
   "markupAdd",
   "markupUpdate",
   "rowInsert",
@@ -78,89 +80,75 @@ export type ChangeEventId = EnumeratedLiteralType<typeof ChangeEventIds>;
 export const MetaEventIds = enumeratedLiterals(["forward", "reverse"] as const);
 export type MetaEventId = EnumeratedLiteralType<typeof MetaEventIds>;
 
-export const EventIds = enumeratedLiterals([
+export const TableEventIds = enumeratedLiterals([
   ...ChangeEventIds.__ALL__,
   ...ControlEventIds.__ALL__,
   ...MetaEventIds.__ALL__,
 ] as const);
-export type EventId = EnumeratedLiteralType<typeof EventIds>;
-
-export type CellChangeValue<
-  R extends rows.Row<rows.EditableRowType>,
-  K extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
-> = rows.RowData<R>[K];
+export type TableEventId = EnumeratedLiteralType<typeof TableEventIds>;
 
 export type CellChange<
-  R extends rows.Row<rows.EditableRowType>,
+  R extends rows.Row,
   K extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
 > = {
-  readonly oldValue: CellChangeValue<R, K>;
-  readonly newValue: CellChangeValue<R, K>;
+  readonly oldValue: types.CellValue<R, K>;
+  readonly newValue: types.CellValue<R, K>;
 };
 
 export type SoloCellChange<
-  R extends rows.Row<rows.EditableRowType>,
+  R extends rows.Row,
   K extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
 > = CellChange<R, K> & {
   readonly field: K;
-  readonly id: R["id"];
+  readonly id: rows.RowSubType<R, rows.EditableRowType>["id"];
 };
 
-export type RowChangeData<R extends rows.Row<rows.EditableRowType>> = {
-  [key in columns.ColumnFieldName<R>]?: CellChange<R, key>;
-};
+export type RowChangeData<R extends rows.Row> = Partial<{
+  [key in columns.ColumnFieldName<R>]: CellChange<R, key>;
+}>;
 
-export type RowChange<R extends rows.Row<rows.EditableRowType>> = {
-  readonly id: R["id"];
+export type RowChange<
+  R extends rows.Row,
+  ID extends rows.RowSubType<R, rows.EditableRowType>["id"] = rows.RowSubType<
+    R,
+    rows.EditableRowType
+  >["id"],
+> = {
+  readonly id: ID;
   readonly data: RowChangeData<R>;
 };
 
-export type RowAddCountPayload = { readonly count: number };
-export type RowAddIndexPayload = { readonly newIndex: number; readonly count?: number };
-export type RowAddDataPayload<R extends rows.RowData> = Partial<R>[];
-export type RowAddPayload<R extends rows.RowData> =
-  | RowAddCountPayload
-  | RowAddIndexPayload
-  | RowAddDataPayload<R>;
+export type RowAddCountPayload = {
+  readonly count: number;
+  /* Placeholder IDs must be provided ahead of time so that the IDs are consistent between the sagas
+     and the reducer. */
+  readonly placeholderIds: rows.PlaceholderRowId[];
+};
 
-export type TableEventArg<T extends EventId = EventId> = T extends EventId
-  ? {
-      readonly modelsUpdated: model.RowTypedApiModel;
-      readonly updateRows: rows.Row<rows.EditableRowType> | rows.RowData;
-      readonly modelsAdded: model.RowTypedApiModel;
-      readonly placeholdersActivated: model.RowTypedApiModel;
-      readonly dataChange: rows.Row<rows.EditableRowType> | rows.RowData;
-      readonly rowInsert: rows.Row<rows.DataRowType> | rows.RowData;
-      readonly rowPositionChanged: never;
-      readonly rowDelete: never;
-      readonly rowAdd: rows.Row<rows.EditableRowType> | rows.RowData;
-      readonly groupAdd: never;
-      readonly markupAdd: never;
-      readonly rowUpdate: never;
-      readonly markupUpdate: never;
-      readonly groupUpdate: never;
-      readonly rowAddToGroup: never;
-      readonly rowRemoveFromGroup: never;
-      readonly forward: never;
-      readonly reverse: never;
-    }[T]
-  : never;
+export type RowAddIndexPayload = {
+  readonly newIndex: number;
+  readonly count?: number;
+  /* Placeholder IDs must be provided ahead of time so that the IDs are consistent between the sagas
+     and the reducer. */
+  readonly placeholderIds: rows.PlaceholderRowId[];
+};
+
+export type RowAddDataPayload<R extends rows.Row = rows.Row> = {
+  readonly data: rows.RowData<R>[];
+  /* Placeholder IDs must be provided ahead of time so that the IDs are consistent between the sagas
+     and the reducer. */
+  readonly placeholderIds: rows.PlaceholderRowId[];
+};
 
 export type ChangeEventPayload<
   T extends ChangeEventId = ChangeEventId,
-  R extends TableEventArg<T> = TableEventArg<T>,
+  R extends rows.Row = rows.Row,
 > = T extends ChangeEventId
   ? {
-      readonly dataChange: R extends rows.Row<rows.EditableRowType>
-        ? SingleOrArray<RowChange<R>>
-        : never;
+      readonly dataChange: SingleOrArray<RowChange<R>>;
       readonly rowInsert: {
         readonly previous: number;
-        readonly data: R extends rows.Row<"model">
-          ? Partial<R["data"]>
-          : R extends rows.RowData
-          ? Partial<R>
-          : never;
+        readonly data: rows.RowData<R>;
         readonly group: rows.RowId<"group"> | null;
       };
       readonly rowPositionChanged: {
@@ -171,11 +159,9 @@ export type ChangeEventPayload<
       readonly rowDelete: {
         readonly rows: SingleOrArray<rows.RowId<"body">>;
       };
-      readonly rowAdd: R extends rows.Row<rows.EditableRowType>
-        ? RowAddPayload<R["data"]>
-        : R extends rows.RowData
-        ? RowAddPayload<R>
-        : never;
+      readonly rowAddData: RowAddDataPayload<R>;
+      readonly rowAddIndex: RowAddIndexPayload;
+      readonly rowAddCount: RowAddCountPayload;
       readonly groupAdd: api.GroupPayload;
       readonly markupAdd: api.MarkupPayload;
       readonly rowUpdate: {
@@ -201,39 +187,24 @@ export type ModelTableEventPayload<M extends model.RowTypedApiModel = model.RowT
 
 export type ControlEventPayload<
   T extends ControlEventId = ControlEventId,
-  R extends TableEventArg<T> = TableEventArg<T>,
+  R extends rows.Row = rows.Row,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = T extends ControlEventId
   ? {
-      readonly modelsUpdated: R extends model.RowTypedApiModel
-        ? SingleOrArray<ModelTableEventPayload<R> | model.Group | model.Markup>
-        : never;
+      readonly modelsUpdated: SingleOrArray<ModelTableEventPayload<M> | model.Group | model.Markup>;
       readonly updateRows: {
-        readonly data: R extends rows.Row<rows.EditableRowType>
-          ? Partial<R["data"]>
-          : R extends model.RowTypedApiModel
-          ? never
-          : R extends rows.RowData
-          ? Partial<R>
-          : never;
+        readonly data: Partial<rows.RowSubType<R, rows.EditableRowType>["data"]>;
         readonly id: rows.RowId<"model">;
       };
-      readonly modelsAdded: R extends model.RowTypedApiModel
-        ? SingleOrArray<ModelTableEventPayload<R> | model.Group | model.Markup>
-        : never;
-      readonly placeholdersActivated: R extends model.RowTypedApiModel
-        ? {
-            readonly placeholderIds: rows.RowId<"placeholder">[];
-            readonly models: R[];
-          }
-        : never;
+      readonly modelsAdded: SingleOrArray<ModelTableEventPayload<M> | model.Group | model.Markup>;
+      readonly placeholdersActivated: {
+        readonly placeholderIds: rows.RowId<"placeholder">[];
+        readonly models: M[];
+      };
     }[T]
   : never;
 
-export type MetaEventPayload<
-  T extends MetaEventId = MetaEventId,
-  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-  R extends TableEventArg<T> = TableEventArg<T>,
-> = T extends MetaEventId
+export type MetaEventPayload<T extends MetaEventId = MetaEventId> = T extends MetaEventId
   ? {
       readonly reverse: null;
       readonly forward: null;
@@ -241,32 +212,32 @@ export type MetaEventPayload<
   : never;
 
 export type TableEventPayload<
-  T extends EventId = EventId,
-  R extends TableEventArg<T> = TableEventArg<T>,
+  T extends TableEventId = TableEventId,
+  R extends rows.Row = rows.Row,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = T extends MetaEventId
-  ? MetaEventPayload<T, R>
+  ? MetaEventPayload<T>
   : T extends ControlEventId
-  ? ControlEventPayload<T, R>
+  ? ControlEventPayload<T, R, M>
   : T extends ChangeEventId
   ? ChangeEventPayload<T, R>
   : never;
 
-// export type RowAddDataEvent<R extends TableEventArg<"rowAdd">> = RowAddDataPayload<R>;
-
 type BaseTableEvent<
-  T extends EventId = EventId,
-  R extends TableEventArg<T> = TableEventArg<T>,
-> = T extends EventId
+  T extends TableEventId = TableEventId,
+  R extends rows.Row = rows.Row,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
+> = T extends TableEventId
   ? {
       readonly type: T;
-      readonly payload: TableEventPayload<T, R>;
+      readonly payload: TableEventPayload<T, R, M>;
       readonly meta?: "forward" | "reverse";
     }
   : never;
 
 type _ChangeEvent<
   T extends ChangeEventId = ChangeEventId,
-  R extends TableEventArg<T> = TableEventArg<T>,
+  R extends rows.Row = rows.Row,
 > = BaseTableEvent<T, R> & {
   readonly onSuccess?: <V>(v: V) => void;
   readonly onError?: (e: Error) => void;
@@ -274,81 +245,78 @@ type _ChangeEvent<
 
 type _ControlEvent<
   T extends ControlEventId = ControlEventId,
-  R extends TableEventArg<T> = TableEventArg<T>,
-> = BaseTableEvent<T, R>;
+  R extends rows.Row = rows.Row,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
+> = BaseTableEvent<T, R, M>;
 
 type _MetaEvent<
   T extends MetaEventId = MetaEventId,
-  R extends TableEventArg<T> = TableEventArg<T>,
+  R extends rows.Row = rows.Row,
 > = BaseTableEvent<T, R>;
 
 type _TableEvent<
-  T extends EventId = EventId,
-  R extends TableEventArg<T> = TableEventArg<T>,
-> = T extends EventId
+  T extends TableEventId = TableEventId,
+  R extends rows.Row = rows.Row,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
+> = T extends TableEventId
   ? {
       change: T extends ChangeEventId ? _ChangeEvent<T, R> : never;
-      control: T extends ControlEventId ? _ControlEvent<T, R> : never;
+      control: T extends ControlEventId ? _ControlEvent<T, R, M> : never;
       meta: T extends MetaEventId ? _MetaEvent<T, R> : never;
     }[EventFormFromId<T>]
   : never;
 
 export type TableEvent<
-  T extends EventId | TableEventArg<EventId> = EventId,
-  R extends T extends EventId ? TableEventArg<T> : never = T extends EventId
-    ? TableEventArg<T>
-    : never,
-> = T extends EventId
-  ? _TableEvent<T, R>
-  : T extends TableEventArg<EventId>
-  ? TableEvent<EventId, T>
-  : never;
+  T extends TableEventId = TableEventId,
+  R extends rows.Row = rows.Row,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
+> = T extends TableEventId ? _TableEvent<T, R, M> : never;
+
+export type AnyTableEvent<
+  R extends rows.Row = rows.Row,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
+> = _TableEvent<TableEventId, R, M>;
 
 // Events for which undo/redo is supported.  The events must be ChangeEvents.
 export type TraversibleEvent<
-  T extends TraversibleEventId | TableEventArg<TraversibleEventId> = TraversibleEventId,
-  R extends T extends TraversibleEventId ? TableEventArg<T> : never = T extends TraversibleEventId
-    ? TableEventArg<T>
-    : never,
-> = T extends TraversibleEventId
-  ? _TableEvent<T, R>
-  : T extends TableEventArg<TraversibleEventId>
-  ? TraversibleEvent<TraversibleEventId, T>
-  : never;
+  T extends TraversibleEventId = TraversibleEventId,
+  R extends rows.Row = rows.Row,
+> = T extends TraversibleEventId ? _TableEvent<T, R> : never;
+
+export type AnyTraversibleEvent<R extends rows.Row = rows.Row> = TraversibleEvent<
+  TraversibleEventId,
+  R
+>;
 
 export type ChangeEvent<
-  T extends ChangeEventId | TableEventArg<ChangeEventId> = ChangeEventId,
-  R extends TableEventArg = T extends ChangeEventId ? TableEventArg<T> : never,
-> = T extends ChangeEventId
-  ? R extends TableEventArg<T>
-    ? _TableEvent<T, R>
-    : `The event type is incorrect for event with ID ${T}`
-  : T extends TableEventArg<ChangeEventId>
-  ? ChangeEvent<ChangeEventId, T>
-  : never;
+  T extends ChangeEventId = ChangeEventId,
+  R extends rows.Row = rows.Row,
+> = T extends ChangeEventId ? _TableEvent<T, R> : never;
 
-export type MetaEvent<
-  T extends MetaEventId | TableEventArg<MetaEventId> = MetaEventId,
-  R extends TableEventArg = T extends MetaEventId ? TableEventArg<T> : never,
-> = T extends MetaEventId
-  ? R extends TableEventArg<T>
-    ? _TableEvent<T, R>
-    : `The event type is incorrect for event with ID ${T}`
-  : T extends TableEventArg<MetaEventId>
-  ? MetaEvent<MetaEventId, T>
-  : never;
+export type AnyChangeEvent<R extends rows.Row = rows.Row> = ChangeEvent<ChangeEventId, R>;
+
+export type RowAddEventId = "rowAddIndex" | "rowAddData" | "rowAddCount";
+export type RowAddEvent<
+  R extends rows.Row = rows.Row,
+  T extends RowAddEventId = RowAddEventId,
+> = T extends RowAddEventId ? ChangeEvent<T, R> : never;
+
+export type MetaEvent<T extends MetaEventId> = T extends MetaEventId ? _TableEvent<T> : never;
+
+export type AnyMetaEvent = MetaEvent<MetaEventId>;
 
 export type ControlEvent<
-  T extends ControlEventId | TableEventArg<ChangeEventId> = ControlEventId,
-  R extends TableEventArg = T extends ControlEventId ? TableEventArg<T> : never,
-> = T extends ControlEventId
-  ? R extends TableEventArg<T>
-    ? _TableEvent<T, R>
-    : `The event type is incorrect for event with ID ${T}`
-  : T extends TableEventArg<ControlEventId>
-  ? ControlEvent<ControlEventId, T>
-  : never;
+  T extends ControlEventId,
+  R extends rows.Row = rows.Row,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
+> = T extends ControlEventId ? _TableEvent<T, R, M> : never;
 
-export type ChangeEventHistory<
-  R extends TableEventArg<TraversibleEventId> = TableEventArg<TraversibleEventId>,
-> = TraversibleEvent<TraversibleEventId, R>[];
+export type AnyControlEvent<
+  R extends rows.Row = rows.Row,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
+> = ControlEvent<ControlEventId, R, M>;
+
+export type ChangeEventHistory<R extends rows.Row = rows.Row> = TraversibleEvent<
+  TraversibleEventId,
+  R
+>[];

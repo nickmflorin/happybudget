@@ -17,7 +17,7 @@ interface UseAttachmentsProps<
     id: number,
     query?: Http.ListQuery,
     options?: Http.RequestOptions,
-  ) => Promise<Http.ListResponse<Model.Attachment>>;
+  ) => Promise<Http.ApiListResponse<Model.Attachment>>;
   readonly deleteAttachment: (
     id: number,
     objId: number,

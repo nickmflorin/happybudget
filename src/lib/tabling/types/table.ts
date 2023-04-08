@@ -1,6 +1,7 @@
 import * as fs from "../../fs";
 import * as model from "../../model";
-import { enumeratedLiterals, EnumeratedLiteralType } from "../../util";
+import * as ui from "../../ui";
+import { enumeratedLiterals, EnumeratedLiteralType, SingleOrArray } from "../../util";
 import * as columns from "../columns";
 import * as events from "../events";
 import * as rows from "../rows";
@@ -37,10 +38,10 @@ export type TableInstance<
   UINotificationsManager & {
     readonly saving: (v: boolean) => void;
     readonly getColumns: () => columns.ModelColumn<R, M>[];
-    readonly getFocusedRow: () => rows.Row<R, rows.BodyRowType> | null;
-    readonly getRow: (id: rows.RowId<"body">) => rows.Row<R, rows.BodyRowType> | null;
-    readonly getRows: () => rows.Row<R, rows.BodyRowType>[];
-    readonly getRowsAboveAndIncludingFocusedRow: () => rows.Row<R, rows.BodyRowType>[];
+    readonly getFocusedRow: () => rows.RowSubType<R, rows.BodyRowType> | null;
+    readonly getRow: (id: rows.RowId<"body">) => rows.RowSubType<R, rows.BodyRowType> | null;
+    readonly getRows: () => rows.RowSubType<R, rows.BodyRowType>[];
+    readonly getRowsAboveAndIncludingFocusedRow: () => rows.RowSubType<R, rows.BodyRowType>[];
     readonly dispatchEvent: (event: SingleOrArray<events.TableEvent>) => void;
     readonly changeColumnVisibility: (
       changes: SingleOrArray<columns.ColumnVisibilityChange>,
@@ -64,7 +65,7 @@ export type MenuActionRenderFunc = (props: MenuActionRenderProps) => JSX.Element
 export type MenuActionObj = {
   readonly index?: number;
   readonly icon?: IconOrElement;
-  readonly tooltip?: DeterministicTooltip;
+  readonly tooltip?: ui.DeterministicTooltip;
   readonly disabled?: boolean;
   readonly hidden?: boolean;
   readonly label?: string;
@@ -94,7 +95,7 @@ export type AuthenticatedMenuActionParams<
   R extends rows.Row = rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = PublicMenuActionParams<R, M> & {
-  readonly selectedRows: rows.Row<R, rows.EditableRowType>[];
+  readonly selectedRows: rows.RowSubType<R, rows.EditableRowType>[];
 };
 
 export type MenuActionCallback<
@@ -141,7 +142,7 @@ export type FooterGridConfig<
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
 > = {
   readonly id: "page" | "footer";
-  readonly rowClass: rows.RowClassName<rows.Row<R, rows.BodyRowType>>;
+  readonly rowClass: rows.RowClassName<rows.RowSubType<R, rows.BodyRowType>>;
   readonly className: string;
   readonly rowHeight?: number;
   readonly getFooterColumn: (column: columns.DataColumn<R, M>) => columns.FooterColumn<R, M> | null;

@@ -23,26 +23,26 @@ import { ClassName } from ".";
 
 export type CellValue<
   R extends rows.Row = rows.Row,
-  N extends columns.ColumnFieldName<R> | string = string,
-> = N extends columns.ColumnFieldName<R> ? rows.RowData<R>[N] : unknown;
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+> = N extends columns.ColumnFieldName<R> ? rows.RowData<R>[N] : never;
 
 export type CellClassName<
-  R extends rows.Row<rows.BodyRowType> = rows.Row<rows.BodyRowType>,
-  N extends string = columns.ColumnFieldName<R>,
+  R extends rows.RowOfType<rows.BodyRowType> = rows.RowOfType<rows.BodyRowType>,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
   T = CellValue<R, N>,
 > = ClassName<CellClassParams<R, T>>;
 
 export interface CellStyleFunc<
-  R extends rows.Row<rows.BodyRowType> = rows.Row<rows.BodyRowType>,
-  N extends string = columns.ColumnFieldName<R>,
+  R extends rows.RowOfType<rows.BodyRowType> = rows.RowOfType<rows.BodyRowType>,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
   T = CellValue<R, N>,
 > {
   (cellClassParams: CellClassParams<R, T>): ui.Style | null | undefined;
 }
 
 export type CellStyle<
-  R extends rows.Row<rows.BodyRowType> = rows.Row<rows.BodyRowType>,
-  N extends string = columns.ColumnFieldName<R>,
+  R extends rows.RowOfType<rows.BodyRowType> = rows.RowOfType<rows.BodyRowType>,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
   T = CellValue<R, N>,
 > = ui.Style | CellStyleFunc<R, N, T>;
 
@@ -66,14 +66,14 @@ export interface CellProps<
   readonly suffixChildren?: JSX.Element;
   readonly icon?:
     | IconOrElement
-    | ((row: rows.Row<R, rows.BodyRowType>) => IconOrElement | undefined | null);
+    | ((row: rows.RowSubType<R, rows.BodyRowType>) => IconOrElement | undefined | null);
   readonly innerCellClassName?: string | undefined | ((r: R) => string | undefined);
   readonly innerCellStyle?: ui.Style | undefined | ((r: R) => ui.Style | undefined);
   readonly table: table.TableInstance<R, M>;
   /* Note: This is only applied for the data grid rows/cells - so we have to be careful.  We need a
      better way of establishing which props are available to cells based on which grid they lie in.
 		 */
-  readonly getRowColorDef: (row: rows.Row<R, rows.BodyRowType>) => rows.RowColorDef;
+  readonly getRowColorDef: (row: rows.RowSubType<R, rows.BodyRowType>) => rows.RowColorDef;
   readonly selector: (state: store.ApplicationStore) => S;
   readonly onKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void;
   // readonly onEvent?: (event: Event<R, M, EditableRow<R>>) => void;
@@ -150,43 +150,43 @@ export type CalculatedCellProps<
     | boolean
     | ((
         cell: CellConstruct<
-          rows.Row<R, "model">,
+          rows.RowSubType<R, "model">,
           columns.CalculatedColumn<
-            rows.Row<R, "model">,
+            rows.RowSubType<R, "model">,
             M,
-            N & columns.ColumnFieldName<rows.Row<R, "model">>,
+            N & columns.ColumnFieldName<rows.RowSubType<R, "model">>,
             T
           >,
           M,
-          N & columns.ColumnFieldName<rows.Row<R, "model">>,
+          N & columns.ColumnFieldName<rows.RowSubType<R, "model">>,
           T
         >,
       ) => boolean | undefined);
   readonly onInfoClicked?: (
     cell: CellConstruct<
-      rows.Row<R, "model">,
+      rows.RowSubType<R, "model">,
       columns.CalculatedColumn<
-        rows.Row<R, "model">,
+        rows.RowSubType<R, "model">,
         M,
-        N & columns.ColumnFieldName<rows.Row<R, "model">>,
+        N & columns.ColumnFieldName<rows.RowSubType<R, "model">>,
         T
       >,
       M,
-      N & columns.ColumnFieldName<rows.Row<R, "model">>,
+      N & columns.ColumnFieldName<rows.RowSubType<R, "model">>,
       T
     >,
   ) => void;
   readonly infoTooltip?: (
     cell: CellConstruct<
-      rows.Row<R, "model">,
+      rows.RowSubType<R, "model">,
       columns.CalculatedColumn<
-        rows.Row<R, "model">,
+        rows.RowSubType<R, "model">,
         M,
-        N & columns.ColumnFieldName<rows.Row<R, "model">>,
+        N & columns.ColumnFieldName<rows.RowSubType<R, "model">>,
         T
       >,
       M,
-      N & columns.ColumnFieldName<rows.Row<R, "model">>,
+      N & columns.ColumnFieldName<rows.RowSubType<R, "model">>,
       T
     >,
   ) => ui.TooltipContent | null;
@@ -195,7 +195,7 @@ export type CalculatedCellProps<
 export type CellPosition = Omit<RootCellPosition, "rowPinned">;
 
 export type CellConstruct<
-  R extends rows.Row<rows.BodyRowType>,
+  R extends rows.RowOfType<rows.BodyRowType>,
   C extends columns.DataColumn<R, M, N, T>,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,

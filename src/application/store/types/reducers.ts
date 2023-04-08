@@ -6,20 +6,16 @@ import {
   ActionPayload,
   ActionCreatorMap,
   ActionPayloadMap,
+  BasicAction,
 } from "./actions";
 
-export type BasicReducer<S, A extends Action = Action> = RootReducer<S, A>;
+export type BasicReducer<S, A extends BasicAction = BasicAction> = RootReducer<S, A>;
 
 export type BasicDynamicReducer<S, ARG, A> = (s: S | undefined, a: A, arg?: ARG) => S;
 
 export type BasicDynamicRequiredReducer<S, ARG, A> = (s: S | undefined, a: A, arg: ARG) => S;
 
-export type Reducer<
-  S,
-  C extends ActionContext = ActionContext,
-  P extends ActionPayload = ActionPayload,
-  A extends Action<P, C> = Action<P, C>,
-> = BasicReducer<S, A>;
+export type Reducer<S, A extends Action = Action> = BasicReducer<S, A>;
 
 export type DynamicReducer<
   S,
@@ -46,19 +42,11 @@ export type ReducerWithDefinedState<
   A extends Action<P, C> = Action<P, C>,
 > = BasicReducerWithDefinedState<S, A>;
 
-export type ReducersMapObject<
-  S,
-  C extends ActionContext = ActionContext,
-  P extends ActionPayload = ActionPayload,
-  A extends Action<P, C> = Action<P, C>,
-> = {
-  [K in keyof S]-?: Reducer<S[K], C, A>;
-};
-
 export type ReducerConfig<
   S,
-  A extends ActionCreatorMap<ActionPayloadMap, C>,
+  M extends ActionPayloadMap,
   C extends ActionContext = ActionContext,
+  A extends ActionCreatorMap<M, C> = ActionCreatorMap<M, C>,
 > = {
   readonly initialState: S;
   readonly actions: Partial<A>;

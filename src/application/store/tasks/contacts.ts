@@ -1,8 +1,8 @@
+import * as api from "api";
 import { filter } from "lodash";
 import { SagaIterator } from "redux-saga";
 import { put, fork, select, call } from "redux-saga/effects";
 
-import * as api from "api";
 import { tabling, notifications, http, redux } from "lib";
 
 import * as actions from "../actions";
@@ -22,7 +22,7 @@ export function* request(context?: Redux.ActionContext): SagaIterator {
   if (!requestCached) {
     yield put(actions.loadingContactsAction(true, {}));
     try {
-      const response: Http.ListResponse<M> = yield http.request(api.getContacts, context);
+      const response: Http.ApiListResponse<M> = yield http.request(api.getContacts, context);
       yield put(actions.responseContactsAction(response, {}));
       /* Only set the filtered contacts at the same time if there isn't an active
          search. */
@@ -66,7 +66,7 @@ export function* requestFiltered(context?: Redux.ActionContext): SagaIterator {
   if (!requestCached) {
     yield put(actions.loadingFilteredContactsAction(true, {}));
     try {
-      const response: Http.ListResponse<M> = yield http.request(api.getContacts, context, query);
+      const response: Http.ApiListResponse<M> = yield http.request(api.getContacts, context, query);
       yield put(actions.responseFilteredContactsAction(response, {}));
     } catch (e: unknown) {
       notifications.ui.banner.handleRequestError(e as Error, {
@@ -94,7 +94,7 @@ export const createTableTaskSet = (
   function* tableRequest(action: Redux.Action<Redux.TableRequestPayload, TC>): SagaIterator {
     yield put(config.actions.loading(true, {}));
     try {
-      const response: Http.ListResponse<M> = yield http.request(api.getContacts, action.context);
+      const response: Http.ApiListResponse<M> = yield http.request(api.getContacts, action.context);
       yield put(config.actions.response({ models: response.data }, {}));
     } catch (e: unknown) {
       config.table.handleRequestError(e as Error, {

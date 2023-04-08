@@ -1,23 +1,27 @@
+import { config } from "application";
+
 import { initialState, reducers, sagas } from "./store";
 
-export const TemplateReduxConfig: Application.ModuleConfig<Modules.Template.Store> = {
+export const TemplateReduxConfig = config.moduleConfig({
   rootReducer: reducers.templateRootReducer,
   rootSaga: sagas.templateRootSaga,
   initialState: initialState.initialTemplateState,
-  label: "template",
-};
+  label: "template" as const,
+  isPublic: false,
+});
 
-export const BudgetReduxConfig: Application.ModuleConfig<Modules.Budget.Store> = {
+export const BudgetReduxConfig = config.moduleConfig({
   rootReducer: reducers.budgetRootReducer,
   rootSaga: sagas.budgetRootSaga,
   initialState: initialState.initialBudgetState,
-  label: "budget",
-};
+  label: "budget" as const,
+  isPublic: false,
+});
 
-export const PublicBudgetReduxConfig: Application.ModuleConfig<Modules.PublicBudget.Store> = {
+export const PublicBudgetReduxConfig = config.moduleConfig({
   rootReducer: reducers.publicRootReducer,
   rootSaga: sagas.publicRootSaga,
   initialState: initialState.initialPublicBudgetState,
-  label: "budget",
+  label: "public-budget" as const,
   isPublic: true,
-};
+});
