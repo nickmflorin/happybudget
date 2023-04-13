@@ -1,9 +1,15 @@
-export type TooltipType = "info" | "action";
+import { ReactNode } from "react";
+
+import { formatters, EnumeratedLiteralType, enumeratedLiterals } from "../../util";
+import * as buttons from "../buttons";
+
+export const TooltipTypes = enumeratedLiterals(["info", "action"] as const);
+export type TooltipType = EnumeratedLiteralType<typeof TooltipTypes>;
 
 export type IItemizedTooltipItem = {
   readonly label: string;
   readonly value: string | number;
-  readonly formatter?: NativeFormatter<string | number>;
+  readonly formatter?: formatters.Formatter<string | number>;
 };
 
 export type TooltipContent = string | JSX.Element | IItemizedTooltipItem[];
@@ -15,14 +21,12 @@ export type TooltipProps = Omit<
   "title" | "className" | "style"
 > & {
   readonly content: TooltipContent;
-  readonly includeLink?: IncludeLink;
+  readonly includeLink?: buttons.IncludeLink;
   readonly type?: TooltipType;
   // Only applicable when content is specified as IItemizedTooltipItem[].
-  readonly valueFormatter?: NativeFormatter<string | number>;
+  readonly valueFormatter?: formatters.Formatter<string | number>;
 };
 
 export type DeterministicTooltip = string | Omit<TooltipProps, "children">;
 
-export type Tooltip =
-  | DeterministicTooltip
-  | RenderPropChild<{ children: import("react").ReactNode }>;
+export type Tooltip = DeterministicTooltip | ((args: { children: ReactNode }) => JSX.Element);

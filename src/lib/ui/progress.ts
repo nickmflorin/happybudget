@@ -1,6 +1,6 @@
 import { useReducer, useEffect, useMemo, useRef } from "react";
 
-import { isNil, includes } from "lodash";
+import { enumeratedLiterals, EnumeratedLiteralType } from "../util";
 
 type ProgressState = {
   readonly dampened: number;
@@ -16,7 +16,12 @@ const InitialProgressState: ProgressState = {
   active: false,
 };
 
-type ProgressActionType = "INCREMENT_ACTUAL" | "INCREMENT_DAMPENED" | "CANCEL";
+const ProgressActionTypes = enumeratedLiterals([
+  "increment_actual",
+  "increment_dampened",
+  "cancel",
+] as const);
+type ProgressActionType = EnumeratedLiteralType<typeof ProgressActionTypes>;
 
 type IProgressAction<T extends ProgressActionType, P = null> = {
   readonly type: T;
@@ -24,7 +29,7 @@ type IProgressAction<T extends ProgressActionType, P = null> = {
 };
 
 type ProgressIncrementAction = IProgressAction<
-  "INCREMENT_ACTUAL",
+  "increment_actual",
   {
     readonly value: number;
     readonly total: number;
@@ -33,8 +38,8 @@ type ProgressIncrementAction = IProgressAction<
 
 type ProgressAction =
   | ProgressIncrementAction
-  | IProgressAction<"CANCEL">
-  | IProgressAction<"INCREMENT_DAMPENED">;
+  | IProgressAction<"cancel">
+  | IProgressAction<"increment_dampened">;
 
 type ProgressReducerConfig = {
   readonly rate: number;
@@ -48,19 +53,21 @@ const createProgressReducer = (config: ProgressReducerConfig) => {
     state: ProgressState = InitialProgressState,
     action: ProgressAction,
   ): ProgressState => {
-    if (includes(["INCREMENT_ACTUAL", "INCREMENT_DAMPENED"], action.type)) {
-      let { actual, progress, dampened }: ProgressState = { ...state };
-      if (action.type === "INCREMENT_ACTUAL") {
+    let { actual, progress, dampened }: ProgressState = { ...state };
+    switch (action.type) {
+      case ProgressActionTypes.INCREMENT_ACTUAL:
         actual = Math.min(...[action.payload.value / action.payload.total, 1.0]);
-      } else if (action.type === "INCREMENT_DAMPENED") {
+        break;
+      case ProgressActionTypes.INCREMENT_DAMPENED:
         dampened = Math.min(...[dampened + config.rate, 1.0]);
-      } else if (action.type === "CANCEL") {
+        break;
+      case ProgressActionTypes.CANCEL:
         return InitialProgressState;
-      }
-      progress = Math.min(dampened, actual);
-      return { ...state, dampened, actual, progress, active: progress !== 1.0 && progress !== 0.0 };
+      default:
+        throw new Error("This should never happen!");
     }
-    return state;
+    progress = Math.min(dampened, actual);
+    return { ...state, dampened, actual, progress, active: progress !== 1.0 && progress !== 0.0 };
   };
   return progressReducer;
 };
@@ -87,30 +94,30 @@ export const useDampenedProgress = (
   const progress = useMemo(
     () => (value: number, total: number) => {
       if (state.active === false) {
-        dispatch({ type: "INCREMENT_DAMPENED", payload: null });
+        dispatch({ type: ProgressActionTypes.INCREMENT_DAMPENED, payload: null });
       }
-      dispatch({ type: "INCREMENT_ACTUAL", payload: { value, total } });
+      dispatch({ type: ProgressActionTypes.INCREMENT_ACTUAL, payload: { value, total } });
     },
     [state.active],
   );
 
   const cancel = useMemo(
     () => () => {
-      if (!isNil(interval.current)) {
+      if (interval.current !== undefined) {
         clearInterval(interval.current);
       }
     },
-    [interval.current],
+    [],
   );
 
   useEffect(() => {
     if (state.active === true) {
       interval.current = window.setInterval(() => {
-        dispatch({ type: "INCREMENT_DAMPENED", payload: null });
+        dispatch({ type: ProgressActionTypes.INCREMENT_DAMPENED, payload: null });
       }, config?.perMilliseconds || 100);
       return () => clearInterval(interval.current);
     }
-  }, [state.active]);
+  }, [state.active, config?.perMilliseconds]);
 
   return [state.progress, state.active, progress, cancel];
 };

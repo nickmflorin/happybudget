@@ -1,6 +1,6 @@
-import { ComponentProps } from "..";
 import * as icons from "../icons";
 import * as tooltip from "../tooltip";
+import { ComponentProps } from "../types";
 
 export type LinkObj = {
   readonly text?: string;
@@ -28,4 +28,4 @@ export type ClickableProps = ComponentProps<{
   readonly disabled?: boolean;
   readonly tooltip?: tooltip.Tooltip;
   readonly icon?: ClickableIconOrElement;
-}>
+}>;

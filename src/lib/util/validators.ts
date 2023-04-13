@@ -1,4 +1,4 @@
-import { isNil, uniq } from "lodash";
+import { uniq } from "lodash";
 
 export type Validator<T> = (value: T) => boolean;
 
@@ -56,7 +56,7 @@ export type PasswordValidationState = { [key in PasswordValidationID]: boolean }
  * @deprecated
  */
 export const validatePassword = (value: string): boolean => {
-  if (isNil(value) || value === "") {
+  if (value === "") {
     return false;
   }
   const state = getPasswordValidationState(value);

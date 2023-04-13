@@ -2,9 +2,10 @@ import { ComponentProps as ReactComponentProps, ComponentType } from "react";
 
 import { RequiredKeys, OptionalKeys } from "utility-types";
 
-import { HexColor } from "./style";
 import { HTMLElementName, HTMLElementTag } from "../../core";
 import { IntersectionIfPopulated, enumeratedLiterals, EnumeratedLiteralType } from "../../util";
+
+import { HexColor } from "./style";
 
 type Props = Record<string, unknown>;
 

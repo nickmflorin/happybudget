@@ -1,6 +1,6 @@
+import { stringIsInteger, validators } from "../util";
+
 import * as types from "./types";
-import * as typeguards from "../util/typeguards";
-import * as validators from "../util/validators";
 
 export const isCSSSizeUnit = (value: string): value is types.CSSSizeUnit =>
   types.CSSSizeUnits.includes(value as types.CSSSizeUnit);
@@ -38,7 +38,7 @@ export const isCSSSizeUnit = (value: string): value is types.CSSSizeUnit =>
 export const isCSSSize = (value: string | number): value is types.CSSSize => {
   if (
     typeof value === "number" ||
-    (typeof value === "string" && typeguards.stringIsInteger(value))
+    (typeof value === "string" && stringIsInteger(value))
   ) {
     return true;
   }
@@ -52,7 +52,7 @@ export const isCSSSize = (value: string | number): value is types.CSSSize => {
       }
       return (
         value.endsWith(tail) &&
-        typeguards.stringIsInteger(value.slice(0, Math.max(tail.length - 1, 1)))
+        stringIsInteger(value.slice(0, Math.max(tail.length - 1, 1)))
       );
     },
   );

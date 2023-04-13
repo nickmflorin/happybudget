@@ -2,7 +2,6 @@ import { sumChars } from "./string";
 
 export * as colors from "./colors";
 export * as clipboard from "./clipboard";
-export * as dates from "./dates";
 export * as events from "./events";
 export * as formatters from "./formatters";
 export * as html from "./html";
