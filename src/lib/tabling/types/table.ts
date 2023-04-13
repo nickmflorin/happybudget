@@ -39,7 +39,9 @@ export type TableInstance<
     readonly saving: (v: boolean) => void;
     readonly getColumns: () => columns.ModelColumn<R, M>[];
     readonly getFocusedRow: () => rows.RowSubType<R, rows.BodyRowType> | null;
-    readonly getRow: (id: rows.RowId<"body">) => rows.RowSubType<R, rows.BodyRowType> | null;
+    readonly getRow: (
+      id: rows.RowId<rows.BodyRowType>,
+    ) => rows.RowSubType<R, rows.BodyRowType> | null;
     readonly getRows: () => rows.RowSubType<R, rows.BodyRowType>[];
     readonly getRowsAboveAndIncludingFocusedRow: () => rows.RowSubType<R, rows.BodyRowType>[];
     readonly dispatchEvent: (event: SingleOrArray<events.TableEvent>) => void;
@@ -64,7 +66,7 @@ export type MenuActionRenderFunc = (props: MenuActionRenderProps) => JSX.Element
 
 export type MenuActionObj = {
   readonly index?: number;
-  readonly icon?: IconOrElement;
+  readonly icon?: ui.IconProp;
   readonly tooltip?: ui.DeterministicTooltip;
   readonly disabled?: boolean;
   readonly hidden?: boolean;
@@ -152,11 +154,11 @@ export type FooterGridConfig<
 export type PdfBudgetTableOption = "topsheet" | number;
 
 export type PdfBudgetTableHeaderOptions = {
-  readonly header: Pdf.HTMLNode[];
+  readonly header: ui.HTMLPdfNode[];
   readonly left_image: fs.UploadedImage | fs.SavedImage | null;
-  readonly left_info: Pdf.HTMLNode[] | null;
+  readonly left_info: ui.HTMLPdfNode[] | null;
   readonly right_image: fs.UploadedImage | fs.SavedImage | null;
-  readonly right_info: Pdf.HTMLNode[] | null;
+  readonly right_info: ui.HTMLPdfNode[] | null;
 };
 
 export type PdfBudgetTableOptions = {
@@ -165,13 +167,13 @@ export type PdfBudgetTableOptions = {
   readonly columns: string[];
   readonly tables?: PdfBudgetTableOption[] | null | undefined;
   readonly excludeZeroTotals: boolean;
-  readonly notes?: Pdf.HTMLNode[];
+  readonly notes?: ui.HTMLPdfNode[];
   readonly includeNotes: boolean;
 };
 
 export type PdfActualsTableOptions = {
   readonly date: string;
-  readonly header: Pdf.HTMLNode[];
+  readonly header: ui.HTMLPdfNode[];
   readonly columns: string[];
   readonly excludeZeroTotals: boolean;
 };

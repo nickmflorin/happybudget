@@ -85,37 +85,25 @@ export const createDetailReducer =
     M extends model.ApiModel,
     C extends types.ActionContext = types.ActionContext,
     S extends types.ApiModelDetailStore<M> = types.ApiModelDetailStore<M>,
-    MP extends types.ModelDetailActionPayloadMap<M> = types.ModelDetailActionPayloadMap<M>,
+    MP extends Partial<types.ModelDetailActionPayloadMap<M>> = Partial<
+      types.ModelDetailActionPayloadMap<M>
+    >,
   >(
-    config: types.ReducerConfig<S, MP, C>,
+    c: types.ReducerConfig<S, MP, C>,
   ): types.Reducer<S, types.ActionFromPayloadMap<MP, C>> =>
-  (state: S = config.initialState, action: types.ActionFromPayloadMap<MP, C>): S => {
-    if (
-      config.actions.response !== undefined &&
-      action.type === config.actions.response.toString()
-    ) {
-      const a = action as types.Action<MP["response"], C>;
-      const { response, error } = a.payload;
+  (state: S = c.initialState, action: types.ActionFromPayloadMap<MP, C>): S => {
+    const actions: types.ActionCreatorMap<MP, C> = c.actions;
+    if (types.actionQualifiesMap(actions, "response", action)) {
+      const { response, error } = action.payload;
       if (error) {
         return { ...state, data: null, error, invalidated: false };
       }
       return { ...state, data: response, error: null, invalidated: false };
-    } else if (
-      config.actions.loading !== undefined &&
-      action.type === config.actions.loading.toString()
-    ) {
-      const a = action as types.Action<MP["loading"], C>;
-      return { ...state, loading: a.payload };
-    } else if (
-      config.actions.updateInState !== undefined &&
-      action.type === config.actions.updateInState.toString()
-    ) {
-      const a = action as types.Action<MP["updateInState"], C>;
-      return { ...state, data: { ...state.data, ...a.payload.data } };
-    } else if (
-      config.actions.invalidate !== undefined &&
-      action.type === config.actions.invalidate.toString()
-    ) {
+    } else if (types.actionQualifiesMap(actions, "loading", action)) {
+      return { ...state, loading: action.payload };
+    } else if (types.actionQualifiesMap(actions, "updateInState", action)) {
+      return { ...state, data: { ...state.data, ...action.payload.data } };
+    } else if (types.actionQualifiesMap(actions, "invalidate", action)) {
       return { ...state, invalidated: true };
     }
     return state;
@@ -142,15 +130,12 @@ export const createListReducer =
     config: types.ReducerConfig<S, MP>,
   ): types.Reducer<S, types.ActionFromPayloadMap<MP, C>> =>
   (state: S = config.initialState, action: types.ActionFromPayloadMap<MP, C>): S => {
-    if (config.actions.loading !== undefined && action.type === config.actions.loading.toString()) {
-      const a = action as types.Action<MP["loading"], C>;
-      return { ...state, loading: a.payload };
-    } else if (
-      config.actions.response !== undefined &&
-      action.type === config.actions.response.toString()
-    ) {
-      const a = action as types.Action<MP["response"], C>;
-      const { response, error, requestMeta } = a.payload;
+    const actions: types.ActionCreatorMap<MP, C> = config.actions;
+
+    if (types.actionQualifiesMap(actions, "loading", action)) {
+      return { ...state, loading: action.payload };
+    } else if (types.actionQualifiesMap(actions, "response", action)) {
+      const { response, error, requestMeta } = action.payload;
       const newState: S = {
         ...state,
         responseWasReceived: true,
@@ -166,10 +151,7 @@ export const createListReducer =
         count: response.count,
         invalidated: false,
       };
-    } else if (
-      config.actions.invalidate !== undefined &&
-      action.type === config.actions.invalidate.toString()
-    ) {
+    } else if (types.actionQualifiesMap(actions, "invalidate", action)) {
       return { ...state, invalidated: true };
     }
     return state;
@@ -211,21 +193,18 @@ export const createAuthenticatedModelListReducer = <
 >(
   config: types.ReducerConfig<S, MP>,
 ): types.Reducer<S, types.ActionFromPayloadMap<MP, C>> => {
-  const unauthenticatedReducer = createModelListReducer<M, C, S>(
+  const unauthenticatedReducer = createModelListReducer<M, C, S, MP>(
     config as types.ReducerConfig<S, MP, C>,
   );
+  const actions: types.ActionCreatorMap<MP, C> = config.actions;
   return (state: S = config.initialState, action: types.ActionFromPayloadMap<MP, C>): S => {
     if (
-      (config.actions.loading !== undefined && action.type === config.actions.loading.toString()) ||
-      (config.actions.response !== undefined &&
-        action.type === config.actions.response.toString()) ||
-      (config.actions.invalidate !== undefined &&
-        action.type === config.actions.invalidate.toString())
+      types.actionQualifiesMap(actions, "loading", action) ||
+      types.actionQualifiesMap(actions, "response", action) ||
+      types.actionQualifiesMap(actions, "invalidate", action)
     ) {
-      const a = action as types.Action<MP["loading" | "response" | "invalidate"], C>;
-      state = unauthenticatedReducer(state, a);
+      state = unauthenticatedReducer(state, action);
     }
-
     const reorderIfApplicable = (s: S) =>
       s.ordering.length !== 0
         ? {
@@ -234,23 +213,12 @@ export const createAuthenticatedModelListReducer = <
           }
         : s;
 
-    if (
-      config.actions.setSearch !== undefined &&
-      action.type === config.actions.setSearch.toString()
-    ) {
-      const a = action as types.Action<MP["setSearch"], C>;
-      return { ...state, search: a.payload };
-    } else if (
-      config.actions.request !== undefined &&
-      action.type === config.actions.request.toString()
-    ) {
+    if (types.actionQualifiesMap(actions, "setSearch", action)) {
+      return { ...state, search: action.payload };
+    } else if (types.actionQualifiesMap(actions, "request", action)) {
       return { ...state, data: [], count: 0 };
-    } else if (
-      config.actions.removeFromState !== undefined &&
-      action.type === config.actions.removeFromState.toString()
-    ) {
-      const a = action as types.Action<MP["removeFromState"], C>;
-      const existing = model.getModelInState(state.data, a.payload, { action });
+    } else if (types.actionQualifiesMap(actions, "removeFromState", action)) {
+      const existing = model.getModelInState(state.data, action.payload, { action });
       if (existing === null) {
         return state;
       }
@@ -259,32 +227,24 @@ export const createAuthenticatedModelListReducer = <
         data: state.data.filter((entity: M) => entity.id !== action.payload),
         count: state.count - 1,
       };
-    } else if (
-      config.actions.updateInState !== undefined &&
-      action.type === config.actions.updateInState.toString()
-    ) {
-      const a = action as types.Action<MP["updateInState"], C>;
+    } else if (types.actionQualifiesMap(actions, "updateInState", action)) {
       /* Note: Eventually we will want to apply `reorderIfApplicable` here but we need to make sure
          it is fully properly functioning before we do so. */
-      const existing = model.getModelInState(state.data, a.payload.id, { action });
+      const existing = model.getModelInState(state.data, action.payload.id, { action });
       if (existing === null) {
         return state;
       }
       /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-      const { id: _, ...withoutId } = a.payload.data;
+      const { id: _, ...withoutId } = action.payload.data;
       return {
         ...state,
-        data: replaceInArray<M>(state.data, (m: M) => m.id === a.payload.id, {
+        data: replaceInArray<M>(state.data, (m: M) => m.id === action.payload.id, {
           ...existing,
           ...withoutId,
         }),
       };
-    } else if (
-      config.actions.addToState !== undefined &&
-      action.type === config.actions.addToState.toString()
-    ) {
-      const a = action as types.Action<MP["addToState"], C>;
-      const existing = model.getModelInState(state.data, a.payload.id, {
+    } else if (types.actionQualifiesMap(actions, "addToState", action)) {
+      const existing = model.getModelInState(state.data, action.payload.id, {
         warnOnMissing: false,
       });
       if (existing !== undefined) {
@@ -296,16 +256,12 @@ export const createAuthenticatedModelListReducer = <
       }
       return reorderIfApplicable({
         ...state,
-        data: [...state.data, a.payload],
+        data: [...state.data, action.payload],
         count: state.count + 1,
       });
-    } else if (
-      config.actions.updateOrdering !== undefined &&
-      action.type === config.actions.updateOrdering.toString()
-    ) {
-      const a = action as types.Action<MP["updateOrdering"], C>;
+    } else if (types.actionQualifiesMap(actions, "updateOrdering", action)) {
       const existing: api.FieldOrder<string & keyof M> | undefined = find(state.ordering, {
-        field: a.payload.field as keyof M & string,
+        field: action.payload.field as keyof M & string,
       }) as api.FieldOrder<string & keyof M> | undefined;
       if (existing !== undefined) {
         notifications.internal.inconsistentStateError({
@@ -318,40 +274,24 @@ export const createAuthenticatedModelListReducer = <
         ...state,
         ordering: state.ordering.reduce(
           (curr: api.ModelOrdering<M>, o: api.ModelFieldOrder<M>): api.ModelOrdering<M> => {
-            if (o.field === a.payload.field) {
-              return [...curr, { ...o, order: a.payload.order }];
+            if (o.field === action.payload.field) {
+              return [...curr, { ...o, order: action.payload.order }];
             }
             return [...curr, { ...o, order: 0 }];
           },
           [] as api.ModelOrdering<M>,
         ),
       };
-    } else if (
-      config.actions.setPagination !== undefined &&
-      action.type === config.actions.setPagination.toString()
-    ) {
-      const a = action as types.Action<MP["setPagination"], C>;
-      return a.payload.pageSize !== undefined
-        ? { ...state, page: a.payload.page, pageSize: a.payload.pageSize }
-        : { ...state, page: a.payload.page };
-    } else if (
-      config.actions.deleting !== undefined &&
-      action.type === config.actions.deleting.toString()
-    ) {
-      const a = action as types.Action<MP["deleting"], C>;
-      return { ...state, deleting: modelListActionReducer(state.deleting, a.payload) };
-    } else if (
-      config.actions.updating !== undefined &&
-      action.type === config.actions.updating.toString()
-    ) {
-      const a = action as types.Action<MP["updating"], C>;
-      return { ...state, updating: modelListActionReducer(state.updating, a.payload) };
-    } else if (
-      config.actions.creating !== undefined &&
-      action.type === config.actions.creating.toString()
-    ) {
-      const a = action as types.Action<MP["creating"], C>;
-      return { ...state, creating: a.payload };
+    } else if (types.actionQualifiesMap(actions, "setPagination", action)) {
+      return action.payload.pageSize !== undefined
+        ? { ...state, page: action.payload.page, pageSize: action.payload.pageSize }
+        : { ...state, page: action.payload.page };
+    } else if (types.actionQualifiesMap(actions, "deleting", action)) {
+      return { ...state, deleting: modelListActionReducer(state.deleting, action.payload) };
+    } else if (types.actionQualifiesMap(actions, "updating", action)) {
+      return { ...state, updating: modelListActionReducer(state.updating, action.payload) };
+    } else if (types.actionQualifiesMap(actions, "creating", action)) {
+      return { ...state, creating: action.payload };
     }
     return state;
   };

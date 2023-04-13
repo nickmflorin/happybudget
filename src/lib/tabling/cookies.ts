@@ -1,11 +1,12 @@
-import { includes, isNil, reduce } from "lodash";
 import Cookies from "universal-cookie";
+
+import * as columns from "./columns";
 
 export const parseHiddenColumns = (
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   obj: any,
   validateAgainst?: string[],
-): Table.HiddenColumns => {
+): columns.HiddenColumns => {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   let data: any = null;
   if (typeof obj === "string") {
@@ -20,20 +21,16 @@ export const parseHiddenColumns = (
   } else if (typeof obj === "object") {
     data = obj;
   }
-  if (!isNil(data)) {
+  if (data !== null) {
     const cols = Object.keys(data);
-    return reduce(
-      cols,
-      (curr: { [key: string]: boolean }, c: string) => {
-        if (isNil(validateAgainst) || includes(validateAgainst, c)) {
-          if (typeof data[c] === "boolean") {
-            return { ...curr, [c]: data[c] };
-          }
+    return cols.reduce((curr: { [key: string]: boolean }, c: string) => {
+      if (validateAgainst === undefined || validateAgainst.includes(c)) {
+        if (typeof data[c] === "boolean") {
+          return { ...curr, [c]: data[c] };
         }
-        return { ...curr };
-      },
-      {},
-    );
+      }
+      return { ...curr };
+    }, {});
   }
   return {};
 };
@@ -41,13 +38,13 @@ export const parseHiddenColumns = (
 export const getHiddenColumns = (
   tableId: string,
   validateAgainst?: string[],
-): Table.HiddenColumns => {
+): columns.HiddenColumns => {
   const cookiesObj = new Cookies();
   const cookiesHiddenColumns = cookiesObj.get(`hidden-columns-${tableId}`);
   return parseHiddenColumns(cookiesHiddenColumns, validateAgainst);
 };
 
-export const setHiddenColumns = (tableId: string, fields: Table.HiddenColumns) => {
+export const setHiddenColumns = (tableId: string, fields: columns.HiddenColumns) => {
   const cookiesObj = new Cookies();
   cookiesObj.set(`hidden-columns-${tableId}`, fields);
 };

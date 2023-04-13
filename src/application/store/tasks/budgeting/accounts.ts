@@ -133,7 +133,7 @@ function* requestTableData<
   yield put(config.actions.loading(false, action.context));
 }
 
-export const createPublicTableTaskSet = (
+export const createPublicAccountsTableTaskSet = (
   config: PublicAccountsTableTaskConfig,
 ): types.TableTaskMap<TableContext<model.AnotherUserBudget>> => {
   function* request(
@@ -159,7 +159,9 @@ export const createPublicTableTaskSet = (
   return { request };
 };
 
-export const createAuthenticatedTableTaskSet = <B extends model.UserBudget | model.Template>(
+export const createAuthenticatedAccountsTableTaskSet = <
+  B extends model.UserBudget | model.Template,
+>(
   config: AuthenticatedAccountsTableTaskConfig<B>,
 ): types.AuthenticatedTableTaskMap<R, TableContext<B>> => {
   function* request(

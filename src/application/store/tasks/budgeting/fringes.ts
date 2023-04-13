@@ -77,7 +77,7 @@ export type FringesTableTaskConfig<B extends model.Template | model.UserBudget> 
   ) => types.SubAccountTableStore;
 };
 
-export const createTableTaskSet = <B extends model.Template | model.UserBudget>(
+export const createFringesTableTaskSet = <B extends model.Template | model.UserBudget>(
   config: FringesTableTaskConfig<B>,
 ): Omit<types.AuthenticatedTableTaskMap<R, TableContext<B>>, "request"> => {
   const selectTableStore = createSelector(

@@ -1,9 +1,9 @@
 import { ActualFileObject } from "filepond/types";
 
-import { model } from "lib";
+import { model, schemas } from "lib";
 
 export type FilepondFile = ActualFileObject;
-export type PayloadData = Record<string, JsonValue | ArrayBuffer>;
+export type PayloadData = schemas.JsonObject;
 export type Payload<P extends PayloadData = PayloadData> = FormData | P;
 
 export const payloadIsFormData = <P extends PayloadData>(p: Payload<P>): p is FormData =>
@@ -185,8 +185,8 @@ export type ContactPayload = {
   readonly contact_type?: model.ContactType["id"] | null;
   readonly image?: ArrayBuffer | string | null;
   readonly previous?: number | null;
-  readonly first_name: model.Contact["first_name"];
-  readonly last_name: model.Contact["last_name"];
+  readonly first_name?: model.Contact["first_name"];
+  readonly last_name?: model.Contact["last_name"];
 };
 
 export type BulkCreatePayload<T extends PayloadData> = { data: Partial<T>[] };

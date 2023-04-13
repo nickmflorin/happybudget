@@ -29,7 +29,7 @@ export type TableStore<R extends tabling.Row = tabling.Row> = {
    * A history of user submitted events that alter the data in the table, and the current index of
    * the event history that represents the current state of the table.  Used for undo/redo behavior.
    */
-  readonly eventHistory: tabling.ChangeEventHistory<tabling.RowSubType<R, tabling.EditableRowType>>;
+  readonly eventHistory: tabling.ChangeEventHistory<R>;
   readonly eventIndex: number;
   /**
    * Indicates whether or not the data in the store is the result of an API request versus the
@@ -84,6 +84,21 @@ export type TableRequestActionPayload = { ids: number[] } | actions.RequestActio
 export type TableRequestAction<C extends actions.ActionContext = actions.ActionContext> =
   actions.Action<TableRequestActionPayload, C>;
 
+export const tableRequestActionIsForced = <C extends actions.ActionContext>(
+  a: TableRequestAction<C>,
+): a is actions.Action<{ force: true }, C> =>
+  a.payload !== null && (a as actions.Action<{ force: true }, C>).payload.force === true;
+
+export const isListRequestIdsPayload = (obj: TableRequestActionPayload): obj is { ids: number[] } =>
+  obj !== null &&
+  typeof obj === "object" &&
+  (obj as { ids: number[] }).ids !== undefined &&
+  Array.isArray((obj as { ids: number[] }).ids);
+
+export const tableRequestActionIsListIds = <C extends actions.ActionContext>(
+  obj: actions.Action<TableRequestActionPayload, C>,
+): obj is actions.Action<{ ids: number[] }, C> => isListRequestIdsPayload(obj.payload);
+
 export type TableRequestActionCreator<C extends actions.ActionContext = actions.ActionContext> =
   actions.ActionCreator<TableRequestActionPayload, C>;
 
@@ -102,11 +117,22 @@ export type AuthenticatedTableActionPayloadMap<
   readonly handleEvent: tabling.AnyTableEvent<R>;
 };
 
+export const isTableActionWithEventType = <
+  T extends tabling.TableEventId,
+  R extends tabling.Row,
+  M extends model.RowTypedApiModel,
+>(
+  a: actions.Action,
+  eventId: T,
+): a is actions.Action<tabling.TableEvent<T, R, M>> =>
+  typeof (a as actions.Action<tabling.TableEvent<T, R, M>>).payload === "string" &&
+  (a as actions.Action<tabling.TableEvent<T, R, M>>).payload.type === eventId;
+
 /*----------------------------------------- Selectors ------------------------------------------- */
 
 export type RowDataSelector<R extends tabling.Row> = (
   state: application.ApplicationStore,
-) => Partial<tabling.RowData<R>>;
+) => Partial<tabling.GetRowData<R>>;
 
 /*------------------------------------------- Tasks --------------------------------------------- */
 export type TableChangeEventTask<
@@ -146,22 +172,6 @@ export type TableTaskConfig<
   readonly table: tabling.TableInstance<R, M>;
   readonly selectStore: (state: application.ApplicationStore, ctx: C) => S;
 };
-
-export type DefaultValueOnCreate<R extends tabling.Row> =
-  | tabling.RowData<R>[keyof tabling.RowData<R>]
-  | ((r: Partial<tabling.RowData<R>>) => tabling.RowData<R>[keyof tabling.RowData<R>]);
-
-// type DefaultValueOnUpdate<R extends RowData> = R[keyof R] | ((r: ModelRow<R>) => R[keyof R]);
-export type DefaultDataOnCreate<R extends tabling.Row> =
-  | Partial<tabling.RowData<R>>
-  | ((r: Partial<tabling.RowData<R>>) => Partial<tabling.RowData<R>>);
-
-export type DefaultDataOnUpdate<R extends tabling.Row> =
-  | tabling.RowData<R>
-  | ((
-      r: tabling.RowSubType<R, "model">,
-      ch: tabling.RowChangeData<tabling.RowSubType<R, "model">>,
-    ) => Partial<tabling.RowData<R>>);
 
 /*------------------------------------------ Reducers ------------------------------------------- */
 export type TableReducerConfig<

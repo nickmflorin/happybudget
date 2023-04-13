@@ -1,233 +1,251 @@
-import * as api from "api";
-import { filter } from "lodash";
 import { SagaIterator } from "redux-saga";
-import { put, fork, select, call } from "redux-saga/effects";
+import { put, call, select } from "redux-saga/effects";
 
-import { tabling, notifications, http, redux } from "lib";
+import { tabling, notifications, model } from "lib";
 
+import * as api from "../../api";
 import * as actions from "../actions";
+import * as types from "../types";
 
-type R = Tables.ContactRowData;
-type M = Model.Contact;
-type P = Http.ContactPayload;
-type TC = Redux.ActionContext;
+import * as cache from "./cache";
+import { createBulkCreateTask, createChangeEventHandler } from "./tabling";
 
-export function* request(context?: Redux.ActionContext): SagaIterator {
-  const requestCached = yield select((s: Application.Store) =>
-    redux.canUseCachedListResponse(s.contacts),
+type R = model.ContactRow;
+type M = model.Contact;
+type P = api.ContactPayload;
+type TableContext = types.ActionContext;
+
+export function* requestContacts(context?: types.ActionContext): SagaIterator {
+  const requestCached = yield select((s: types.ApplicationStore) =>
+    cache.canUseCachedListResponse(s.contacts),
   );
-  const filteredQuery: Http.ListQuery = yield select((state: Application.Store) => ({
+  const filteredQuery: api.ListQuery = yield select((state: types.ApplicationStore) => ({
     search: state.filteredContacts.search,
   }));
   if (!requestCached) {
     yield put(actions.loadingContactsAction(true, {}));
-    try {
-      const response: Http.ApiListResponse<M> = yield http.request(api.getContacts, context);
-      yield put(actions.responseContactsAction(response, {}));
-      /* Only set the filtered contacts at the same time if there isn't an active
-         search. */
-      if (filteredQuery.search !== "") {
-        yield put(actions.responseFilteredContactsAction(response, {}));
-      }
-    } catch (e: unknown) {
-      notifications.ui.banner.handleRequestError(e as Error, {
+    const response: Awaited<ReturnType<typeof api.getContacts>> = yield call(api.getContacts);
+    if (response.error) {
+      notifications.ui.banner.handleRequestError(response.error, {
         message: context?.errorMessage || "There was an error retrieving the contacts.",
       });
-      // Non api.RequestError will be thrown in the above block.
-      yield put(
-        actions.responseContactsAction(
-          { count: 0, data: [], error: e as api.RequestError, query: {} },
-          {},
-        ),
-      );
-      /* Only set the filtered contacts at the same time if there isn't an active
-         search. */
-      if (filteredQuery.search !== "") {
-        yield put(
-          actions.responseFilteredContactsAction(
-            { count: 0, data: [], error: e as api.RequestError, query: {} },
-            {},
-          ),
-        );
-      }
-    } finally {
-      yield put(actions.loadingContactsAction(false, {}));
     }
+    yield put(actions.responseContactsAction(response, {}));
+    // Only set the filtered contacts at the same time if there isn't an active search.
+    if (filteredQuery.search !== "") {
+      yield put(actions.responseFilteredContactsAction(response, {}));
+    }
+    yield put(actions.loadingContactsAction(false, {}));
   }
 }
 
-export function* requestFiltered(context?: Redux.ActionContext): SagaIterator {
-  const query: Http.ListQuery = yield select((state: Application.Store) => ({
+export function* requestFilteredContacts(context?: types.ActionContext): SagaIterator {
+  const query: api.ListQuery = yield select((state: types.ApplicationStore) => ({
     search: state.filteredContacts.search,
   }));
-  const requestCached = yield select((s: Application.Store) =>
-    redux.canUseCachedListResponse(s.filteredContacts, query),
+  const requestCached = yield select((s: types.ApplicationStore) =>
+    cache.canUseCachedListResponse(s.filteredContacts, query),
   );
   if (!requestCached) {
     yield put(actions.loadingFilteredContactsAction(true, {}));
-    try {
-      const response: Http.ApiListResponse<M> = yield http.request(api.getContacts, context, query);
-      yield put(actions.responseFilteredContactsAction(response, {}));
-    } catch (e: unknown) {
-      notifications.ui.banner.handleRequestError(e as Error, {
+    const response: Awaited<ReturnType<typeof api.getContacts>> = yield call(api.getContacts, {
+      query,
+    });
+    if (response.error) {
+      notifications.ui.banner.handleRequestError(response.error, {
         message: context?.errorMessage || "There was an error retrieving the contacts.",
       });
-      // Non api.RequestError will be thrown in the above block.
-      yield put(
-        actions.responseFilteredContactsAction({ error: e as api.RequestError, query }, {}),
-      );
-    } finally {
-      yield put(actions.loadingFilteredContactsAction(false, {}));
     }
+    yield put(actions.responseFilteredContactsAction(response, {}));
+    yield put(actions.loadingFilteredContactsAction(false, {}));
   }
 }
 
-export const createTableTaskSet = (
-  config: Table.TaskConfig<
+export const createContactsTableTaskSet = (
+  config: types.TableTaskConfig<
     R,
     M,
-    Tables.ContactTableStore,
-    Redux.ActionContext,
-    Redux.AuthenticatedTableActionCreatorMap<R, M>
+    types.ContactTableStore,
+    TableContext,
+    types.AuthenticatedTableActionPayloadMap<R>
   >,
-): Redux.AuthenticatedTableTaskMap<R, TC> => {
-  function* tableRequest(action: Redux.Action<Redux.TableRequestPayload, TC>): SagaIterator {
+): types.AuthenticatedTableTaskMap<R, TableContext> => {
+  function* tableRequest(
+    action: types.Action<types.TableRequestActionPayload, TableContext>,
+  ): SagaIterator {
     yield put(config.actions.loading(true, {}));
-    try {
-      const response: Http.ApiListResponse<M> = yield http.request(api.getContacts, action.context);
-      yield put(config.actions.response({ models: response.data }, {}));
-    } catch (e: unknown) {
-      config.table.handleRequestError(e as Error, {
+    const response: Awaited<ReturnType<typeof api.getContacts>> = yield call(api.getContacts);
+    if (response.error) {
+      config.table.handleRequestError(response.error, {
         message: action.context.errorMessage || "There was an loading the table data.",
         dispatchClientErrorToSentry: true,
       });
-      yield put(config.actions.response({ models: [], error: e as api.RequestError }, {}));
-    } finally {
-      yield put(config.actions.loading(false, {}));
+      yield put(config.actions.response({ models: [], error: response.error }, {}));
+    } else {
+      yield put(config.actions.response({ models: response.response.data }, {}));
     }
+    yield put(config.actions.loading(false, {}));
   }
 
-  const bulkCreateTask: (e: Table.RowAddEvent<R>, ctx: TC) => SagaIterator = tabling.createBulkTask(
-    {
+  const bulkCreateTask: (e: tabling.RowAddEvent<R>, ctx: TableContext) => SagaIterator =
+    createBulkCreateTask<R, M, api.ContactPayload, api.ChildListResponse<M>, TableContext>({
       table: config.table,
-      service: () => api.bulkCreateContacts,
       selectStore: config.selectStore,
-      responseActions: (ctx: TC, r: Http.ChildListResponse<M>, e: Table.RowAddEvent<R>) => [
+      responseActions: (
+        ctx: TableContext,
+        r: api.ChildListResponse<M>,
+        e: tabling.RowAddEvent<R>,
+      ) => [
         config.actions.handleEvent(
           {
             type: "placeholdersActivated",
-            payload: { placeholderIds: e.placeholderIds, models: r.children },
+            payload: { placeholderIds: e.payload.placeholderIds, models: r.children },
           },
           ctx,
         ),
       ],
-      performCreate: (
-        ctx: Redux.WithActionContext<TC>,
-        p: Http.BulkCreatePayload<Http.ContactPayload>,
-      ): [Http.BulkCreatePayload<Http.ContactPayload>] => [p],
-    },
-  );
+      performCreate:
+        (ctx: TableContext, p: api.BulkCreatePayload<api.ContactPayload>) => async () =>
+          api.bulkCreateContacts({ body: p }),
+    });
 
-  function* bulkUpdateTask(ctx: TC, requestPayload: Http.BulkUpdatePayload<P>): SagaIterator {
+  function* bulkUpdateTask(
+    ctx: TableContext,
+    requestPayload: api.BulkUpdatePayload<P>,
+  ): SagaIterator {
     config.table.saving(true);
-    try {
-      yield http.request(api.bulkUpdateContacts, ctx, requestPayload);
-    } catch (err: unknown) {
-      config.table.handleRequestError(err as Error, {
-        message: ctx.errorMessage || "There was an error updating the table rows.",
+    const r: Awaited<ReturnType<typeof api.bulkUpdateContacts>> = yield call(
+      api.bulkUpdateContacts,
+      { body: requestPayload },
+    );
+    if (r.error) {
+      config.table.handleRequestError(r.error, {
+        message: ctx.errorMessage || "There was an error updating the rows.",
         dispatchClientErrorToSentry: true,
       });
-    } finally {
-      config.table.saving(false);
     }
+    config.table.saving(false);
   }
 
-  function* bulkDeleteTask(ctx: TC, ids: number[]): SagaIterator {
+  function* bulkDeleteTask(ctx: TableContext, ids: number[]): SagaIterator {
     config.table.saving(true);
-    try {
-      yield http.request(api.bulkDeleteContacts, ctx, { ids });
-    } catch (err: unknown) {
-      config.table.handleRequestError(err as Error, {
-        message: ctx.errorMessage || "There was an error removing the table rows.",
+    const r: Awaited<ReturnType<typeof api.bulkDeleteContacts>> = yield call(
+      api.bulkDeleteContacts,
+      { body: { ids } },
+    );
+    if (r.error) {
+      config.table.handleRequestError(r.error, {
+        message: ctx.errorMessage || "There was an error deleting the rows.",
         dispatchClientErrorToSentry: true,
       });
-    } finally {
-      config.table.saving(false);
     }
+    config.table.saving(false);
   }
 
-  function* handleRowInsertEvent(e: Table.RowInsertEvent<R>, ctx: TC): SagaIterator {
-    const response: M = yield http.request(api.createContact, ctx, {
-      previous: e.payload.previous,
-      ...tabling.rows.postPayload<R, M, P>(e.payload.data, config.table.getColumns()),
+  function* handleRowInsertEvent(
+    e: tabling.ChangeEvent<"rowInsert", R>,
+    ctx: TableContext,
+  ): SagaIterator {
+    config.table.saving(true);
+    const r: Awaited<ReturnType<typeof api.createContact>> = yield call(api.createContact, {
+      body: {
+        previous: e.payload.previous,
+        ...tabling.postPayload<R, M, P>(e.payload.data, config.table.getColumns()),
+      },
     });
-    yield put(
-      config.actions.handleEvent({ type: "modelsAdded", payload: { model: response } }, {}),
-    );
+    if (r.error) {
+      config.table.handleRequestError(r.error, {
+        message: ctx.errorMessage || "There was an error adding the table rows.",
+        dispatchClientErrorToSentry: true,
+      });
+    } else {
+      yield put(
+        config.actions.handleEvent(
+          {
+            type: "modelsAdded",
+            payload: { model: r.response },
+          },
+          ctx,
+        ),
+      );
+    }
+    config.table.saving(false);
   }
 
-  function* handleRowPositionChangedEvent(e: Table.RowPositionChangedEvent, ctx: TC): SagaIterator {
-    const response: M = yield http.request(api.updateContact, ctx, e.payload.id, {
-      previous: e.payload.previous,
-    });
-    yield put(
-      config.actions.handleEvent({ type: "modelsUpdated", payload: { model: response } }, {}),
+  function* handleRowPositionChangedEvent(
+    e: tabling.ChangeEvent<"rowPositionChanged", R>,
+    ctx: TableContext,
+  ): SagaIterator {
+    config.table.saving(true);
+    const r: Awaited<ReturnType<typeof api.updateContact>> = yield call(
+      api.updateContact,
+      { id: e.payload.id },
+      { body: { previous: e.payload.previous } },
     );
+    if (r.error) {
+      config.table.handleRequestError(r.error, {
+        message: ctx.errorMessage || "There was an error moving the table rows.",
+        dispatchClientErrorToSentry: true,
+      });
+    } else {
+      yield put(
+        config.actions.handleEvent(
+          {
+            type: "modelsUpdated",
+            payload: { model: r.response },
+          },
+          ctx,
+        ),
+      );
+    }
+    config.table.saving(false);
   }
 
-  function* handleRowAddEvent(e: Table.RowAddEvent<R>, ctx: TC): SagaIterator {
+  function* handleRowAddEvent(e: tabling.RowAddEvent<R>, ctx: TableContext): SagaIterator {
+    config.table.saving(true);
     yield call(bulkCreateTask, e, ctx);
+    config.table.saving(false);
   }
 
-  function* handleRowDeleteEvent(e: Table.RowDeleteEvent, ctx: TC): SagaIterator {
-    const ids: Table.RowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
-    const modelRowIds = filter(ids, (id: Table.RowId) => tabling.rows.isModelRowId(id)) as number[];
+  function* handleRowDeleteEvent(
+    e: tabling.ChangeEvent<"rowDelete", R>,
+    ctx: TableContext,
+  ): SagaIterator {
+    const ids: tabling.RowId[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
+    const modelRowIds = ids.filter((id: tabling.RowId) => tabling.isModelRowId(id)) as number[];
     if (modelRowIds.length !== 0) {
-      yield fork(bulkDeleteTask, ctx, modelRowIds);
+      config.table.saving(true);
+      yield call(bulkDeleteTask, ctx, modelRowIds);
+      config.table.saving(false);
     }
   }
 
   function* handleDataChangeEvent(
-    e: Table.DataChangeEvent<R, Table.ModelRow<R>>,
-    ctx: TC,
+    e: tabling.ChangeEvent<"dataChange", R>,
+    ctx: TableContext,
   ): SagaIterator {
-    const merged = tabling.events.consolidateRowChanges(e.payload);
+    const merged = tabling.consolidateRowChanges(e.payload);
     if (merged.length !== 0) {
-      const requestPayload = tabling.rows.createBulkUpdatePayload<R, M, P>(
+      const requestPayload = tabling.createBulkUpdatePayload<R, M, P>(
         merged,
         config.table.getColumns(),
       );
       if (requestPayload.data.length !== 0) {
-        yield fork(bulkUpdateTask, ctx, requestPayload);
+        yield call(bulkUpdateTask, ctx, requestPayload);
       }
     }
   }
 
   return {
     request: tableRequest,
-    handleChangeEvent: tabling.createChangeEventHandler({
-      rowAdd: handleRowAddEvent,
+    handleChangeEvent: createChangeEventHandler({
+      rowAddData: handleRowAddEvent,
+      rowAddIndex: handleRowAddEvent,
+      rowAddCount: handleRowAddEvent,
       rowDelete: handleRowDeleteEvent,
-      rowInsert: tabling.task(
-        handleRowInsertEvent,
-        config.table,
-        "There was an error adding the table rows.",
-      ),
-      rowPositionChanged: tabling.task(
-        handleRowPositionChangedEvent,
-        config.table,
-        "There was an error moving the table rows.",
-      ),
-      /*
-			It is safe to assume that the ID of the row for which data is being
-			changed will always be a ModelRowId - but we have to force coerce that
-			here.
-			*/
-      dataChange: handleDataChangeEvent as Redux.TableChangeEventTask<
-        Table.DataChangeEvent<R>,
-        R,
-        TC
-      >,
+      rowInsert: handleRowInsertEvent,
+      rowPositionChanged: handleRowPositionChangedEvent,
+      dataChange: handleDataChangeEvent,
     }),
   };
 };

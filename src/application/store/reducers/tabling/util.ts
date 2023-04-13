@@ -1,15 +1,17 @@
 import { isNil, filter, includes, reduce, map, uniq } from "lodash";
 
-import { tabling, redux, util } from "lib";
+import { tabling } from "lib";
+
+import * as types from "../../types";
 
 export const reorderRows = <
-  R extends Table.RowData,
-  S extends Redux.TableStore<R> = Redux.TableStore<R>,
+  R extends tabling.Row,
+  S extends types.TableStore<R> = types.TableStore<R>,
 >(
   st: S,
 ): S => ({
   ...st,
-  data: tabling.rows.orderTableData<R>(st.data),
+  data: tabling.orderTableData<R>(st.data),
 });
 
 export const groupRowFromState = <

@@ -84,17 +84,14 @@ export const FringeUnits = choice.choices([
   choice.choice(1, FringeUnitNames.FLAT, FringeUnitSlugs.FLAT),
 ] as const);
 
-export type Fringe = types.RowTypedApiModel<
-  "fringe",
-  {
-    readonly color: ui.HexColor | null;
-    readonly name: string | null;
-    readonly description: string | null;
-    readonly cutoff: number | null;
-    readonly rate: number | null;
-    readonly unit: FringeUnit | null;
-  }
->;
+export type Fringe = types.RowTypedApiModel<"fringe"> & {
+  readonly color: ui.HexColor | null;
+  readonly name: string | null;
+  readonly description: string | null;
+  readonly cutoff: number | null;
+  readonly rate: number | null;
+  readonly unit: FringeUnit | null;
+};
 
 export const MarkupUnitNames = enumeratedLiterals(["Percent", "Flat"] as const);
 export type MarkupUnitName = EnumeratedLiteralType<typeof MarkupUnitNames>;
@@ -109,13 +106,10 @@ export const MarkupUnits = choice.choices([
   choice.choice(1, MarkupUnitNames.FLAT, MarkupUnitSlugs.FLAT),
 ] as const);
 
-export type SimpleMarkup = types.TypedApiModel<
-  "markup",
-  {
-    readonly identifier: string | null;
-    readonly description: string | null;
-  }
->;
+export type SimpleMarkup = types.TypedApiModel<"markup"> & {
+  readonly identifier: string | null;
+  readonly description: string | null;
+};
 
 export type UnknownMarkup = SimpleMarkup & {
   readonly rate: number | null;
@@ -135,20 +129,15 @@ export type PercentMarkup = Omit<UnknownMarkup, "unit"> & {
 
 export type Markup = FlatMarkup | PercentMarkup;
 
-export type AbstractBudget = types.TypedApiModel<
-  "budget",
-  {
-    readonly name: string;
-    readonly domain: BudgetDomain;
-    readonly updated_at: string;
-    readonly image: fs.SavedImage | null;
-    /*
-		A budget will not have an updated by field in the case that the user who updated the budget has
-    since been deleted.
-		*/
-    readonly updated_by: Omit<user.SimpleUser, "profile_image"> | null;
-  }
->;
+export type AbstractBudget = types.TypedApiModel<"budget"> & {
+  readonly name: string;
+  readonly domain: BudgetDomain;
+  readonly updated_at: string;
+  readonly image: fs.SavedImage | null;
+  /* A budget will not have an updated by field in the case that the user who updated the budget has
+     since been deleted. */
+  readonly updated_by: Omit<user.SimpleUser, "profile_image"> | null;
+};
 
 export type SimpleTemplate = AbstractBudget & {
   readonly domain: "template";
@@ -171,15 +160,13 @@ export type SimpleBudget = SimpleCollaboratingBudget & {
   readonly is_permissioned: boolean;
 };
 
-type _Budget = auth.PublicTypedApiModel<
-  "budget",
+type _Budget = auth.PublicTypedApiModel<"budget"> &
   Omit<SimpleBudget, "is_permissioned"> & {
     readonly nominal_value: number;
     readonly actual: number;
     readonly accumulated_fringe_contribution: number;
     readonly accumulated_markup_contribution: number;
-  }
->;
+  };
 
 export type AnotherUserBudget = _Budget;
 export type UserBudget = _Budget & {
@@ -188,15 +175,12 @@ export type UserBudget = _Budget & {
 export type Budget = AnotherUserBudget | UserBudget;
 export type BaseBudget = Budget | Template;
 
-export type Collaborator = types.TypedApiModel<
-  "collaborator",
-  {
-    readonly created_at: string;
-    readonly updated_at: string;
-    readonly access_type: CollaboratorAccessType;
-    readonly user: user.SimpleUser;
-  }
->;
+export type Collaborator = types.TypedApiModel<"collaborator"> & {
+  readonly created_at: string;
+  readonly updated_at: string;
+  readonly access_type: CollaboratorAccessType;
+  readonly user: user.SimpleUser;
+};
 
 export interface PdfBudget extends types.TypedApiModel<"pdf-budget"> {
   readonly name: string;
@@ -209,14 +193,11 @@ export interface PdfBudget extends types.TypedApiModel<"pdf-budget"> {
   readonly children_markups: Markup[];
 }
 
-export type Group = types.TypedApiModel<
-  "group",
-  {
-    readonly name: string;
-    readonly color: ui.HexColor | null;
-    readonly children: number[];
-  }
->;
+export type Group = types.TypedApiModel<"group"> & {
+  readonly name: string;
+  readonly color: ui.HexColor | null;
+  readonly children: number[];
+};
 
 export type LineMetrics = {
   readonly nominal_value: number;
@@ -226,23 +207,17 @@ export type LineMetrics = {
   readonly accumulated_markup_contribution: number;
 };
 
-export type SimpleAccount = types.TypedApiModel<
-  "account",
-  {
-    readonly identifier: string | null;
-    readonly description: string | null;
-    readonly domain: BudgetDomain;
-  }
->;
-
-export type SimpleSubAccount = types.TypedApiModel<
-"subaccount",
-{
+export type SimpleAccount = types.TypedApiModel<"account"> & {
   readonly identifier: string | null;
   readonly description: string | null;
   readonly domain: BudgetDomain;
-}
->;
+};
+
+export type SimpleSubAccount = types.TypedApiModel<"subaccount"> & {
+  readonly identifier: string | null;
+  readonly description: string | null;
+  readonly domain: BudgetDomain;
+};
 
 export type Account = LineMetrics &
   SimpleAccount & {
@@ -254,7 +229,7 @@ export type Account = LineMetrics &
     readonly ancestors?: [SimpleBudget | SimpleTemplate];
   };
 
-export interface PdfAccount extends types.RowTypedApiModel<"pdf-account", LineMetrics> {
+export interface PdfAccount extends types.RowTypedApiModel<"pdf-account">, LineMetrics {
   readonly identifier: string | null;
   readonly description: string | null;
   readonly domain: BudgetDomain;
@@ -294,7 +269,7 @@ export type SubAccount = SimpleSubAccount &
     ];
   };
 
-export interface PdfSubAccount extends types.RowTypedApiModel<"pdf-subaccount", SubAccountMixin> {
+export interface PdfSubAccount extends types.RowTypedApiModel<"pdf-subaccount">, SubAccountMixin {
   readonly domain: BudgetDomain;
   readonly identifier: string | null;
   readonly description: string | null;
@@ -311,38 +286,32 @@ export type Ancestor =
 
 export type ActualOwner = SimpleMarkup | Omit<SimpleSubAccount, "order" | "domain">;
 
-export type TaggedActual = types.TypedApiModel<
-  "actual",
-  {
-    readonly name: string | null;
-    readonly date: string | null;
-    readonly value: number | null;
-    readonly owner: ActualOwner | null;
-    readonly budget: SimpleBudget;
-  }
->;
+export type TaggedActual = types.TypedApiModel<"actual"> & {
+  readonly name: string | null;
+  readonly date: string | null;
+  readonly value: number | null;
+  readonly owner: ActualOwner | null;
+  readonly budget: SimpleBudget;
+};
 
 export type ActualType = tagging.Tag<typeof types.ApiModelTagTypes.ACTUAL_TYPE>;
 
-export type Actual = types.RowTypedApiModel<
-  "actual",
-  {
-    readonly contact: number | null;
-    readonly name: string | null;
-    readonly notes: string | null;
-    readonly purchase_order: string | null;
-    readonly date: string | null;
-    readonly payment_id: string | null;
-    readonly value: number | null;
-    readonly actual_type: ActualType | null;
-    readonly attachments: attachment.SimpleAttachment[];
-    readonly owner: ActualOwner | null;
-  }
->;
+export type Actual = types.RowTypedApiModel<"actual"> & {
+  readonly contact: number | null;
+  readonly name: string | null;
+  readonly notes: string | null;
+  readonly purchase_order: string | null;
+  readonly date: string | null;
+  readonly payment_id: string | null;
+  readonly value: number | null;
+  readonly actual_type: ActualType | null;
+  readonly attachments: attachment.SimpleAttachment[];
+  readonly owner: ActualOwner | null;
+};
 
-export type SimpleHeaderTemplate = types.ApiModel<{
+export type SimpleHeaderTemplate = types.ApiModel & {
   readonly name: string;
-}>;
+};
 
 export type HeaderTemplate = SimpleHeaderTemplate & {
   readonly header: string | null;

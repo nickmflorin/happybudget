@@ -1,21 +1,23 @@
-declare type MenuItemSelectedState = {
+export type ModelSelectionMode = "single" | "multiple";
+
+export type MenuItemSelectedState = {
   readonly selected: boolean;
 };
 
-declare type MenuItemStateWithModel<
+export type MenuItemStateWithModel<
   S extends Record<string, unknown> = MenuItemSelectedState,
   M extends MenuItemModel<S> = MenuItemModel<S>,
 > = S & {
   readonly model: M;
 };
 
-declare type MenuExtraItemClickEvent = {
+export type MenuExtraItemClickEvent = {
   readonly searchValue: string;
   readonly event: Table.CellDoneEditingEvent;
   readonly closeParentDropdown: (() => void) | undefined;
 };
 
-declare type MenuButtonClickEvent<
+export type MenuButtonClickEvent<
   S extends Record<string, unknown> = MenuItemSelectedState,
   M extends MenuItemModel<S> = MenuItemModel<S>,
 > = {
@@ -23,14 +25,14 @@ declare type MenuButtonClickEvent<
   readonly event: React.MouseEvent<HTMLButtonElement>;
 };
 
-declare type IMenuItemRef<S extends Record<string, unknown> = MenuItemSelectedState> = {
+export type IMenuItemRef<S extends Record<string, unknown> = MenuItemSelectedState> = {
   readonly closeParentDropdown: (() => void) | undefined;
   readonly setLoading: (v: boolean) => void;
   readonly performClick: (e: Table.CellDoneEditingEvent) => void;
   readonly getState: () => S;
 };
 
-declare type MenuItemModelClickEvent<S extends Record<string, unknown> = MenuItemSelectedState> = {
+export type MenuItemModelClickEvent<S extends Record<string, unknown> = MenuItemSelectedState> = {
   readonly state: S;
   readonly event: Table.CellDoneEditingEvent;
   readonly item: Omit<IMenuItemRef<S>, "performClick">;
@@ -38,7 +40,7 @@ declare type MenuItemModelClickEvent<S extends Record<string, unknown> = MenuIte
 
 type InferStateFromModel<M> = M extends MenuItemModel<infer S> ? S : never;
 
-declare type MenuChangeEvent<
+export type MenuChangeEvent<
   S extends Record<string, unknown> = MenuItemSelectedState,
   M extends MenuItemModel<S> = MenuItemModel<S>,
 > = MenuItemModelClickEvent<S> & {
@@ -47,7 +49,7 @@ declare type MenuChangeEvent<
   readonly menu: IMenuRef<S, M>;
 };
 
-declare type BaseMenuItemModel = Model.Model & {
+export type BaseMenuItemModel = Model.Model & {
   readonly label?: string | number | null;
   readonly icon?: IconOrElement;
   readonly loading?: boolean;
@@ -59,12 +61,12 @@ declare type BaseMenuItemModel = Model.Model & {
   readonly renderContent?: () => JSX.Element;
 };
 
-declare type MenuItemModel<S extends Record<string, unknown> = MenuItemSelectedState> =
+export type MenuItemModel<S extends Record<string, unknown> = MenuItemSelectedState> =
   BaseMenuItemModel & {
     readonly onClick?: (e: MenuItemModelClickEvent<S>) => void;
   };
 
-declare type ExtraMenuItemModel = BaseMenuItemModel & {
+export type ExtraMenuItemModel = BaseMenuItemModel & {
   readonly showOnNoSearchResults?: boolean;
   readonly focusOnNoSearchResults?: boolean;
   readonly leaveAtBottom?: boolean;
@@ -73,7 +75,7 @@ declare type ExtraMenuItemModel = BaseMenuItemModel & {
   readonly onClick?: (e: MenuExtraItemClickEvent) => void;
 };
 
-declare interface IMenuButton<
+export interface IMenuButton<
   S extends Record<string, unknown> = MenuItemSelectedState,
   M extends MenuItemModel<S> = MenuItemModel<S>,
 > {
@@ -84,7 +86,7 @@ declare interface IMenuButton<
   readonly keepDropdownOpenOnClick?: boolean;
 }
 
-declare type IMenuRef<
+export type IMenuRef<
   S extends Record<string, unknown> = MenuItemSelectedState,
   M extends MenuItemModel<S> = MenuItemModel<S>,
 > = {
@@ -99,7 +101,7 @@ declare type IMenuRef<
   readonly focusSearch: (value: boolean, search?: string) => void;
 };
 
-declare type IMenu<
+export type IMenu<
   S extends Record<string, unknown> = MenuItemSelectedState,
   M extends MenuItemModel<S> = MenuItemModel<S>,
 > = StandardComponentProps & {
@@ -141,7 +143,7 @@ type OrderingMenuItemState = {
   readonly order: Http.Order;
 };
 
-declare interface ContentMenuInstance extends UINotificationsManager {
+export interface ContentMenuInstance extends UINotificationsManager {
   readonly setLoading: (value: boolean) => void;
   readonly loading: boolean | undefined;
 }

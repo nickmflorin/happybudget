@@ -1,5 +1,6 @@
 import { FillOperationParams } from "ag-grid-community";
 import { findLastIndex } from "lodash";
+import { z } from "zod";
 
 import { logger } from "internal";
 
@@ -18,10 +19,17 @@ type SeparatorAndIndex = {
   readonly index: number;
 };
 
-type PatternValue = string | number | null;
+type PatternValue<
+  R extends types.Row<types.RowData<N>>,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+> = (string | number | null) & CellValue<R, N>;
 
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-const isPatternValue = (value: any): value is PatternValue =>
+const isPatternValue = <
+  R extends types.Row<types.RowData<N>>,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+>(
+  value: unknown,
+): value is PatternValue<R, N> =>
   value === null || typeof value === "string" || typeof value === "number";
 
 /**
@@ -54,7 +62,13 @@ const isPatternValue = (value: any): value is PatternValue =>
  * detectNextInPattern(["account-100", "account-102"])
  * >>> "account-104"
  */
-export const detectNextInPattern = (values: PreviousValues<PatternValue>): PatternValue => {
+export const detectNextInPattern = <
+  R extends types.Row<types.RowData<N>>,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  V extends PatternValue<R, N> = PatternValue<R, N>,
+>(
+  values: PreviousValues<V>,
+): V | null => {
   const findLastSeparator = (value: string): SeparatorAndIndex | null => {
     const indices: number[] = SEPARATORS.map((sep: string) =>
       findLastIndex(value, (c: string) => c.toLowerCase() === sep.toLocaleLowerCase()),
@@ -78,19 +92,8 @@ export const detectNextInPattern = (values: PreviousValues<PatternValue>): Patte
     return null;
   };
 
-  const toNumber = (value: PatternValue): number | null => {
-    if (value === null) {
-      return null;
-    } else if (typeof value === "number") {
-      return value;
-    } else if (!isNaN(parseInt(value))) {
-      return parseInt(value);
-    }
-    return null;
-  };
-
-  let previousValue: PatternValue = null;
-  let value: PatternValue = null;
+  let previousValue: V | null = null;
+  let value: V | null = null;
   if (Array.isArray(values)) {
     if (values.length !== 1) {
       previousValue = values[0];
@@ -102,24 +105,32 @@ export const detectNextInPattern = (values: PreviousValues<PatternValue>): Patte
     value = values;
   }
 
-  const numericValue = toNumber(value);
+  const numericValue = value === null ? null : z.coerce.number().parse(value);
   if (numericValue !== null) {
-    const previousNumericValue = toNumber(previousValue);
+    const previousNumericValue =
+      previousValue === null ? null : z.coerce.number().parse(previousValue);
     if (previousNumericValue !== null) {
       if (previousNumericValue < numericValue) {
         const diff = numericValue - previousNumericValue;
-        return typeof value === "string" ? String(numericValue + diff) : numericValue + diff;
+        if (typeof value === "number") {
+          return diff as V;
+        }
+        return `${diff}` as V;
       } else if (numericValue < previousNumericValue) {
         const diff = previousNumericValue - numericValue;
-        return typeof value === "string" ? String(numericValue - diff) : numericValue - diff;
+        if (typeof value === "number") {
+          return diff as V;
+        }
+        return `${diff}` as V;
       } else {
         /* The numeric values are the same, but if we are not considering an equality part of a
            pattern then we should return null to indicate that we could not infer a pattern. */
         return null;
       }
-    } else {
-      return typeof value === "string" ? String(numericValue + 1) : numericValue + 1;
+    } else if (typeof value === "string") {
+      return `${numericValue + 1}` as V;
     }
+    return (numericValue + 1) as V;
   } else if (typeof value === "string") {
     /* If the value itself is not numeric, then maybe there is a prefix before a numeric value that
        we can infer from. */
@@ -133,7 +144,7 @@ export const detectNextInPattern = (values: PreviousValues<PatternValue>): Patte
         if (previousSeparated !== null && previousSeparated[1] === separated[1]) {
           const nextInPattern = detectNextInPattern([previousSeparated[2], separated[2]]);
           if (nextInPattern !== null) {
-            return separated[0] + separated[1] + String(nextInPattern);
+            return (separated[0] + separated[1] + String(nextInPattern)) as V;
           }
         }
       }
@@ -163,7 +174,7 @@ This is because when creating multiple rows, or creating rows very quickly, the 
 have been created yet at the time of usage - only the data being used to create the row via the API.
 */
 type ReduxSource<R extends types.Row> = {
-  readonly store: (types.RowSubType<R, types.BodyRowType> | types.RowData<R>)[];
+  readonly store: (types.RowSubType<R, types.BodyRowType> | types.GetRowData<R>)[];
   readonly newIndex?: number;
   readonly count?: number;
 };
@@ -203,7 +214,7 @@ const getSourceIndex = <R extends types.Row>(
 
 type ModelRowOrData<R extends types.Row> =
   | types.RowSubType<R, "model">
-  | types.RowData<R>
+  | types.GetRowData<R>
   | types.RowSubType<R, "placeholder">;
 
 /**
@@ -229,14 +240,14 @@ export const findPreviousModelRows = <R extends types.Row>(
   let runningIndex = getSourceIndex(source);
 
   const isModelRowOrData = (
-    r: types.RowSubType<R, types.BodyRowType> | types.RowData<R>,
-  ): r is types.RowSubType<R, "model"> | types.RowData<R> | types.RowSubType<R, "placeholder"> =>
+    r: types.RowSubType<R, types.BodyRowType> | types.GetRowData<R>,
+  ): r is types.RowSubType<R, "model"> | types.GetRowData<R> | types.RowSubType<R, "placeholder"> =>
     typeguards.isRow(r) ? typeguards.isModelRow(r) || typeguards.isPlaceholderRow(r) : true;
 
   if (
     runningIndex === 0 ||
     (isReduxSource(source) &&
-      source.store.filter((r: types.RowSubType<R, types.BodyRowType> | types.RowData<R>) =>
+      source.store.filter((r: types.RowSubType<R, types.BodyRowType> | types.GetRowData<R>) =>
         isModelRowOrData(r),
       ).length === 0)
   ) {
@@ -245,7 +256,7 @@ export const findPreviousModelRows = <R extends types.Row>(
 
   const getRowAtIndex = (
     index: number,
-  ): types.RowSubType<R, types.BodyRowType> | types.RowData<R> | null => {
+  ): types.RowSubType<R, types.BodyRowType> | types.GetRowData<R> | null => {
     if (isAgSource(source)) {
       /* The node should exist at the index because we check the validity of the index compared to
          the number of rows in the table in `getSourceIndex` - but this is mostly to make TS happy
@@ -270,7 +281,7 @@ export const findPreviousModelRows = <R extends types.Row>(
     runningIndex = runningIndex - 1;
   }
 
-  let row: types.RowSubType<R, types.BodyRowType> | types.RowData<R> | null =
+  let row: types.RowSubType<R, types.BodyRowType> | types.GetRowData<R> | null =
     getRowAtIndex(runningIndex);
   while (runningIndex > 0 && row !== null) {
     if (isModelRowOrData(row)) {
@@ -292,24 +303,27 @@ export const findPreviousModelRows = <R extends types.Row>(
 const mapPreviousValues = <T, R>(values: PreviousValues<T>, fn: (v: T) => R): PreviousValues<R> =>
   values.length === 1 ? [fn(values[0])] : [fn(values[0]), fn(values[1])];
 
-const detectPatternFromPreviousRows = <R extends types.Row>(
+const detectPatternFromPreviousRows = <
+  R extends types.Row<types.RowData<N>>,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+>(
   /* We have to allow the previousRows to include both ModelRow(s) and partially created RowData
      because in the sagas, the full rows will not have been created yet, only the data that is used
      to create the new rows via the API. */
   previousRows: PreviousValues<ModelRowOrData<R>>,
-  field: columns.ColumnFieldName<R>,
-): PatternValue | null => {
+  field: N,
+): PatternValue<R, N> | null => {
   let columnSupportsSmartInference = true;
 
-  const previousValues = mapPreviousValues<ModelRowOrData<R>, CellValue<R>>(
+  const previousValues = mapPreviousValues<ModelRowOrData<R>, CellValue<R, N>>(
     previousRows,
-    (ri: ModelRowOrData<R>): CellValue<R> => {
+    (ri: ModelRowOrData<R>): CellValue<R, N> => {
       /* If the object is a Row, then we know the value will not be undefined because we do not
          allow undefined values for Row(s).  In the worst case scenario, if it happened to slip in
          and avoid TS type checks, the below block of code would recognize that `undefined` is not a
          PatternValue and previous smart inference based on this column. */
-      if (typeguards.isRow(ri)) {
-        return ri.data[field] as CellValue<R>;
+      if (typeguards.isModelRow(ri) || typeguards.isPlaceholderRow(ri)) {
+        return ri.data[field];
       }
       /* If the object is not a Row, and is a partially created RowData object, then the value will
          be undefined if the field does not exist in the Partial - which can happen if there is an
@@ -321,7 +335,7 @@ const detectPatternFromPreviousRows = <R extends types.Row>(
       return ri[field];
     },
   );
-  const patternValues: PatternValue[] = [];
+  const patternValues: PatternValue<R, N>[] = [];
   for (let i = 0; i < previousValues.length; i++) {
     const v = previousValues[i];
     if (isPatternValue(v)) {
@@ -346,17 +360,22 @@ const detectPatternFromPreviousRows = <R extends types.Row>(
     }
   }
   if (columnSupportsSmartInference) {
-    return detectNextInPattern(patternValues as PreviousValues<PatternValue>);
+    return detectNextInPattern(patternValues as PreviousValues<PatternValue<R, N>>);
   }
   return null;
 };
 
-export const inferFillCellValue = <R extends types.Row, M extends model.RowTypedApiModel>(
+export const inferFillCellValue = <
+  R extends types.Row,
+  M extends model.RowTypedApiModel,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  T extends CellValue<R, N> = CellValue<R, N>,
+>(
   params: FillOperationParams,
-  cs: columns.BodyColumn<R, M>[],
-): CellValue<R> | null => {
+  cs: columns.BodyColumn<R, M, N, T>[],
+): T | null => {
   if (params.direction === "down") {
-    const c: columns.BodyColumn<R, M> | null = columns.getColumn(cs, params.column.getColId());
+    const c = columns.getColumn(cs, params.column.getColId());
     /* The column will be by default not-fake and readable (`isRead !== false`) since it is already
        in the table. */
     if (c !== null && c.smartInference === true && params.rowNode.rowIndex !== null) {
@@ -365,10 +384,7 @@ export const inferFillCellValue = <R extends types.Row, M extends model.RowTyped
         true,
       );
       if (previousRows !== null) {
-        return detectPatternFromPreviousRows(
-          previousRows,
-          params.column.getColId(),
-        ) as CellValue<R>;
+        return detectPatternFromPreviousRows(previousRows, params.column.getColId()) as T;
       }
     }
   }
@@ -378,7 +394,7 @@ export const inferFillCellValue = <R extends types.Row, M extends model.RowTyped
 export const generateNewRowData = <R extends types.Row, M extends model.RowTypedApiModel>(
   source: Source<R>,
   cs: columns.BodyColumn<R, M>[],
-): types.RowData<R>[] => {
+): types.GetRowData<R>[] => {
   if (isReduxSource(source) && source.count !== undefined && source.count !== 1) {
     if (source.count === 0) {
       return [];
@@ -386,7 +402,7 @@ export const generateNewRowData = <R extends types.Row, M extends model.RowTyped
     /* We need to keep track of the RowData objects that are created as we go, because in the case
        we are generating multiple RowData objects, the previously created RowData object needs to
        factor into the pattern recognition. */
-    const runningRows: types.RowData<R>[] = [];
+    const runningRows: types.GetRowData<R>[] = [];
     for (let i = 0; i < source.count; i++) {
       const runningSource = { ...source, count: 1, store: [...source.store, ...runningRows] };
       const newRowData = generateNewRowData(runningSource, cs);
@@ -395,7 +411,7 @@ export const generateNewRowData = <R extends types.Row, M extends model.RowTyped
     return runningRows;
   }
   return [
-    cs.reduce((prev: types.RowData<R>, c: columns.BodyColumn<R, M>): types.RowData<R> => {
+    cs.reduce((prev: types.GetRowData<R>, c: columns.BodyColumn<R, M>): types.GetRowData<R> => {
       if (c.smartInference === true) {
         if (isAgSource(source) && source.newIndex !== undefined) {
           source = { ...source, newIndex: aggrid.getRows(source.api).length };
@@ -409,6 +425,6 @@ export const generateNewRowData = <R extends types.Row, M extends model.RowTyped
         }
       }
       return prev;
-    }, {} as types.RowData<R>),
+    }, {} as types.GetRowData<R>),
   ];
 };

@@ -3,7 +3,8 @@ import { RowClassParams } from "ag-grid-community";
 import * as model from "../../model";
 import * as ui from "../../ui";
 import { enumeratedLiterals, EnumeratedLiteralType } from "../../util";
-import { FooterGridId, ClassName } from "../types";
+import * as columns from "../columns";
+import { CellValue, FooterGridId, TableClassName } from "../types";
 
 export type EditRowActionBehavior = "expand" | "edit";
 
@@ -11,9 +12,8 @@ export type GetRowStyle<R extends RowOfType<BodyRowType> = RowOfType<BodyRowType
   params: RowClassParams<R>,
 ) => ui.Style | null | undefined;
 
-export type RowClassName<R extends RowOfType<BodyRowType> = RowOfType<BodyRowType>> = ClassName<
-  RowClassParams<R>
->;
+export type RowClassName<R extends RowOfType<BodyRowType> = RowOfType<BodyRowType>> =
+  TableClassName<RowClassParams<R>>;
 
 export type GetRowClassName<R extends RowOfType<BodyRowType> = RowOfType<BodyRowType>> = (
   params: RowClassParams<R>,
@@ -40,13 +40,14 @@ export type RowType = EnumeratedLiteralType<typeof RowTypes>;
 export const EditableRowTypes = enumeratedLiterals([RowTypes.MARKUP, RowTypes.MODEL] as const);
 export type EditableRowType = EnumeratedLiteralType<typeof EditableRowTypes>;
 
-export const ExpandedRowTypes = enumeratedLiterals([
-  ...RowTypes.__ALL__,
-  "body",
-  "data",
-  "editable",
-] as const);
+export const ExpandedRowTypes = enumeratedLiterals(["body", "data", "editable"] as const);
 export type ExpandedRowType = EnumeratedLiteralType<typeof ExpandedRowTypes>;
+
+export type ExpandableRowTypeToRowType<T extends ExpandedRowType> = {
+  body: BodyRowType;
+  data: DataRowType;
+  editable: EditableRowType;
+}[T];
 
 export type ModelRowId = number;
 export type FooterRowId<T extends FooterGridId> = `footer-${T}`;
@@ -56,30 +57,25 @@ export type MarkupRowId = `markup-${number}`;
 
 export type NonPlaceholderBodyRowId = RowId<EditableRowType | "group">;
 
-export type RowId<T extends ExpandedRowType = ExpandedRowType> = T extends ExpandedRowType
-  ? {
-      markup: MarkupRowId;
-      group: GroupRowId;
-      placeholder: PlaceholderRowId;
-      model: ModelRowId;
-      footer: FooterRowId<"footer">;
-      page: FooterRowId<"page">;
-      data: RowId<DataRowType>;
-      editable: RowId<EditableRowType>;
-      body: RowId<BodyRowType>;
-    }[T]
-  : never;
+export type RowId<T extends RowType> = {
+  markup: MarkupRowId;
+  group: GroupRowId;
+  placeholder: PlaceholderRowId;
+  model: ModelRowId;
+  footer: FooterRowId<"footer">;
+  page: FooterRowId<"page">;
+}[T];
 
-export type RowGridId<T extends RowType = RowType> = T extends RowType
-  ? {
-      markup: "data";
-      group: "data";
-      placeholder: "data";
-      model: "data";
-      footer: "footer";
-      page: "page";
-    }[T]
-  : never;
+export type AnyRowId = RowId<RowType>;
+
+export type RowGridId<T extends RowType> = {
+  markup: "data";
+  group: "data";
+  placeholder: "data";
+  model: "data";
+  footer: "footer";
+  page: "page";
+}[T];
 
 /**
  * The base representation of a {@link Row} in the application that rows of all types extend.
@@ -106,14 +102,16 @@ export type RowGridId<T extends RowType = RowType> = T extends RowType
  *
  * @member {T} rowType The type classification of the row.
  */
-export type BaseRow<T extends RowType = RowType, D extends RowData = RowData> = T extends RowType
-  ? {
-      readonly id: RowId<T>;
-      readonly gridId: RowGridId<T>;
-      readonly rowType: T;
-      readonly __dataType__: D;
-    }
-  : never;
+export type BaseRow<
+  T extends RowType = RowType,
+  D extends RowData = RowData,
+  I extends RowId<T> = RowId<T>,
+> = {
+  readonly id: I;
+  readonly gridId: RowGridId<T>;
+  readonly rowType: T;
+  readonly __dataType__: D;
+};
 
 export type ModelRow<D extends RowData = RowData> = BaseRow<"model", D> & {
   readonly children: number[];
@@ -141,34 +139,37 @@ export type PlaceholderRow<D extends RowData = RowData> = BaseRow<"placeholder",
 export type FooterRow<D extends RowData = RowData> = BaseRow<"footer", D>;
 export type PageRow<D extends RowData = RowData> = BaseRow<"page", D>;
 
-export type RowData<R extends Row | undefined = undefined> = R extends undefined
-  ? Record<string, unknown>
-  : R extends { __dataType__: infer D extends RowData }
+export type RowData<N extends string = string, T = unknown> = { [key in N]: T };
+
+export type GetRowData<R extends Row, N extends string = string, T = unknown> = R extends {
+  __dataType__: infer D extends RowData<N, T>;
+}
   ? D
   : never;
 
-type _Row<T extends RowType, D extends RowData> = T extends RowType
-  ? {
-      model: ModelRow<D>;
-      markup: MarkupRow<D>;
-      group: GroupRow<D>;
-      placeholder: PlaceholderRow<D>;
-      footer: FooterRow<D>;
-      page: PageRow<D>;
-    }[T]
-  : never;
+export type _Row<T extends RowType = RowType, D extends RowData = RowData> = {
+  model: ModelRow<D>;
+  markup: MarkupRow<D>;
+  group: GroupRow<D>;
+  placeholder: PlaceholderRow<D>;
+  footer: FooterRow<D>;
+  page: PageRow<D>;
+}[T];
 
 export type Row<D extends RowData = RowData> = _Row<RowType, D>;
 
 export type RowOfType<T extends RowType, D extends RowData = RowData> = _Row<T, D>;
 
-export type RowSubType<R extends Row, T extends RowType> = _Row<T, R["__dataType__"]>;
+export type RowSubType<
+  R extends Row,
+  TP extends RowType,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  T extends CellValue<R, N> = CellValue<R, N>,
+> = R & RowOfType<TP, GetRowData<R, N, T>>;
 
 export type RowNameLabelType = number | string | null;
 
-export type RowStringGetter<R extends Row> =
-  | RowNameLabelType
-  | FnWithTypedArgs<RowNameLabelType, [R]>;
+export type RowStringGetter<R extends Row> = RowNameLabelType | ((row: R) => RowNameLabelType);
 
 export type RowWithColor<D extends RowData> = RowOfType<"model", D & { color: ui.HexColor | null }>;
 

@@ -1,20 +1,16 @@
 import { type SagaIterator } from "redux-saga";
 import { spawn, take, cancel, call, debounce } from "redux-saga/effects";
-import { Optional } from "utility-types";
 
 import { model } from "lib";
 
 import * as api from "../../api";
 import * as types from "../types";
 
-export const convertContextTaskToTask = <
-  A extends types.Action<types.ActionPayload, C>,
-  C extends types.ActionContext = types.ActionContext<A>,
->(
-  contextTask: types.ContextTask<A, C>,
+export const convertContextTaskToTask = <A extends types.Action>(
+  contextTask: types.ContextTask<A>,
 ): types.Task<A> => {
   function* task(action: A): SagaIterator {
-    yield call(contextTask, action.context);
+    yield call(contextTask, action.context as types.ActionContext<A>);
   }
   return task;
 };
@@ -73,10 +69,10 @@ export const createAuthenticatedApiModelListSaga = <
 >(
   config: types.SagaConfig<
     types.ModelListTaskMap,
-    Optional<
-      Pick<types.AuthenticatedApiModelListActionPayloadMap<M>, "setSearch" | "request">,
-      "setSearch"
-    >,
+    {
+      request: types.AuthenticatedApiModelListActionPayloadMap<M>["request"];
+      setSearch?: types.AuthenticatedApiModelListActionPayloadMap<M>["setSearch"];
+    },
     C
   >,
 ) => {

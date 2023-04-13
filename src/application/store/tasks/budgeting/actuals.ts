@@ -129,7 +129,7 @@ const getRequestEffects = (
   } as types.Action<null, TableContext>),
 ];
 
-export const createTableTaskSet = (
+export const createActualsTableTaskSet = (
   config: ActualsTableTaskConfig,
 ): ActualsAuthenticatedTableTaskMap => {
   function* request(
@@ -146,8 +146,8 @@ export const createTableTaskSet = (
         action as types.Action<types.RequestActionPayload, TableContext>,
       );
       /* TODO: We might want to move the contacts request to the batched requests to retrieve the
-           supplementary data. */
-      yield fork(contacts.request, action.context);
+         supplementary data. */
+      yield fork(contacts.requestContacts, action.context);
       const [actuals]: [api.ClientResponse<api.ApiListResponse<model.Actual>>] = yield all(effects);
       if (actuals.error !== undefined) {
         if (

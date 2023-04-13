@@ -103,19 +103,20 @@ export type SoloCellChange<
   readonly id: rows.RowSubType<R, rows.EditableRowType>["id"];
 };
 
-export type RowChangeData<R extends rows.Row> = Partial<{
-  [key in columns.ColumnFieldName<R>]: CellChange<R, key>;
+export type RowChangeData<
+  R extends rows.Row,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+> = Partial<{
+  [key in N]: CellChange<R, key>;
 }>;
 
 export type RowChange<
   R extends rows.Row,
-  ID extends rows.RowSubType<R, rows.EditableRowType>["id"] = rows.RowSubType<
-    R,
-    rows.EditableRowType
-  >["id"],
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  ID extends rows.MarkupRowId | rows.ModelRowId = rows.MarkupRowId | rows.ModelRowId,
 > = {
   readonly id: ID;
-  readonly data: RowChangeData<R>;
+  readonly data: RowChangeData<R, N>;
 };
 
 export type RowAddCountPayload = {
@@ -134,7 +135,7 @@ export type RowAddIndexPayload = {
 };
 
 export type RowAddDataPayload<R extends rows.Row = rows.Row> = {
-  readonly data: rows.RowData<R>[];
+  readonly data: rows.GetRowData<R>[];
   /* Placeholder IDs must be provided ahead of time so that the IDs are consistent between the sagas
      and the reducer. */
   readonly placeholderIds: rows.PlaceholderRowId[];
@@ -148,7 +149,7 @@ export type ChangeEventPayload<
       readonly dataChange: SingleOrArray<RowChange<R>>;
       readonly rowInsert: {
         readonly previous: number;
-        readonly data: rows.RowData<R>;
+        readonly data: rows.GetRowData<R>;
         readonly group: rows.RowId<"group"> | null;
       };
       readonly rowPositionChanged: {
@@ -157,7 +158,7 @@ export type ChangeEventPayload<
         readonly id: rows.RowId<"model">;
       };
       readonly rowDelete: {
-        readonly rows: SingleOrArray<rows.RowId<"body">>;
+        readonly rows: SingleOrArray<rows.RowId<rows.BodyRowType>>;
       };
       readonly rowAddData: RowAddDataPayload<R>;
       readonly rowAddIndex: RowAddIndexPayload;

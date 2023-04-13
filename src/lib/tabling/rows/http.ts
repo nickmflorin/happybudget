@@ -130,7 +130,7 @@ export const postPayload = <
   M extends model.RowTypedApiModel,
   P extends api.PayloadData,
 >(
-  data: types.RowData<R>,
+  data: types.GetRowData<R>,
   cs: columns.ModelColumn<R, M>[],
 ): P =>
   cs.reduce((p: P, col: columns.ModelColumn<R, M>) => {
@@ -165,7 +165,10 @@ export const postPayloads = <
 
   const payload: events.RowAddDataPayload<R>["data"] = isEvent(p) ? p.payload.data : p;
   return payload.reduce(
-    (prev: P[], addition: tabling.RowData<R>): P[] => [...prev, postPayload<R, M, P>(addition, cs)],
+    (prev: P[], addition: tabling.GetRowData<R>): P[] => [
+      ...prev,
+      postPayload<R, M, P>(addition, cs),
+    ],
     [] as P[],
   );
 };

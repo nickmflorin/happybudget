@@ -3,7 +3,7 @@ import { z } from "zod";
 import { errors } from "application";
 
 const JsonLiteralSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
-export type JsonLiteral = z.infer<typeof JsonLiteralSchema>;
+export type JsonLiteral = z.infer<typeof JsonLiteralSchema> | ArrayBuffer;
 
 export type JsonObject = Record<string, Json>;
 export type Json = JsonLiteral | { [key: string]: Json } | Json[];
@@ -38,7 +38,7 @@ export const isObjectOfType = <P, O extends IsObjectOfTypeOptions = IsObjectOfTy
 
 export type ParseObjectResponse<P> =
   | { error?: undefined; data: P }
-  | { error: errors.MalformedDataSchemaError<P>; data?: undefined };
+  | { error: errors.MalformedDataSchemaError; data?: undefined };
 
 export type ObjectParserOptions = {
   readonly prefix?: string;
@@ -54,7 +54,7 @@ export const parseObjectOfType = <P>(
     return { data: result.data, error: undefined };
   }
   return {
-    error: new errors.MalformedDataSchemaError<P>({
+    error: new errors.MalformedDataSchemaError({
       value: obj,
       error: result.error,
       prefix: options?.prefix,

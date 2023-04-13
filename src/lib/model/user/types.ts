@@ -3,13 +3,13 @@ import * as billing from "../billing";
 import * as contact from "../contact";
 import * as types from "../types";
 
-export type SimpleUser = types.ApiModel<{
+export type SimpleUser = types.ApiModel & {
   readonly first_name: string;
   readonly last_name: string;
   readonly full_name: string;
   readonly email: string;
   readonly profile_image: fs.SavedImage | null;
-}>;
+};
 
 export type UserMetrics = {
   readonly num_budgets: number;

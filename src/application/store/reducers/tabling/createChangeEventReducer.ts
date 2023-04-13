@@ -1,6 +1,8 @@
 import { isNil, filter, includes } from "lodash";
 
-import { tabling, redux, util } from "lib";
+import { tabling } from "lib";
+
+import * as types from "../../../types";
 
 import createDataChangeEventReducer from "./createDataChangeEventReducer";
 import createRowAddEventReducer from "./createRowAddEventReducer";

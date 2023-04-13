@@ -13,45 +13,50 @@ import { store } from "application";
 import * as model from "../../model";
 import * as ui from "../../ui";
 import * as columns from "../columns";
+import * as events from "../events";
 import * as rows from "../rows";
 
 import * as formatting from "./formatting";
 import { GridId, GridApis } from "./framework";
 import * as table from "./table";
 
-import { ClassName } from ".";
+import { TableClassName } from ".";
+
+type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N;
+type IsAny<T> = IfAny<T, true, never>;
 
 export type CellValue<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
-> = N extends columns.ColumnFieldName<R> ? rows.RowData<R>[N] : never;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+> = IsAny<R> extends never ? rows.GetRowData<R, N>[N] : any;
 
 export type CellClassName<
-  R extends rows.RowOfType<rows.BodyRowType> = rows.RowOfType<rows.BodyRowType>,
+  R extends rows.Row,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
-  T = CellValue<R, N>,
-> = ClassName<CellClassParams<R, T>>;
+  T extends CellValue<R, N> = CellValue<R, N>,
+> = TableClassName<CellClassParams<R, T>>;
 
 export interface CellStyleFunc<
-  R extends rows.RowOfType<rows.BodyRowType> = rows.RowOfType<rows.BodyRowType>,
+  R extends rows.Row,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
-  T = CellValue<R, N>,
+  T extends CellValue<R, N> = CellValue<R, N>,
 > {
   (cellClassParams: CellClassParams<R, T>): ui.Style | null | undefined;
 }
 
 export type CellStyle<
-  R extends rows.RowOfType<rows.BodyRowType> = rows.RowOfType<rows.BodyRowType>,
+  R extends rows.Row,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
-  T = CellValue<R, N>,
+  T extends CellValue<R, N> = CellValue<R, N>,
 > = ui.Style | CellStyleFunc<R, N, T>;
 
 // TODO: Move to Cell Renderer file.
 export interface CellProps<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
-  T = CellValue<R, N>,
+  T extends CellValue<R, N> = CellValue<R, N>,
   C extends table.TableContext = table.TableContext,
   S extends store.TableStore<R> = store.TableStore<R>,
   CL extends columns.RealColumn<R, M, N, T> = columns.BodyColumn<R, M, N, T>,
@@ -65,8 +70,8 @@ export interface CellProps<
   readonly prefixChildren?: JSX.Element;
   readonly suffixChildren?: JSX.Element;
   readonly icon?:
-    | IconOrElement
-    | ((row: rows.RowSubType<R, rows.BodyRowType>) => IconOrElement | undefined | null);
+    | ui.IconProp
+    | ((row: rows.RowSubType<R, rows.BodyRowType>) => ui.IconProp | undefined | null);
   readonly innerCellClassName?: string | undefined | ((r: R) => string | undefined);
   readonly innerCellStyle?: ui.Style | undefined | ((r: R) => ui.Style | undefined);
   readonly table: table.TableInstance<R, M>;
@@ -76,41 +81,47 @@ export interface CellProps<
   readonly getRowColorDef: (row: rows.RowSubType<R, rows.BodyRowType>) => rows.RowColorDef;
   readonly selector: (state: store.ApplicationStore) => S;
   readonly onKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void;
-  // readonly onEvent?: (event: Event<R, M, EditableRow<R>>) => void;
+  readonly onEvent?: (event: events.AnyChangeEvent<R>) => void;
 }
 
 export type Cell<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  T extends CellValue<R, N> = CellValue<R, N>,
 > = {
   readonly row: R;
-  readonly column: columns.RealColumn<R, M>;
+  readonly column: columns.RealColumn<R, M, N, T>;
   readonly rowNode: RowNode<R>;
 };
 
 export type CellFocusedParams<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  T extends CellValue<R, N> = CellValue<R, N>,
 > = {
-  readonly cell: Cell<R, M>;
+  readonly cell: Cell<R, M, N, T>;
   readonly apis: GridApis<R>;
 };
 
 export type CellFocusChangedParams<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  T extends CellValue<R, N> = CellValue<R, N>,
 > = {
-  readonly cell: Cell<R, M>;
-  readonly previousCell: Cell<R, M> | null;
+  readonly cell: Cell<R, M, N, T>;
+  readonly previousCell: Cell<R, M, N, T> | null;
   readonly apis: GridApis<R>;
 };
 
 // TODO: Move to Cell Renderer file.
 export type CellWithChildrenProps<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
-  T = CellValue<R, N>,
+  T extends CellValue<R, N> = CellValue<R, N>,
   C extends table.TableContext = table.TableContext,
   S extends store.TableStore<R> = store.TableStore<R>,
   CL extends columns.RealColumn<R, M, N, T> = columns.BodyColumn<R, M, N, T>,
@@ -120,10 +131,10 @@ export type CellWithChildrenProps<
 
 // TODO: Move to Cell Renderer file.
 export type ValueCellProps<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
-  T = CellValue<R, N>,
+  T extends CellValue<R, N> = CellValue<R, N>,
   C extends table.TableContext = table.TableContext,
   S extends store.TableStore<R> = store.TableStore<R>,
   CL extends columns.DataColumn<R, M, N, T> = columns.DataColumn<R, M, N, T>,
@@ -136,10 +147,10 @@ export type ValueCellProps<
 
 // TODO: Move to Cell Renderer file.
 export type CalculatedCellProps<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
-  T = CellValue<R, N>,
+  T extends CellValue<R, N> = CellValue<R, N>,
   C extends table.TableContext = table.TableContext,
   S extends store.TableStore<R> = store.TableStore<R>,
 > = Omit<
@@ -195,21 +206,21 @@ export type CalculatedCellProps<
 export type CellPosition = Omit<RootCellPosition, "rowPinned">;
 
 export type CellConstruct<
-  R extends rows.RowOfType<rows.BodyRowType>,
+  R extends rows.Row,
   C extends columns.DataColumn<R, M, N, T>,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
-  T = CellValue<R, N>,
+  T extends CellValue<R, N> = CellValue<R, N>,
 > = {
   readonly col: C;
   readonly row: R;
 };
 
 export type PdfCellCallbackParams<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
-  T = CellValue<R, N>,
+  T extends CellValue<R, N> = CellValue<R, N>,
 > = {
   readonly row?: R;
   readonly colIndex: number;
@@ -222,57 +233,57 @@ export type PdfCellCallbackParams<
 
 export type PdfCellCallback<
   RV,
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
-  T = CellValue<R, N>,
+  T extends CellValue<R, N> = CellValue<R, N>,
 > = (params: PdfCellCallbackParams<R, M, N, T>) => RV;
 
 export type PdfOptionalCellCallback<
   RV,
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
-  T = CellValue<R, N>,
+  T extends CellValue<R, N> = CellValue<R, N>,
 > = RV | PdfCellCallback<RV, R, M, N, T> | undefined;
 
 export interface _PdfCellClassName<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
-  T = CellValue<R, N>,
+  T extends CellValue<R, N> = CellValue<R, N>,
 > {
   [n: number]: PdfOptionalCellCallback<string, R, M, N, T> | _PdfCellClassName<R, M, N, T>;
 }
 
 export type PdfCellClassName<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
-  T = CellValue<R, N>,
+  T extends CellValue<R, N> = CellValue<R, N>,
 > = PdfOptionalCellCallback<string, R, M, N, T> | _PdfCellClassName<R, M, N, T>;
 
 export interface _PdfCellStyle<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
-  T = CellValue<R, N>,
+  T extends CellValue<R, N> = CellValue<R, N>,
 > {
   [n: number]: PdfOptionalCellCallback<ReactPDFStyle, R, M, N, T> | _PdfCellStyle<R, M, N, T>;
 }
 
 export type PdfCellStyle<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
-  T = CellValue<R, N>,
+  T extends CellValue<R, N> = CellValue<R, N>,
 > = PdfOptionalCellCallback<ReactPDFStyle, R, M, N, T> | _PdfCellStyle<R, M, N, T>;
 
 export type PdfCellStandardProps<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
-  T = CellValue<R, N>,
+  T extends CellValue<R, N> = CellValue<R, N>,
 > = {
   readonly style?: PdfCellStyle<R, M, N, T>;
   readonly className?: PdfCellClassName<R, M, N, T>;

@@ -44,12 +44,12 @@ export const getContactTaggedActuals = client.createParameterizedListModelsServi
 
 export const bulkUpdateContacts = client.createPatchService<
   types.ChildListResponse<model.Contact>,
-  types.ModelPayload<model.Contact>
+  types.BulkUpdatePayload<types.ModelPayload<model.Contact>>
 >("/contacts/bulk-update/");
 
 export const bulkCreateContacts = client.createPatchService<
   types.ChildListResponse<model.Contact>,
-  types.ModelPayload<model.Contact>
+  types.BulkCreatePayload<types.ModelPayload<model.Contact>>
 >("/contacts/bulk-create/");
 
 export const bulkDeleteContacts = client.createPatchService<null, types.BulkDeletePayload>(

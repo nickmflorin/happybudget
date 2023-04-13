@@ -23,12 +23,12 @@ export const createApplicationSaga = (): Saga => {
   const publicSaga = createPublicRootSaga();
 
   const contactsSaga = factories.createAuthenticatedApiModelListSaga({
-    tasks: { request: factories.convertContextTaskToTask(tasks.contacts.request) },
+    tasks: { request: factories.convertContextTaskToTask(tasks.requestContacts) },
     actions: { request: actions.requestContactsAction },
   });
 
   const filteredContactsSaga = factories.createAuthenticatedApiModelListSaga({
-    tasks: { request: factories.convertContextTaskToTask(tasks.contacts.requestFiltered) },
+    tasks: { request: factories.convertContextTaskToTask(tasks.requestContacts) },
     actions: {
       request: actions.requestFilteredContactsAction,
       setSearch: actions.setContactsSearchAction,

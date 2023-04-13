@@ -1,5 +1,4 @@
 import { generateRandomNumericId } from "../../util";
-import { GridIds } from "../types";
 
 import * as typeguards from "./typeguards";
 import * as types from "./types";
@@ -13,9 +12,8 @@ export const groupId = (r: types.GroupRowId): number => parseInt(r.split("group-
 export const placeholderRowId = (): types.PlaceholderRowId =>
   `placeholder-${generateRandomNumericId()}`;
 
-export const footerRowId = <T extends typeof GridIds.FOOTER | typeof GridIds.PAGE>(
-  gridId: T,
-): types.FooterRowId<T> => `footer-${gridId}`;
+export const footerRowId = <T extends "page" | "footer">(gridId: T): types.FooterRowId<T> =>
+  `footer-${gridId}`;
 
 export const safeEditableRowId = (
   r: types.RowId<types.EditableRowType>,

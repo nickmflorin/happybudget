@@ -91,11 +91,10 @@ const batchIsEmpty = <
  * problem.  But if they differ, then we have to treat entities of the batch differently.
  */
 const actionInconsistentWithBatch = <
-  E extends tabling.ChangeEvent<BatchChangeEventId | "rowAddIndex" | "rowAddCount">,
   R extends tabling.Row,
   C extends types.ActionContext = types.ActionContext,
 >(
-  action: types.Action<E, C>,
+  action: types.Action<tabling.ChangeEvent<BatchChangeEventId, R>, C>,
   batch: Batch<BatchChangeEvent<R>, R, C>,
 ): boolean => !batchIsEmpty(batch) && !isEqual(action.context, batch.context);
 
@@ -107,7 +106,7 @@ interface Flusher<
 > {
   (
     config: types.AuthenticatedTableSagaConfig<R, M, S, C>,
-    actions: types.Action<tabling.ChangeEvent<R>, C>[],
+    actions: types.Action<tabling.AnyChangeEvent<R>, C>[],
   ): SagaIterator;
 }
 
@@ -128,32 +127,34 @@ function* flushEvents<
   C extends types.ActionContext = types.ActionContext,
 >(
   config: types.AuthenticatedTableSagaConfig<R, M, S, C>,
-  actions: types.Action<tabling.ChangeEvent<R>, C>[],
+  actions: types.Action<tabling.AnyChangeEvent<R>, C>[],
 ): SagaIterator {
   let running: RunningBatches<R, C> = {
     dataChange: { context: null, events: [] },
     rowAddData: { context: null, events: [] },
   };
 
-  const addEventToBatch = <E extends BatchChangeEvent<R>>(
-    action: types.Action<E, C>,
+  const addEventToBatch = (
+    action: types.Action<BatchChangeEvent<R>, C>,
     runningBatches: RunningBatches<R, C>,
   ): RunningBatches<R, C> => {
-    const e: E = action.payload;
-    const b: Batch<BatchChangeEvent<R>, R, C> = runningBatches[e.type];
+    const b: Batch<BatchChangeEvent<R>, R, C> = runningBatches[action.payload.type];
 
     // This should be prevented before calling this method.
-    if (actionInconsistentWithBatch<E, R, C>(action, b)) {
+    if (actionInconsistentWithBatch<R, C>(action, b)) {
       throw new Error("Action is inconsistent with batch!");
     } else if (batchIsEmpty(b)) {
       return {
         ...runningBatches,
-        [e.type]: { ...b, events: [action.payload], context: action.context },
+        [action.payload.type]: { ...b, events: [action.payload], context: action.context },
       };
     } else {
       /* Because of the first check, it is guaranteed that the batch in question has a context that
          is consistent with the provided action. */
-      return { ...runningBatches, [e.type]: { ...b, events: [...b.events, action.payload] } };
+      return {
+        ...runningBatches,
+        [action.payload.type]: { ...b, events: [...b.events, action.payload] },
+      };
     }
   };
 
@@ -190,20 +191,15 @@ function* flushEvents<
 
   for (let i = 0; i < actions.length; i++) {
     const a = actions[i];
-    if (tabling.isActionWithChangeEvent(a, "dataChange")) {
+    if (types.isTableActionWithEventType(a, "dataChange")) {
       /* If the context of the new event is inconsistent with the batched events of the same type,
          that means the context changed quickly before the batch had a chance to flush. In this
          case, we need to flush the previous batch and start a new batch. */
-      if (
-        actionInconsistentWithBatch<tabling.ChangeEvent<"dataChange", R>, R, C>(
-          a,
-          running.dataChange,
-        )
-      ) {
+      if (actionInconsistentWithBatch<R, C>(a, running.dataChange)) {
         running = yield call(flushDataBatch, running);
       }
       running = addEventToBatch(a, running);
-    } else if (tabling.isRowAddEventAction(a) && tabling.isRowAddDataEventAction(a)) {
+    } else if (types.isTableActionWithEventType(a, "rowAddData")) {
       /* If the context of the new event is inconsistent with the batched events of the same type,
          that means the context changed quickly before the batch had a chance to flush.  In this
          case, we need to flush the previous batch and start a new batch. */
@@ -242,7 +238,7 @@ export const createAuthenticatedTableSaga = <
       a: types.Action<tabling.ChangeEvent<"dataChange", R>, C>,
     ): SagaIterator {
       yield delay(200);
-      const actions: types.Action<tabling.ChangeEvent<R>, C>[] = yield flush(changeChannel);
+      const actions: types.Action<tabling.AnyChangeEvent<R>, C>[] = yield flush(changeChannel);
       yield call(flusher, config, [a, ...actions]);
     }
 
@@ -253,13 +249,13 @@ export const createAuthenticatedTableSaga = <
          particularly important for dragging cell values to update other cell values as it submits a
          separate DataChangeEvent for every new cell value. */
       yield delay(500);
-      const actions: types.Action<tabling.ChangeEvent<R>, C>[] = yield flush(changeChannel);
+      const actions: types.Action<tabling.AnyChangeEvent<R>, C>[] = yield flush(changeChannel);
       yield call(flusher, config, [a, ...actions]);
     }
 
-    function* handleChangeEvent(a: types.Action<tabling.ChangeEvent<R>, C>): SagaIterator {
-      const e: tabling.ChangeEvent<R> = a.payload;
-      if (tabling.isDataChangeEvent(e)) {
+    function* handleChangeEvent(a: types.Action<tabling.AnyChangeEvent<R>, C>): SagaIterator {
+      const e: tabling.AnyChangeEvent<R> = a.payload;
+      if (tabling.isTableEventOfType(e, "dataChange")) {
         yield call(
           handleDataChangeEvent,
           a as types.Action<tabling.ChangeEvent<"dataChange", R>, C>,
@@ -267,8 +263,7 @@ export const createAuthenticatedTableSaga = <
       } else if (
         /* We do not want to buffer RowAdd events if the row is being added either by the
            RowAddIndexPayload or the RowAddCountPayload. */
-        tabling.isRowAddEvent(e) &&
-        tabling.isRowAddDataEvent(e)
+        tabling.isTableEventOfType(e, "rowAddData")
       ) {
         yield call(handleRowAddEvent, a as types.Action<tabling.ChangeEvent<"rowAddData", R>, C>);
       } else {
@@ -277,8 +272,8 @@ export const createAuthenticatedTableSaga = <
     }
 
     while (true) {
-      const action: types.Action<tabling.TableEvent<R, M>, C> = yield take(changeChannel);
-      const e: tabling.TableEvent<R, M> = action.payload;
+      const action: types.Action<tabling.AnyTableEvent<R, M>, C> = yield take(changeChannel);
+      const e: tabling.AnyTableEvent<R, M> = action.payload;
       const store = yield select((s: types.ApplicationStore) =>
         config.selectStore(s, action.context),
       );

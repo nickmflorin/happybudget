@@ -47,6 +47,14 @@ const getPasswordValidationState = (value: string): PasswordValidationState => {
   return { lowercase, uppercase, number, character, minChar };
 };
 
+export type PasswordValidationID = "lowercase" | "uppercase" | "number" | "character" | "minChar";
+export type PasswordValidationName = { id: PasswordValidationID; name: string };
+export type PasswordValidationState = { [key in PasswordValidationID]: boolean };
+
+/**
+ * Convert to ZOD Schema
+ * @deprecated
+ */
 export const validatePassword = (value: string): boolean => {
   if (isNil(value) || value === "") {
     return false;
@@ -55,18 +63,10 @@ export const validatePassword = (value: string): boolean => {
   return uniq(Object.values(state)).length === 1 && Object.values(state)[0] === true;
 };
 
-export const validateNumeric = (value: string | number): boolean =>
-  !isNaN(parseFloat(String(value)));
-
-export const validateEmail = (email?: string): boolean => {
-  if (isNil(email) || email === "") {
-    return false;
-  }
-  const re =
-    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return re.test(String(email).toLowerCase());
-};
-
+/**
+ * Convert to ZOD Schema
+ * @deprecated
+ */
 export const validateSlug = (slug: string) => {
   if (slug === "") {
     return false;

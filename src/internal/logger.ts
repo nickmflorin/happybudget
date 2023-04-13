@@ -12,11 +12,16 @@ import { ulid } from "ulid";
 import { ProductionEnvironments } from "application/config/types";
 /* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { ApplicationError } from "application/errors/errors/base";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { JsonLiteral } from "lib/schemas";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { generateRandomNumericId } from "lib/util";
 
-export type LogMessageContext = Record<
-  string,
-  JsonValue | import("application/errors/errors").ApplicationError
->;
+type LogContextValue =
+  | Exclude<JsonLiteral, ArrayBuffer>
+  | import("application/errors/errors").ApplicationError;
+
+export type LogMessageContext = Record<string, LogContextValue>;
 
 const RESTRICTED_LOG_CONTEXT = ["application", "environment", "productionEnv"] as const;
 
@@ -53,17 +58,60 @@ if (application === undefined) {
  */
 const messageContextErrorProcessor: TransformMessageFunction<LogMessageContext> = (
   message: Message<LogMessageContext>,
-): Message<RoarrMessageContext> => ({
-  ...message,
-  context: Object.keys(message.context).reduce((prev: RoarrMessageContext, key: string) => {
-    const value: JsonValue | import("application/errors/errors").ApplicationError =
-      message.context[key];
-    if (value instanceof ApplicationError) {
-      return { ...prev, ...value.logContext };
-    }
-    return { ...prev, [key]: value };
-  }, {} as RoarrMessageContext),
-});
+): Message<RoarrMessageContext> => {
+  let jsonContext: RoarrMessageContext = {};
+
+  /* Separate the log context keys that are not associated with instances of errors.ApplicationError
+     from those that are. */
+  const errors = Object.keys(message.context).reduce(
+    (prev: import("application/errors/errors").ApplicationError[], key: string) => {
+      const value: LogContextValue = message.context[key];
+      if (value instanceof ApplicationError) {
+        return [...prev, value];
+      }
+      jsonContext = { ...jsonContext, [key]: value };
+      return prev;
+    },
+    [] as import("application/errors/errors").ApplicationError[],
+  );
+
+  // If the message that was provided is an empty string, use the message from the error.
+  if (errors.length !== 0 && message.message.trim() === "") {
+    message = { ...message, message: errors[0].message };
+  }
+
+  return {
+    ...message,
+    // Add in the log context for each individual error instance in the original context.
+    context: errors.reduce(
+      (
+        prev: RoarrMessageContext,
+        e: import("application/errors/errors").ApplicationError,
+      ): RoarrMessageContext => {
+        const logContext = e.logContext;
+        return Object.keys(logContext).reduce(
+          (prev: RoarrMessageContext, key: string, index: number): RoarrMessageContext => {
+            /* For the key of the context object for each error, we have to be concerned with the
+               key overwriting an existing key of the log context, either from another error or from
+               the base context provided to the log method.  To avoid data loss in logs, we prefix
+               context keys for errors with randomly generated IDs in the case that the key is
+               already in the context. */
+            const errorKeyPrefix =
+              errors.length > 1
+                ? `error-${index + 1}-${generateRandomNumericId()}_${key}`
+                : `error-${generateRandomNumericId()}_${key}`;
+            if (Object.keys(logContext).includes(key)) {
+              return { ...prev, [errorKeyPrefix]: logContext[key] };
+            }
+            return { ...prev, [key]: logContext[key] };
+          },
+          prev,
+        );
+      },
+      jsonContext,
+    ),
+  };
+};
 
 export default Logger.child<LogMessageContext>(messageContextErrorProcessor).child(message => {
   const inter = intersection(Object.keys(message.context), RESTRICTED_LOG_CONTEXT);

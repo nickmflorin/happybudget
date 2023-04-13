@@ -1,21 +1,27 @@
 import { useRef } from "react";
 
+import { logger } from "internal";
 import { notifications } from "lib";
 
-export const InitialGridRef: Table.DataGridInstance = {
+import * as model from "../model";
+
+import * as rows from "./rows";
+import * as types from "./types";
+
+export const InitialGridRef: types.DataGridInstance = {
   getCSVData: () => [],
 };
 
-export const useDataGrid = (): NonNullRef<Table.DataGridInstance> =>
-  useRef<Table.DataGridInstance>(InitialGridRef);
+export const useDataGrid = (): NonNullRef<types.DataGridInstance> =>
+  useRef<types.DataGridInstance>(InitialGridRef);
 
-export const InitialTableRef: Table.TableInstance<Table.RowData, model.RowTypedApiModel> = {
+export const InitialTableRef: types.TableInstance<rows.Row> = {
   ...InitialGridRef,
   notifications: [],
   /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   saving: () => {},
   notify: () => {
-    console.warn(
+    logger.warn(
       `Cannot dispatch notifications ${notifications.objToJson(
         notifications,
       )} to table because table ref has not been attached yet.`,
@@ -39,7 +45,7 @@ export const InitialTableRef: Table.TableInstance<Table.RowData, model.RowTypedA
 };
 
 export const useTable = <
-  R extends Table.RowData,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
->(): NonNullRef<Table.TableInstance<R, M>> =>
-  useRef<Table.TableInstance<R, M>>(InitialTableRef as Table.TableInstance<R, M>);
+>(): NonNullRef<types.TableInstance<R, M>> =>
+  useRef<types.TableInstance<R, M>>(InitialTableRef as types.TableInstance<R, M>);

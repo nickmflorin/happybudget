@@ -1,59 +1,65 @@
-import { isNil, filter, includes } from "lodash";
+import * as model from "../../../model";
+import { SingleOrArray } from "../../../util";
+import * as columns from "../../columns";
+import { CellValue } from "../../types";
+import * as ids from "../ids";
+import * as types from "../types";
 
-import { tabling } from "lib";
-
-import BodyRowManager, { BodyRowManagerConfig } from "./base";
+import { BodyRowManagerConfig } from "./base";
+import { EditableRowManager } from "./editable";
 
 type CreateGroupRowConfig = {
-  readonly model: Model.Group;
+  readonly model: model.Group;
 };
 
-class GroupRowManager<
-  R extends Table.RowData,
-  M extends model.RowTypedApiModel = model.RowTypedApiModel,
-> extends BodyRowManager<Table.GroupRow<R>, R, M, [Model.Group]> {
-  constructor(config: Omit<BodyRowManagerConfig<Table.GroupRow<R>, R, M>, "rowType">) {
-    super({ ...config, rowType: "group" });
+type GroupRowManagerConfig<
+  R extends types.Row,
+  M extends model.RowTypedApiModel,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  T extends CellValue<R, N> = CellValue<R, N>,
+> = Omit<BodyRowManagerConfig<"model", R, M, types.ModelRowId, N, T>, "rowType">;
+
+export class GroupRowManager<
+  R extends types.Row,
+  M extends model.RowTypedApiModel,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  T extends CellValue<R, N> = CellValue<R, N>,
+> extends EditableRowManager<"group", R, M, [model.Group], types.GroupRowId, N, T> {
+  constructor(config: GroupRowManagerConfig<R, M, N, T>) {
+    super({ ...config, rowType: types.RowTypes.GROUP });
   }
 
-  getValueForRow<V extends Table.RawRowValue, C extends Table.ModelColumn<R, M, V>>(
-    col: C,
-    group: Model.Group,
-  ): V | undefined {
-    // The FakeColumn(s) are not applicable for Groups.
-    if (tabling.columns.isDataColumn<R, M>(col) && !isNil(col.groupField)) {
-      return group[col.groupField] as V;
+  getValueForRow(col: columns.ModelColumn<R, M, N, T>, m: model.Group): T | undefined {
+    if (columns.isDataColumn<R, M, N, T>(col) && col.groupField !== undefined) {
+      return m[col.groupField] as T | undefined;
     }
-    /* We need to indicate that the value is not applicable for the column for
-       this GroupRow, otherwise a warning will be issued and the value will be
-       set to the column's `nullValue`. */
+    /* We need to indicate that the value is not applicable for the column for this GroupRow,
+       otherwise a warning will be issued and the value will be set to the column's `nullValue`. */
     this.throwNotApplicable();
   }
 
-  removeChildren(row: Table.GroupRow<R>, Ids: SingleOrArray<number>): Table.GroupRow<R> {
-    const IDs: number[] = Array.isArray(Ids) ? Ids : [Ids];
+  removeChildren(
+    row: types.RowSubType<R, "group", N, T>,
+    ids: SingleOrArray<number>,
+  ): types.RowSubType<R, "group", N, T> {
+    const IDs: number[] = Array.isArray(ids) ? ids : [ids];
     return {
       ...row,
-      children: filter(row.children, (child: number) => !includes(IDs, child)),
+      children: row.children.filter((child: number) => !IDs.includes(child)),
     };
   }
 
-  create(config: CreateGroupRowConfig): Table.GroupRow<R> {
+  create(config: CreateGroupRowConfig): types.GroupRow<types.GetRowData<R, N, T>> {
     return {
       ...this.createBasic(
         {
           ...config,
-          id: tabling.rows.groupRowId(config.model.id),
+          id: ids.groupRowId(config.model.id),
         },
         config.model,
       ),
       children: config.model.children,
-      groupData: {
-        name: config.model.name,
-        color: config.model.color,
-      },
+      data: config.model,
     };
   }
 }
-
-export default GroupRowManager;

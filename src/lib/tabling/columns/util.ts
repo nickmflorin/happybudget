@@ -1,75 +1,82 @@
 import React from "react";
 
-import { find, isNil, reduce, filter, orderBy, map } from "lodash";
+import { find, orderBy } from "lodash";
 
-import { tabling } from "lib";
+import { logger } from "internal";
+
+import * as model from "../../model";
+import { removeObjAttributes } from "../../util";
+import * as rows from "../rows";
+import { CellValue } from "../types";
 
 import ColumnTypes from "./ColumnTypes";
 import * as typeguards from "./typeguards";
+import * as types from "./types";
 
 export const editColumnRowConfigIsApplicable = <
-  R extends Table.RowData,
-  RW extends Table.NonPlaceholderBodyRow<R>,
+  R extends rows.RowOfType<Exclude<rows.BodyRowType, "placeholder">>,
 >(
-  c: Table.EditColumnRowConfig<R, RW>,
-  row: Table.NonPlaceholderBodyRow<R>,
-  behavior?: Table.EditRowActionBehavior,
+  c: types.EditColumnRowConfig<R>,
+  row: rows.RowOfType<Exclude<rows.BodyRowType, "placeholder">>,
+  behavior?: rows.EditRowActionBehavior,
 ): boolean => {
   let condition = c.typeguard(row);
-  if (!isNil(behavior)) {
+  if (behavior !== undefined) {
     condition = condition && c.behavior === behavior;
   }
-  if (!isNil(c.conditional)) {
-    condition = condition && c.conditional(row as RW);
+  if (c.conditional !== undefined) {
+    condition = condition && c.conditional(row as R);
   }
   return condition;
 };
 
 export const getEditColumnRowConfig = <
-  R extends Table.RowData,
-  RW extends Table.NonPlaceholderBodyRow<R> = Table.NonPlaceholderBodyRow<R>,
+  R extends rows.RowOfType<Exclude<rows.BodyRowType, "placeholder">>,
 >(
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  config: Table.EditColumnRowConfig<R, any>[],
-  row: RW,
-  behavior?: Table.EditRowActionBehavior,
-): Table.EditColumnRowConfig<R, RW> | null => {
-  const filtered = filter(config, (c: Table.EditColumnRowConfig<R, any>) =>
+  config: types.EditColumnRowConfig<R>[],
+  row: R,
+  behavior?: rows.EditRowActionBehavior,
+): types.EditColumnRowConfig<R> | null => {
+  const filtered = config.filter((c: types.EditColumnRowConfig<R>) =>
     editColumnRowConfigIsApplicable(c, row, behavior),
   );
   return filtered.length !== 0 ? filtered[0] : null;
 };
 
 export const normalizedField = <
-  R extends Table.RowData,
-  M extends model.RowTypedApiModel = model.RowTypedApiModel,
+  R extends rows.Row,
+  M extends model.RowTypedApiModel,
+  N extends types.ColumnFieldName<R>,
+  T extends CellValue<R, N>,
 >(
-  col: Table.RealColumn<R, M>,
+  col: types.RealColumn<R, M, N, T>,
 ): string =>
   typeguards.isBodyColumn(col) ? col.field : typeguards.isActionColumn(col) ? col.colId : col.field;
 
-declare type Case = "pdf" | "aggrid";
+export type Case = "pdf" | "aggrid";
 
 export const getColumnRowValue = <
-  R extends Table.RowData,
-  M extends model.RowTypedApiModel = model.RowTypedApiModel,
-  V extends Table.RawRowValue = Table.RawRowValue,
+  R extends rows.Row,
+  M extends model.RowTypedApiModel,
+  N extends types.ColumnFieldName<R>,
+  T extends CellValue<R, N>,
 >(
-  col: Table.DataColumn<R, M, V>,
-  row: Table.BodyRow<R>,
-  rws: Table.BodyRow<R>[],
+  col: types.DataColumn<R, M, N, T>,
+  row: rows.RowSubType<R, rows.BodyRowType>,
+  rws: rows.RowSubType<R, rows.BodyRowType>[],
   tableCase: Case = "aggrid",
-): V => {
+): T => {
   const returnNullWithWarning = (fld: string) => {
     // The row managers should prevent this, but you never know.
-    if (tabling.rows.isModelRow(row)) {
-      console.error(
-        `Undefined value for row ${row.id} (type = ${row.rowType}, ` +
-          `modelType = ${row.modelType}) encountered for field ${fld}! ` +
-          `Returning ${String(col.nullValue)}.`,
+    if (rows.isModelRow(row)) {
+      logger.error(
+        { row: JSON.stringify(row), field: fld, modelType: row.modelType, id: row.id },
+        `Undefined value for row ${row.id} (type = ${row.rowType}, modelType = ${row.modelType}) ` +
+          `encountered for field ${fld}! Returning ${String(col.nullValue)}.`,
       );
     } else {
-      console.error(
+      logger.error(
+        { row: JSON.stringify(row), field: fld, id: row.id },
         `Undefined value for row ${row.id} (type = ${row.rowType}) ` +
           `encountered for field ${fld}! Returning ${String(col.nullValue)}.`,
       );
@@ -79,164 +86,239 @@ export const getColumnRowValue = <
 
   const valueGetter = tableCase === "aggrid" ? col.valueGetter : col.pdfValueGetter;
 
-  /* If the column does not define a valueGetter, we need to pull the row value
-     from the underlying row data. */
-  if (isNil(valueGetter)) {
-    if (tabling.rows.isMarkupRow(row)) {
-      if (!isNil(col.markupField)) {
+  /* If the column does not define a valueGetter, we need to pull the row value from the underlying
+     row data. */
+  if (valueGetter === undefined) {
+    if (rows.isMarkupRow(row)) {
+      if (col.markupField !== undefined) {
         if (row.data[col.markupField] === undefined) {
           // The row managers should prevent this, but you never know.
           return returnNullWithWarning(col.markupField);
         }
-        return row.data[col.markupField] as unknown as V;
-      } else {
-        /* In this case, the column is not applicable for a MarkupRow, so we
-           just return the nullValue and do not issue a warning. */
-        return col.nullValue;
+        return row.data[col.markupField] as T;
       }
-    } else if (tabling.rows.isGroupRow(row)) {
-      if (!isNil(col.groupField)) {
+      /* In this case, the column is not applicable for a MarkupRow, so we just return the nullValue
+         and do not issue a warning. */
+      return col.nullValue;
+    } else if (rows.isGroupRow(row)) {
+      if (col.groupField !== undefined) {
         if (row.data[col.groupField] === undefined) {
           // The row managers should prevent this, but you never know.
           return returnNullWithWarning(col.groupField);
         }
-        return row.data[col.groupField] as unknown as V;
-      } else {
-        /* In this case, the column is not applicable for a GroupRow, so we
-           just return the nullValue and do not issue a warning. */
-        return col.nullValue;
+        return row.data[col.groupField] as T;
       }
-    } else {
+      /* In this case, the column is not applicable for a GroupRow, so we just return the nullValue
+         and do not issue a warning. */
+      return col.nullValue;
       // The field should always be applicable for the model row case.
-      if (row.data[col.field] === undefined) {
-        // The row managers should prevent this, but you never know.
-        return returnNullWithWarning(col.field);
-      }
-      return row.data[col.field] as unknown as V;
+    } else if (row.data[col.field] === undefined) {
+      // The row managers should prevent this, but you never know.
+      return returnNullWithWarning(col.field);
     }
-  } else {
-    return valueGetter(row, rws);
+    return row.data[col.field] as unknown as T;
   }
+  return valueGetter(row, rws);
 };
 
-export const getColumn = <CA extends Table.Column[]>(
-  columns: CA,
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+export const getColumn = <C extends types.Column<any, any, any, any>>(
+  columns: C[],
   field: string,
-  flt?: (c: CA[number]) => boolean,
-): CA[number] | null => {
-  const realColumnLookupFilter = (c: CA[number]) =>
-    typeguards.isRealColumn<Table.InferR<typeof c>, Table.InferM<typeof c>>(c) &&
-    normalizedField<Table.InferR<typeof c>, Table.InferM<typeof c>>(c) === field;
+  flt?: (c: C) => boolean,
+): C | null => {
+  const realColumnLookupFilter = (c: C) =>
+    typeguards.isRealColumn(c) && normalizedField(c) === field;
 
-  const fakeColumnLooupFilter = (c: CA[number]) =>
-    typeguards.isFakeColumn<Table.InferR<typeof c>, Table.InferM<typeof c>>(c) && c.field === field;
+  const fakeColumnLooupFilter = (c: C) => typeguards.isFakeColumn(c) && c.field === field;
 
-  const baseFlt = isNil(flt)
-    ? (c: typeof columns[number]) => realColumnLookupFilter(c) || fakeColumnLooupFilter(c)
-    : (c: CA[number]) => (flt(c) && realColumnLookupFilter(c)) || fakeColumnLooupFilter(c);
-  const foundColumn = find(columns, baseFlt);
-  if (!isNil(foundColumn)) {
-    return foundColumn;
-  } else {
-    console.error(`Could not find column for field ${field}!`);
+  const baseFlt =
+    flt === undefined
+      ? (c: C) => realColumnLookupFilter(c) || fakeColumnLooupFilter(c)
+      : (c: C) => (flt(c) && realColumnLookupFilter(c)) || fakeColumnLooupFilter(c);
+  const foundColumn = columns.filter(baseFlt);
+  if (foundColumn.length === 1) {
+    return foundColumn[0];
+  } else if (foundColumn.length === 0) {
+    logger.error(`Could not find column for field ${field}!`);
     return null;
   }
+  throw new Error(`Multiple columns returned for field ${field}!`);
 };
 
-export const getRealColumn = <CA extends Table.Column[]>(
+export const getColumnOfType = <
+  I extends types.ColumnTypeId,
+  R extends rows.Row,
+  M extends model.RowTypedApiModel,
+  N extends types.ColumnFieldName<R>,
+  T extends CellValue<R, N>,
+  CA extends types.Columns<R, M, N, T>,
+>(
   columns: CA,
   field: string,
-): Table.InferRealColumn<CA[number]> | null =>
-  getColumn(columns, field, (c: CA[number]) => typeguards.isRealColumn(c)) as Table.InferRealColumn<
-    CA[number]
-  > | null;
+  cType: I | I[],
+): types.ColumnOfType<I, R, M, N, T> | null =>
+  getColumn(columns, field, (c: types.Column<R, M, N, T>) =>
+    Array.isArray(cType) ? cType.includes(c.cType as typeof cType[number]) : c.cType === cType,
+  ) as types.ColumnOfType<I, R, M, N, T> | null;
 
-export const getBodyColumn = <CA extends Table.Column[]>(
+export const getRealColumn = <
+  R extends rows.Row,
+  M extends model.RowTypedApiModel,
+  N extends types.ColumnFieldName<R>,
+  T extends CellValue<R, N>,
+  CA extends types.Columns<R, M, N, T>,
+>(
   columns: CA,
   field: string,
-): Table.InferBodyColumn<CA[number]> | null =>
-  getColumn(columns, field, (c: CA[number]) => typeguards.isBodyColumn(c)) as Table.InferBodyColumn<
-    CA[number]
-  > | null;
+) =>
+  getColumnOfType<"action" | "body" | "calculated", R, M, N, T, CA>(columns, field, [
+    types.ColumnTypeIds.ACTION,
+    types.ColumnTypeIds.BODY,
+    types.ColumnTypeIds.CALCULATED,
+  ]);
 
-export const getActionColumn = <CA extends Table.Column[]>(
+export const getBodyColumn = <
+  R extends rows.Row,
+  M extends model.RowTypedApiModel,
+  N extends types.ColumnFieldName<R>,
+  T extends CellValue<R, N>,
+  CA extends types.Columns<R, M, N, T>,
+>(
   columns: CA,
   field: string,
-): Table.InferActionColumn<CA[number]> | null =>
-  getColumn(columns, field, (c: CA[number]) =>
-    typeguards.isActionColumn(c),
-  ) as Table.InferActionColumn<CA[number]> | null;
+) => getColumnOfType<"body", R, M, N, T, CA>(columns, field, types.ColumnTypeIds.BODY);
 
-export const getCalculatedColumn = <CA extends Table.Column[]>(
+export const getActionColumn = <
+  R extends rows.Row,
+  M extends model.RowTypedApiModel,
+  N extends types.ColumnFieldName<R>,
+  T extends CellValue<R, N>,
+  CA extends types.Columns<R, M, N, T>,
+>(
   columns: CA,
   field: string,
-): Table.InferCalculatedColumn<CA[number]> | null =>
-  getColumn(columns, field, (c: CA[number]) =>
-    typeguards.isCalculatedColumn(c),
-  ) as Table.InferCalculatedColumn<CA[number]> | null;
+) => getColumnOfType<"action", R, M, N, T, CA>(columns, field, types.ColumnTypeIds.ACTION);
 
-export const filterActionColumns = <CA extends Table.Column[]>(
+export const getCalculatedColumn = <
+  R extends rows.Row,
+  M extends model.RowTypedApiModel,
+  N extends types.ColumnFieldName<R>,
+  T extends CellValue<R, N>,
+  CA extends types.Columns<R, M, N, T>,
+>(
   columns: CA,
-): CA extends Table.Column<infer R, infer M>[] ? Table.ActionColumn<R, M>[] : never =>
-  filter(columns, (col: typeof columns[number]) =>
-    typeguards.isActionColumn<Table.InferR<typeof col>, Table.InferM<typeof col>>(col),
-  ) as CA extends Table.Column<infer R, infer M>[] ? Table.ActionColumn<R, M>[] : never;
+  field: string,
+) => getColumnOfType<"calculated", R, M, N, T, CA>(columns, field, types.ColumnTypeIds.CALCULATED);
 
-export const filterFakeColumns = <CA extends Table.Column[]>(
+export const filterColumnsOfType = <
+  I extends types.ColumnTypeId,
+  R extends rows.Row,
+  M extends model.RowTypedApiModel,
+  N extends types.ColumnFieldName<R>,
+  T extends CellValue<R, N>,
+  CA extends types.Columns<R, M, N, T>,
+>(
   columns: CA,
-): CA extends Table.Column<infer R, infer M, infer V>[] ? Table.FakeColumn<R, M, V>[] : never =>
-  filter(columns, (col: typeof columns[number]) =>
-    typeguards.isFakeColumn<Table.InferR<typeof col>, Table.InferM<typeof col>>(col),
-  ) as CA extends Table.Column<infer R, infer M, infer V>[] ? Table.FakeColumn<R, M, V>[] : never;
+  cType: I | I[],
+): types.ColumnOfType<I, R, M, N, T>[] =>
+  ([...columns] as types.Column<R, M, N, T>[]).filter((col: types.Column<R, M, N, T>) =>
+    Array.isArray(cType)
+      ? cType.map((v: I) => typeguards.isColumnOfType<I, R, M, N, T>(col, v)).includes(true)
+      : typeguards.isColumnOfType<I, R, M, N, T>(col, cType),
+  ) as types.ColumnOfType<I, R, M, N, T>[];
 
-export const filterCalculatedColumns = <CA extends Table.Column[]>(
+export const filterActionColumns = <
+  R extends rows.Row,
+  M extends model.RowTypedApiModel,
+  N extends types.ColumnFieldName<R>,
+  T extends CellValue<R, N>,
+  CA extends types.Columns<R, M, N, T>,
+>(
   columns: CA,
-): CA extends Table.Column<infer R, infer M, infer V>[]
-  ? Table.CalculatedColumn<R, M, V>[]
-  : never =>
-  filter(columns, (col: typeof columns[number]) =>
-    typeguards.isCalculatedColumn<Table.InferR<typeof col>, Table.InferM<typeof col>>(col),
-  ) as CA extends Table.Column<infer R, infer M, infer V>[]
-    ? Table.CalculatedColumn<R, M, V>[]
-    : never;
+) => filterColumnsOfType<"action", R, M, N, T, CA>(columns, "action");
 
-export const filterDataColumns = <CA extends Table.Column[]>(
+export const filterFakeColumns = <
+  R extends rows.Row,
+  M extends model.RowTypedApiModel,
+  N extends types.ColumnFieldName<R>,
+  T extends CellValue<R, N>,
+  CA extends types.Columns<R, M, N, T>,
+>(
   columns: CA,
-): CA extends Table.Column<infer R, infer M, infer V>[] ? Table.DataColumn<R, M, V>[] : never =>
-  filter(columns, (col: typeof columns[number]) =>
-    typeguards.isDataColumn<Table.InferR<typeof col>, Table.InferM<typeof col>>(col),
-  ) as CA extends Table.Column<infer R, infer M, infer V>[] ? Table.DataColumn<R, M, V>[] : never;
+) => filterColumnsOfType<"fake", R, M, N, T, CA>(columns, "fake");
 
-export const filterBodyColumns = <CA extends Table.Column[]>(
+export const filterCalculatedColumns = <
+  R extends rows.Row,
+  M extends model.RowTypedApiModel,
+  N extends types.ColumnFieldName<R>,
+  T extends CellValue<R, N>,
+  CA extends types.Columns<R, M, N, T>,
+>(
   columns: CA,
-): CA extends Table.Column<infer R, infer M, infer V>[] ? Table.BodyColumn<R, M, V>[] : never =>
-  filter(columns, (col: typeof columns[number]) =>
-    typeguards.isBodyColumn<Table.InferR<typeof col>, Table.InferM<typeof col>>(col),
-  ) as CA extends Table.Column<infer R, infer M, infer V>[] ? Table.BodyColumn<R, M, V>[] : never;
+) => filterColumnsOfType<"calculated", R, M, N, T, CA>(columns, "calculated");
 
-export const filterRealColumns = <CA extends Table.Column[]>(
+export const filterDataColumns = <
+  R extends rows.Row,
+  M extends model.RowTypedApiModel,
+  N extends types.ColumnFieldName<R>,
+  T extends CellValue<R, N>,
+  CA extends types.Columns<R, M, N, T>,
+>(
   columns: CA,
-): CA extends Table.Column<infer R, infer M, infer V>[] ? Table.RealColumn<R, M, V>[] : never =>
-  filter(columns, (col: typeof columns[number]) =>
-    typeguards.isRealColumn<Table.InferR<typeof col>, Table.InferM<typeof col>>(col),
-  ) as CA extends Table.Column<infer R, infer M, infer V>[] ? Table.RealColumn<R, M, V>[] : never;
+) => filterColumnsOfType<"body" | "calculated", R, M, N, T, CA>(columns, ["body", "calculated"]);
 
-export const filterModelColumns = <CA extends Table.Column[]>(
+export const filterBodyColumns = <
+  R extends rows.Row,
+  M extends model.RowTypedApiModel,
+  N extends types.ColumnFieldName<R>,
+  T extends CellValue<R, N>,
+  CA extends types.Columns<R, M, N, T>,
+>(
   columns: CA,
-): CA extends Table.Column<infer R, infer M, infer V>[] ? Table.ModelColumn<R, M, V>[] : never =>
-  filter(columns, (col: typeof columns[number]) =>
-    typeguards.isModelColumn<Table.InferR<typeof col>, Table.InferM<typeof col>>(col),
-  ) as CA extends Table.Column<infer R, infer M, infer V>[] ? Table.ModelColumn<R, M, V>[] : never;
+) => filterColumnsOfType<"body", R, M, N, T, CA>(columns, "body");
+
+export const filterRealColumns = <
+  R extends rows.Row,
+  M extends model.RowTypedApiModel,
+  N extends types.ColumnFieldName<R>,
+  T extends CellValue<R, N>,
+  CA extends types.Columns<R, M, N, T>,
+>(
+  columns: CA,
+) =>
+  filterColumnsOfType<"body" | "calculated" | "action", R, M, N, T, CA>(columns, [
+    "body",
+    "calculated",
+    "action",
+  ]);
+
+export const filterModelColumns = <
+  R extends rows.Row,
+  M extends model.RowTypedApiModel,
+  N extends types.ColumnFieldName<R>,
+  T extends CellValue<R, N>,
+  CA extends types.Columns<R, M, N, T>,
+>(
+  columns: CA,
+) =>
+  filterColumnsOfType<"body" | "calculated" | "fake", R, M, N, T, CA>(columns, [
+    "body",
+    "calculated",
+    "fake",
+  ]);
 
 export const isEditable = <
-  R extends Table.RowData,
+  R extends rows.Row,
   M extends model.RowTypedApiModel,
-  C extends Table.BodyColumn<R, M> = Table.BodyColumn<R, M>,
+  N extends types.ColumnFieldName<R>,
+  T extends CellValue<R, N>,
+  C extends types.BodyColumn<R, M, N, T> = types.BodyColumn<R, M, N, T>,
 >(
   column: C,
-  row: Table.BodyRow<R>,
+  row: rows.RowSubType<R, rows.BodyRowType>,
 ): boolean => {
-  if (isNil(column.editable)) {
+  if (column.editable === undefined) {
     return false;
   } else if (typeof column.editable === "boolean") {
     return column.editable;
@@ -245,136 +327,122 @@ export const isEditable = <
 };
 
 export const parseBaseColumn = <
-  R extends Table.RowData,
+  R extends rows.Row,
   M extends model.RowTypedApiModel,
-  C extends Table.Column<R, M>,
+  N extends types.ColumnFieldName<R>,
+  T extends CellValue<R, N>,
+  C extends types.Column<R, M, N, T> = types.Column<R, M, N, T>,
 >(
   column: C,
-): Table.BaseColumn => {
-  if (typeguards.isFakeColumn<R, M>(column)) {
-    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-    const {
-      cType,
-      getRowValue,
-      nullValue,
-      isApplicableForModel,
-      isApplicableForRowType,
-      ...agColumn
-    } = column;
-    return agColumn;
-  } else if (typeguards.isActionColumn<R, M>(column)) {
-    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-    const { cType, footer, ...agColumn } = column;
-    return agColumn;
-  } else if (typeguards.isCalculatedColumn<R, M>(column)) {
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    const {
-      markupField,
-      groupField,
-      footer,
-      page,
-      requiresAuthentication,
-      index,
-      canBeExported,
-      canBeHidden,
-      isRead,
-      dataType,
-      nullValue,
-      cType,
-      defaultHidden,
-      includeInPdf,
-      pdfWidth,
-      pdfHeaderName,
-      pdfFooter,
-      pdfFooterValueGetter,
-      pdfHeaderCellProps,
-      pdfCellProps,
-      pdfFlexGrow,
-      isApplicableForModel,
-      isApplicableForRowType,
-      pdfValueGetter,
-      pdfChildFooter,
-      pdfCellRenderer,
-      pdfFormatter,
-      onCellDoubleClicked,
-      processCellForClipboard,
-      processCellForCSV,
-      getHttpValue,
-      getRowValue,
-      ...agColumn
-    } = column;
-    /* eslint-enable @typescript-eslint/no-unused-vars */
-    return agColumn;
-  } else if (typeguards.isBodyColumn<R, M>(column)) {
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    const {
-      markupField,
-      groupField,
-      footer,
-      page,
-      selectable,
-      requiresAuthentication,
-      index,
-      canBeExported,
-      canBeHidden,
-      dataType,
-      isRead,
-      cType,
-      nullValue,
-      parsedFields,
-      isApplicableForModel,
-      isApplicableForRowType,
-      smartInference,
-      defaultHidden,
-      includeInPdf,
-      pdfWidth,
-      pdfHeaderName,
-      pdfFooter,
-      pdfFooterValueGetter,
-      pdfHeaderCellProps,
-      pdfCellProps,
-      pdfFlexGrow,
-      pdfValueGetter,
-      pdfChildFooter,
-      pdfCellRenderer,
-      pdfFormatter,
-      onDataChange,
-      parseIntoFields,
-      refreshColumns,
-      onCellDoubleClicked,
-      processCellForClipboard,
-      processCellForCSV,
-      processCellFromClipboard,
-      getHttpValue,
-      getRowValue,
-      ...agColumn
-    } = column;
-    /* eslint-enable @typescript-eslint/no-unused-vars */
-    return agColumn;
+): types.BaseAgColumn<R> => {
+  if (typeguards.isFakeColumn<R, M, N, T>(column)) {
+    return removeObjAttributes<C>(column, [
+      "cType",
+      "getRowValue",
+      "nullValue",
+      "isApplicableForModel",
+      "isApplicableForRowType",
+    ]) as types.BaseAgColumn<R>;
+  } else if (typeguards.isActionColumn<R, M, N, T>(column)) {
+    return removeObjAttributes<C>(column, ["cType", "footer"]) as types.BaseAgColumn<R>;
+  } else if (typeguards.isCalculatedColumn<R, M, N, T>(column)) {
+    return removeObjAttributes<C>(column, [
+      "markupField",
+      "groupField",
+      "footer",
+      "page",
+      "requiresAuthentication",
+      "index",
+      "canBeExported",
+      "canBeHidden",
+      "isRead",
+      "dataType",
+      "nullValue",
+      "cType",
+      "defaultHidden",
+      "includeInPdf",
+      "pdfWidth",
+      "pdfHeaderName",
+      "pdfFooter",
+      "pdfFooterValueGetter",
+      "pdfHeaderCellProps",
+      "pdfCellProps",
+      "pdfFlexGrow",
+      "isApplicableForModel",
+      "isApplicableForRowType",
+      "pdfValueGetter",
+      "pdfChildFooter",
+      "pdfCellRenderer",
+      "pdfFormatter",
+      "onCellDoubleClicked",
+      "processCellForClipboard",
+      "processCellForCSV",
+      "getHttpValue",
+      "getRowValue",
+    ]) as types.BaseAgColumn<R>;
+  } else if (typeguards.isBodyColumn<R, M, N, T>(column)) {
+    return removeObjAttributes<C>(column, [
+      "markupField",
+      "groupField",
+      "footer",
+      "page",
+      "selectable",
+      "requiresAuthentication",
+      "index",
+      "canBeExported",
+      "canBeHidden",
+      "dataType",
+      "isRead",
+      "cType",
+      "nullValue",
+      "parsedFields",
+      "isApplicableForModel",
+      "isApplicableForRowType",
+      "smartInference",
+      "defaultHidden",
+      "includeInPdf",
+      "pdfWidth",
+      "pdfHeaderName",
+      "pdfFooter",
+      "pdfFooterValueGetter",
+      "pdfHeaderCellProps",
+      "pdfCellProps",
+      "pdfFlexGrow",
+      "pdfValueGetter",
+      "pdfChildFooter",
+      "pdfCellRenderer",
+      "pdfFormatter",
+      "onDataChange",
+      "parseIntoFields",
+      "refreshColumns",
+      "onCellDoubleClicked",
+      "processCellForClipboard",
+      "processCellForCSV",
+      "processCellFromClipboard",
+      "getHttpValue",
+      "getRowValue",
+    ]) as types.BaseAgColumn<R>;
   }
-  return column as Table.BaseColumn;
+  return column as types.BaseAgColumn<R>;
 };
 
-export const normalizePdfColumnWidths = <CA extends Table.Column[]>(
-  cs: CA,
-  flt?: CA extends Table.Column<infer R, infer M, infer V>[]
-    ? (c: Table.DataColumn<R, M, V>) => boolean
-    : never,
-): CA extends Table.Column<infer R, infer M, infer V>[] ? Table.BodyColumn<R, M, V>[] : never => {
-  let columns = [...cs];
-
-  const baseFilter = (c: Table.DataColumn) =>
-    !isNil(flt) ? c.includeInPdf !== false && flt(c) : c.includeInPdf !== false;
+export const normalizePdfColumnWidths = <
+  R extends rows.Row,
+  M extends model.RowTypedApiModel,
+  N extends types.ColumnFieldName<R>,
+  T extends CellValue<R, N>,
+  CA extends types.Columns<R, M, N, T>,
+>(
+  columns: CA,
+  flt?: (c: types.DataColumn<R, M, N, T>) => boolean,
+): types.BodyColumn<R, M, N, T>[] => {
+  const baseFilter = (c: types.DataColumn<R, M, N, T>) =>
+    flt !== undefined ? c.includeInPdf !== false && flt(c) : c.includeInPdf !== false;
 
   // Determine the total width of all the columns that have a specified width.
-  const totalSpecifiedWidth = reduce(
-    columns,
-    (prev: number, c: CA[number]) => {
-      if (
-        typeguards.isDataColumn<Table.InferR<typeof c>, Table.InferM<typeof c>>(c) &&
-        baseFilter(c) &&
-        c.pdfWidth !== undefined
-      ) {
+  const totalSpecifiedWidth = ([...columns] as types.Column<R, M, N, T>[]).reduce(
+    (prev: number, c: types.Column<R, M, N, T>) => {
+      if (typeguards.isDataColumn<R, M, N, T>(c) && baseFilter(c) && c.pdfWidth !== undefined) {
         return prev + c.pdfWidth;
       }
       return prev;
@@ -382,110 +450,90 @@ export const normalizePdfColumnWidths = <CA extends Table.Column[]>(
     0.0,
   );
 
-  /* Determine if there is a column that should flex grow to fill remaining space
-     in the case that the total width of the visible columns is less than 1.0. */
-  const flexColumns = filter(
-    columns,
-    (c: CA[number]) =>
-      typeguards.isDataColumn<Table.InferR<typeof c>, Table.InferM<typeof c>>(c) &&
-      baseFilter(c) &&
-      !isNil(c.pdfFlexGrow),
-  ) as Table.DataColumn<Table.InferR<CA[number]>, Table.InferM<CA[number]>>[];
+  /* Determine if there is a column that should flex grow to fill remaining space in the case that
+     the total width of the visible columns is less than 1.0. */
+  const flexColumns = ([...columns] as types.Column<R, M, N, T>[]).filter(
+    (c: types.Column<R, M, N, T>) =>
+      typeguards.isDataColumn<R, M, N, T>(c) && baseFilter(c) && c.pdfFlexGrow !== undefined,
+  ) as types.DataColumn<R, M, N, T>[];
   if (flexColumns.length !== 0 && totalSpecifiedWidth < 1.0) {
     const flexColumn = flexColumns[0];
 
-    /* If there are multiple columns with 'pdfFlexGrow' specified, we cannot apply
-       the flex to all of the columns because we would have to split the leftover
-			 space up between the columns with 'pdfFlexGrow' which can get
-			 hairy/complicated - and is not needed at this point. */
+    /* If there are multiple columns with 'pdfFlexGrow' specified, we cannot apply the flex to all
+       of the columns because we would have to split the leftover space up between the columns with
+       'pdfFlexGrow' which can get hairy/complicated - and is not needed at this point. */
     if (flexColumns.length !== 1) {
-      const flexColumnFields: (string | undefined)[] = map(
-        flexColumns,
-        (c: Table.DataColumn<Table.InferR<CA[number]>, Table.InferM<CA[number]>>) => c.field,
+      const flexColumnFields: (string | undefined)[] = flexColumns.map(
+        (c: types.DataColumn<R, M, N, T>) => c.field,
       );
-      console.warn(
+      logger.warn(
+        { fields: JSON.stringify(flexColumnFields) },
         `Found multiple columns, ${flexColumnFields.join(", ")}, with 'pdfFlexGrow' specified.
         Since only one column can flex grow in the PDF, only the column ${flexColumnFields[0] || ""}
         will have 'pdfFlexGrow' applied.`,
       );
     }
-    /* If the remaining non-flex columns do not specify a width, then we cannot
-       apply 'pdfFlexGrow' to the remaining column because we do not know how
-       much space should be available. */
-    const columnsWithoutSpecifiedWidth = filter(
-      columns,
-      (c: CA[number]) =>
-        typeguards.isDataColumn<Table.InferR<CA[number]>, Table.InferM<CA[number]>>(c) &&
+    /* If the remaining non-flex columns do not specify a width, then we cannot apply 'pdfFlexGrow'
+       to the remaining column because we do not know how much space should be available. */
+    const columnsWithoutSpecifiedWidth = ([...columns] as types.Column<R, M, N, T>[]).filter(
+      (c: types.Column<R, M, N, T>) =>
+        typeguards.isDataColumn<R, M, N, T>(c) &&
         baseFilter(c) &&
-        isNil(c.pdfWidth) &&
+        c.pdfWidth === undefined &&
         flexColumn.field !== c.field,
-    ) as Table.DataColumn<Table.InferR<CA[number]>, Table.InferM<CA[number]>>[];
+    ) as types.DataColumn<R, M, N, T>[];
     if (columnsWithoutSpecifiedWidth.length !== 0) {
-      const missingWidthFields: (string | undefined)[] = map(
-        columnsWithoutSpecifiedWidth,
-        (c: Table.DataColumn<Table.InferR<CA[number]>, Table.InferM<CA[number]>>) => c.field,
+      const missingWidthFields: (string | undefined)[] = columnsWithoutSpecifiedWidth.map(
+        (c: types.DataColumn<R, M, N, T>) => c.field,
       );
-      console.warn(
+      logger.warn(
+        { field: flexColumn.field },
         `Cannot apply 'pdfFlexGrow' to column ${flexColumn.field} because
         columns ${missingWidthFields.join(", ")} do not specify a 'pdfWidth'.`,
       );
     } else {
-      /* Return the columns as they were but only changing the width of the column
-         with 'pdfFlexGrow' applied to take up the remaining space in the
-				 table. */
-      return map(columns, (c: CA[number]) => {
-        if (
-          typeguards.isDataColumn<Table.InferR<typeof c>, Table.InferM<typeof c>>(c) &&
-          c.field === flexColumn.field
-        ) {
+      /* Return the columns as they were but only changing the width of the column with
+         'pdfFlexGrow' applied to take up the remaining space in the table. */
+      return ([...columns] as types.Column<R, M, N, T>[]).map((c: types.Column<R, M, N, T>) => {
+        if (typeguards.isDataColumn<R, M, N, T>(c) && c.field === flexColumn.field) {
           return { ...c, pdfWidth: 1.0 - totalSpecifiedWidth };
         }
         return c;
-      }) as CA extends Table.Column<infer R, infer M, infer V>[]
-        ? Table.BodyColumn<R, M, V>[]
-        : never;
+      }) as types.BodyColumn<R, M, N, T>[];
     }
   }
 
-  /* Determine what the default width should be for columns that do not specify it
-     based on the leftover width available after the columns that specify a width
-     are inserted. */
+  /* Determine what the default width should be for columns that do not specify it based on the
+     leftover width available after the columns that specify a width are inserted. */
   let defaultWidth = 0;
   if (totalSpecifiedWidth < 1.0) {
     defaultWidth =
       (1.0 - totalSpecifiedWidth) /
-      filter(
-        columns,
-        (c: CA[number]) =>
-          typeguards.isDataColumn<Table.InferR<typeof c>, Table.InferM<typeof c>>(c) &&
-          baseFilter(c) &&
-          isNil(c.pdfWidth),
+      ([...columns] as types.Column<R, M, N, T>[]).filter(
+        (c: types.Column<R, M, N, T>) =>
+          typeguards.isDataColumn<R, M, N, T>(c) && baseFilter(c) && c.pdfWidth === undefined,
       ).length;
   }
   // Calculate total width of all the columns.
-  const totalWidth = reduce(
-    columns,
-    (prev: number, c: CA[number]) =>
-      typeguards.isDataColumn<Table.InferR<typeof c>, Table.InferM<typeof c>>(c) && baseFilter(c)
+  const totalWidth = ([...columns] as types.Column<R, M, N, T>[]).reduce(
+    (prev: number, c: types.Column<R, M, N, T>) =>
+      typeguards.isDataColumn<R, M, N, T>(c) && baseFilter(c)
         ? prev + (c.pdfWidth || defaultWidth)
         : prev,
     0.0,
   );
   if (totalWidth !== 0.0) {
-    /* Normalize the width of each column such that the sum of all column widths
-       is 1.0 */
-    columns = map(columns, (c: CA[number]) =>
-      typeguards.isDataColumn<Table.InferR<typeof c>, Table.InferM<typeof c>>(c)
+    // Normalize the width of each column such that the sum of all column widths is 1.0.
+    return ([...columns] as types.Column<R, M, N, T>[]).map((c: types.Column<R, M, N, T>) =>
+      typeguards.isDataColumn<R, M, N, T>(c)
         ? {
             ...c,
             pdfWidth: baseFilter(c) ? (c.pdfWidth || defaultWidth) / totalWidth : c.pdfWidth,
           }
         : c,
-    );
+    ) as types.BodyColumn<R, M, N, T>[];
   }
-  return columns as CA extends Table.Column<infer R, infer M, infer V>[]
-    ? Table.BodyColumn<R, M, V>[]
-    : never;
+  return [...columns] as types.BodyColumn<R, M, N, T>[];
 };
 
 type ColumnTypeVariantOptions = {
@@ -494,13 +542,13 @@ type ColumnTypeVariantOptions = {
 };
 
 export const getColumnTypeCSSStyle = (
-  type: Table.ColumnDataTypeId | Table.ColumnDataType,
+  type: types.ColumnDataTypeId | types.ColumnDataType,
   options: ColumnTypeVariantOptions = { header: false, pdf: false },
 ): React.CSSProperties => {
-  let colType: Table.ColumnDataType;
+  let colType: types.ColumnDataType;
   if (typeof type === "string") {
-    const ct: Table.ColumnDataType | undefined = find(ColumnTypes, { id: type });
-    if (isNil(ct)) {
+    const ct: types.ColumnDataType | undefined = find(ColumnTypes, { id: type });
+    if (ct === undefined) {
       return {};
     }
     colType = ct;
@@ -508,111 +556,115 @@ export const getColumnTypeCSSStyle = (
     colType = type;
   }
   let style = colType.style || {};
-  if (options.header === true && !isNil(colType.headerOverrides)) {
+  if (options.header === true && colType.headerOverrides !== undefined) {
     style = { ...style, ...(colType.headerOverrides.style || {}) };
   }
-  if (options.pdf === true && !isNil(colType.pdfOverrides)) {
+  if (options.pdf === true && colType.pdfOverrides !== undefined) {
     style = { ...style, ...(colType.pdfOverrides.style || {}) };
   }
   return style;
 };
 
-type ColumnUpdate<C extends Table.RealColumn> = Partial<C> | ((p: C) => Partial<C>);
+type ColumnUpdate<
+  C extends types.RealColumn<R, M, N, T>,
+  R extends rows.Row,
+  M extends model.RowTypedApiModel,
+  N extends types.ColumnFieldName<R>,
+  T extends CellValue<R, N>,
+> = Partial<C> | ((p: C) => Partial<C>);
 
-type ColumnTypeUpdates<CA extends Table.Column[]> = {
-  readonly body?: ColumnUpdate<Table.InferBodyColumn<CA[number]>>;
-  readonly action?: ColumnUpdate<Table.InferActionColumn<CA[number]>>;
-  readonly calculated?: ColumnUpdate<Table.InferCalculatedColumn<CA[number]>>;
+type ColumnTypeUpdates<
+  R extends rows.Row,
+  M extends model.RowTypedApiModel,
+  N extends types.ColumnFieldName<R>,
+  T extends CellValue<R, N>,
+> = {
+  readonly body?: ColumnUpdate<types.BodyColumn<R, M, N, T>, R, M, N, T>;
+  readonly action?: ColumnUpdate<types.ActionColumn<R, M, N, T>, R, M, N, T>;
+  readonly calculated?: ColumnUpdate<types.CalculatedColumn<R, M, N, T>, R, M, N, T>;
 };
 
-export const normalizeColumns = <CA extends Table.Column[]>(
+export const normalizeColumns = <
+  R extends rows.Row,
+  M extends model.RowTypedApiModel,
+  N extends types.ColumnFieldName<R>,
+  T extends CellValue<R, N>,
+  CA extends types.Columns<R, M, N, T>,
+>(
   columns: CA,
   updates: Partial<{
-    [key: string]: ColumnUpdate<Table.InferBodyColumn<CA[number]>>;
+    [key: string]: ColumnUpdate<types.BodyColumn<R, M, N, T>, R, M, N, T>;
   }> = {},
-  typeUpdates: ColumnTypeUpdates<CA> = {},
+  typeUpdates: ColumnTypeUpdates<R, M, N, T> = {},
 ): CA => {
-  const normalizeUpdate = <CT extends Table.InferRealColumn<CA[number]>>(
-    d: ColumnUpdate<CT> | undefined,
-    c: CT,
-  ): Partial<CT> | undefined => (typeof d === "function" ? d(c) : d);
+  const normalizeUpdate = <C extends types.RealColumn<R, M, N, T>>(
+    d: ColumnUpdate<C, R, M, N, T> | undefined,
+    c: C,
+  ): Partial<C> | undefined => (typeof d === "function" ? d(c) : d);
 
-  const getUpdateForColumn = <CT extends Table.InferRealColumn<CA[number]>>(
-    c: CT,
-  ): Partial<CT> | undefined => {
-    if (!isNil(updates)) {
+  const getUpdateForColumn = <C extends types.RealColumn<R, M, N, T>>(
+    c: C,
+  ): Partial<C> | undefined => {
+    if (updates !== undefined) {
       const cTypeUpdate = typeUpdates[c.cType];
       if (cTypeUpdate !== undefined) {
-        return normalizeUpdate<CT>(cTypeUpdate as ColumnUpdate<CT>, c);
+        return normalizeUpdate<C>(cTypeUpdate as ColumnUpdate<C, R, M, N, T>, c);
       } else {
-        const id = normalizedField<Table.InferR<CA[number]>, Table.InferM<CA[number]>>(c);
-        return normalizeUpdate<CT>(updates[id] as ColumnUpdate<CT>, c);
+        const id = normalizedField<R, M, N, T>(c);
+        return normalizeUpdate<C>(updates[id] as ColumnUpdate<C, R, M, N, T>, c);
       }
     }
     return {};
   };
 
-  let evaluated: CA = [] as unknown as CA;
-
-  for (let i = 0; i < columns.length; i++) {
-    const c = columns[i];
-    if (typeguards.isRealColumn(c)) {
-      const data = getUpdateForColumn(c as Table.InferRealColumn<CA[number]>) as Partial<typeof c>;
-      evaluated = [...evaluated, { ...c, ...data }] as CA;
-    } else {
-      evaluated = [...evaluated, c] as CA;
+  const updateColumn = <C extends types.Column<R, M, N, T>>(c: C): C => {
+    if (typeguards.isRealColumn<R, M, N, T>(c)) {
+      return { ...c, ...getUpdateForColumn(c) } as C;
     }
-  }
-
-  return evaluated;
-};
-
-export const orderColumns = <CA extends Table.Column[]>(columns: CA): CA => {
-  const actionColumns = filterActionColumns(columns);
-  const calculatedColumns = filterCalculatedColumns(columns);
-  const bodyColumns = filterBodyColumns(columns);
-
-  /* It doesn't matter where the fake columns go in the ordering because they
-		 are not displayed - all we care about is that they are present. */
-  const fakeColumns = filterFakeColumns(columns);
-
-  const actionColumnsWithIndex = filter(
-    actionColumns,
-    (c: Table.ActionColumn<Table.InferR<CA[number]>, Table.InferM<CA[number]>>) => !isNil(c.index),
-  );
-  const actionColumnsWithoutIndex = filter(
-    actionColumns,
-    (c: Table.ActionColumn<Table.InferR<CA[number]>, Table.InferM<CA[number]>>) => isNil(c.index),
-  );
-
-  const calculatedColumnsWithIndex = filter(
-    calculatedColumns,
-    (c: Table.CalculatedColumn<Table.InferR<CA[number]>, Table.InferM<CA[number]>>) =>
-      !isNil(c.index),
-  );
-
-  const calculatedColumnsWithoutIndex = filter(
-    calculatedColumns,
-    (c: Table.CalculatedColumn<Table.InferR<CA[number]>, Table.InferM<CA[number]>>) =>
-      isNil(c.index),
-  );
-
-  const bodyColumnsWithIndex = filter(
-    bodyColumns,
-    (c: Table.BodyColumn<Table.InferR<CA[number]>, Table.InferM<CA[number]>>) => !isNil(c.index),
-  );
-  const bodyColumnsWithoutIndex = filter(
-    bodyColumns,
-    (c: Table.BodyColumn<Table.InferR<CA[number]>, Table.InferM<CA[number]>>) => isNil(c.index),
-  );
+    return c;
+  };
 
   return [
-    ...fakeColumns,
-    ...orderBy(actionColumnsWithIndex, ["index"], ["asc"]),
-    ...actionColumnsWithoutIndex,
-    ...orderBy(bodyColumnsWithIndex, ["index"], ["asc"]),
-    ...bodyColumnsWithoutIndex,
-    ...orderBy(calculatedColumnsWithIndex, ["index"], ["asc"]),
-    ...calculatedColumnsWithoutIndex,
+    ...([...columns] as types.Column<R, M, N, T>[]).map((c: types.Column<R, M, N, T>) =>
+      updateColumn(c),
+    ),
+  ] as CA;
+};
+
+export const orderColumns = <
+  R extends rows.Row,
+  M extends model.RowTypedApiModel,
+  N extends types.ColumnFieldName<R>,
+  T extends CellValue<R, N>,
+  CA extends types.Columns<R, M, N, T>,
+>(
+  columns: CA,
+): CA => {
+  const actionColumns = filterActionColumns<R, M, N, T, CA>(columns);
+  const calculatedColumns = filterCalculatedColumns<R, M, N, T, CA>(columns);
+  const bodyColumns = filterBodyColumns<R, M, N, T, CA>(columns);
+
+  return [
+    /* It doesn't matter where the fake columns go in the ordering because they are not displayed -
+       all we care about is that they are present. */
+    ...filterFakeColumns<R, M, N, T, CA>(columns),
+    ...orderBy(
+      actionColumns.filter((c: types.ActionColumn<R, M, N, T>) => c.index !== undefined),
+      ["index"],
+      ["asc"],
+    ),
+    ...actionColumns.filter((c: types.ActionColumn<R, M, N, T>) => c.index === undefined),
+    ...orderBy(
+      bodyColumns.filter((c: types.BodyColumn<R, M, N, T>) => c.index !== undefined),
+      ["index"],
+      ["asc"],
+    ),
+    ...bodyColumns.filter((c: types.BodyColumn<R, M, N, T>) => c.index === undefined),
+    ...orderBy(
+      calculatedColumns.filter((c: types.CalculatedColumn<R, M, N, T>) => c.index !== undefined),
+      ["index"],
+      ["asc"],
+    ),
+    ...calculatedColumns.filter((c: types.CalculatedColumn<R, M, N, T>) => c.index === undefined),
   ] as CA;
 };

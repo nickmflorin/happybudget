@@ -1,6 +1,8 @@
-import { reduce, flatten, map } from "lodash";
+import { flatten } from "lodash";
 
-export const Breakpoints: Style.Breakpoints = {
+import { ui } from "lib";
+
+export const Breakpoints: ui.Breakpoints = {
   small: 320,
   medium: 480,
   large: 768,
@@ -9,7 +11,7 @@ export const Breakpoints: Style.Breakpoints = {
   xxxl: 1580,
 };
 
-export const DEFAULT_COLOR_SCHEME: Style.HexColor[] = [
+export const DEFAULT_COLOR_SCHEME: ui.HexColor[] = [
   "#d5d5e5",
   "#ffd2ba",
   "#beebff",
@@ -26,7 +28,7 @@ export const DEFAULT_COLOR_SCHEME: Style.HexColor[] = [
   "#beebff",
 ];
 
-export const Colors: { [key: string]: Style.HexColor } = {
+export const Colors: { [key: string]: ui.HexColor } = {
   TEXT_PRIMARY: "#404152",
   TEXT_SECONDARY: "#424242",
   TABLE_BORDER: "#F7F7F7",
@@ -36,7 +38,7 @@ export const Colors: { [key: string]: Style.HexColor } = {
 
 export const TABLE_BORDER_RADIUS = 8;
 
-export const FontWeightMap: { [key in Style.FontWeightName]: Style.FontWeight } = {
+export const FontWeightMap: { [key in ui.FontWeightName]: ui.FontWeight } = {
   Bold: 700,
   Regular: 400,
   Light: 300,
@@ -44,7 +46,7 @@ export const FontWeightMap: { [key in Style.FontWeightName]: Style.FontWeight } 
   Medium: 600,
 };
 
-export const SupportedFontFaces: Style.FontFace[] = [
+export const SupportedFontFaces: ui.FontFace[] = [
   {
     family: "Roboto",
     variants: [
@@ -66,41 +68,37 @@ export const SupportedFontFaces: Style.FontFace[] = [
   },
 ];
 
-export const fontToString = (font: Style.Font): string =>
+export const fontToString = (font: ui.Font): string =>
   `Font { family = ${font.family}, weight: ${font.weight}, italic: ${String(
     font.italic || false,
   )} }`;
 
-export const getFontSourceModuleName = (font: Style.Font): string =>
+export const getFontSourceModuleName = (font: ui.Font): string =>
   font.italic === true ? `${font.family}_${font.weight}Italic` : `${font.family}_${font.weight}`;
 
-export const getFontSourceFileName = (font: Style.Font, extension = "ttf"): string =>
+export const getFontSourceFileName = (font: ui.Font, extension = "ttf"): string =>
   font.italic === true
     ? `${font.family}-${font.weight}Italic.${extension}`
     : `${font.family}-${font.weight}.${extension}`;
 
-export const getFontSourceFileDirectory = (font: Style.Font): string =>
+export const getFontSourceFileDirectory = (font: ui.Font): string =>
   font.italic === true ? `${font.family}/${font.weight}/Italic` : `${font.family}/${font.weight}`;
 
-export const getFontSourceFile = (font: Style.Font, extension = "ttf"): string =>
+export const getFontSourceFile = (font: ui.Font, extension = "ttf"): string =>
   `./fonts/${getFontSourceFileDirectory(font)}/${getFontSourceFileName(font, extension)}`;
 
-export const fontsFromFontFace = (fontFace: Style.FontFace): Style.Font[] =>
-  reduce(
-    fontFace.variants,
-    (fonts: Style.Font[], variant: Style.FontVariant) => {
-      fonts = [
-        ...fonts,
-        { family: fontFace.family, weight: typeof variant === "string" ? variant : variant.weight },
-      ];
-      if (typeof variant !== "string" && variant.hasItalic === true) {
-        return [...fonts, { family: fontFace.family, weight: variant.weight, italic: true }];
-      }
-      return fonts;
-    },
-    [],
-  );
+export const fontsFromFontFace = (fontFace: ui.FontFace): ui.Font[] =>
+  fontFace.variants.reduce((fonts: ui.Font[], variant: ui.FontVariant) => {
+    fonts = [
+      ...fonts,
+      { family: fontFace.family, weight: typeof variant === "string" ? variant : variant.weight },
+    ];
+    if (typeof variant !== "string" && variant.hasItalic === true) {
+      return [...fonts, { family: fontFace.family, weight: variant.weight, italic: true }];
+    }
+    return fonts;
+  }, []);
 
-export const SupportedFonts: Style.Font[] = flatten(
-  map(SupportedFontFaces, (fontFace: Style.FontFace) => fontsFromFontFace(fontFace)),
+export const SupportedFonts: ui.Font[] = flatten(
+  SupportedFontFaces.map((fontFace: ui.FontFace) => fontsFromFontFace(fontFace)),
 );

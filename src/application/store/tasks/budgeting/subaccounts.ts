@@ -336,7 +336,7 @@ function* requestTableData<
   yield put(config.actions.loading(false, action.context));
 }
 
-export const createPublicTableTaskSet = <M extends model.Account | model.SubAccount>(
+export const createPublicSubAccountsTableTaskSet = <M extends model.Account | model.SubAccount>(
   config: PublicSubAccountsTableTaskConfig<model.AnotherUserBudget, M>,
 ): types.TableTaskMap<TableContext<model.AnotherUserBudget, M>> => {
   function* request(
@@ -368,7 +368,7 @@ export const createPublicTableTaskSet = <M extends model.Account | model.SubAcco
   return { request };
 };
 
-export const createAuthenticatedTableTaskSet = <
+export const createAuthenticatedSubAccountsTableTaskSet = <
   B extends model.Template | model.UserBudget,
   M extends model.Account | model.SubAccount,
 >(
@@ -423,7 +423,7 @@ export const createAuthenticatedTableTaskSet = <
       if (!canUseCachedResponse || types.tableRequestActionIsForced(action)) {
         /* TODO: We might want to move the contacts request to the batched requests to retrieve the
            supplementary data. */
-        yield fork(contacts.request, action.context);
+        yield fork(contacts.requestContacts, action.context);
 
         yield call(requestTableData as RequestTableData<B, M>, action, config, {
           onResponse: function* (r: types.SuccessfulTableResponse<model.SubAccount>) {

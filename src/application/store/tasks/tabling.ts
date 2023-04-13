@@ -67,7 +67,7 @@ export const createBulkCreateTask = <
     const selectData = (s: types.ApplicationStore) => config.selectStore(s, ctx).data;
     const store: tabling.RowOfType<tabling.BodyRowType, R>[] = yield select(selectData);
 
-    let data: tabling.RowData<R>[];
+    let data: tabling.GetRowData<R>[];
     if (tabling.isRowAddCountPayload(payload) || tabling.isRowAddIndexPayload(payload)) {
       data = tabling.generateNewRowData(
         { store, ...payload },

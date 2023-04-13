@@ -1,3 +1,5 @@
+import { Optional, OptionalKeys } from "utility-types";
+
 import { model } from "lib";
 
 import * as api from "../../api";
@@ -23,7 +25,7 @@ export type ActionContext<T extends Action | undefined = undefined> = T extends 
 export type WithActionContext<T> = T extends null ? ActionContext : T & ActionContext;
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export type BasicAction<P, T extends string = string> = P extends any
+export type BasicAction<P = any, T extends string = string> = P extends any
   ? {
       readonly payload: P;
       readonly type: T;
@@ -66,12 +68,52 @@ export type ActionCreatorMap<
   S extends ActionPayloadMap = ActionPayloadMap,
   C extends ActionContext = ActionContext,
   MAP extends ActionTypeMap<S> = ActionTypeMap<S>,
-> = {
-  [K in keyof S & string]: ActionCreator<S[K], C, MAP[K]>;
-};
+> = Optional<
+  {
+    [K in keyof S & string]: K extends OptionalKeys<S>
+      ? ActionCreator<Exclude<S[K], undefined>, C, MAP[K]>
+      : ActionCreator<S[K], C, MAP[K]>;
+  },
+  OptionalKeys<S> & keyof S & string
+>;
+
+type _ActionMapWithDefinedKey<
+  T extends keyof S,
+  S extends ActionPayloadMap,
+  C extends ActionContext,
+  MAP extends ActionTypeMap<S>,
+> = ActionCreatorMap<S, C, MAP> & { [key in T]: S[key & keyof S] };
+
+export const actionMapDefinesKey = <
+  T extends keyof S,
+  S extends ActionPayloadMap,
+  C extends ActionContext,
+  MAP extends ActionTypeMap<S>,
+>(
+  actions: ActionCreatorMap<S, C, MAP>,
+  type: T,
+): actions is _ActionMapWithDefinedKey<T, S, C, MAP> =>
+  (actions as _ActionMapWithDefinedKey<T, S, C, MAP>)[type] !== undefined;
+
+export const actionQualifiesMap = <
+  T extends keyof S,
+  S extends ActionPayloadMap,
+  C extends ActionContext,
+  MAP extends ActionTypeMap<S> = ActionTypeMap<S>,
+>(
+  actions: ActionCreatorMap<S, C, MAP>,
+  type: T,
+  action: ActionFromPayloadMap<S, C>,
+): action is Action<Exclude<S[T], undefined>, C> =>
+  actionMapDefinesKey<T, S, C, MAP>(actions, type) && action.type === actions[type].toString();
 
 export type RequestActionPayload = null | { force: true };
 export type UpdateOrderingPayload<F extends string = string> = { field: F; order: api.Order };
+
+export const requestActionIsForced = <C extends ActionContext>(
+  a: RequestAction<C>,
+): a is Action<{ force: true }, C> =>
+  a.payload !== null && (a as Action<{ force: true }, C>).payload.force === true;
 
 export type RequestAction<C extends ActionContext = ActionContext> = Action<
   RequestActionPayload,

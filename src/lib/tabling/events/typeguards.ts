@@ -38,6 +38,19 @@ export const isTableEventOfType = <
   eventId: T,
 ): e is types.TableEvent<T, R, M> => e.type === eventId;
 
+type PartialTableEventTypeGuard<
+  T extends types.TableEventId,
+  R extends rows.Row,
+  M extends model.RowTypedApiModel,
+> = (e: types.AnyTableEvent<R, M>) => e is types.TableEvent<T, R, M>;
+
+export const createTableEventTypeGuard =
+  <T extends types.TableEventId, R extends rows.Row, M extends model.RowTypedApiModel>(
+    eventId: T,
+  ): PartialTableEventTypeGuard<T, R, M> =>
+  (e: types.AnyTableEvent<R, M>): e is types.TableEvent<T, R, M> =>
+    isTableEventOfType<T, R, M>(e, eventId);
+
 export const isRowAddEvent = <R extends rows.Row, M extends model.RowTypedApiModel>(
   e: types.AnyTableEvent<R, M>,
 ): e is types.RowAddEvent<R> =>

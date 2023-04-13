@@ -1,4 +1,6 @@
-const ColumnTypes: Table.ColumnDataType[] = [
+import * as types from "./types";
+
+const ColumnTypes: types.ColumnDataType[] = [
   {
     id: "text",
     icon: "font-case",

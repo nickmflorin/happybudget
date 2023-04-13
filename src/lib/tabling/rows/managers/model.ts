@@ -1,65 +1,83 @@
-import { isNil } from "lodash";
-
-import { tabling, util } from "lib";
+import * as model from "../../../model";
+import * as columns from "../../columns";
+import { CellValue } from "../../types";
+import * as types from "../types";
 
 import { BodyRowManagerConfig } from "./base";
-import EditableRowManager from "./editable";
+import { EditableRowManager } from "./editable";
 
 type GetRowValue<
-  R extends Table.RowData,
+  R extends types.Row,
   M extends model.RowTypedApiModel,
-  V extends Table.RawRowValue,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  T extends CellValue<R, N> = CellValue<R, N>,
 > = (
   m: M,
-  col: Table.DataColumn<R, M>,
-  original: (ci: Table.DataColumn<R, M>, mi: M) => V | undefined,
-) => V | undefined;
+  col: columns.DataColumn<R, M, N, T>,
+  original: (ci: columns.DataColumn<R, M, N, T>, mi: M) => T | undefined,
+) => T | undefined;
 
-type CreateModelRowConfig<R extends Table.RowData, M extends model.RowTypedApiModel> = {
+type CreateModelRowConfig<
+  R extends types.Row,
+  M extends model.RowTypedApiModel,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  T extends CellValue<R, N> = CellValue<R, N>,
+> = {
   readonly model: M;
   // Used solely for PDF purposes.
-  readonly getRowValue?: GetRowValue<R, M, Table.RawRowValue> | undefined;
+  readonly getRowValue?: GetRowValue<R, M, N, T>;
 };
 
 type ModelRowManagerConfig<
-  R extends Table.RowData,
-  M extends model.RowTypedApiModel = model.RowTypedApiModel,
-> = Omit<BodyRowManagerConfig<Table.ModelRow<R>, R, M>, "rowType"> & {
+  R extends types.Row,
+  M extends model.RowTypedApiModel,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  T extends CellValue<R, N> = CellValue<R, N>,
+> = Omit<BodyRowManagerConfig<"model", R, M, types.ModelRowId, N, T>, "rowType"> & {
   readonly getRowChildren?: (m: M) => number[];
 };
 
-class ModelRowManager<
-  R extends Table.RowData,
-  M extends model.RowTypedApiModel = model.RowTypedApiModel,
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-> extends EditableRowManager<Table.ModelRow<R>, R, M, [M, GetRowValue<R, M, any> | undefined]> {
+export class ModelRowManager<
+  R extends types.Row,
+  M extends model.RowTypedApiModel,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  T extends CellValue<R, N> = CellValue<R, N>,
+> extends EditableRowManager<
+  "model",
+  R,
+  M,
+  [M, GetRowValue<R, M, N, T> | undefined],
+  types.ModelRowId,
+  N,
+  T
+> {
   public getRowChildren: ((m: M) => number[]) | undefined;
 
-  constructor(config: ModelRowManagerConfig<R, M>) {
-    super({ ...config, rowType: "model" });
+  constructor(config: ModelRowManagerConfig<R, M, N, T>) {
+    super({ ...config, rowType: types.RowTypes.MODEL });
     this.getRowChildren = config.getRowChildren;
   }
 
-  getValueForRow<
-    V extends Table.RawRowValue,
-    C extends Table.ModelColumn<R, M, V>,
-    // The optional `getRowValue` callback is only used for PDF cases.
-  >(col: C, m: M, getRowValue?: GetRowValue<R, M, V>): V | undefined {
+  getValueForRow(
+    col: columns.ModelColumn<R, M, N, T>,
+    m: M,
+    getRowValue?: GetRowValue<R, M, N, T>,
+  ): T | undefined {
     if (col.isApplicableForModel?.(m) === false) {
       this.throwNotApplicable();
     }
-    if (!isNil(getRowValue) && tabling.columns.isDataColumn<R, M>(col)) {
-      return getRowValue(m, col, (colr: Table.DataColumn<R, M>, mr: M) =>
-        this.getValueForRow<V, C>(colr as C, mr),
+    if (getRowValue !== undefined && columns.isDataColumn<R, M, N, T>(col)) {
+      return getRowValue(m, col, (colr: columns.DataColumn<R, M, N, T>, mr: M) =>
+        this.getValueForRow(colr, mr),
       );
-    } else if (!isNil(col.getRowValue)) {
+    } else if (col.getRowValue !== undefined) {
       return col.getRowValue(m);
     } else {
-      return util.getKeyValue<M, keyof M>(col.field as keyof M)(m) as unknown as V | undefined;
+      return m[col.field as keyof M] as T | undefined;
     }
   }
 
-  create(config: CreateModelRowConfig<R, M>): Table.ModelRow<R> {
+  create(config: CreateModelRowConfig<R, M, N, T>): types.ModelRow<types.GetRowData<R, N, T>> {
     return {
       order: config.model.order,
       modelType: config.model.type,
@@ -75,5 +93,3 @@ class ModelRowManager<
     };
   }
 }
-
-export default ModelRowManager;

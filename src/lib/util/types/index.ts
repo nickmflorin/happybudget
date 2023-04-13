@@ -3,7 +3,7 @@ export * from "./composites";
 export * from "./literals";
 export * from "./strings";
 
-export type ExtractValues<T> = keyof T extends string ? T[keyof T] : never;
+export type ExtractValues<T> = keyof T extends string | number ? T[keyof T] : never;
 
 export type Mutable<T> = { -readonly [P in keyof T]: T[P] };
 export type Immutable<T> = { readonly [P in keyof T]: T[P] };

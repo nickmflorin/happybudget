@@ -12,14 +12,14 @@ export type IDropdownRef = {
   readonly setVisible: (visible: boolean) => void;
 };
 
-declare type RootModalProps = import("antd/lib/modal").ModalProps;
+export type RootModalProps = import("antd/lib/modal").ModalProps;
 
-declare interface ModalInstance extends UINotificationsManager {
+export interface ModalInstance extends UINotificationsManager {
   readonly setLoading: (value: boolean) => void;
   readonly loading: boolean | undefined;
 }
 
-declare interface ModalProps extends Omit<RootModalProps, "visible"> {
+export interface ModalProps extends Omit<RootModalProps, "visible"> {
   readonly id?: string;
   readonly open?: boolean;
   readonly titleIcon?: IconOrElement;
@@ -28,3 +28,6 @@ declare interface ModalProps extends Omit<RootModalProps, "visible"> {
   readonly modal?: NonNullRef<ModalInstance>;
   readonly buttonSpinnerOnLoad?: boolean;
 }
+
+export type SearchIndex = string | string[];
+export type SearchIndicies = SearchIndex[];

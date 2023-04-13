@@ -5,7 +5,9 @@ import { schemas, formatters } from "lib";
 
 import * as errorTypes from "../errorTypes";
 
-export type ApplicationErrorLogContext<T extends schemas.JsonObject = schemas.JsonObject> = T & {
+type CustomLogContext = Record<string, Exclude<schemas.JsonLiteral, ArrayBuffer>>;
+
+export type ApplicationErrorLogContext<T extends CustomLogContext = CustomLogContext> = T & {
   message: string;
 };
 
@@ -15,12 +17,12 @@ export type ApplicationErrorConfig<
 > = Readonly<{
   readonly errorType: E;
   readonly message?: string;
-  readonly logContext: C;
+  readonly logContext?: C;
   readonly prefix?: string;
   readonly detail?: string;
 }>;
 
-export interface IApplicationError<C extends schemas.JsonObject = schemas.JsonObject> {
+export interface IApplicationError<C extends CustomLogContext = CustomLogContext> {
   readonly message: string;
   readonly logContext: ApplicationErrorLogContext<C>;
 }
@@ -37,7 +39,7 @@ export interface IApplicationError<C extends schemas.JsonObject = schemas.JsonOb
  */
 export class ApplicationError<
     E extends errorTypes.ErrorType = errorTypes.ErrorType,
-    C extends schemas.JsonObject = schemas.JsonObject,
+    C extends CustomLogContext = CustomLogContext,
   >
   extends Error
   implements IApplicationError<C>
@@ -45,7 +47,7 @@ export class ApplicationError<
   protected readonly defaultPrefix: string | undefined = undefined;
   protected readonly defaultMessage: string = "There was an error.";
   private readonly _messageContent: string | undefined;
-  private readonly _logContext: C;
+  private readonly _logContext: C | undefined;
   private _prefix: string | undefined;
   private readonly _messageDetail: string | undefined = undefined;
 
@@ -77,7 +79,7 @@ export class ApplicationError<
   }
 
   public get logContext(): ApplicationErrorLogContext<C> {
-    return { ...this._logContext, message: this.message };
+    return { ...this._logContext, message: this.message } as ApplicationErrorLogContext<C>;
   }
 
   public get message(): string {
@@ -94,13 +96,13 @@ export class ApplicationError<
 
 export type ApplicationUserErrorConfig<
   E extends errorTypes.ErrorType,
-  C extends schemas.JsonObject = schemas.JsonObject,
+  C extends CustomLogContext = CustomLogContext,
 > = Optional<ApplicationErrorConfig<E, C>, "message"> &
   Readonly<{
     readonly userMessage?: string;
   }>;
 
-export interface IApplicationUserError<C extends schemas.JsonObject = schemas.JsonObject>
+export interface IApplicationUserError<C extends CustomLogContext = CustomLogContext>
   extends IApplicationError<C> {
   readonly userMessage: string;
 }
@@ -122,7 +124,7 @@ export interface IApplicationUserError<C extends schemas.JsonObject = schemas.Js
  */
 export class ApplicationUserError<
     E extends errorTypes.ErrorType,
-    C extends schemas.JsonObject = schemas.JsonObject,
+    C extends CustomLogContext = CustomLogContext,
   >
   extends ApplicationError<E, C>
   implements IApplicationUserError<C>
@@ -149,7 +151,7 @@ type MalformedDataLogContext = {
 
 type MalformedDataErrorConfig = Omit<
   ApplicationErrorConfig<typeof errorTypes.ErrorTypes.MALFORMED_DATA>,
-  "errorType" | "logContext" | "detail"
+  "errorType" | "detail"
 > & {
   readonly value: unknown;
 };
@@ -163,25 +165,35 @@ export class MalformedDataError extends ApplicationError<
   constructor(config: MalformedDataErrorConfig) {
     super({
       ...config,
-      logContext: { value: JSON.stringify(config.value) },
+      logContext: { ...config.logContext, value: JSON.stringify(config.value) },
       errorType: errorTypes.ErrorTypes.MALFORMED_DATA,
       detail: `Value: ${JSON.stringify(config.value)}`,
     });
   }
 }
 
-export class MalformedDataSchemaError<P> extends MalformedDataError {
-  public readonly error: z.ZodError<P>;
+export class MalformedDataSchemaError extends MalformedDataError {
+  public readonly error: z.ZodError<unknown>;
   defaultPrefix = "The object does not conform to the expected schema";
 
   constructor(
-    config: Omit<MalformedDataErrorConfig, "message"> & { readonly error: z.ZodError<P> },
+    config: Omit<MalformedDataErrorConfig, "message"> & { readonly error: z.ZodError<unknown> },
   ) {
-    super(config);
+    let additionalContext = {};
+    if (config.error.issues.length === 1) {
+      additionalContext = {
+        code: config.error.issues[0].code,
+        path: config.error.issues[0].path,
+      };
+    }
+    super({ ...config, logContext: { ...config.logContext, ...additionalContext } });
     this.error = config.error;
   }
 
   protected get messageContent(): string {
+    if (this.error.issues.length === 1) {
+      return this.error.issues[0].message;
+    }
     return formatters.stringifyZodIssues(this.error.issues);
   }
 }

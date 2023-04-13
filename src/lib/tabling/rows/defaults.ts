@@ -1,68 +1,141 @@
-import { isNil, reduce } from "lodash";
+import { logger } from "internal";
 
-import { tabling } from "lib";
+import * as model from "../../model";
+import * as columns from "../columns";
+import * as events from "../events";
+import { CellValue } from "../types";
+
+import * as types from "./types";
 
 type Context = "update" | "create";
 
-function insertDefaults<R extends Table.RowData, M extends model.RowTypedApiModel>(
-  cs: Table.ModelColumn<R, M>[],
-  data: R,
-  defaults: Partial<R>,
-  context: "update",
-): R;
+export type DefaultValueOnCreate<
+  R extends types.Row,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  T extends CellValue<R, N> = CellValue<R, N>,
+> = T | ((r: Partial<types.GetRowData<R>>) => T);
 
-function insertDefaults<R extends Table.RowData, M extends model.RowTypedApiModel>(
-  cs: Table.ModelColumn<R, M>[],
-  data: Partial<R>,
-  defaults: Partial<R>,
+export type DefaultValueOnUpdate<
+  R extends types.Row,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  T extends CellValue<R, N> = CellValue<R, N>,
+> = T | ((r: types.RowSubType<R, "model">) => T);
+
+/* Typecheck is necessary because T does not exclude function types - but that would be a severe
+   edge cases so simply checking that the value is a function suffices. */
+const defaultValueOnCreateIsFn = <
+  R extends types.Row,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  T extends CellValue<R, N> = CellValue<R, N>,
+>(
+  v: DefaultValueOnCreate<R, N, T>,
+): v is (r: Partial<types.GetRowData<R>>) => T => typeof v === "function";
+
+/* Typecheck is necessary because T does not exclude function types - but that would be a severe
+   edge cases so simply checking that the value is a function suffices. */
+const defaultValueOnUpdateIsFn = <
+  R extends types.Row,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  T extends CellValue<R, N> = CellValue<R, N>,
+>(
+  v: DefaultValueOnUpdate<R, N, T>,
+): v is (r: types.RowSubType<R, "model">) => T => typeof v === "function";
+
+export type DefaultDataOnCreate<
+  R extends types.Row,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  T extends CellValue<R, N> = CellValue<R, N>,
+> =
+  | Partial<types.GetRowData<R, N, T>>
+  | ((r: Partial<types.GetRowData<R, N, T>>) => Partial<types.GetRowData<R, N, T>>);
+
+export type DefaultDataOnUpdate<
+  R extends types.Row,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  T extends CellValue<R, N> = CellValue<R, N>,
+> =
+  | types.GetRowData<R, N, T>
+  | ((
+      r: types.RowSubType<R, "model">,
+      ch: events.RowChangeData<R>,
+    ) => Partial<types.GetRowData<R, N, T>>);
+
+function insertDefaults<
+  R extends types.Row,
+  M extends model.RowTypedApiModel,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  T extends CellValue<R, N> = CellValue<R, N>,
+>(
+  cs: columns.ModelColumn<R, M, N, T>[],
+  data: types.GetRowData<R, N, T>,
+  defaults: Partial<types.GetRowData<R, N, T>>,
+  context: "update",
+): types.GetRowData<R, N, T>;
+
+function insertDefaults<
+  R extends types.Row,
+  M extends model.RowTypedApiModel,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  T extends CellValue<R, N> = CellValue<R, N>,
+>(
+  cs: columns.ModelColumn<R, M, N, T>[],
+  data: Partial<types.GetRowData<R, N, T>>,
+  defaults: Partial<types.GetRowData<R, N, T>>,
   context: "create",
-): Partial<R>;
+): Partial<types.GetRowData<R, N, T>>;
 
 /**
- * Inserts the default values for the RowData object into the RowData object
- * based on the provided defaults and column definitions.
+ * Updates the row data, {@link D}, of a given row, {@link R}, or creates the initial row data,
+ * {@link D}, for a given row, {@link R}, based on provided default values for the row data object,
+ * {@link Partial<types.GetRowData<R>>} and provided columns definitions.
  *
- * When inserting defaults for a RowData object (R) in the update context, the
- * the RowData object (R) will always have values present for all the fields
- * associated with the defined Columns in the associated table.  This means that
- * the determination of whether or not the default should be used is made based
- * on whether or not the current value on the RowData object (R) for a given
- * field is equal to the definition of the `nullValue` for the Column associated
- * with that field.
+ * In the update context, the row data object {@link D} will always have all values present for
+ * all fields associated with the defined columns in the associated table.  This means that the
+ * determination of whether or not the default should be used is made based on whether or not the
+ * current value in the row data object, {@link D}, for a given field, is equal to the definition
+ * of the 'nullValue' for the column associated with that field.
  *
- * When inserting defaults for a RowData object (R) in the create context, the
- * RowData object is the partial form (Partial<R>).  This is because when
- * creating rows, only some of the values (if any) are required to be specified.
- * This means that the determination of whether or not the default should be
- * used is made based on both whether or not the current value on the partial
- * form of the RowData object (Partial<R>) is equal to the `nullValue` for
- * the associated Column as well as whether or not the value is included in the
- * partial form of the RowData object (Partial<R>).
+ * In the create context, the row data object {@link D} is a partial form of the row's row data,
+ * {@link types.GetRowData<R>}, because when creating rows, only some of the values (if any) are
+ * required to be specified.  This means that the determination of whether or not the default should
+ * be used is made based on both whether or not the current value on the partial form of the row
+ * data object, {@link D}, is equal to the 'nullValue' for the associated column as well as whether
+ * or not the value is included in the partial form of the row data object, {@link D}.
  *
- * @param data Either the full RowData object (R) in the case of an update or
- *             the partial RowData object (Partial<R>) in the case of a create,
- *             without defaults applied.
- * @param defaults The default values, (Partial<R>) that should be inserted into
- *                 the RowData object.
- * @param columns The columns associated with the RowData object.
- * @param context: Whether or not the defaults are being inserted in an update
- *                 context or a create context.
- * @returns The original RowData object (either Partial<R> or R, depending on
- *          the context) with the defaults inserted.
+ * @param {D} data
+ *   Either the full row data object {@link types.GetRowData<R>} in the update context, or the
+ *   partial row data object, {@link Partial<types.GetRowData<R>>} in the create context.
+ *
+ * @param {Partial<types.GetRowData<R>>} defaults
+ *   The default values that should be inserted into the row data object.
+ *
+ * @param {columns.ModelColumn<R, M>[]} columns The columns associated with the row data object.
+ *
+ * @param {Context} context
+ *   Whether or not the defaults are being inserted in an update context or a create context.
+ *
+ * @returns {D}
  */
 function insertDefaults<
-  R extends Table.RowData,
+  R extends types.Row,
   M extends model.RowTypedApiModel,
-  D extends Partial<R> | R,
->(cs: Table.ModelColumn<R, M>[], data: D, defaults: Partial<R>, context: Context): D {
-  let key: keyof R;
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  T extends CellValue<R, N> = CellValue<R, N>,
+>(
+  cs: columns.ModelColumn<R, M, N, T>[],
+  data: Partial<types.GetRowData<R, N, T>> | types.GetRowData<R, N, T>,
+  defaults: Partial<types.GetRowData<R, N, T>>,
+  context: Context,
+) {
+  let key: columns.ColumnFieldName<R>;
   for (key in defaults) {
     // A warning will be issued if the column is null.
-    const column = tabling.columns.getColumn(cs, key);
-    if (!isNil(column)) {
+    const column = columns.getColumn(cs, key);
+    if (column !== null) {
       if (data[key] === undefined) {
         if (context === "update") {
-          console.warn(
+          logger.warn(
+            { key: String(key), column: column.field },
             `Encountered an undefined value for column ${String(
               key,
             )} when attempting to set default values on the row.`,
@@ -78,77 +151,79 @@ function insertDefaults<
   return data;
 }
 
-export const applyDefaultsOnCreate = <R extends Table.RowData, M extends model.RowTypedApiModel>(
-  cs: Table.ModelColumn<R, M>[],
-  data?: Partial<R> | undefined,
-  defaults?: Table.DefaultDataOnCreate<R>,
-): Partial<R> | undefined => {
-  const definedData: Partial<R> = data || {};
-
-  /* Apply defaults defined on the columns themselves before defaults are
-     are applied from the explicitly passed in default data. */
-  data = reduce(
-    cs,
-    (curr: Partial<R>, c: Table.ModelColumn<R, M>) => {
+export const applyDefaultsOnCreate = <
+  R extends types.Row,
+  M extends model.RowTypedApiModel,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  T extends CellValue<R, N> = CellValue<R, N>,
+>(
+  cs: columns.ModelColumn<R, M, N, T>[],
+  data?: Partial<types.GetRowData<R, N, T>> | undefined,
+  defaults?: DefaultDataOnCreate<R, N, T>,
+): Partial<types.GetRowData<R, N, T>> | undefined => {
+  const definedData: Partial<types.GetRowData<R, N, T>> = data || {};
+  /* Apply defaults defined on the columns themselves before defaults are are applied from the
+     explicitly passed in default data. */
+  data = cs.reduce(
+    (
+      curr: Partial<types.GetRowData<R, N, T>>,
+      c: columns.ModelColumn<R, M, N, T>,
+    ): Partial<types.GetRowData<R, N, T>> => {
       if (c.defaultValueOnCreate !== undefined && definedData[c.field] === undefined) {
-        /* Do not pass in the current data with defaults from the columns applied
-           up until this point, because the callback should expect that the
-					 provided data does not yet include defaults - otherwise, the result
-					 of the callback would depend on the order in which the callbacks for
-					 each possible default are applied. */
-        const defaultValue =
-          typeof c.defaultValueOnCreate === "function"
-            ? c.defaultValueOnCreate(definedData)
-            : c.defaultValueOnCreate;
+        /* Do not pass in the current data with defaults from the columns applied up until this
+           point, because the callback should expect that the provided data does not yet include
+           defaults - otherwise, the result of the callback would depend on the order in which the
+           callbacks for each possible default are applied. */
+        const defaultValue = defaultValueOnCreateIsFn(c.defaultValueOnCreate)
+          ? c.defaultValueOnCreate(definedData)
+          : c.defaultValueOnCreate;
         return { ...curr, [c.field]: defaultValue };
       }
       return curr;
     },
-    definedData,
+    {} as Partial<types.GetRowData<R, N, T>>,
   );
-
   if (defaults !== undefined) {
     return typeof defaults === "function"
-      ? insertDefaults(cs, data, defaults(data), "create")
-      : insertDefaults(cs, data, defaults, "create");
+      ? insertDefaults<R, M, N, T>(cs, data, defaults(data), "create")
+      : insertDefaults<R, M, N, T>(cs, data, defaults, "create");
   }
   return data;
 };
 
-// export const applyDefaultsOnUpdate = <R extends Table.RowData, M extends model.RowTypedApiModel>(
-//   cs: Table.ModelColumn<R, M>[],
-//   row: Table.ModelRow<R>,
-//   change: Table.RowChangeData<R, Table.ModelRow<R>>,
-//   defaults?: Table.DefaultDataOnUpdate<R>,
-// ): Table.ModelRow<R> => {
-//   /* Apply defaults defined on the columns themselves before defaults are
-//      are applied from the explicitly passed in default data. */
-//   row = {
-//     ...row,
-//     data: reduce(
-//       cs,
-//       (curr: R, c: Table.ModelColumn<R, M>) => {
-//         if (c.defaultValueOnCreate !== undefined && row.data[c.field] === undefined) {
-//           /* Do not pass in the current data with defaults from the columns
-// 					   applied up until this point, because the callback should expect
-// 						 that the provided data does not yet include defaults - otherwise,
-// 						 the result of the callback would depend on the order in which the
-// 						 callbacks for each possible default are applied. */
-//           const defaultValue =
-//             typeof c.defaultValueOnUpdate === "function"
-//               ? c.defaultValueOnUpdate(row)
-//               : c.defaultValueOnUpdate;
-//           return { ...curr, [c.field]: defaultValue };
-//         }
-//         return curr;
-//       },
-//       row.data,
-//     ),
-//   };
-//   if (defaults !== undefined) {
-//     return typeof defaults === "function"
-//       ? { ...row, data: insertDefaults(cs, row.data, defaults(row, change), "update") }
-//       : { ...row, data: insertDefaults(cs, row.data, defaults, "update") };
-//   }
-//   return row;
-// };
+export const applyDefaultsOnUpdate = <
+  R extends types.Row,
+  M extends model.RowTypedApiModel,
+  N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  T extends CellValue<R, N> = CellValue<R, N>,
+>(
+  cs: columns.ModelColumn<R, M, N, T>[],
+  row: types.RowSubType<R, "model">,
+  change: events.RowChangeData<R>,
+  defaults?: DefaultDataOnUpdate<R, N, T>,
+): types.RowSubType<R, "model"> => {
+  /* Apply defaults defined on the columns themselves before defaults are are applied from the
+     explicitly passed in default data. */
+  row = {
+    ...row,
+    data: cs.reduce((curr: types.GetRowData<R, N, T>, c: columns.ModelColumn<R, M, N, T>) => {
+      if (c.defaultValueOnUpdate !== undefined && row.data[c.field] === undefined) {
+        /* Do not pass in the current data with defaults from the columns applied up until this
+           point, because the callback should expect that the provided data does not yet include
+           defaults - otherwise, the result of the callback would depend on the order in which the
+					 callbacks for each possible default are applied. */
+        const defaultValue = defaultValueOnUpdateIsFn(c.defaultValueOnUpdate)
+          ? c.defaultValueOnUpdate(row)
+          : c.defaultValueOnUpdate;
+        return { ...curr, [c.field]: defaultValue };
+      }
+      return curr;
+    }, row.data),
+  };
+  if (defaults !== undefined) {
+    return typeof defaults === "function"
+      ? { ...row, data: insertDefaults(cs, row.data, defaults(row, change), "update") }
+      : { ...row, data: insertDefaults(cs, row.data, defaults, "update") };
+  }
+  return row;
+};

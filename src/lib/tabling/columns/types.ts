@@ -2,7 +2,9 @@ import { Style as ReactPDFStyle } from "@react-pdf/types";
 import { ColSpanParams as RootColSpanParams, ColDef } from "ag-grid-community";
 
 import * as model from "../../model";
-import { enumeratedLiterals, EnumeratedLiteralType } from "../../util";
+import * as schemas from "../../schemas";
+import * as ui from "../../ui";
+import { formatters, ExtractValues, enumeratedLiterals, EnumeratedLiteralType } from "../../util";
 import * as events from "../events";
 import * as rows from "../rows";
 import * as types from "../types";
@@ -33,28 +35,63 @@ export type ColumnTypeId = EnumeratedLiteralType<typeof ColumnTypeIds>;
 export interface ColumnDataType {
   readonly id: ColumnDataTypeId;
   readonly style?: React.CSSProperties;
-  readonly icon?: IconOrElement;
+  readonly icon?: ui.IconProp;
   readonly pdfOverrides?: Omit<Partial<ColumnDataType>, "id">;
   readonly headerOverrides?: Omit<Partial<ColumnDataType>, "id" | "icon" | "pdfOverrides">;
 }
 
-export type ColumnFieldName<R extends rows.Row = rows.Row> = keyof rows.RowData<R> & string;
+export type ColumnFieldName<R extends rows.Row = rows.Row> = keyof rows.GetRowData<R> & string;
 
 export type ColSpanParams<
   R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
+  N extends ColumnFieldName<R> = ColumnFieldName<R>,
+  T extends types.CellValue<R, N> = types.CellValue<R, N>,
 > = RootColSpanParams<R> & {
-  readonly columns: RealColumn<R, M>[];
+  readonly columns: RealColumn<R, M, N, T>[];
 };
 
 interface PdfFooterColumn<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   N extends ColumnFieldName<R> = ColumnFieldName<R>,
-  T = types.CellValue<R, N>,
+  T extends types.CellValue<R, N> = types.CellValue<R, N>,
 > {
   readonly value?: T;
   readonly textStyle?: ReactPDFStyle;
 }
+
+export type ParsedColumnField<
+  R extends rows.Row,
+  N extends ColumnFieldName<R> = ColumnFieldName<R>,
+  T extends types.CellValue<R, N> = types.CellValue<R, N>,
+> = {
+  field: string;
+  value: T;
+};
+
+export type HiddenColumns = { [key: string]: boolean };
+
+export type EditColumnRowConfig<
+  R extends rows.Row,
+  RT extends "model" | "markup" | "group" = "model" | "markup" | "group",
+> = RT extends rows.RowType
+  ? {
+      readonly typeguard: <D extends rows.RowData>(
+        row: rows.Row<D>,
+      ) => row is rows.RowOfType<RT, D>;
+      readonly conditional?: (row: R) => boolean;
+      readonly behavior: rows.EditRowActionBehavior;
+      readonly action: (row: R, hovered: boolean) => void;
+      readonly tooltip?:
+        | string
+        | ((row: R, params: { hovered: boolean; disabled: boolean }) => string);
+      readonly disabled?: boolean | ((row: R, hovered: boolean) => boolean);
+    }
+  : never;
+
+export type ColumnCallbackParams<R extends rows.Row = rows.Row> = {
+  readonly row: rows.RowSubType<R, rows.BodyRowType>;
+};
 
 export type OmitColDefParams =
   | "field"
@@ -68,64 +105,33 @@ export type OmitColDefParams =
   | "valueGetter"
   | "onCellDoubleClicked";
 
-export type ParsedColumnField<
-  R extends rows.Row = rows.Row,
-  N extends ColumnFieldName<R> = ColumnFieldName<R>,
-  T = types.CellValue<R, N>,
-> = {
-  field: string;
-  value: T;
-};
+export type BaseAgColumn<R extends rows.Row> = Omit<ColDef<R>, OmitColDefParams>;
 
-export type HiddenColumns = { [key: string]: boolean };
-
-/* export type EditColumnRowConfig<
-     R extends rows.Row,
-     RT extends "model" | "markup" | "group" = "model" | "markup" | "group",
-     RW extends rows.Row<R, RT> = rows.Row<R, RT>,
-   > = {
-     readonly typeguard: (row: R) => row is RW;
-     readonly conditional?: (row: RW) => boolean;
-     readonly behavior: rows.EditRowActionBehavior;
-     readonly action: (row: RW, hovered: boolean) => void;
-     readonly tooltip?:
-       | string
-       | ((row: RW, params: { hovered: boolean; disabled: boolean }) => string);
-     readonly disabled?: boolean | ((row: RW, hovered: boolean) => boolean);
-   }; */
-
-export type ColumnCallbackParams<R extends rows.Row = rows.Row> = {
-  readonly row: rows.RowSubType<R, rows.BodyRowType>;
-};
-
-export type BaseColumn<
-  R extends rows.Row = rows.Row,
-  CType extends ColumnTypeId = ColumnTypeId,
-> = CType extends ColumnTypeId
+export type BaseColumn<R extends rows.Row, CType extends ColumnTypeId> = CType extends ColumnTypeId
   ? Omit<ColDef<R>, OmitColDefParams> & { readonly cType: CType }
   : never;
 
 export type RealColumnMixin<
-  R extends rows.Row = rows.Row,
-  M extends model.RowTypedApiModel = model.RowTypedApiModel,
+  R extends rows.Row,
+  M extends model.RowTypedApiModel,
   N extends ColumnFieldName<R> = ColumnFieldName<R>,
-  T = types.CellValue<R, N>,
+  T extends types.CellValue<R, N> = types.CellValue<R, N>,
 > = {
   readonly index?: number;
   readonly cellRenderer?: string | Partial<types.GridSet<string>>;
-  readonly cellClass?: types.CellClassName<rows.RowSubType<R, rows.BodyRowType>, N, T>;
-  readonly footer?: FooterColumn<R, M>;
-  readonly colSpan?: (params: ColSpanParams<R, M>) => number;
-  readonly onCellFocus?: (params: types.CellFocusedParams<R, M>) => void;
-  readonly onCellUnfocus?: (params: types.CellFocusedParams<R, M>) => void;
-  readonly onCellDoubleClicked?: (row: rows.RowSubType<R, "model">) => void;
+  readonly cellClass?: types.CellClassName<R, N, T>;
+  readonly footer?: FooterColumn<R, M, N, T>;
+  readonly colSpan?: (params: ColSpanParams<R, M, N, T>) => number;
+  readonly onCellFocus?: (params: types.CellFocusedParams<R, M, N, T>) => void;
+  readonly onCellUnfocus?: (params: types.CellFocusedParams<R, M, N, T>) => void;
+  readonly onCellDoubleClicked?: (row: R) => void;
 };
 
 export type ModelColumnMixin<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends ColumnFieldName<R> = ColumnFieldName<R>,
-  T = types.CellValue<R, N>,
+  T extends types.CellValue<R, N> = types.CellValue<R, N>,
 > = {
   readonly field: N;
   /**
@@ -137,12 +143,12 @@ export type ModelColumnMixin<
    * when a row is created and the created row does not specify a value for the field associated
    * with this column.
    */
-  readonly defaultValueOnCreate?: redux.DefaultValueOnCreate<R>;
+  readonly defaultValueOnCreate?: rows.DefaultValueOnCreate<R, N, T>;
   /**
    * A callback or explicit value that will be used to update the {@link rows.RowData} object
    * when a row is updated and a null value is specified for the field associated with this column.
    */
-  // readonly defaultValueOnUpdate?: DefaultValueOnUpdate<R>;
+  readonly defaultValueOnUpdate?: rows.DefaultValueOnUpdate<R, N, T>;
   /**
    * The default behavior to obtain the value for a cell is to access the attribute on the row
    * {@link rows.Row} associated with the field {@link N} of the column.  If this behavior is not
@@ -165,30 +171,30 @@ export type ModelColumnMixin<
 };
 
 export type FakeColumn<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends ColumnFieldName<R> = ColumnFieldName<R>,
-  T = types.CellValue<R, N>,
+  T extends types.CellValue<R, N> = types.CellValue<R, N>,
 > = BaseColumn<R, "fake"> & ModelColumnMixin<R, M, N, T>;
 
 export const ActionColumnIds = enumeratedLiterals(["checkbox", "edit", "drag"] as const);
 export type ActionColumnId = EnumeratedLiteralType<typeof ActionColumnIds>;
 
 export type ActionColumn<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends ColumnFieldName<R> = ColumnFieldName<R>,
-  T = types.CellValue<R, N>,
+  T extends types.CellValue<R, N> = types.CellValue<R, N>,
 > = BaseColumn<R, "action"> &
   RealColumnMixin<R, M, N, T> & {
     readonly colId: ActionColumnId;
   };
 
 export type DataColumnMixin<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends ColumnFieldName<R> = ColumnFieldName<R>,
-  T = types.CellValue<R, N>,
+  T extends types.CellValue<R, N> = types.CellValue<R, N>,
 > = ModelColumnMixin<R, M, N, T> & {
   // This field will be used to pull data from the Markup model if applicable.
   readonly markupField?: keyof model.Markup;
@@ -211,7 +217,7 @@ export type DataColumnMixin<
     row: rows.RowSubType<R, rows.BodyRowType>,
     rows: rows.RowSubType<R, rows.BodyRowType>[],
   ) => T;
-  readonly getHttpValue?: (value: T) => JsonValue;
+  readonly getHttpValue?: (value: T) => schemas.JsonObject;
   readonly processCellForCSV?: (row: R) => string | number;
   readonly processCellForClipboard?: (row: R) => string | number;
   // PDF Column Properties
@@ -223,7 +229,7 @@ export type DataColumnMixin<
   readonly pdfHeaderCellProps?: types.PdfCellStandardProps<R, M, N, T>;
   readonly pdfCellRenderer?: (params: types.PdfCellCallbackParams<R, M, N, T>) => JSX.Element;
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  readonly pdfFormatter?: NativeFormatter<any>;
+  readonly pdfFormatter?: formatters.Formatter<any>;
   readonly pdfValueGetter?: (
     r: rows.RowSubType<R, rows.BodyRowType>,
     rows: rows.RowSubType<R, rows.BodyRowType>[],
@@ -234,10 +240,10 @@ export type DataColumnMixin<
 };
 
 export type BodyColumn<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends ColumnFieldName<R> = ColumnFieldName<R>,
-  T = types.CellValue<R, N>,
+  T extends types.CellValue<R, N> = types.CellValue<R, N>,
 > = BaseColumn<R, "body"> &
   RealColumnMixin<R, M, N, T> &
   DataColumnMixin<R, M, N, T> & {
@@ -267,54 +273,76 @@ export type BodyColumn<
   };
 
 export type CalculatedColumn<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends ColumnFieldName<R> = ColumnFieldName<R>,
-  T = types.CellValue<R, N>,
+  T extends types.CellValue<R, N> = types.CellValue<R, N>,
 > = BaseColumn<R, "calculated"> & RealColumnMixin<R, M, N, T> & DataColumnMixin<R, M, N, T>;
 
 export type DataColumn<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends ColumnFieldName<R> = ColumnFieldName<R>,
-  T = types.CellValue<R, N>,
+  T extends types.CellValue<R, N> = types.CellValue<R, N>,
 > = BodyColumn<R, M, N, T> | CalculatedColumn<R, M, N, T>;
 
 export type ModelColumn<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends ColumnFieldName<R> = ColumnFieldName<R>,
-  T = types.CellValue<R, N>,
+  T extends types.CellValue<R, N> = types.CellValue<R, N>,
 > = DataColumn<R, M, N, T> | FakeColumn<R, M, N, T>;
 
 export type RealColumn<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends ColumnFieldName<R> = ColumnFieldName<R>,
-  T = types.CellValue<R, N>,
-> = BodyColumn<R, M, N, T> | CalculatedColumn<R, M, N, T> | ActionColumn<R, M>;
+  T extends types.CellValue<R, N> = types.CellValue<R, N>,
+> = BodyColumn<R, M, N, T> | CalculatedColumn<R, M, N, T> | ActionColumn<R, M, N, T>;
 
 export type Column<
-  R extends rows.Row = rows.Row,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends ColumnFieldName<R> = ColumnFieldName<R>,
-  T = types.CellValue<R, N>,
+  T extends types.CellValue<R, N> = types.CellValue<R, N>,
 > =
   | BodyColumn<R, M, N, T>
-  | ActionColumn<R, M>
+  | ActionColumn<R, M, N, T>
   | CalculatedColumn<R, M, N, T>
   | FakeColumn<R, M, N, T>;
 
-export interface FooterColumn<
-  R extends rows.Row = rows.Row,
+export type ColumnOfType<
+  I extends ColumnTypeId,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends ColumnFieldName<R> = ColumnFieldName<R>,
-  T = types.CellValue<R, N>,
+  T extends types.CellValue<R, N> = types.CellValue<R, N>,
+> = {
+  body: BodyColumn<R, M, N, T>;
+  action: ActionColumn<R, M, N, T>;
+  calculated: CalculatedColumn<R, M, N, T>;
+  fake: FakeColumn<R, M, N, T>;
+}[I];
+
+export interface FooterColumn<
+  R extends rows.Row,
+  M extends model.RowTypedApiModel = model.RowTypedApiModel,
+  N extends ColumnFieldName<R> = ColumnFieldName<R>,
+  T extends types.CellValue<R, N> = types.CellValue<R, N>,
 > extends Pick<DataColumn<R, M, N, T>, "colSpan"> {
-  readonly cellStyle?: types.CellStyle<rows.RowSubType<R, rows.BodyRowType>, N, T>;
+  readonly cellStyle?: types.CellStyle<R, N, T>;
 }
 
 export type ColumnVisibilityChange = {
   readonly field: string;
   readonly visible: boolean;
 };
+
+export type Columns<
+  R extends rows.Row,
+  M extends model.RowTypedApiModel,
+  N extends ColumnFieldName<R> = ColumnFieldName<R>,
+  T extends types.CellValue<R, N> = types.CellValue<R, N>,
+> = ExtractValues<{
+  [key in N]: Column<R, M, key, T & types.CellValue<R, key>>;
+}>[];

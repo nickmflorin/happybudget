@@ -1,23 +1,31 @@
-import { isNil, reduce, filter, orderBy } from "lodash";
+import { orderBy } from "lodash";
 
-export const orderActions = (actions: Table.MenuActionObj[]): Table.MenuActionObj[] => {
-  const actionsWithIndex = filter(actions, (action: Table.MenuActionObj) => !isNil(action.index));
-  const actionsWithoutIndex = filter(actions, (action: Table.MenuActionObj) => isNil(action.index));
+import * as model from "../model";
+
+import * as rows from "./rows";
+import * as types from "./types";
+
+export const orderActions = (actions: types.MenuActionObj[]): types.MenuActionObj[] => {
+  const actionsWithIndex = actions.filter(
+    (action: types.MenuActionObj) => action.index !== undefined,
+  );
+  const actionsWithoutIndex = actions.filter(
+    (action: types.MenuActionObj) => action.index === undefined,
+  );
   return [...orderBy(actionsWithIndex, ["index"], ["asc"]), ...actionsWithoutIndex];
 };
 
 export const evaluateActions = <
-  R extends Table.RowData,
+  R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
-  T extends Table.PublicMenuActionParams<R, M> = Table.PublicMenuActionParams<R, M>,
+  T extends types.PublicMenuActionParams<R, M> = types.PublicMenuActionParams<R, M>,
 >(
-  actions: Table.MenuActions<R, M, T>,
+  actions: types.MenuActions<R, M, T>,
   params: T,
-): Table.MenuActionObj[] =>
+): types.MenuActionObj[] =>
   orderActions(
-    reduce(
-      Array.isArray(actions) ? actions : actions(params),
-      (objs: Table.MenuActionObj[], action: Table.MenuAction<R, M, T>) => [
+    (Array.isArray(actions) ? actions : actions(params)).reduce(
+      (objs: types.MenuActionObj[], action: types.MenuAction<R, M, T>) => [
         ...objs,
         typeof action === "function" ? action(params) : action,
       ],
@@ -27,16 +35,15 @@ export const evaluateActions = <
 
 export const combineMenuActions =
   <
-    P extends Table.PublicMenuActionParams<R, M>,
-    R extends Table.RowData,
+    P extends types.PublicMenuActionParams<R, M>,
+    R extends rows.Row,
     M extends model.RowTypedApiModel,
   >(
-    ...args: Table.MenuActions<R, M, P>[]
-  ): Table.MenuActions<R, M, P> =>
+    ...args: types.MenuActions<R, M, P>[]
+  ): types.MenuActions<R, M, P> =>
   (params: P) =>
-    reduce(
-      args,
-      (curr: Array<Table.MenuAction<R, M, P>>, actions: Table.MenuActions<R, M, P>) => [
+    args.reduce(
+      (curr: Array<types.MenuAction<R, M, P>>, actions: types.MenuActions<R, M, P>) => [
         ...curr,
         ...(typeof actions === "function" ? actions(params) : actions),
       ],
