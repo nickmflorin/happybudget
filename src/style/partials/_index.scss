@@ -1,0 +1,28 @@
+/**
+The contents of the partials directory should contain functionality, utilities, mixins, variables
+and functions that are used by both globally scoped or locally scoped style files but do not
+represent CSS that needs to be transpiled as a standalone file.
+
+This file should forward all of the various files or modules in the directory such that they can be
+referenced under the same "partials" namespace.
+
+In order to avoid stylesheet import issues, it is very important that the imports within this module
+are directional.  The import patterns should be structured as follows:
+
+1. Files in the `functions` module cannot import from either the `mixins` or the `variables` module.
+2. Files in the `variables` module can import from the `functions` module but not the `mixins`
+   module.
+3. Files in the `mixins` module can import from both the `functions` and the `variables` module.
+
+This in effect gives a unidirectional import pattern as:
+
+  functions -> variables -> mixins
+
+Breaking this pattern will result in SASS import errors due to files outside of the partials module
+importing the partials directory.
+
+For more information, see the documentation in src/styles/ReadMe.md.
+*/
+@forward "./mixins";
+@forward "./variables/index.module";
+@forward "./functions";

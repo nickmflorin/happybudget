@@ -68,8 +68,15 @@ export const SizeAxisMap: { [key in SizeAxis]: SizeDimension } = {
 export const SizeContains = enumeratedLiterals(["fit", "square"] as const);
 export type SizeContain = EnumeratedLiteralType<typeof SizeContains>;
 
-export const CSSDirections = enumeratedLiterals(["top", "bottom", "left", "right"] as const);
+export const CSSDirections = enumeratedLiterals(["up", "down", "left", "right"] as const);
 export type CSSDirection = EnumeratedLiteralType<typeof CSSDirections>;
+
+export type OppositeCSSDirection<T extends CSSDirection> = {
+  up: "down";
+  down: "up";
+  left: "right";
+  right: "left";
+}[T];
 
 /**
  * A generic type that results in the {@link SizeDimension} that is associated with axis,

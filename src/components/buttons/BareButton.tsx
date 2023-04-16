@@ -1,11 +1,23 @@
-import React from "react";
+import { ui } from "lib";
 
-import classNames from "classnames";
+import { SolidButton, SolidButtonProps, SolidAnchor, SolidAnchorProps } from "./abstract";
 
-import Button, { ButtonProps } from "./Button";
+type BareProps<
+  P extends
+    | SolidButtonProps<typeof ui.ButtonSolidVariants.BARE>
+    | SolidAnchorProps<typeof ui.ButtonSolidVariants.BARE> =
+    | SolidButtonProps<typeof ui.ButtonSolidVariants.BARE>
+    | SolidAnchorProps<typeof ui.ButtonSolidVariants.BARE>,
+> = Omit<P, "variant">;
 
-const BareButton = (props: ButtonProps): JSX.Element => (
-  <Button {...props} className={classNames("btn--bare", props.className)} />
+export type BareButtonProps = BareProps<SolidButtonProps<typeof ui.ButtonSolidVariants.BARE>>;
+
+export const BareButton = (props: BareButtonProps) => (
+  <SolidButton {...props} variant={ui.ButtonSolidVariants.BARE} />
 );
 
-export default React.memo(BareButton);
+export type BareAnchorProps = BareProps<SolidAnchorProps<typeof ui.ButtonSolidVariants.BARE>>;
+
+export const BareAnchor = (props: BareAnchorProps) => (
+  <SolidAnchor {...props} variant={ui.ButtonSolidVariants.BARE} />
+);

@@ -1,23 +1,22 @@
 .tag {
+  border-radius: 20px;
+  color: $white;
+  font-family: $avenir;
+  font-size: $medium-body-font-size;
+  font-weight: 400;
   height: 20px;
-  text-align: center;
   line-height: 20.5px;
-  font-size: $medium-text-size;
-  padding-top: 0px !important;
+  margin-right: 0.2rem;
   padding-bottom: 0px !important;
   padding-left: 8px;
   padding-right: 8px;
-  font-family: $avenir;
-  font-weight: 400;
-  width: -moz-fit-content;
+  padding-top: 0px !important;
+  text-align: center;
   width: fit-content;
-  margin-right: 0.2rem;
-  color: $white;
-  border-radius: 20px;
 
   &.uppercase {
+    font-size: $small-body-font-size;
     text-transform: uppercase;
-    font-size: $small-text-size;
   }
 
   &.fill-width {
@@ -26,12 +25,12 @@
   }
 
   &--account {
-    color: $text-secondary !important;
     background-color: white !important;
-    font-weight: 500;
-    line-height: 18px;
     border: 1px solid $text-secondary !important;
     border-radius: 4px;
+    color: $text-secondary !important;
+    font-weight: 500;
+    line-height: 18px;
   }
 
   &--contact {
@@ -43,18 +42,18 @@
   }
 
   &--product {
-    border-radius: 4px !important;
     background-color: $gray-light !important;
+    border-radius: 4px !important;
   }
 
   .btn {
+    color: $blue !important;
     display: block;
     font-family: $avenir;
-    line-height: 20.5px;
-    font-size: $medium-text-size;
+    font-size: $medium-body-font-size;
     font-weight: 400;
-    color: $blue !important;
     height: 20px;
+    line-height: 20.5px;
 
     &:hover,
     &:focus {
@@ -79,14 +78,15 @@
 }
 
 .color {
+  @include vertical-flex-c;
+
   position: relative;
-  @include vertical-flex-c();
 }
 
 .color-grid {
   display: flex;
-  flex-wrap: wrap;
   flex-grow: 100;
+  flex-wrap: wrap;
   padding: 6px;
 
   .color {

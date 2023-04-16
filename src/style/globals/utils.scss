@@ -1,0 +1,13 @@
+@use "partials";
+
+.truncate {
+  @include partials.truncate;
+}
+
+.transform--underline {
+  text-decoration: underline;
+}
+
+.transform--caps {
+  text-transform: uppercase;
+}

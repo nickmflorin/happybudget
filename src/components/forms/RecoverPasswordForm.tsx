@@ -4,7 +4,7 @@ import classNames from "classnames";
 
 import { util } from "lib";
 import { Form } from "components";
-import { PrimaryButton } from "components/buttons";
+import { PrimaryButton } from "components/buttonsOld";
 import { EmailInput } from "components/fields";
 import { RouterLink } from "components/links";
 

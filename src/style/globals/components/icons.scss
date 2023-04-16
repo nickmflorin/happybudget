@@ -1,0 +1,136 @@
+@use "sass:map";
+@use "sass:color";
+
+@use "throw";
+@use "partials";
+
+@mixin colors($form) {
+  @include partials.with-icon-colors using ($value, $data) {
+    $name: partials.map-get($data, "name");
+    &.#{$form}--color-#{$name} {
+      color: $value;
+    }
+  }
+}
+
+%icon-svg-base {
+  fill: currentcolor;
+  max-height: 100%;
+  max-width: 100%;
+  padding: 0;
+  vertical-align: 0;
+
+  path {
+    color: inherit;
+    fill: inherit;
+  }
+}
+
+.svg {
+  @extend %icon-svg-base;
+  @include partials.flex-c;
+  @include colors("svg");
+}
+
+@mixin svg($name) {
+  .svg {
+    &--#{$name} {
+      &.svg--contain-square:not(.svg--contain-fit) {
+        @include partials.svg-contain($name, "square");
+      }
+
+      &.svg--contain-fit:not(.svg--contain-square) {
+        @include partials.svg-contain($name, "fit");
+      }
+
+      &:not(.svg--contain-fit, .svg--contain-square) {
+        @include partials.svg-contain($name, partials.$icon-default-size-contain);
+      }
+    }
+  }
+}
+
+@mixin icon-size($size, $axis: "vertical") {
+  $axis: partials.validate-value($axis, partials.$size-axes);
+  $size: partials.validate-value($size, partials.$icon-sizes);
+  $dim: partials.get-dimension($axis);
+  $opposite: partials.get-dimension($axis, true);
+
+  #{$dim}: partials.map-get(partials.$icon-sizes, $size);
+  #{$opposite}: auto;
+}
+
+@mixin icon-contain($contain) {
+  $contain: partials.validate-value($contain, ("square", "fit"));
+  @if $contain == "square" {
+    aspect-ratio: 1;
+  }
+}
+
+@mixin icon-size-classes($axis) {
+  @each $size in map.keys(partials.$icon-sizes) {
+    &.icon--size-#{$size} {
+      @include icon-size($size, $axis);
+    }
+  }
+}
+
+.icon {
+  @extend %icon-svg-base;
+  @include partials.flex-c;
+  @include colors("icon");
+
+  // For when the icon is a spinner and indicating loading state.
+  animation-duration: 1s;
+  padding: 0;
+  vertical-align: 0;
+
+  @include partials.with-icon-colors using ($value, $data) {
+    $name: partials.map-get($data, "name");
+    &.icon--color-#{$name} {
+      color: $value;
+    }
+  }
+
+  &--contain-square:not(&--contain-fit) {
+    @include icon-contain("square");
+  }
+
+  &--contain-fit:not(&--contain-square) {
+    @include icon-contain("fit");
+  }
+
+  &:not(&--contain-fit, &--contain-square) {
+    @include icon-contain(partials.$icon-default-size-contain);
+  }
+
+  &--axis-vertical:not(&--axis-horizontal) {
+    @include icon-size-classes("vertical");
+  }
+
+  &--axis-horizontal:not(&--axis-vertical) {
+    @include icon-size-classes("horizontal");
+  }
+
+  &.icon--feedback {
+    @include partials.with-feedback-types using ($feedback, $data) {
+      &.icon--feedback-#{$feedback} {
+        color: partials.map-get($data, "icon-color");
+      }
+    }
+  }
+
+  &.icon--row-drag {
+    color: partials.get-icon-color("grey");
+
+    &:hover {
+      color: color.lighten($icon-color, 20%);
+    }
+
+    &:active {
+      color: color.lighten($icon-color, 20%);
+    }
+  }
+}
+
+@include svg(partials.$corsha-logo-svg-name);

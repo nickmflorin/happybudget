@@ -1,0 +1,26 @@
+@use "partials";
+
+.header {
+  align-items: center;
+  background-color: partials.$header-bg-color;
+  display: flex;
+  flex-direction: row;
+  height: partials.$header-height;
+  justify-content: flex-end;
+  max-width: 100%;
+  overflow: hidden;
+  padding: partials.$header-padding;
+  z-index: 1000;
+
+  > * {
+    // The dropdown buttons in the header should be specifying size=ButtonSizes.LARGE - which should
+    // be consistent with the `partials.$header-item-size` - but just in case those definitions
+    // are altered, we always want the dropdown buttons in the header to have these sizes.
+    height: partials.$header-item-size;
+    width: partials.$header-item-size;
+  }
+
+  > * + * {
+    margin-left: partials.$header-item-spacing;
+  }
+}

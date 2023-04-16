@@ -1,5 +1,6 @@
 import { useEffect, useState, forwardRef, useImperativeHandle, ForwardedRef } from "react";
 
+import * as api from "api";
 import { AxiosResponse } from "axios";
 import classNames from "classnames";
 import { isNil, includes } from "lodash";
@@ -8,11 +9,10 @@ import { Upload } from "antd";
 import { UploadChangeParam } from "antd/lib/upload";
 import { UploadFile } from "antd/lib/upload/interface";
 
-import * as api from "api";
+import * as config from "application/config";
 import { util } from "lib";
 import { Icon, RenderWithSpinner, Image, ShowHide } from "components";
-import { ImageClearButton } from "components/buttons";
-import * as config from "application/config";
+import { ImageClearButton } from "components/buttonsOld";
 
 type UploaderImageProps = StandardComponentProps & {
   readonly image: UploadedImage | SavedImage;

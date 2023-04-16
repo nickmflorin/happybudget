@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 
 import { tabling } from "lib";
 import { Icon } from "components";
-import { IconButton } from "components/buttons";
+import { IconButton } from "components/buttonsOld";
 
 export interface EditCellProps<
   R extends Table.RowData,

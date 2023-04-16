@@ -1,34 +1,35 @@
 .no-data {
-  @include vertical-flex-c();
+  @include vertical-flex-c;
+
   align-items: center;
+  height: 100%;
+  margin: 0 auto;
   max-width: 500px;
   text-align: center;
-  margin: 0 auto;
-  height: 100%;
 
   .no-data-content {
     svg:not(.btn svg) {
-      width: 100%;
-      max-width: 475px;
       margin-bottom: 30px;
+      max-width: 475px;
+      width: 100%;
     }
 
     h1 {
       font-size: 18px;
       line-height: 20px;
-      width: 100%;
       max-width: 462px;
+      width: 100%;
 
       @include media(">=large") {
-        line-height: 30px;
         font-size: 28px;
+        line-height: 30px;
       }
     }
 
     p {
-      font-size: $medium-text-size;
-      margin-top: 10px;
+      font-size: $medium-body-font-size;
       font-weight: 500;
+      margin-top: 10px;
 
       @include media(">=large") {
         font-size: 15px;

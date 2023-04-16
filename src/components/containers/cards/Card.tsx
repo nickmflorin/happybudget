@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { isNil, map } from "lodash";
 
 import { Icon, ShowHide, RenderWithSpinner } from "components";
-import { IconButton } from "components/buttons";
+import { IconButton } from "components/buttonsOld";
 import { DropdownMenu } from "components/dropdowns";
 import { CardImage } from "components/images";
 

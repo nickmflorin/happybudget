@@ -1,30 +1,30 @@
 @mixin button_size_standard() {
-  @include standard_height_variants();
+  @include standard_height_variants;
 
   &.xlarge {
-    padding: 10px 12px;
+    font-size: $xlarge-body-font-size;
     line-height: 20px;
-    font-size: $xlarge-text-size;
+    padding: 10px 12px;
   }
 
   &.large {
-    padding: 10px 10px;
     line-height: 16px;
+    padding: 10px;
   }
 
   &.standard {
-    padding: 8px 10px;
     line-height: 16px;
+    padding: 8px 10px;
   }
 
   &.medium {
-    padding: 7px 10px;
     line-height: 16px;
+    padding: 7px 10px;
   }
 
   &.small {
-    padding: 6px 8px;
     line-height: 16px;
+    padding: 6px 8px;
   }
 }
 
@@ -44,9 +44,9 @@
 }
 
 @mixin color_on_hover($c) {
-  &:hover:not(:disabled):not(.disabled):not(.fake-disabled),
-  &:focus:not(:disabled):not(.disabled):not(.fake-disabled),
-  &.hovered:not(:disabled):not(.disabled):not(.fake-disabled) {
+  &:hover:not(:disabled, .disabled, .fake-disabled),
+  &:focus:not(:disabled, .disabled, .fake-disabled),
+  &.hovered:not(:disabled, .disabled, .fake-disabled) {
     color: $c;
   }
 }
@@ -65,11 +65,11 @@
 }
 
 @mixin bg_color_on_hover($c) {
-  &:hover:not(:disabled):not(.disabled):not(.fake-disabled),
-  &:focus:not(:disabled):not(.disabled):not(.fake-disabled),
-  &.hovered:not(:disabled):not(.disabled):not(.fake-disabled) {
-    background-color: $c;
+  &:hover:not(:disabled, .disabled, .fake-disabled),
+  &:focus:not(:disabled, .disabled, .fake-disabled),
+  &.hovered:not(:disabled, .disabled, .fake-disabled) {
     background: $c;
+    background-color: $c;
   }
 }
 
@@ -77,8 +77,8 @@
   &:disabled,
   &.disabled,
   &.fake-disabled {
-    background-color: $c;
     background: $c;
+    background-color: $c;
   }
 }
 
@@ -92,8 +92,8 @@
 }
 
 @mixin bg_color($c) {
-  background-color: $c;
   background: $c;
+  background-color: $c;
 }
 
 @mixin green() {
@@ -120,6 +120,7 @@
 
 @mixin bare_color_set($c, $h: lighten($c, 20%), $d: $disabled-color) {
   @include color_set($c, $h, $d);
+
   border-color: $transparent !important;
 
   &:hover,
@@ -127,8 +128,8 @@
   &.disabled,
   &.fake-disabled,
   &:focus {
-    border-color: $transparent;
     background-color: $transparent;
+    border-color: $transparent;
   }
 }
 

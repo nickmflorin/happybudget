@@ -1,0 +1,222 @@
+@use "sass:map";
+@use "partials";
+
+// AntD selectors that are used to define the .ant-checkbox class in each state.
+$checkbox-antd-state-selectors: (
+  "checked": ".ant-checkbox-checked:not(.ant-checkbox-disabled)",
+  "unchecked": ":not(.ant-checkbox-disabled)",
+  "disabled": ".ant-checkbox-disabled",
+);
+
+// Defines the color of the actual check inside of the checkbox.
+@mixin checkbox-map-color($map-slice) {
+  @if map.has-key($map-slice, "color") {
+    border-color: partials.map-get($map-slice, "color");
+  }
+}
+
+@mixin checkbox-map-props($map-slice) {
+  @include partials.border(partials.map-get($map-slice, "border-color"));
+
+  background: partials.map-get($map-slice, "background-color");
+  background-color: partials.map-get($map-slice, "background-color");
+}
+
+/**
+Defines the properties for the different layers of the `.checkbox` class that need to be overridden
+with border, color and background-color related properties based on the specific state that the
+checkbox is in.
+
+Because we are overriding a third-party component that unfortunately defines these properties for
+every state without any inheritance, we have to also apply these properties to every state, both
+normal and hovered, in order to completely override AntD's implementation.
+*/
+@mixin checkbox-state($state) {
+  $state: partials.validate-value($state, partials.$checkbox-states);
+  $props: partials.map-get(partials.$checkbox-state-properties, $state);
+  $selector: partials.map-get($checkbox-antd-state-selectors, $state);
+
+  .checkbox,
+  .ant-checkbox-wrapper {
+    > .ant-checkbox {
+      &#{$selector} {
+        > .ant-checkbox-inner {
+          @include checkbox-map-props($props);
+
+          &::after {
+            @include checkbox-map-color($props);
+          }
+        }
+
+        &:hover {
+          $hovered: partials.map-get($props, "hovered");
+
+          > .ant-checkbox-inner {
+            @include checkbox-map-props($hovered);
+
+            &::after {
+              @include checkbox-map-color($hovered);
+            }
+          }
+        }
+      }
+    }
+
+    /**
+    Because AntD treats the `.ant-checkbox-wrapper` class as the "actual" checkbox (which is
+    sized the same way as its child, `.ant-checkbox`), they apply hover behavior to the outer
+    most element, `.ant-checkbox-wrapper`.  This does not work for us, because the
+    `.ant-checkbox-wrapper` can be larger than the underlying `.ant-checkbox` - so we need to
+    override the hover behavior for the `.ant-checkbox-wrapper` as well.
+
+    See the comment regarding the `.checkbox` class below for more context.
+    */
+    &:hover {
+      > .ant-checkbox:not(:hover) {
+        &#{$selector} {
+          > .ant-checkbox-inner {
+            @include checkbox-map-props($props);
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+The .checkbox class is our internalized class for the outermost element/layer of the AntD Checkbox
+component.  AntD gives this component a class `.ant-checkbox-wrapper`, but we're internalizing as
+`.checkbox`:
+
+<label class="ant-checkbox-wrapper checkbox">
+  <span class="ant-checkbox [ant-checkbox-checked, ant-checkbox-disabled, ant-checkbox-unchecked]">
+    <input type="checkbox" class="ant-checkbox-input" value="">
+    <span class="ant-checkbox-inner"></span>
+  </span>
+</label>
+
+The problem here is that AntD treats the `ant-checkbox-wrapper` class as always being tightly
+wrapped around the underlying `.ant-checkbox` - but we want to allow the `.checkbox` or
+`.ant-checkbox-wrapper` to grow in either or both horizontal and vertical directions, while still
+keeping the underlying `.ant-checkbox` (which is the actual checkbox) centered inside of it, both
+horizontally and vertically.  This will allow us to resize the `<Checkbox />` component to fill
+its parent, while still centering the actual checkbox - which is how we will vertically align the
+`.ant-checkbox` in a parent that uses the component.
+
+However, because this differs from AntD's expectation that the `.ant-checkbox-wrapper` and
+`.ant-checkbox` elements will be the same size, certain behaviors they apply to the
+`.ant-checkbox-wrapper` class we have to turn off.  This primarily includes the `:hover` behavior
+for the outer element (`.ant-checkbox-wrapper`) and `pointer-events` - because we only want a click
+to toggle the checkbox when it's on the actual `.ant-checkbox` (not the surrounding
+`.ant-checkbox-wrapper` that can be any size.
+*/
+.checkbox {
+  // Center the inner `.ant-checkbox` element, which is the "actual" checkbox, both vertically and
+  // horizontally inside of this wrapping container.
+  @include partials.flex-c;
+  @include partials.transition(none);
+
+  cursor: default;
+
+  // This primarily applies to the label that appears to the right of the checkbox - which is
+  // something that we don't allow in our implementation of the component.  However, in the
+  // font-size in the `.ant-checkbox` class can cause the checkbox to offset from the vertical
+  // center line, so we want to ensure we override AntD's value both here and in `.ant-checkbox`.
+  font-size: partials.$checkbox-size;
+
+  // The height and width of the wrapping `.checkbox` class should default to being the size of the
+  // underlying `.ant-checkbox` - but the class should be capable of resizing and still centering
+  // the `.ant-checkbox` inside of it.
+  height: partials.$checkbox-size;
+  line-height: 1;
+  min-height: partials.$checkbox-size;
+  min-width: partials.$checkbox-size;
+
+  // See comment above regarding discrepancies between sizes of the `.ant-checkbox-wrapper` and
+  // `.ant-checkbox`.
+  pointer-events: auto;
+  width: partials.$checkbox-size;
+
+  // AntD automatically specifies a left-margin via the `margin-inline-start` property for all
+  // .checkbox elements (or `.ant-checkbox-wrapper` elements) that come after an initial .checkbox
+  // element (or `.ant-checkbox-wrapper` element).  They do this even when the checkboxes are
+  // stacked vertically, which causes each checkbox after the first to be pushed to the left.
+  + .checkbox {
+    margin-inline-start: 0;
+  }
+
+  > .ant-checkbox {
+    @include partials.transition(none);
+
+    aspect-ratio: 1;
+    cursor: default;
+
+    // The `font-size` of the actual checkbox will cause the checkbox to be pushed down vertically
+    // if it is larger than the width and height of the checkbox, and the opposite if it is smaller.
+    font-size: partials.$checkbox-size;
+    height: partials.$checkbox-size;
+    line-height: 1;
+
+    // See comment above regarding discrepancies between sizes of the `.ant-checkbox-wrapper` and
+    // `.ant-checkbox`.
+    pointer-events: all;
+    top: 0em;
+
+    // The width to be defined to allow the aspect-ratio to work, because it needs to override the
+    // value that AntD uses - which is 16px.  Auto will cause it to respect the aspect-ratio.
+    width: auto;
+
+    > .ant-checkbox-input {
+      margin: 0;
+      padding: 0;
+    }
+
+    > .ant-checkbox-inner {
+      @include partials.transition(none);
+      @include partials.fill-parent;
+
+      border-radius: partials.$checkbox-border-radius;
+      left: 0;
+      top: 0;
+
+      &::after {
+        // This is needed to center the actual check in the checkbox at the larger 24px size.
+        inset-inline-start: 28.5%;
+      }
+    }
+
+    &.ant-checkbox-disabled {
+      cursor: not-allowed;
+      // See comment above regarding discrepancies between sizes of the `.ant-checkbox-wrapper` and
+      // `.ant-checkbox`.
+      pointer-events: auto;
+    }
+
+    &::after {
+      border: none;
+
+      // It is weird to set the `border-radius` when there is no `border` (previous line) - but
+      // this is mostly a safeguard against cases where AntD might apply a border based on selectors
+      // that we did not override.
+      border-radius: partials.$checkbox-border-radius;
+    }
+  }
+
+  &::after {
+    // I don't fully understand why AntD does this, but it causes things to be off center vertically
+    // with flex and is not necessary - at least for our uses.
+    content: none;
+  }
+}
+
+@include checkbox-state("checked");
+@include checkbox-state("unchecked");
+@include checkbox-state("disabled");
+
+// Normally, wildcard selectors are a bad idea - but in this case it is the only way we can ensure
+// the font-size is always overridden, because AntD specifies the `font-size` via this exact
+// selector.
+[class^="ant-checkbox"],
+[class*=" ant-checkbox"] {
+  font-size: partials.$checkbox-size;
+}

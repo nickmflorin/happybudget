@@ -1,0 +1,36 @@
+@use "sass:map";
+@use "partials";
+
+.structural-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+
+  .affix-group {
+    > .button,
+    .icon {
+      height: 100%;
+    }
+  }
+
+  &__left {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+
+    .affix-group {
+      margin-left: 8px;
+    }
+  }
+
+  // The height of the header needs to be the same as the line-height of the heading text, such that
+  // affixes (i.e. buttons, icons, etc.) can be sized at 100% and with padding, be slightly smaller
+  // than the text.
+  @each $level in partials.map-get(partials.$typography-levels, "heading") {
+    &--level-#{$level} {
+      height: partials.get-line-height("heading", $level);
+    }
+  }
+}

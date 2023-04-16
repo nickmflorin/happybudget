@@ -1,15 +1,16 @@
 @mixin input_framework(
   $horizontal-padding: 12px,
   $svg-height: 0.8rem,
-  $font-size: $medium-text-size,
+  $font-size: $medium-body-font-size,
   $size: $standard-size,
   $radius: $input-border-radius,
   $vertical-padding: 4px
 ) {
-  line-height: ($size - 2 * $vertical-padding) !important;
-  font-size: $font-size !important;
-  padding: $vertical-padding $horizontal-padding !important;
   border-radius: $radius !important;
+  font-size: $font-size !important;
+  line-height: ($size - 2 * $vertical-padding) !important;
+  padding: $vertical-padding $horizontal-padding !important;
+
   .ant-input-prefix {
     font-size: $font-size;
 
@@ -20,8 +21,8 @@
 }
 
 @mixin input_size_standard() {
-  @include input_framework();
-  @include standard_height_variants();
+  @include input_framework;
+  @include standard_height_variants;
 
   &.large,
   &.xlarge {
@@ -29,7 +30,7 @@
   }
 
   &.standard {
-    @include input_framework();
+    @include input_framework;
   }
 
   &.medium {

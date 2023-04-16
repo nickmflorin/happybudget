@@ -1,40 +1,40 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 
-import { isNil, find, includes } from "lodash";
+import { find } from "lodash";
 
-import { util } from "lib";
+import { ui, fs } from "lib";
 
-import Icon from "./Icon";
+import { Icon } from "./Icon";
 
 type FileIconExtensionMap = {
   readonly extensions: string[];
-  readonly icon: IconProp;
+  readonly icon: ui.IconName;
 };
 
 const FILE_ICON_EXTENSION_MAPPING: FileIconExtensionMap[] = [
   {
     extensions: ["jpg", "jpeg", "gif", "png"],
-    icon: "file-image",
+    icon: ui.IconNames.FILE_IMAGE,
   },
   {
     extensions: ["mp4", "avi", "mov", "wmv"],
-    icon: "file-video",
+    icon: ui.IconNames.FILE_VIDEO,
   },
   {
     extensions: ["mp3", "wma", "aac", "wav"],
-    icon: "file-audio",
+    icon: ui.IconNames.FILE_AUDIO,
   },
   {
     extensions: ["csv"],
-    icon: "file-csv",
+    icon: ui.IconNames.FILE_CSV,
   },
   {
     extensions: ["zip"],
-    icon: "file-archive",
+    icon: ui.IconNames.FILE_ARCHIVE,
   },
   {
     extensions: ["pdf"],
-    icon: "file-pdf",
+    icon: ui.IconNames.FILE_PDF,
   },
   {
     extensions: [
@@ -51,7 +51,7 @@ const FILE_ICON_EXTENSION_MAPPING: FileIconExtensionMap[] = [
       "sldx",
       "sldm",
     ],
-    icon: "file-powerpoint",
+    icon: ui.IconNames.FILE_POWERPOINT,
   },
   {
     extensions: [
@@ -68,11 +68,11 @@ const FILE_ICON_EXTENSION_MAPPING: FileIconExtensionMap[] = [
       "xll",
       "xlw",
     ],
-    icon: "file-excel",
+    icon: ui.IconNames.FILE_EXCEL,
   },
   {
     extensions: ["doc", "dot", "wbk", "docx", "docm", "dotx", "dotm", "docb"],
-    icon: "file-word",
+    icon: ui.IconNames.FILE_WORD,
   },
 ];
 
@@ -80,30 +80,28 @@ const getFileExtension = (
   name: string | undefined,
   ext: string | undefined | null,
 ): string | undefined => {
-  if (!isNil(ext)) {
+  if (ext !== undefined && ext !== null) {
     return ext.toLowerCase();
-  } else if (!isNil(name)) {
-    return util.files.getFileType(name)?.toLowerCase();
+  } else if (name !== undefined) {
+    return fs.getFileType(name)?.toLowerCase();
   }
   return undefined;
 };
 
-const getFileIcon = (name: string | undefined, ext: string | undefined | null): IconProp => {
+const getFileIcon = (name: string | undefined, ext: string | undefined | null): ui.IconName => {
   const mapping: FileIconExtensionMap | undefined = find(
     FILE_ICON_EXTENSION_MAPPING,
-    (mp: FileIconExtensionMap) => includes(mp.extensions, getFileExtension(name, ext)),
+    (mp: FileIconExtensionMap) => mp.extensions.includes(getFileExtension(name, ext) as string),
   );
-  return mapping?.icon || "file";
+  return mapping?.icon || ui.IconNames.FILE;
 };
 
-type FileIconProps = Omit<IconProps, "icon"> & {
+type FileIconProps = Omit<ui.IconComponentProps, "icon"> & {
   readonly name?: string | undefined;
   readonly ext?: string | null | undefined;
 };
 
-const FileIcon = ({ name, ext, ...props }: FileIconProps) => {
+export const FileIcon = ({ name, ext, ...props }: FileIconProps) => {
   const icon = useMemo(() => getFileIcon(name, ext), [name, ext]);
   return <Icon {...props} icon={icon} />;
 };
-
-export default React.memo(FileIcon);

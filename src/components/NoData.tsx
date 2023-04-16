@@ -1,22 +1,22 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 
 import classNames from "classnames";
-import { isNil } from "lodash";
 
-import { PrimaryButton } from "components/buttons";
+import { ui } from "lib";
+import { PrimaryButton } from "components/buttonsOld";
 
-export type NoDataProps = StandardComponentProps & {
+export type NoDataProps = ui.ComponentProps<{
   readonly title?: string;
   readonly subTitle?: string;
   readonly button?: { readonly onClick?: () => void; readonly text: string };
-  readonly icon?: IconOrElement;
-};
+  readonly icon?: ui.IconProp;
+}>
 
 type PrivateNoDataProps = NoDataProps & {
   readonly children?: ReactNode;
 };
 
-const NoData = ({
+export const NoData = ({
   title,
   subTitle,
   button,
@@ -27,9 +27,9 @@ const NoData = ({
   <div {...props} className={classNames("no-data", props.className)}>
     <div className="no-data-content">
       {children}
-      {!isNil(title) && <h1>{title}</h1>}
-      {!isNil(subTitle) && <p>{subTitle}</p>}
-      {!isNil(button) && (
+      {title !== undefined && <h1>{title}</h1>}
+      {subTitle !== undefined && <p>{subTitle}</p>}
+      {button !== undefined && (
         <PrimaryButton style={{ marginTop: 20 }} icon={icon} onClick={() => button.onClick?.()}>
           {button.text}
         </PrimaryButton>
@@ -37,5 +37,3 @@ const NoData = ({
     </div>
   </div>
 );
-
-export default React.memo(NoData);

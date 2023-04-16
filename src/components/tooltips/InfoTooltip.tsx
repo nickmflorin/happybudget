@@ -1,11 +1,17 @@
+import { ReactNode } from "react";
+
 import classNames from "classnames";
 
-import RootTooltip from "./Tooltip";
+import { ui } from "lib";
 
-const InfoTooltip = ({ children, ...props }: TooltipProps): JSX.Element => (
+import { RootTooltip } from "./RootTooltip";
+
+export type InfoTooltipProps = ui.TooltipProps & {
+  readonly children: ReactNode;
+};
+
+export const InfoTooltip = ({ children, ...props }: InfoTooltipProps): JSX.Element => (
   <RootTooltip {...props} overlayClassName={classNames("tooltip--info", props.overlayClassName)}>
     {children}
   </RootTooltip>
 );
-
-export default InfoTooltip;

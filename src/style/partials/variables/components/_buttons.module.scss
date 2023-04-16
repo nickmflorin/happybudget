@@ -1,0 +1,250 @@
+@use "sass:string";
+@use "sass:list";
+@use "sass:map";
+@use "sass:meta";
+
+@use "../../functions" as fn;
+@use "../colors.module" as colors;
+@use "./icons.module" as icons;
+@use "./typography.module" as typography;
+@use "./input.module" as input;
+
+/*
+A specific button and/or anchor that has text but the size of the element is determined solely from
+the line-height of the text.  There is no padding between the edges of the button and/or anchor and
+the text.
+*/
+$button-variant-alternate: "alternate";
+$button-variant-primary: "primary";
+$button-variant-secondary: "secondary";
+$button-variant-bare: "bare";
+
+/* Any button and/or anchor that contains *just* an Icon. */
+$button-variant-action: "action";
+
+/*
+A button or anchor whose sizing properties include inherent inner padding between the outer edges of
+the button and the button's content, which will be text with optional Icons and/or Loading
+indicators.
+*/
+$button-solid-variants: ($button-variant-primary, $button-variant-secondary, $button-variant-bare);
+
+/*
+Any button and/or anchor that contains text.  The Text Variant is the direct opposite of the Action
+Variant, which is any button and/or anchor that contains *just* an icon.  A Text Variant may include
+an Icon and/or Loading indicator.
+ */
+$button-content-variants: fn.list-join($button-solid-variants, $button-variant-alternate);
+$button-variants: fn.list-join($button-content-variants, $button-variant-action);
+
+/*
+The Action Variant has a base variant "action", but sub-variants "primary" and "bare".
+
+Variant = "bare":    Refers to the case where the button and/or anchor is just the icon, and the
+                     button has a transparent border and background color.
+Variant = "primary": Refers to the case where the button and/or anchor has an icon but the button
+                     that contains it has a specific background color and a border.
+*/
+$button-action-variants: ("bare", "primary");
+
+/* ---------------------------------------- Constants ------------------------------------------ */
+
+/*
+Buttons and Anchors need to leverage an "outline" instead of a border, because an "outline" is inset
+and a border is outset.  In other words, the border will contribute size to the overall Button or
+Anchor, while the outline will not.
+*/
+$button-outline-width: 2px;
+$button-action-outline-width: 1px;
+$button-border-radius: 6px;
+$button-font-family: typography.$font-family-nunito;
+
+/*
+When an Icon and/or Spinner are in the Button (or Anchor), the size of the Icon or Spinner needs
+to be just a hair smaller than the line-height of the accompanying text (per designers).  To do
+this, the height of the element inside of the Button (or Anchor) that wraps the Icon or Spinner
+needs to still consume 100% of the available height (i.e. size = "fill"), but needs to have inner
+padding to shrink the size of the Icon or Spinner it contains.
+*/
+$button-icon-padding: 2px;
+
+/* ----------------------------------------- Defaults ------------------------------------------ */
+$button-default-font-size: typography.get-font-size("body", 1);
+$button-action-default-variant: "primary";
+$button-default-variant: $button-variant-primary;
+
+/* ----------------------------------------- Properties ----------------------------------------- */
+@function button-color-set($color, $args...) {
+  $bg-color: fn.get-optional-kwarg("bg-color", $default: colors.$transparent, $args...);
+  $border-color: fn.get-optional-kwarg("border-color", $default: $bg-color, $args...);
+  @return (color: $color, background-color: $bg-color, border-color: $border-color);
+}
+
+@function button-variant-colors($color, $args...) {
+  $stateless: button-color-set($color, $args...);
+  $hovered: map.merge($stateless, fn.get-optional-kwarg("hovered", $default: (), $args...));
+  $focused: map.merge($stateless, fn.get-optional-kwarg("focused", $default: $hovered, $args...));
+  @return ("hovered": $hovered, "stateless": $stateless, "focused": $focused);
+}
+
+$button-alternate-colors: (
+  "link":
+    button-variant-colors(
+      $color: colors.$link-blue,
+      $hovered: button-color-set(colors.$dark-blue),
+    ),
+  // We should eventually probably have focused and hover colors for this guy.
+  "inline": button-variant-colors(colors.$text-primary),
+  "danger":
+    button-color-set(
+      $color: colors.$red,
+      $hovered: button-color-set(colors.$dark-red),
+    ),
+);
+
+$button-solid-colors: (
+  "primary":
+    button-variant-colors(
+      $color: colors.$white,
+      $bg-color: colors.$green,
+      $border-color: colors.$green,
+      $hovered:
+        button-color-set(
+          $color: colors.$white,
+          $bg-color: colors.$dark-green,
+          $border-color: colors.$dark-green,
+        ),
+    ),
+  // We need to figure out what the hovered colors should be for the secondary case.
+  "secondary":
+    button-variant-colors(
+      $color: colors.$text-primary,
+      $bg-color: colors.$light-grey,
+      $border-color: colors.$light-grey,
+    ),
+  "bare":
+    button-variant-colors(
+      $color: colors.$link-blue,
+      $hovered: button-color-set(colors.$dark-blue),
+    ),
+  "danger":
+    button-variant-colors(
+      $color: colors.$white,
+      $bg-color: colors.$red,
+      $border-color: colors.$red,
+      $hovered:
+        button-color-set(
+          $color: colors.$white,
+          $bg-color: colors.$dark-red,
+          $border-color: colors.$dark-red,
+        ),
+    ),
+);
+
+$button-action-colors: (
+  "primary": fn.map-get($button-solid-colors, "primary"),
+  "secondary": fn.map-get($button-solid-colors, "secondary"),
+  "bare": // These need to be updated.
+  button-variant-colors(
+      $color: colors.$text-primary,
+      $hovered: button-color-set(colors.$dark-blue),
+    ),
+);
+
+$button-colors: (
+  "solid": $button-solid-colors,
+  "action": $button-action-colors,
+  "alternate": $button-alternate-colors,
+);
+
+// We may need to use a Nunito-Medium for the solid font weight in the future.
+$button-font-weight: typography.get-font-weight("body", "regular");
+
+/*
+Note: The mapped values are not applicable for the Alternate Variant - just the buttons/anchors that
+have borders and/or backgrounds with text (Primary, Secondary and Bare Variants).
+*/
+$button-solid-padding: (
+  "small": 8px 16px,
+  "medium": 10px 20px,
+  "large": 14px 30px,
+);
+
+/*
+Usually, the height of the button would just be determined by the combination of the vertical
+padding and line-height (i.e. height = 2 * vertical-padding + line-height).  However, we need
+to constrain the height (and not allow it to be "auto") such that the SVG icons or spinners can
+properly fill up the available height and size responsively.  If we did not define the height
+explicitly, it would not be constrained and this would not work.
+
+So instead of calculating the height based on the padding and line-height, we define the heights
+and the padding and then calculate the line-height based on the padding and height - and all 3
+consistent with each other while still allowing the height to be constrained.
+*/
+$button-solid-sizes: (
+  "small": 32px,
+  "medium": 40px,
+  "large": 48px,
+);
+
+$button-alternate-sizes: (
+  "small": 14px,
+  "medium": 16px,
+  "large": 18px,
+);
+
+/*
+The button action sizes are designed such that the icon sizes, which are already defined for icons,
+stay consistent between the bare and the primary variant for a given size string.  For instance,
+a medium sized primary action button should have a medium sized icon, and a medium sized bare
+action button should have a medium sized icon, even if the sizes of the buttons themselves differ.
+
+The difference between the bare and primary variants are that a primary variant has a border, which
+means that it has to have a larger padding than the bare variant, such that the border does not get
+very very close to the edges of the icon.  This means that a medium sized bare action button will
+be smaller than a medium sized primary action button.
+*/
+$button-action-bare-padding: 2px;
+$button-action-primary-padding: 6px;
+
+$button-action-bare-sizes: (
+  "small": fn.map-get(icons.$icon-sizes, "small") + 2 * $button-action-bare-padding,
+  "medium": fn.map-get(icons.$icon-sizes, "medium") + 2 * $button-action-bare-padding,
+  "large": fn.map-get(icons.$icon-sizes, "large") + 2 * $button-action-bare-padding,
+);
+
+$button-action-primary-sizes: (
+  "small": fn.map-get(icons.$icon-sizes, "small") + 2 * $button-action-primary-padding,
+  "medium": fn.map-get(icons.$icon-sizes, "medium") + 2 * $button-action-primary-padding,
+  "large": fn.map-get(icons.$icon-sizes, "large") + 2 * $button-action-primary-padding,
+);
+
+$button-solid-font-sizes: (
+  "small": typography.get-font-size("body", 2),
+  "medium": typography.get-font-size("body", 1),
+  "large": typography.get-font-size("body", 1),
+);
+
+$button-alternate-font-sizes: (
+  "small": typography.get-font-size("body", 2),
+  "medium": 15px,
+  "large": typography.get-font-size("body", 1),
+);
+
+$sidebar-anchor-border-radius: 8px;
+$sidebar-anchor-color: colors.$white;
+$sidebar-anchor-active-bg-color: colors.$brand-green;
+
+/* ========================================== Exports =========================================== */
+:export {
+  buttonAlternateBgColor: $button-alternate-bg-color;
+  buttonAlternateBorderColor: $button-alternate-border-color;
+  buttonBareBgColor: $button-bare-bg-color;
+  buttonBareBorderColor: $button-bare-border-color;
+  buttonPrimaryBgColor: $button-primary-bg-color;
+  buttonPrimaryBorderColor: $button-primary-border-color;
+  buttonPrimaryColor: $button-primary-color;
+  buttonSecondaryBgColor: $button-secondary-bg-color;
+  buttonSecondaryBorderColor: $button-secondary-border-color;
+  buttonSecondaryColor: $button-secondary-color;
+}

@@ -1,0 +1,44 @@
+@use "sass:color";
+@use "sass:list";
+
+@use "partials";
+@use "./base";
+
+.text-input {
+  $affix-group-padding: 2px;
+  @include base.input-base;
+
+  display: flex;
+  flex-direction: row;
+  line-height: partials.$text-input-line-height;
+  padding: partials.$text-input-padding;
+
+  .affix-group {
+    // We have to explicitly set the height of the affix-group (rather than relying on the 100%
+    // height) because SVGs do not respond well to relative heights.
+    height: partials.$text-input-line-height;
+    // The AffixGroup should be padded such that the elements it contains are slightly smaller than
+    // the accompanying text.
+    padding: $affix-group-padding;
+
+    > * {
+      color: partials.$input-affix-color;
+      // The affixes should be slightly smaller than the accompanying text.
+      height: partials.$text-input-line-height - 2 * $affix-group-padding;
+    }
+  }
+
+  &__input {
+    @extend %native-input-base;
+
+    flex-grow: 100;
+  }
+
+  .affix-group + input {
+    margin-left: 12px;
+  }
+
+  input + .affix-group {
+    margin-left: 12px;
+  }
+}

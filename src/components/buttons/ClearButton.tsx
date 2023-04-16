@@ -1,15 +1,13 @@
-import React from "react";
+import classNames from "classnames";
 
-import { Icon } from "components";
+import { ui } from "lib";
 
-import IconButton, { IconButtonProps } from "./IconButton";
+import { BareActionButton, BareActionButtonProps } from "./BareActionButton";
 
-const ClearButton = (props: Omit<IconButtonProps, "icon">): JSX.Element => (
-  <IconButton
+export const ClearButton = (props: Omit<BareActionButtonProps, "icon">): JSX.Element => (
+  <BareActionButton
     {...props}
-    className="btn--clear"
-    icon={<Icon icon="times-circle" weight="solid" />}
+    className={classNames("btn--clear", props.className)}
+    icon={ui.IconNames.TIMES_CIRCLE}
   />
 );
-
-export default React.memo(ClearButton);

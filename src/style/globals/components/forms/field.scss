@@ -1,0 +1,30 @@
+@use "sass:map";
+@use "partials";
+
+$field-part-separation: 4px;
+
+.field {
+  &__label {
+    margin-bottom: $field-part-separation;
+
+    // The checkbox should be left aligned in the Form.  In order to do this, the width cannot be
+    // 100%, but needs to be the size of the checkbox.
+    + .checkbox {
+      width: partials.$checkbox-size;
+    }
+
+    + *:not(.checkbox) {
+      width: 100%;
+    }
+  }
+
+  > .field__help-text {
+    @include partials.typography-style("body", $level: 4, $override: (line-height: 16px));
+
+    margin-top: $field-part-separation;
+  }
+
+  > .field-feedback {
+    margin-top: $field-part-separation;
+  }
+}

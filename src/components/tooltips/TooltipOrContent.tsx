@@ -1,27 +1,28 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 
-import Tooltip from "./Tooltip";
+import { ui } from "lib";
 
-type TooltipOrContentProps = Omit<TooltipProps, "content"> & {
-  readonly children?: ReactNode;
-  readonly tooltip: Tooltip;
-};
+import { Tooltip, TooltipProps } from "./Tooltip";
 
-const TooltipOrContent = ({ tooltip, children, ...props }: TooltipOrContentProps): JSX.Element => {
+type TooltipOrContentProps<T extends typeof ui.TooltipTypes.BRAND | typeof ui.TooltipTypes.INFO> =
+  Omit<TooltipProps<T>, "content"> & {
+    readonly children?: ReactNode;
+    readonly tooltip: ui.Tooltip;
+  };
+
+export const TooltipOrContent = <
+  T extends typeof ui.TooltipTypes.BRAND | typeof ui.TooltipTypes.INFO,
+>({
+  tooltip,
+  children,
+  ...props
+}: TooltipOrContentProps<T>): JSX.Element => {
   if (typeof tooltip === "function") {
     return tooltip({ children });
   } else if (typeof tooltip === "string") {
-    return (
-      <Tooltip {...props} content={tooltip}>
-        {children}
-      </Tooltip>
-    );
+    const ps = { ...props, content: tooltip, children } as TooltipProps<T>;
+    return <Tooltip<T> {...ps} />;
   }
-  return (
-    <Tooltip {...tooltip} {...props}>
-      {children}
-    </Tooltip>
-  );
+  const ps = { ...props, ...tooltip, children } as TooltipProps<T>;
+  return <Tooltip<T> {...ps} />;
 };
-
-export default React.memo(TooltipOrContent);

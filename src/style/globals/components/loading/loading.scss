@@ -1,0 +1,48 @@
+@use "sass:map";
+@use "partials";
+
+@mixin app-loading() {
+  height: 100vh;
+  width: 100vw;
+
+  > .icon--spinner {
+    height: partials.$spinner-size-screen;
+    width: partials.$spinner-size-screen;
+
+    > .anticon {
+      height: 100%;
+      width: 100%;
+
+      > svg {
+        height: 100%;
+        width: 100%;
+      }
+    }
+  }
+}
+
+.loading {
+  @include partials.flex-c;
+  @include partials.fill-parent;
+
+  left: 0;
+  position: absolute;
+  top: 0;
+  z-index: 1000;
+
+  > .icon--spinner {
+    margin: auto;
+    max-height: 100%;
+    max-width: 100%;
+  }
+
+  &--screen {
+    @include app-loading;
+
+    background-color: partials.$content-bg-color;
+  }
+
+  &--app {
+    @include app-loading;
+  }
+}

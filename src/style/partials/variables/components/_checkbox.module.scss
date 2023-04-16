@@ -1,0 +1,53 @@
+@use "sass:color";
+
+@use "../../functions" as fn;
+@use "../colors.module" as colors;
+@use "./input.module" as input;
+
+$checkbox-size: 24px;
+$checkbox-border-radius: 3px;
+$checkbox-unchecked-border-color: input.$input-border-color;
+$checkbox-unchecked-background-color: #ffffff;
+$checkbox-checked-border-color: colors.$brand-mid-blue;
+$checkbox-checked-background-color: colors.$brand-mid-blue;
+$checkbox-checked-color: #ffffff;
+$checkbox-disabled-color: color.adjust(#606873, $alpha: -0.4);
+
+/*
+These values were taken from AntD because there are no colors provided in design - they look
+okay but may change in the future.
+*/
+$checkbox-disabled-border-color: colors.$standard-border-color;
+$checkbox-disabled-background-color: #efefef;
+$checkbox-states: (checked, unchecked, disabled);
+
+/* Internal properties that need to be defined to override AntD properties for each state. */
+$checkbox-state-properties: (
+  "checked": (
+    border-color: $checkbox-checked-border-color,
+    background-color: $checkbox-checked-background-color,
+    color: $checkbox-checked-color,
+    "hovered": (
+      background-color: color.adjust($checkbox-checked-background-color, $alpha: -0.2),
+      border-color: color.adjust($checkbox-checked-border-color, $alpha: -0.2),
+    ),
+  ),
+  "unchecked": (
+    border-color: $checkbox-unchecked-border-color,
+    background-color: $checkbox-unchecked-background-color,
+    "hovered": (
+      border-color: $checkbox-checked-border-color,
+      background-color: $checkbox-unchecked-background-color,
+    ),
+  ),
+  "disabled": (
+    border-color: $checkbox-disabled-border-color,
+    background-color: $checkbox-disabled-background-color,
+    color: $checkbox-disabled-color,
+    "hovered": (
+      color: $checkbox-disabled-color,
+      border-color: $checkbox-disabled-border-color,
+      background-color: $checkbox-disabled-background-color,
+    ),
+  ),
+);

@@ -1,5 +1,6 @@
-import * as types from "./types";
 import * as core from "../../core";
+
+import * as types from "./types";
 
 export const isIconPrefix = (i: unknown): i is types.IconPrefix => types.IconPrefixes.contains(i);
 
@@ -9,7 +10,10 @@ export const isIconCodeForName = <N extends types.IconName>(
   code: unknown,
   name: N,
 ): code is types.IconCode<N> =>
-  isIconCode(code) && (types.Icons[code] as readonly types.IconName<typeof code>[]).includes(name);
+  isIconCode(code) &&
+  (types.Icons[code] as readonly types.IconName<typeof code>[]).includes(
+    name as types.IconName<typeof code>,
+  );
 
 export const isIconName = (i: unknown): i is types.IconName => types.IconNames.contains(i);
 

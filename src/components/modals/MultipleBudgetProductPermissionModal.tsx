@@ -2,7 +2,7 @@ import classNames from "classnames";
 import { useHistory } from "react-router-dom";
 
 import { Modal } from "components";
-import { PrimaryButton } from "components/buttons";
+import { PrimaryButton } from "components/buttonsOld";
 
 function MultipleBudgetProductPermissionModal(
   props: Omit<ModalProps, "title" | "footer">,

@@ -1,7 +1,7 @@
 import React from "react";
 
 import { Icon } from "components";
-import { IconButton } from "components/buttons";
+import { IconButton } from "components/buttonsOld";
 
 interface NewRowCellProps
   extends Table.CellProps<

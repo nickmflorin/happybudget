@@ -1,46 +1,46 @@
 .menu-base {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-variant: tabular-nums;
-  font-feature-settings: "tnum";
-  margin-bottom: 0;
-  padding-left: 0;
-  color: $text-secondary;
-  font-size: $large-text-size;
-  line-height: 0;
-  text-align: left;
-  list-style: none;
   background: $white;
-  outline: none;
+  background-color: $white;
   box-shadow: none !important;
+  box-sizing: border-box;
+  color: $text-secondary;
+  font-feature-settings: "tnum";
+  font-size: $large-body-font-size;
+  font-variant: tabular-nums;
+  line-height: 0;
+  list-style: none;
+  margin: 0;
+  margin-bottom: 0;
+  outline: none;
+  padding: 0;
+  padding-left: 0;
+  text-align: left;
   transition: background 0.3s, width 0.3s cubic-bezier(0.2, 0, 0, 1) 0s;
   width: 100%;
-  background-color: $white;
 }
 
 .menu-item {
-  margin-top: 0px;
   color: $text-secondary !important;
-  font-family: $roboto;
-  font-weight: 400;
-  min-width: 100px;
-  padding: 4px 10px;
-  font-size: $standard-text-size;
-  line-height: 24px;
-  height: 32px;
-  margin-bottom: 0px !important;
-  overflow-y: hidden;
   display: flex;
   flex-direction: row;
+  font-family: $roboto;
+  font-size: $standard-body-font-size;
+  font-weight: 400;
+  height: 32px;
+  line-height: 24px;
+  margin-bottom: 0px !important;
+  margin-top: 0px;
+  min-width: 100px;
+  overflow-y: hidden;
+  padding: 4px 10px;
 
   .ant-checkbox-wrapper {
+    bottom: 1px;
     height: 24px !important;
-    width: 24px;
     padding: 4px;
     padding-left: 0px;
     position: relative;
-    bottom: 1px;
+    width: 24px;
 
     .ant-checkbox {
       display: block;
@@ -52,55 +52,61 @@
     flex-direction: row;
 
     .icon-wrapper-left {
-      @include vertical-flex-c();
+      @include vertical-flex-c;
+
       margin-right: 6px;
     }
 
     .menu-item-inner-content {
-      @include vertical-flex-c();
+      @include vertical-flex-c;
 
       .text-wrapper {
-        font-family: $roboto;
-        font-size: $standard-text-size;
         color: $text-secondary !important;
-        line-height: 24px;
         flex-grow: 100;
+        font-family: $roboto;
+        font-size: $standard-body-font-size;
+        line-height: 24px;
       }
     }
 
     .icon-wrapper-right {
-      @include vertical-flex-c();
+      @include vertical-flex-c;
+
       margin-left: 6px;
     }
   }
 
   &.selected {
     background-color: $active-hover-color !important;
+
     span.text-container {
       color: $text-primary !important;
     }
   }
+
   &:focus:not(.selected),
   &.focused:not(.selected),
   &:hover:not(.selected) {
     background-color: $active-hover-color !important;
+
     span.text-container {
       color: $text-primary !important;
     }
   }
+
   &.disabled {
+    background-color: rgb(0 0 0 / 4%);
     cursor: not-allowed !important;
-    background-color: rgba(0, 0, 0, 0.04);
   }
 
   &--extra {
-    font-size: $medium-text-size;
+    color: rgb(70 70 70 / 85%) !important;
+    font-size: $medium-body-font-size;
     font-weight: 500 !important;
-    color: rgba(70, 70, 70, 0.85) !important;
     text-transform: uppercase;
 
     .text-wrapper {
-      font-size: $medium-text-size;
+      font-size: $medium-body-font-size;
     }
 
     &:hover,
@@ -112,6 +118,7 @@
 
 .menu {
   @extend .menu-base;
+
   border: $menu-border;
   display: flex;
   flex-direction: column;
@@ -123,13 +130,14 @@
   .ul-wrapper {
     ul {
       @extend .menu-base;
+
       border: none !important;
     }
   }
 
   .btn-container {
-    width: 100%;
     padding: 8px;
+    width: 100%;
 
     > .btn--menu {
       width: 100%;
@@ -152,8 +160,8 @@
     .menu-item {
       font-family: $avenir;
       font-weight: 400 !important;
-      margin-bottom: 0px !important;
       justify-content: left;
+      margin-bottom: 0px !important;
 
       &:first-child {
         border-top: none !important;
@@ -163,14 +171,15 @@
 
   &--content {
     @extend .menu;
+
     padding: 8px;
   }
 
   &--table {
     @extend .menu;
-    max-height: 220px;
     // The border gets set on the ag-popup-editor.
     border: none !important;
+    max-height: 220px;
 
     .ul-wrapper {
       overflow-y: scroll;
@@ -190,11 +199,13 @@
 
       .icon-wrapper {
         @include size(24px);
-        padding-top: 4px;
+
         padding-bottom: 4px;
+        padding-top: 4px;
 
         svg {
           @include size(16px);
+
           margin-left: -5px;
           margin-right: 10px;
         }
@@ -205,10 +216,10 @@
 
 .ag-theme-alpine .ag-popup-editor {
   background: $white !important;
-  background-color: $white !important;
-  outline: none !important;
-  box-shadow: none !important;
-  border: $menu-border !important;
   background-clip: unset !important;
+  background-color: $white !important;
+  border: $menu-border !important;
   border-radius: 0px !important;
+  box-shadow: none !important;
+  outline: none !important;
 }

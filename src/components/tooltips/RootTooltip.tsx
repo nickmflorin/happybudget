@@ -1,20 +1,24 @@
-import { useMemo } from "react";
+import { ReactNode, useMemo } from "react";
 
 import classNames from "classnames";
-import { isNil } from "lodash";
 import { Tooltip as AntdTooltip } from "antd";
 
+import { logger } from "internal";
+import { ui } from "lib";
 import { TextWithIncludedLink } from "components/typography";
 
-import ItemizedTooltipContent from "./ItemizedTooltipContent";
+import { ItemizedTooltipContent } from "./ItemizedTooltipContent";
 
-const RootTooltip = ({ children, ...props }: TooltipProps): JSX.Element => {
+export const RootTooltip = ({
+  children,
+  ...props
+}: ui.TooltipProps & { readonly children: ReactNode }): JSX.Element => {
   const title = useMemo(() => {
-    if (!isNil(props.includeLink) && typeof props.content !== "string") {
-      console.warn("Cannot include link in tooltip when the title is not a string.");
+    if (props.includeLink !== undefined && typeof props.content !== "string") {
+      logger.warn("Cannot include link in tooltip when the title is not a string.");
     }
     if (typeof props.content === "string") {
-      if (!isNil(props.includeLink)) {
+      if (props.includeLink !== undefined) {
         return (
           <TextWithIncludedLink includeLink={props.includeLink}>
             {props.content}
@@ -37,5 +41,3 @@ const RootTooltip = ({ children, ...props }: TooltipProps): JSX.Element => {
     </AntdTooltip>
   );
 };
-
-export default RootTooltip;

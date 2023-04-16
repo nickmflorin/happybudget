@@ -3,7 +3,7 @@ import React from "react";
 import { isNil } from "lodash";
 
 import { Icon } from "components";
-import { ImageClearButton } from "components/buttons";
+import { ImageClearButton } from "components/buttonsOld";
 
 import ImageOverlay, { ImageOverlayProps } from "./ImageOverlay";
 

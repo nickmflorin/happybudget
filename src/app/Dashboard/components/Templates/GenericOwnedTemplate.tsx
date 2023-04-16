@@ -1,7 +1,7 @@
 import React from "react";
 
 import { Icon } from "components";
-import { PrimaryButtonIconToggle } from "components/buttons";
+import { PrimaryButtonIconToggle } from "components/buttonsOld";
 import { BudgetEmptyIcon } from "components/svgs";
 
 import GenericOwned, { GenericOwnedProps, RenderGenericOwnedCardParams } from "../GenericOwned";

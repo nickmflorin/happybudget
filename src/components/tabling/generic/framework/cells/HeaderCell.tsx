@@ -6,7 +6,7 @@ import { isNil, find } from "lodash";
 
 import { tabling, ui } from "lib";
 import { Icon, VerticalFlexCenter } from "components";
-import { IconButton } from "components/buttons";
+import { IconButton } from "components/buttonsOld";
 
 /* This is defined in AG Grid's documentation but does not seem to be importable
    from anywhere. */

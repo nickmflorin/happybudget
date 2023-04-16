@@ -5,9 +5,9 @@
 }
 
 .modal {
+  max-height: 90vh;
   padding-bottom: 0px;
   top: auto !important;
-  max-height: 90vh;
 
   &.modal--no-footer {
     .ant-modal-body {
@@ -17,48 +17,47 @@
 
   .ant-modal-content {
     border-radius: 10px;
-    overflow-y: hidden;
-    max-height: 100%;
     display: flex;
     flex-direction: column;
+    max-height: 100%;
+    overflow-y: hidden;
 
     .notifications {
       margin-bottom: 15px;
     }
 
     .modal-text {
-      font-family: $avenir;
-      font-weight: 500;
       color: $text-secondary;
-      font-size: $large-text-size;
+      font-family: $avenir;
+      font-size: $large-body-font-size;
+      font-weight: 500;
     }
 
     .ant-modal-header {
-      padding-top: $standard-size;
-      padding-bottom: 12px;
-      padding-left: $standard-size;
-      padding-right: $standard-size;
-      height: auto;
-
       background: $white !important;
       border-bottom: none !important;
       border-radius: 10px 10px 0 0;
+      height: auto;
+      padding-bottom: 12px;
+      padding-left: $standard-size;
+      padding-right: $standard-size;
+      padding-top: $standard-size;
 
       .ant-modal-title {
-        font-size: 24px;
-        line-height: 24px;
-        font-family: $avenir !important;
-        font-weight: 700 !important;
         color: $text-secondary !important;
+        font-family: $avenir !important;
+        font-size: 24px;
+        font-weight: 700 !important;
+        line-height: 24px;
         width: 100%;
 
         &.modal-title {
-          display: flex;
           align-items: center;
+          display: flex;
 
           .icon {
-            margin-right: 10px;
             color: $text-secondary !important;
+            margin-right: 10px;
           }
         }
       }
@@ -69,18 +68,18 @@
     }
 
     .ant-modal-body {
-      padding: 10px $standard-size;
-      overflow-y: scroll;
       display: flex;
       flex-direction: column;
+      overflow-y: scroll;
+      padding: 10px $standard-size;
     }
 
     .ant-modal-footer {
       border-top: none !important;
-      padding-top: 12px;
-      padding-right: $standard-size;
       padding-bottom: 24px;
       padding-left: $standard-size;
+      padding-right: $standard-size;
+      padding-top: 12px;
     }
   }
 }
@@ -93,9 +92,10 @@
 }
 
 .fringes-modal {
-  min-width: 70vw;
+  @include vertical-flex-c;
+
   height: 70vh;
-  @include vertical-flex-c();
+  min-width: 70vw;
 
   .ant-modal-content {
     min-height: 90vh;

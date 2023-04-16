@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 
 import { model, util } from "lib";
 import { Icon } from "components";
-import { ClearButton } from "components/buttons";
+import { ClearButton } from "components/buttonsOld";
 
 import Uploader, { UploaderProps } from "./Uploader";
 

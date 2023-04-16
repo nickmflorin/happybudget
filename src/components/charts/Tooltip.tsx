@@ -1,48 +1,42 @@
-import React, { useMemo } from "react";
+import { ui, formatters } from "lib";
 
-import { isNil } from "lodash";
-
-type TooltipLineProps = {
+type TooltipLineProps<D extends ui.ChartDatum = ui.ChartDatum> = {
   readonly label: string | number;
-  readonly value: string | number;
+  readonly value: D["value"] | string;
   readonly labelPrefix?: string;
-  readonly valueFormatter?: (v: string | number) => string | number;
+  readonly valueFormatter?: formatters.Formatter<D["value"] | string>;
 };
 
-const TooltipLine = React.memo((props: TooltipLineProps): JSX.Element => {
-  const label = useMemo(
-    () => (isNil(props.labelPrefix) ? `${props.label}:` : `${props.labelPrefix} ${props.label}:`),
-    [props.label, props.labelPrefix],
-  );
-  const value = useMemo(
-    () => (!isNil(props.valueFormatter) ? props.valueFormatter(props.value) : props.value),
-    [props.value, props.valueFormatter],
-  );
-  return (
-    <div className="tooltip-line">
-      <div className="tooltip-line-label">{label}</div>
-      <div className="tooltip-line-value">{value}</div>
+const TooltipLine = (props: TooltipLineProps): JSX.Element => (
+  <div className="tooltip-line">
+    <div className="tooltip-line-label">
+      {props.labelPrefix === undefined ? `${props.label}:` : `${props.labelPrefix} ${props.label}:`}
     </div>
-  );
-});
+    <div className="tooltip-line-value">
+      {props.valueFormatter !== undefined
+        ? props.valueFormatter({ value: props.value })
+        : props.value}
+    </div>
+  </div>
+);
 
-type TooltipProps<D extends Charts.Datum = Charts.Datum> = {
+type TooltipProps<D extends ui.ChartDatum = ui.ChartDatum> = {
   readonly datum?: D;
   readonly label?: string | number;
-  readonly value?: string | number;
+  readonly value?: D["value"] | string;
   readonly labelPrefix?: string;
-  readonly valueFormatter?: (v: string | number) => string | number;
+  readonly valueFormatter?: formatters.Formatter<D["value"] | string>;
 };
 
-const Tooltip = <D extends Charts.Datum = Charts.Datum>(props: TooltipProps<D>): JSX.Element => (
+export const Tooltip = <D extends ui.ChartDatum = ui.ChartDatum>(
+  props: TooltipProps<D>,
+): JSX.Element => (
   <div className="chart-tooltip">
     <TooltipLine
       labelPrefix={props.labelPrefix}
       valueFormatter={props.valueFormatter}
-      label={!isNil(props.label) ? props.label : props.datum?.label || ""}
-      value={!isNil(props.value) ? props.value : props.datum?.value || ""}
+      label={props.label !== undefined ? props.label : props.datum?.label || ""}
+      value={props.value !== undefined ? props.value : props.datum?.value || ""}
     />
   </div>
 );
-
-export default React.memo(Tooltip) as typeof Tooltip;

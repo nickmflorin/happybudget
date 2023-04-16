@@ -1,0 +1,158 @@
+@use "partials";
+
+@mixin cell($height, $typography) {
+  @include partials.truncate;
+  @include partials.mapped-properties($typography);
+
+  align-items: center;
+  border-right: none; // Override
+  border-right-width: 0px; // Override
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  padding: 0.5 * ($height - partials.map-get($typography, "line-height"))
+    partials.$table-cell-horizontal-padding;
+  text-align: center;
+
+  &--align-left {
+    justify-content: start;
+    text-align: left;
+  }
+
+  &--align-right {
+    justify-content: end;
+    text-align: right;
+  }
+
+  &--align-center {
+    justify-content: center;
+    text-align: center;
+  }
+
+  > .cell__inner {
+    display: flex;
+    flex-direction: row;
+    text-align: inherit;
+    width: 100%;
+
+    &--datetime {
+      .datetime {
+        line-height: 20px;
+      }
+    }
+  }
+}
+
+@mixin header-row {
+  // The important flag is needed because AG Grid sets the width dynamically inline based on the
+  // widths of the columns.
+  width: inherit !important;
+
+  > .header-cell {
+    @include cell(partials.$table-header-height, partials.$table-header-typography);
+
+    .ag-cell-label-container {
+      padding: 0;
+
+      .ag-header-cell-label {
+        width: 100%;
+
+        > .ag-header-cell-text {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+@mixin body-cell($height, $typography) {
+  @include cell($height, $typography);
+
+  // The ellipsis currently does not show because it requires display: block on the cell, which is
+  // currently display: flex.  This is something to investigate in the future.
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin body-row {
+  border-bottom: none;
+  // Use a box-shadow instead of a border to not corrupt the height of the cells in the row.
+  box-shadow: inset 0 -1px 0 partials.$table-row-border-color;
+
+  > .cell {
+    @include body-cell(partials.$table-row-height, partials.$table-body-typography);
+  }
+}
+
+@include partials.table-theme-brand;
+
+.grid {
+  // This will need to be adjusted based on the available space leftover for the table when we get
+  // there.
+  max-height: 100%;
+  max-width: 100%;
+  // The grid itself cannot be padded because it will disrupt its ability to size to fit.
+  padding: 0 !important;
+  width: 100%;
+
+  .ag-root-wrapper {
+    height: 100%;
+
+    .ag-root-wrapper-body {
+      // AGGrid seems to be setting this to 0?  No idea why, but it causes the table to disappear.
+      height: 100%;
+
+      // AG Grid Body
+      .ag-root {
+        display: flex;
+        flex-direction: column;
+
+        .ag-header {
+          box-shadow: inset 0 -2px 0 partials.$table-header-bottom-border-color;
+          height: partials.$table-header-height !important;
+          max-height: partials.$table-header-height !important;
+          min-height: partials.$table-header-height !important;
+
+          .ag-header-viewport {
+            .ag-header-container {
+              .ag-header-row {
+                @include header-row;
+              }
+            }
+          }
+        }
+
+        .ag-body {
+          height: calc(100% - partials.$table-header-height);
+          max-height: calc(100% - partials.$table-header-height);
+
+          .ag-body-clipper {
+            height: 100%;
+            max-height: 100%;
+
+            // AG Grid Middle
+            .ag-body-viewport {
+              height: 100%;
+              max-height: 100%;
+
+              // AG Rows Container Center
+              .ag-center-cols-clipper {
+                margin-right: 0 !important;
+
+                > .ag-center-cols-viewport {
+                  > .ag-center-cols-container {
+                    // The Row
+                    > .row {
+                      @include body-row;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

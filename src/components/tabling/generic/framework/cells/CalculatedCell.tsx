@@ -4,7 +4,7 @@ import { isNil } from "lodash";
 
 import { tabling } from "lib";
 import { Icon } from "components";
-import { IconButton } from "components/buttons";
+import { IconButton } from "components/buttonsOld";
 import { InfoTooltip } from "components/tooltips";
 
 import BodyCell from "./BodyCell";

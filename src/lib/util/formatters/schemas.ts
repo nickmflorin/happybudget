@@ -130,7 +130,9 @@ export const createLocalizationSchema = <
   localizationCode: C,
 ) => {
   const localizationFormat = config.localization.getLocalization<T, C>(type, localizationCode);
-  return DateSchema.transform<string>((value): string => moment(value).format(localizationFormat));
+  return DateSchema.transform<types.DatePrimitive>((value): string =>
+    moment(value).format(localizationFormat),
+  );
 };
 
 export const createDateLocalizationSchema = <

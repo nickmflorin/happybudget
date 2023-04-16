@@ -6,7 +6,7 @@ import { useHistory } from "react-router-dom";
 
 import { notifications } from "lib";
 import { Icon } from "components";
-import { IconButton } from "components/buttons";
+import { IconButton } from "components/buttonsOld";
 import { TextWithIncludedLink } from "components/typography";
 
 export type NotificationProps = Omit<StandardComponentProps, "id"> & {

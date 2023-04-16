@@ -1,0 +1,139 @@
+@use "partials";
+@use "./base";
+
+@mixin select-cursor($cursor: null, $disabled: false) {
+  cursor: if($disabled, not-allowed, $cursor);
+
+  .select__indicators {
+    > * {
+      &.select__spinner {
+        cursor: if($disabled, not-allowed, default);
+      }
+
+      &:not(.select__spinner) {
+        cursor: if($disabled, not-allowed, pointer);
+      }
+    }
+  }
+}
+
+.select {
+  @include base.input-base;
+
+  @include select-cursor($cursor: pointer);
+
+  @include partials.disabled {
+    @include select-cursor($disabled: true);
+  }
+
+  &--is-searchable {
+    @include select-cursor($cursor: text);
+  }
+
+  &__control {
+    align-items: center;
+    border: none;
+    -webkit-box-align: center;
+    -webkit-box-flex-wrap: wrap;
+    -webkit-box-pack: justify;
+    cursor: pointer;
+    display: flex;
+    -ms-flex-align: center;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    line-height: partials.$select-line-height;
+    margin: 0;
+    outline: 0;
+    padding: partials.$select-padding;
+    position: relative;
+  }
+
+  &__placeholder {
+    box-sizing: border-box;
+    color: partials.$input-placeholder-color;
+    grid-area: 1/1/2/3;
+  }
+
+  &__menu {
+    @include partials.border(partials.$input-border-color);
+
+    border-radius: partials.$input-border-radius;
+    box-shadow: partials.$menu-shadow;
+    box-sizing: border-box;
+    left: 0px;
+    margin-top: 4px;
+    overflow-y: scroll;
+    padding: 4px 0px;
+    position: absolute;
+    top: 100%;
+    width: 100%;
+    z-index: 1;
+  }
+
+  &__option {
+    align-items: center;
+    background-color: #ffffff;
+    box-sizing: border-box;
+    cursor: default;
+    display: flex;
+    font-size: inherit;
+    height: partials.$select-option-height;
+    line-height: partials.$select-option-line-height;
+    padding: partials.$select-option-padding;
+    -webkit-tap-highlight-color: rgb(0 0 0 / 0%);
+    user-select: none;
+    width: 100%;
+
+    &:hover {
+      background-color: partials.$highlight-blue;
+    }
+
+    &:active {
+      background-color: partials.$highlight-blue;
+    }
+
+    &:current {
+      background-color: partials.$highlight-blue;
+    }
+
+    &--multi-checkbox {
+      .checkbox {
+        margin-right: 16px;
+      }
+    }
+  }
+
+  &__indicators {
+    align-items: center;
+    display: flex;
+    height: partials.$select-line-height;
+    margin-left: 12px;
+    padding: 2px 0px;
+
+    > .select__indicator-separator {
+      display: none;
+    }
+
+    > *:not(.select__indicator-separator) {
+      height: 100%;
+      width: 16px;
+
+      + * {
+        margin-left: 12px;
+      }
+
+      // Even though we give the separator display: none, it is still present in the indicators and
+      // must be accounted for with sibling selectors.
+      + .select__indicator-separator {
+        + * {
+          margin-left: 12px;
+        }
+      }
+    }
+
+    .icon {
+      height: 100%;
+      width: 16px;
+    }
+  }
+}

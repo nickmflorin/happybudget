@@ -7,7 +7,7 @@ import { isNil } from "lodash";
 import * as store from "application/store";
 import { notifications, model, util } from "lib";
 import { Separator, RenderOrSpinner } from "components";
-import { PrimaryButton } from "components/buttons";
+import { PrimaryButton } from "components/buttonsOld";
 import { Tag } from "components/tagging";
 
 import Product from "./Product";

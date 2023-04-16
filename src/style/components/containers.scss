@@ -1,16 +1,16 @@
 .tile {
+  background-color: $white;
+  border: 1px solid $gray-light;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  background-color: $white;
-  border: 1px solid $gray-light;
   padding: 20px;
   position: relative;
+  width: 100%;
 
   .title {
     color: $text-tertiary;
-    font-size: $large-text-size;
+    font-size: $large-body-font-size;
     font-weight: 500;
   }
 
@@ -35,6 +35,7 @@
 
   &.dark {
     color: #8a8a8a !important;
+
     svg {
       color: #8a8a8a !important;
     }
@@ -43,23 +44,24 @@
 
 .icon--card-corner-action {
   @extend .base-card-icon;
+
   height: 16px;
 }
 
 .card {
   border-radius: 14px;
-  position: relative;
-  height: 214px;
   cursor: pointer;
+  height: 214px;
+  position: relative;
 
   // Card corner actions must be outside of the inner card, so that we can
   // disable the inner card while still keeping tooltips on the actions
   // hoverable.
   .card-corner-actions {
-    z-index: 1000;
+    left: 12px;
     position: absolute;
     top: 12px;
-    left: 12px;
+    z-index: 1000;
 
     > * {
       &:not(:last-child) {
@@ -71,40 +73,41 @@
   .card-inner {
     .dropdown-ellipsis {
       @extend .base-card-icon;
+
       position: absolute;
-      z-index: 1000;
-      top: 10px;
       right: 5px;
+      top: 10px;
+      z-index: 1000;
     }
 
     .card-footer {
-      position: absolute;
-      top: 150px;
+      background-color: #404151;
+      border-bottom-left-radius: 14px;
+      border-bottom-right-radius: 14px;
+      color: $white;
       min-height: 44px;
-      width: 100%;
-      padding-top: 12px;
       padding-bottom: 12px;
       padding-left: 16px;
       padding-right: 16px;
-      background-color: #404151;
-      color: $white;
-      border-bottom-left-radius: 14px;
-      border-bottom-right-radius: 14px;
+      padding-top: 12px;
+      position: absolute;
+      top: 150px;
+      width: 100%;
 
       .title {
-        font-size: 18px;
         font-family: $roboto;
+        font-size: 18px;
         font-weight: 600;
         line-height: 20px;
         margin-bottom: 4px;
-        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
       .sub-title {
-        font-size: 10px;
         font-family: $roboto;
+        font-size: 10px;
         font-weight: 400;
         line-height: 16px;
       }
@@ -131,6 +134,7 @@
   &.disabled,
   &.loading {
     pointer-events: none !important;
+
     .card-inner {
       &:hover {
         filter: none !important;
@@ -143,41 +147,41 @@
   text-align: center;
 
   .empty-card {
-    position: relative;
-    height: 214px;
-    cursor: pointer;
-    box-sizing: border-box;
-    display: flex;
     align-items: center;
-    justify-content: center;
-    text-align: center;
-    margin-bottom: 10px;
 
     // This makes the card behave somewhat like the upload image cards.
     border: $dashed-border;
     border-radius: 14px;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: flex;
+    height: 214px;
+    justify-content: center;
+    margin-bottom: 10px;
+    position: relative;
+    text-align: center;
 
     &.template-empty-card {
       height: 194px;
     }
 
     &:hover {
+      background-color: #fdfdfd;
       // This makes the card behave somewhat like the upload image cards.
       border-color: $blue;
-      background-color: #fdfdfd;
     }
 
     svg {
+      color: $text-primary;
       height: $large-size !important;
       width: $large-size !important;
-      color: $text-primary;
     }
   }
 
   .title {
-    font-size: $xlarge-text-size;
-    font-family: $roboto;
-    font-weight: 500;
     color: $text-primary;
+    font-family: $roboto;
+    font-size: $xlarge-body-font-size;
+    font-weight: 500;
   }
 }

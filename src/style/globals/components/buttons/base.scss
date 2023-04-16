@@ -1,0 +1,29 @@
+@use "partials";
+
+%button-link-base {
+  @include partials.transition(none);
+  @include partials.flex-c-children("vertical");
+
+  align-items: center;
+  appearance: none;
+  background-color: transparent;
+
+  /* When providing a border, we need to use the outline property - not the border property.  This
+     is because a border will contribute to the size of the button, whereas an outline will not. */
+  border: none !important;
+  border-radius: partials.$button-border-radius;
+  box-shadow: none !important;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-family: partials.$button-font-family;
+  font-size: partials.$button-default-font-size;
+  font-stretch: normal;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  vertical-align: middle;
+}

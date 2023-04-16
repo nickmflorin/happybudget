@@ -4,7 +4,7 @@ import React, { ReactNode, useMemo } from "react";
 import classNames from "classnames";
 import { map, isNil, reduce } from "lodash";
 
-import { Button } from "components/buttons";
+import { Button } from "components/buttonsOld";
 import { DropdownMenu } from "components/dropdowns";
 import { TooltipWrapper } from "components/tooltips";
 

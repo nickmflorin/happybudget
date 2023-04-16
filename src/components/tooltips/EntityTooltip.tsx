@@ -2,28 +2,27 @@ import { ReactNode } from "react";
 
 import classNames from "classnames";
 
-import { EntityText } from "components/typography";
-import { EntityTextProps } from "components/typography/EntityText";
+import { ui, model } from "lib";
+import { EntityText, EntityTextProps } from "components/typography";
 
-import RootTooltip from "./Tooltip";
+import { RootTooltip } from "./RootTooltip";
 
-export type EntityTooltipProps = Omit<TooltipProps, "content"> & {
-  readonly entity: Model.HttpModel;
+export type EntityTooltipProps = Omit<ui.TooltipProps, "content"> & {
+  readonly model: model.ApiModel;
+  readonly children: ReactNode;
 } & Pick<EntityTextProps, "fillEmpty">;
 
-const EntityTooltip = ({
+export const EntityTooltip = ({
   children,
-  entity,
+  model,
   fillEmpty,
   ...props
 }: EntityTooltipProps & { readonly children: ReactNode }): JSX.Element => (
   <RootTooltip
     {...props}
     overlayClassName={classNames("tooltip--entity", props.overlayClassName)}
-    content={<EntityText fillEmpty={fillEmpty}>{entity}</EntityText>}
+    content={<EntityText model={model} fillEmpty={fillEmpty} />}
   >
     {children}
   </RootTooltip>
 );
-
-export default EntityTooltip;

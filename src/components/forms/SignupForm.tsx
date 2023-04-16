@@ -1,12 +1,12 @@
 import classNames from "classnames";
 import { isNil } from "lodash";
 
+import * as config from "application/config";
 import { util } from "lib";
 import { Form } from "components";
-import { PrimaryButton, SocialButton } from "components/buttons";
+import { PrimaryButton, SocialButton } from "components/buttonsOld";
 import { PasswordInput, EmailInput, UserInput } from "components/fields";
 import { RouterLink, Link } from "components/links";
-import * as config from "application/config";
 
 export type ISignupFormValues = {
   readonly email: string;

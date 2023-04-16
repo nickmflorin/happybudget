@@ -4,6 +4,7 @@
 
     &.with-image {
       border: 1px solid $gray-light;
+
       .ant-upload-select-picture-card {
         border: none !important;
       }
@@ -11,18 +12,20 @@
 
     .ant-upload-select-picture-card {
       @include size(100% !important);
+
+      background-color: $white;
       margin: 0 !important;
       position: relative;
-      background-color: $white;
 
       .uploader-image-wrapper {
         height: 100%;
-        width: 100%;
         padding: 8px;
+        width: 100%;
       }
 
       img {
         @include size(100%);
+
         object-fit: cover !important;
       }
     }
@@ -41,11 +44,11 @@
   &.pdf-image-uploader {
     border: $dashed-border;
     border-radius: $input-border-radius;
+    display: flex;
+    height: 32px;
     max-width: 100%;
     min-width: 200px;
-    height: 32px;
     width: 50%;
-    display: flex;
 
     .ant-upload-select-picture-card {
       border: none !important;
@@ -57,20 +60,22 @@
     }
 
     .upload-text {
-      font-family: $roboto;
-      font-size: $medium-text-size;
-      margin-left: 10px;
       flex-grow: 100;
+      font-family: $roboto;
+      font-size: $medium-body-font-size;
+      margin-left: 10px;
     }
   }
 
   &.user-image-uploader {
     .image-uploader-upload {
       border: none !important;
+
       .ant-upload-select-picture-card {
         border: none !important;
       }
     }
+
     .no-initials {
       display: flex;
       flex-direction: row;
@@ -80,11 +85,14 @@
         &:not(:first-child) {
           margin-left: 4px;
         }
+
         .icon {
           color: $text-secondary !important;
+
           &.fa-camera {
             @include size(26px);
           }
+
           svg {
             color: $text-secondary !important;
           }

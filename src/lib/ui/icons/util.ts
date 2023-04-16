@@ -160,8 +160,8 @@ export const getNativeIcon = (
     if (availableCodes.length === 0) {
       throw new Error(
         `There are no available codes for icon with name '${name}', this should not happen, and ` +
-          "means that the registered icons were not properly validated before registering with the " +
-          "library.",
+          "means that the registered icons were not properly validated before registering with " +
+          "the library.",
       );
     } else if (availableCodes.includes(DEFAULT_ICON_CODE)) {
       return [getIconPrefix(DEFAULT_ICON_CODE), name];

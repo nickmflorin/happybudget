@@ -1,13 +1,21 @@
-import React from "react";
+import { ui } from "lib";
 
-import classNames from "classnames";
+import { SolidAnchor, SolidAnchorProps, SolidButton, SolidButtonProps } from "./abstract";
 
-import Button, { ButtonProps } from "./Button";
+export type PrimaryButtonProps = Omit<
+  SolidButtonProps<typeof ui.ButtonSolidVariants.PRIMARY>,
+  "variant"
+>;
 
-export type PrimaryButtonProps = ButtonProps;
-
-const PrimaryButton = (props: PrimaryButtonProps): JSX.Element => (
-  <Button {...props} className={classNames("btn--primary", props.className)} />
+export const PrimaryButton = (props: PrimaryButtonProps) => (
+  <SolidButton {...props} variant={ui.ButtonSolidVariants.PRIMARY} />
 );
 
-export default React.memo(PrimaryButton);
+export type PrimaryAnchorProps = Omit<
+  SolidAnchorProps<typeof ui.ButtonSolidVariants.PRIMARY>,
+  "variant"
+>;
+
+export const PrimaryAnchor = (props: PrimaryAnchorProps) => (
+  <SolidAnchor {...props} variant={ui.ButtonSolidVariants.PRIMARY} />
+);

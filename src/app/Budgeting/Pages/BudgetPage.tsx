@@ -3,7 +3,7 @@ import React from "react";
 import { map, isNil } from "lodash";
 
 import { budgeting } from "lib";
-import { EntityTextButton } from "components/buttons";
+import { EntityTextButton } from "components/buttonsOld";
 import { Portal, BreadCrumbs } from "components/layout";
 import { EntityText } from "components/typography";
 

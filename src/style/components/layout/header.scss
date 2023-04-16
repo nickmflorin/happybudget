@@ -8,6 +8,7 @@
         margin-right: 10px;
       }
     }
+
     .primary-header-center {
       display: none;
       @if $include_logo {
@@ -19,6 +20,7 @@
         display: none;
       }
     }
+
     .primary-header-right {
       @if $include_logo {
         flex: 1;
@@ -39,8 +41,8 @@
     padding: 7px 0;
 
     .primary-header-left {
-      overflow-x: hidden;
       display: flex;
+      overflow-x: hidden;
 
       #breadcrumbs {
         overflow-x: hidden;
@@ -48,10 +50,10 @@
 
       .leaf-logo-link {
         display: block;
-        text-align: center;
         height: 36px;
-        padding: 6px;
         margin-right: 12px;
+        padding: 6px;
+        text-align: center;
 
         svg {
           height: 100%;
@@ -60,12 +62,12 @@
       }
 
       .btn--sidebar-toggle {
+        margin-right: 8px;
+        min-width: 24.5px;
         padding-left: 0;
         // We have to adjust the width here so that the icon aligns on the left
         // of the button so it aligns on the left of the screen.
         width: 24.5px;
-        min-width: 24.5px;
-        margin-right: 8px;
 
         .icon {
           height: 20px;
@@ -75,20 +77,20 @@
     }
 
     .primary-header-center {
-      padding: 5px 0;
       height: $large-size;
+      padding: 5px 0;
 
       .logo-link {
         display: block;
         height: 100%;
 
+        @include media(">=medium") {
+          display: none;
+        }
+
         svg {
           height: 100%;
           width: auto;
-        }
-
-        @include media(">=medium") {
-          display: none;
         }
       }
     }
@@ -120,16 +122,17 @@
   overflow-x: hidden;
 
   .slash {
-    margin-left: 8px;
-    margin-right: 8px;
-    line-height: $large-size;
+    color: $text-primary;
     font-family: $avenir;
     font-weight: 600;
-    color: $text-primary;
+    line-height: $large-size;
+    margin-left: 8px;
+    margin-right: 8px;
   }
 
   .bread-crumb-item {
-    @include vertical-flex-c();
+    @include vertical-flex-c;
+
     cursor: pointer;
 
     &:last-child {
@@ -137,22 +140,24 @@
     }
 
     .text-wrapper {
+      color: $text-secondary;
+      font-family: $avenir;
+      font-size: $standard-body-font-size;
+      font-weight: 600;
       line-height: $large-size;
       overflow: hidden;
       white-space: nowrap;
-      font-size: $standard-text-size;
-      font-weight: 600;
-      color: $text-secondary;
-      font-family: $avenir;
     }
 
     &:hover {
       .text-wrapper {
         color: darken($text-secondary, 20%) !important;
+
         .entity-text {
           .identifier {
             color: darken(#b5b5b5, 20%) !important;
           }
+
           .description {
             color: darken($text-secondary, 20%) !important;
           }
@@ -165,6 +170,7 @@
         color: $green;
         font-size: 15px;
       }
+
       &:hover {
         .text-wrapper {
           color: $green-darker !important;

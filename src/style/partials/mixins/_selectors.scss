@@ -1,0 +1,107 @@
+@use "sass:selector";
+
+@use "../functions" as fn;
+
+/// A selector that behaves as if all of the provided selectors have been applied.
+///
+/// @param {list} $selectors
+///   The selectors which should be applied.
+/// @param {selector} $base
+///   An optionally provided base that the selector will apply to.  If not provided, defaults to
+///   the parent selector, &.
+/// @param {string} $prefix
+///   An optionally provided prefix that the provided selectors should be modified to include.
+///
+/// .button {
+///   @include with-selectors((":disabled", ".disabled")) {
+///     color: red;
+///   }
+/// }
+///
+/// compiles to
+///
+/// .button:disabled, .button.disabled) {
+///   color: red;
+/// }
+@mixin with-selectors($selectors, $base: null, $prefix: null) {
+  $joined: fn.join-selectors($selectors, $prefix: $prefix);
+  @if not $base or $base == & {
+    @at-root #{selector.unify(&, $joined)} {
+      @content;
+    }
+  } @else {
+    #{selector.unify($base, $joined)} {
+      @content;
+    }
+  }
+}
+
+/// A selector that behaves as the negation of the provided selectors.
+///
+/// @param {list} $selectors
+///   The selectors which should be negated.
+/// @param {selector} $base
+///   An optionally provided base that the negation will apply to.  If not provided, defaults to
+///   the parent selector, &.
+/// @param {string} $prefix
+///   An optionally provided prefix that the provided selectors should be modified to include.
+///
+/// .button {
+///   @include without-selectors((":disabled", ".disabled")) {
+///     color: red;
+///   }
+/// }
+///
+/// compiles to
+///
+/// .button:not(:disabled, .disabled) {
+///   color: red;
+/// }
+@mixin without-selectors($selectors, $base: null, $prefix: null) {
+  $joined: fn.join-selectors($selectors, $prefix: $prefix);
+  $nots: selector.parse(":not(#{$joined})");
+  @if not $base or $base == & {
+    @at-root #{selector.unify(&, $nots)} {
+      @content;
+    }
+  } @else {
+    $nots: selector.parse(":not(#{$joined})");
+    #{selector.unify($base, $nots)} {
+      @content;
+    }
+  }
+}
+
+/// A selector that behaves as the distinct provided selector without the other selectors.
+///
+/// @param {list} $choice
+///   The distinct selector that should be used.
+/// @param {list} $selectors
+///   The selectors which should be negated.
+/// @param {selector} $base
+///   An optionally provided base that the negation will apply to.  If not provided, defaults to
+///   the parent selector, &.
+/// @param {string} $prefix
+///   An optionally provided prefix that the provided selectors should be modified to include.
+///
+/// .button {
+///   $feedback-types: ("warning", "error", "success");
+///   @include with-distinct-selectors("warning", $feedback-types, $prefix: ".feedback--") {
+///     color: red;
+///   }
+/// }
+///
+/// compiles to
+///
+/// .button.feedback--warning:not(.feedback--error, .feedback--success) {
+///   color: red;
+/// }
+@mixin with-distinct-selector($choice, $selectors, $base: null, $prefix: null) {
+  // Remove the distinct selector from the list of selectors if it is included.
+  $selectors: fn.list-remove($selectors, $choice, $strict: false);
+  @include with-selectors(($choice), $base: $base, $prefix: $prefix) {
+    @include without-selectors($selectors, $base: $base, $prefix: $prefix) {
+      @content;
+    }
+  }
+}

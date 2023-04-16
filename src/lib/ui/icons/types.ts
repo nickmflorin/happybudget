@@ -2,6 +2,7 @@ import React, { ReactElement } from "react";
 
 import { FontAwesomeIconProps } from "@fortawesome/react-fontawesome";
 
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import {
   IconCodes,
   IconNames,
@@ -12,6 +13,7 @@ import {
 import { enumeratedLiterals, EnumeratedLiteralType } from "../../util";
 import * as types from "../types";
 
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 export * from "application/config/configuration/fontAwesome/constants";
 
 export const IconPrefixMap = {

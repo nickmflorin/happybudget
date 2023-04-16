@@ -2,17 +2,17 @@ import { isNil } from "lodash";
 import { ResponsiveBar } from "@nivo/bar";
 import { BarTooltipProps } from "@nivo/bar/dist/types";
 
-import { formatters } from "lib";
+import { formatters, ui } from "lib";
 
-import Tooltip from "./Tooltip";
+import { Tooltip } from "./Tooltip";
 
-interface BudgetTotalChartProps<D extends Charts.Datum = Charts.Datum> {
+export interface BudgetTotalChartProps<D extends ui.ChartDatum = ui.ChartDatum> {
   readonly data: D[];
   readonly tooltip?: (datum: BarTooltipProps<D>) => JSX.Element;
   readonly tooltipLabelPrefix?: (datum: BarTooltipProps<D>) => string;
 }
 
-const ActualsByDateChart = <D extends Charts.Datum = Charts.Datum>(
+export const ActualsByDateChart = <D extends ui.ChartDatum = ui.ChartDatum>(
   props: BudgetTotalChartProps<D>,
 ): JSX.Element => (
   <ResponsiveBar<D>
@@ -51,5 +51,3 @@ const ActualsByDateChart = <D extends Charts.Datum = Charts.Datum>(
     maxValue={1200}
   />
 );
-
-export default ActualsByDateChart;

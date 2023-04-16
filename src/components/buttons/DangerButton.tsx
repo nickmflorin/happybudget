@@ -1,13 +1,21 @@
-import React from "react";
+import { ui } from "lib";
 
-import classNames from "classnames";
+import { SolidButton, SolidButtonProps, SolidAnchor, SolidAnchorProps } from "./abstract";
 
-import Button, { ButtonProps } from "./Button";
+export type DangerButtonProps = Omit<
+  SolidButtonProps<typeof ui.ButtonSolidVariants.DANGER>,
+  "variant"
+>;
 
-export type DangerButtonProps = ButtonProps;
-
-const DangerButton = (props: DangerButtonProps): JSX.Element => (
-  <Button {...props} className={classNames("btn--danger", props.className)} />
+export const DangerButton = (props: DangerButtonProps) => (
+  <SolidButton {...props} variant={ui.ButtonSolidVariants.DANGER} />
 );
 
-export default React.memo(DangerButton);
+export type DangerAnchorProps = Omit<
+  SolidAnchorProps<typeof ui.ButtonSolidVariants.DANGER>,
+  "variant"
+>;
+
+export const DangerAnchor = (props: DangerAnchorProps) => (
+  <SolidAnchor {...props} variant={ui.ButtonSolidVariants.DANGER} />
+);

@@ -1,0 +1,30 @@
+@use "partials";
+
+.affix-group {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  position: relative;
+
+  > * {
+    color: inherit;
+
+    + * {
+      margin-left: 6px;
+    }
+
+    &.icon,
+    &.button--action--bare,
+    &.button--action--primary {
+      aspect-ratio: 1;
+      width: auto;
+    }
+  }
+
+  &--fill-height {
+    > * {
+      height: 100%;
+    }
+  }
+}

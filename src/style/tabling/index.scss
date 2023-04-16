@@ -3,10 +3,10 @@
 @import "./menus";
 
 .cell-dropdown {
-  border-radius: 0px;
-  border: none !important;
-  padding-top: 4px;
   background-color: transparent;
+  border: none !important;
+  border-radius: 0px;
+  padding-top: 4px;
 
   .model-tags-menu {
     border: 1px solid #efefef;
@@ -18,6 +18,7 @@
     .ag-header {
       background-color: $color !important;
     }
+
     .row {
       > .cell {
         border-bottom: 1px solid $color;
@@ -47,9 +48,11 @@
     .ag-cell-range-selected-1:not(.ag-cell-inline-editing) {
     background-color: $color !important;
   }
-  .row:not(.ag-row-hover):not(.row--group) {
+
+  .row:not(.ag-row-hover, .row--group) {
     > .cell:not(.cell--calculated) {
       background-color: $color;
+
       &.ag-cell-range-selected {
         background-color: $color;
       }
@@ -59,10 +62,12 @@
 
 @mixin footer_grid_background($color) {
   @include grid_background($color);
+
   .row {
     > .cell {
       // Here, we use the !important flag because the rows should not change color on hover.
       background-color: $color !important;
+
       &.ag-cell-range-selected {
         background-color: $color !important;
       }
@@ -75,14 +80,14 @@
 }
 
 .table {
+  @include grid_borders($table-border-color);
+
   display: flex;
   flex-direction: column;
-  max-height: 100%;
   height: 100%;
+  max-height: 100%;
   // Required for absolute positioning of notifications.
   position: relative;
-
-  @include grid_borders($table-border-color);
 
   .ag-header {
     border: none;
@@ -91,12 +96,12 @@
 
     .ag-header-row {
       > .ag-header-cell {
+        font-family: $roboto;
+        font-size: $medium-body-font-size;
+        font-weight: 400;
+        letter-spacing: 0.045em;
         padding-left: 10px;
         padding-right: 10px;
-        letter-spacing: 0.045em;
-        font-size: $medium-text-size;
-        font-weight: 400;
-        font-family: $roboto;
 
         .inner-cell--header {
           display: flex;
@@ -108,9 +113,9 @@
           }
 
           .text {
-            line-height: 36px;
             flex-grow: 100;
             font-weight: 400;
+            line-height: 36px;
           }
         }
       }
@@ -122,13 +127,13 @@
   }
 
   .grid {
+    @include grid_row_height(36px);
+
     position: relative;
 
     .ag-pinned-left-cols-container {
       z-index: 1;
     }
-
-    @include grid_row_height(36px);
 
     .row {
       border: none !important;
@@ -141,40 +146,43 @@
       }
 
       > .cell {
-        padding-left: 6px;
-        padding-right: 6px;
-        font-size: $standard-text-size;
+        // Because we have a 2px border width when the cell is selected and a 1px border
+        // width when it is not selected, if we do not apply this flex centering the text
+        // shifts on selection.
+        @include vertical-flex-c;
+
         font-family: $roboto;
+        font-size: $standard-body-font-size;
+        -webkit-font-smoothing: subpixel-antialiased;
         font-weight: 400;
         overflow: hidden;
         overflow-x: hidden;
+        padding-left: 6px;
+        padding-right: 6px;
         text-overflow: ellipsis;
         // This is needed so that we can display white space in our cells without
         // AG Grid trimming them.  Note that this sometimes causes issues with cell
         // text overflow.  We still need to figure out a mores sustainable solution.
         white-space: pre;
-        -webkit-font-smoothing: subpixel-antialiased;
-        // Because we have a 2px border width when the cell is selected and a 1px border
-        // width when it is not selected, if we do not apply this flex centering the text
-        // shifts on selection.
-        @include vertical-flex-c();
 
         .inner-cell {
+          @include vertical-flex-c;
+
           height: 100%;
           width: 100%;
-          @include vertical-flex-c();
 
           .icon-wrapper {
             height: 100%;
           }
 
           .info-wrapper {
+            @include vertical-flex-c;
+
+            height: 100%;
+            left: 0;
             padding: 4px;
             position: absolute;
             top: 0;
-            left: 0;
-            height: 100%;
-            @include vertical-flex-c();
 
             .btn--cell-info,
             .icon--cell-info {
@@ -184,6 +192,7 @@
             .btn--cell-info {
               height: 15px;
               width: 15px;
+
               .icon {
                 height: 14px;
                 width: auto;
@@ -216,7 +225,7 @@
         // flex to cells that just render text, because they will already be vertically
         // centered and it messes with the cell's ability to truncate text.
         &--renders-html {
-          @include vertical-flex-c();
+          @include vertical-flex-c;
         }
 
         // Used currently just for the AttachmentsCell, where we want the upload
@@ -240,17 +249,17 @@
 
           .ag-input-field-input,
           .ag-text-field-input {
-            padding: 0px !important;
+            background-color: transparent !important;
             border: none !important;
             box-shadow: none !important;
-            background-color: transparent !important;
+            padding: 0px !important;
           }
         }
 
         // This will vertically center the text nicely while also not adjusting the
         // vertical location of the text when the cell is selected.
         .ag-react-container {
-          @include vertical-flex-c();
+          @include vertical-flex-c;
         }
 
         .ag-selection-checkbox {
@@ -260,8 +269,10 @@
 
         &.ag-cell-focus {
           border: 2px solid $green !important;
+
           &.cell--not-selectable {
             border: unset !important;
+
             .ag-fill-handle {
               display: none !important;
             }
@@ -285,8 +296,8 @@
   .core-table {
     display: flex;
     flex-direction: column;
-    max-height: 100%;
     height: 100%;
+    max-height: 100%;
 
     &.with-page-footer {
       max-height: calc(100% - 40px);
@@ -297,16 +308,18 @@
     }
 
     .grid--data {
-      max-height: calc(100% - 40px);
-
       @include grid_background($white);
 
+      max-height: calc(100% - 40px);
+
       .ag-root-wrapper {
-        overflow: visible;
         max-height: 100% !important;
+        overflow: visible;
+
         .ag-root-wrapper-body {
-          overflow-y: hidden;
           max-height: 100% !important;
+          overflow-y: hidden;
+
           .ag-body-viewport {
             overflow-y: scroll !important;
           }
@@ -334,9 +347,9 @@
       .row {
         > .cell {
           .icon-wrapper {
-            width: 16px;
-            margin-right: 6px;
             float: right;
+            margin-right: 6px;
+            width: 16px;
 
             .icon {
               @include size(16px);
@@ -355,8 +368,8 @@
 
           &--action {
             border: unset !important;
-            text-align: center;
             padding: 2px;
+            text-align: center;
 
             > * {
               margin: 0 auto;
@@ -365,21 +378,27 @@
 
           &--calculated {
             background-color: #f7fffa;
+
             .ag-fill-handle {
               display: none !important;
             }
+
             &:not(.ag-cell-range-top) {
               border-top-color: transparent;
             }
+
             &:not(.ag-cell-range-right) {
               border-right-color: transparent;
             }
+
             &:not(.ag-cell-range-left) {
               border-left-color: transparent;
             }
+
             &:not(.ag-cell-range-bottom) {
               border-bottom-color: transparent;
             }
+
             &.negative {
               color: $red !important;
             }
@@ -388,8 +407,10 @@
 
         &.ag-row-hover {
           background-color: $gray-highlight;
+
           > .cell {
             background-color: $gray-highlight;
+
             &.cell--calculated {
               background-color: $gray-highlight;
             }
@@ -405,9 +426,9 @@
           border-radius: 10px !important;
 
           > .cell {
-            font-weight: 400 !important;
-            border: none !important;
             background-color: inherit !important;
+            border: none !important;
+            font-weight: 400 !important;
 
             // Note: We cannot simply do &:first-child because the first child
             // will be different between the pinned cols container and the
@@ -441,6 +462,8 @@
     }
 
     .grid--table-footer {
+      @include footer_grid_background($table-border-color);
+
       flex: none;
       height: 40px;
 
@@ -453,22 +476,23 @@
         .ag-center-cols-viewport {
           max-width: 100%;
           overflow-x: hidden;
+
           .ag-center-cols-container {
             max-width: 100%;
           }
         }
       }
 
-      @include footer_grid_background($table-border-color);
-
       .row {
         border-bottom: none !important;
+
         > .cell {
           border: none !important;
 
           &[aria-colindex="1"] {
             border-bottom-left-radius: 8px;
           }
+
           &.ag-cell-range-right {
             border-bottom-right-radius: 8px;
           }
@@ -478,12 +502,14 @@
   }
 
   .page-footer-grid-wrapper {
-    flex-grow: 100;
     display: flex;
     flex-direction: column;
+    flex-grow: 100;
     min-height: 40px;
 
     .grid--page-footer {
+      @include footer_grid_background(#d3d3d3);
+
       flex: none;
       height: 30px;
       margin-top: 10px;
@@ -496,13 +522,12 @@
         .ag-center-cols-viewport {
           max-width: 100%;
           overflow-x: hidden;
+
           .ag-center-cols-container {
             max-width: 100%;
           }
         }
       }
-
-      @include footer_grid_background(#d3d3d3);
 
       .row {
         border-bottom: none !important;
@@ -515,6 +540,7 @@
             border-bottom-left-radius: 8px;
             border-top-left-radius: 8px;
           }
+
           &.ag-cell-range-right {
             border-bottom-right-radius: 8px;
             border-top-right-radius: 8px;
@@ -526,6 +552,7 @@
 
   &--minimal {
     @include grid_borders($transparent);
+
     font-family: $avenir !important;
 
     .ag-header {
@@ -544,9 +571,11 @@
       .grid--data {
         @include grid_row_height(40px);
         @include grid_background($white);
+
         .row {
           > .cell {
             font-family: $avenir;
+
             .link--table {
               font-family: $avenir;
               text-align: inherit !important;
@@ -554,8 +583,10 @@
           }
         }
       }
+
       .grid--table-footer {
         @include footer_grid_background($white);
+
         .row {
           > .cell {
             font-family: $avenir;

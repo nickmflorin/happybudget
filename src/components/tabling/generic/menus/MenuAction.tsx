@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 
 import { ui } from "lib";
 import { Icon } from "components";
-import { IconButton, BareButton } from "components/buttons";
+import { IconButton, BareButton } from "components/buttonsOld";
 
 interface TableMenuActionProps extends StandardComponentProps {
   readonly action: Table.MenuActionObj;

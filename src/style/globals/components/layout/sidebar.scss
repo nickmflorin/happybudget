@@ -1,0 +1,104 @@
+@use "partials";
+
+/*
+Based on the design comps, the corsha-logo needs to be 50px from the top of the sidebar, where the
+50px is measured from the top of the sidebar to the *top edge of the SVG*, not the top edge of the
+container the SVG is in.
+
+However, based on the size of the container ($sidebar-anchor-size) and the height of the corsha-logo
+(which is known because it is a static SVG), we can calculate how far the container needs to be from
+the top of the sidebar based on how far away the corsha-logo needs to be from the top of the
+sidebar.
+
+This distance will then be the top padding of the sidebar.
+
+Note: This only works properly if the "corsha-logo" svg is used with a "fit" contain, otherwise
+      it will deviate very slightly.
+*/
+$sidebar-padding-top: partials.$sidebar-naive-padding-top - 0.5 *
+  (partials.$sidebar-anchor-size - partials.get-svg-height(partials.$corsha-logo-svg-name));
+
+/*
+Based on the design comps, the support icon needs to be 42px from the bottom of the sidebar, where
+the 42px is measured from the bottom of the sidebar to the *bottom edge of the icon*, not the bottom
+edge of the container the icon is in.
+
+However, based on the size of the container ($sidebar-anchor-size) and the height of the icon of the
+last anchor element ($sidebar-anchor-icon-size), we can calculate how far the container needs to be
+from the bottom of the sidebar based on how far away the last icon needs to be from the bottom of
+the sidebar.
+
+This distance will then be the bottom padding of the sidebar.
+
+Note that sometimes, the icon size is determined based on the ($sidebar-anchor-icon-emphasis-size) -
+when the page associated with the anchor/icon is "emphasized".  In that case, the result will differ
+very, very mildly - there is not a way to dynamically determine whether the last element is
+emphasized or not.
+*/
+$sidebar-padding-bottom: partials.$sidebar-naive-padding-bottom - 0.5 *
+  (partials.$sidebar-anchor-size - partials.$sidebar-anchor-icon-size);
+
+$sidebar-horizontal-padding: 0.5 * (partials.$sidebar-width - partials.$sidebar-anchor-size);
+
+.sidebar {
+  align-items: center;
+  background-color: partials.$sidebar-bg-color;
+  display: flex;
+  flex-direction: column;
+  min-height: fit-content;
+  overflow: hidden;
+  padding: $sidebar-padding-top $sidebar-horizontal-padding $sidebar-padding-bottom
+    $sidebar-horizontal-padding;
+  width: partials.$sidebar-width;
+
+  > .sidebar__corsha-logo-container {
+    @include partials.size(partials.$sidebar-anchor-size);
+    @include partials.flex-c;
+
+    align-self: flex-start;
+
+    .svg {
+      @include partials.svg-contain-fit(partials.$corsha-logo-svg-name);
+      @include partials.hovered {
+        cursor: pointer;
+      }
+    }
+  }
+
+  > * {
+    &:not(:first-child) {
+      margin-top: partials.$sidebar-anchor-separation;
+    }
+  }
+
+  > .separator {
+    color: partials.$sidebar-anchor-color;
+    margin-left: auto;
+    margin-right: auto;
+    width: 36px;
+  }
+
+  > &__routes {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+
+    > .button--action--bare--sidebar {
+      + .button--action--bare--sidebar {
+        margin-top: partials.$sidebar-anchor-separation;
+      }
+    }
+
+    &.sidebar__routes--center {
+      flex-grow: 100;
+    }
+
+    &.sidebar__routes--bottom {
+      align-self: flex-end;
+
+      > .button--action--bare--sidebar {
+        padding: 14px;
+      }
+    }
+  }
+}

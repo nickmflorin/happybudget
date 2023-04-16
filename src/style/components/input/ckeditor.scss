@@ -1,20 +1,19 @@
 :root {
-  --ck-color-image-caption-background: hsl(0, 0%, 97%);
-  --ck-color-image-caption-text: hsl(0, 0%, 20%);
-  --ck-color-mention-background: hsla(341, 100%, 30%, 0.1);
+  --ck-color-image-caption-background: hsl(0deg 0% 97%);
+  --ck-color-image-caption-text: hsl(0deg 0% 20%);
+  --ck-color-mention-background: hsl(341deg 100% 30% / 10%);
   --ck-color-mention-text: $red;
-  --ck-color-table-caption-background: hsl(0, 0%, 97%);
-  --ck-color-table-caption-text: hsl(0, 0%, 20%);
+  --ck-color-table-caption-background: hsl(0deg 0% 97%);
+  --ck-color-table-caption-text: hsl(0deg 0% 20%);
   --ck-highlight-marker-blue: $blue;
   --ck-highlight-marker-green: $green;
-  --ck-highlight-marker-pink: hsl(345, 96%, 73%);
-  --ck-highlight-marker-yellow: hsl(60, 97%, 73%);
+  --ck-highlight-marker-pink: hsl(345deg 96% 73%);
+  --ck-highlight-marker-yellow: hsl(60deg 97% 73%);
   --ck-highlight-pen-green: $green;
   --ck-highlight-pen-red: $red;
   --ck-image-style-spacing: 1.5em;
   --ck-inline-image-style-spacing: calc(var(--ck-image-style-spacing) / 2);
   --ck-todo-list-checkmark-size: 16px;
-
   --ck-border-radius: 8px;
   --ck-inner-shadow: 2px 2px 3px var(--ck-color-shadow-inner) inset;
   --ck-drop-shadow: 0 1px 2px 1px var(--ck-color-shadow-drop);
@@ -30,17 +29,17 @@
 
 .ck-content {
   background: $gray-light;
-  border-radius: $input-border-radius !important;
   border: 1px solid transparent !important;
+  border-radius: $input-border-radius !important;
   box-shadow: none !important;
 }
 
 .ck-content p {
-  margin-top: var(--ck-spacing-small) !important;
-  margin-bottom: 4px !important;
   font-family: $avenir !important;
+  font-size: $standard-body-font-size;
   font-weight: 400;
-  font-size: $standard-text-size;
+  margin-bottom: 4px !important;
+  margin-top: var(--ck-spacing-small) !important;
 }
 
 // we have to use !important here to prevent ckeditor from overriding padding to 0px
@@ -51,8 +50,9 @@
 .ck-content .ck-heading_heading1,
 .ck-content h1 {
   @extend .header-base;
-  font-weight: 700;
+
   font-size: 20px;
+  font-weight: 700;
   line-height: 24px;
   margin-bottom: 8px !important;
   margin-top: var(--ck-spacing-small) !important;
@@ -61,8 +61,9 @@
 .ck-content .ck-heading_heading2,
 .ck-content h2 {
   @extend .header-base;
-  font-weight: 700;
+
   font-size: 18px;
+  font-weight: 700;
   line-height: 22px;
   margin-bottom: 6px !important;
   margin-top: var(--ck-spacing-small) !important;
@@ -71,8 +72,9 @@
 .ck-content .ck-heading_heading3,
 .ck-content h3 {
   @extend .header-base;
-  font-weight: 600;
+
   font-size: 18px;
+  font-weight: 600;
   line-height: 22px;
   margin-bottom: 4px !important;
   margin-top: var(--ck-spacing-small) !important;
@@ -81,8 +83,9 @@
 .ck-content .ck-heading_heading4,
 .ck-content h4 {
   @extend .header-base;
+
+  font-size: $xlarge-body-font-size;
   font-weight: 600;
-  font-size: $xlarge-text-size;
   line-height: 20px;
   margin-bottom: 4px !important;
   margin-top: var(--ck-spacing-small) !important;
@@ -91,8 +94,9 @@
 .ck-content .ck-heading_heading5,
 .ck-content h5 {
   @extend .header-base;
+
+  font-size: $xlarge-body-font-size;
   font-weight: 500;
-  font-size: $xlarge-text-size;
   line-height: 20px;
   margin-bottom: 4px !important;
   margin-top: var(--ck-spacing-small) !important;
@@ -101,8 +105,9 @@
 .ck-content .ck-heading_heading6,
 .ck-content h6 {
   @extend .header-base;
+
+  font-size: $large-body-font-size;
   font-weight: 500;
-  font-size: $large-text-size;
   line-height: 18px;
   margin-bottom: 4px !important;
   margin-top: var(--ck-spacing-small) !important;

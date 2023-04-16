@@ -1,9 +1,7 @@
-export { default as Spinner } from "./Spinner";
-export { default as WrappedSpinner } from "./WrappedSpinner";
-export { default as RenderWithSpinner } from "./RenderWithSpinner";
-export { default as RenderOrSpinner } from "./RenderOrSpinner";
-export { default as IconOrSpinner } from "./IconOrSpinner";
-export { default as SavingChanges } from "./SavingChanges";
-export { default as ApplicationSpinner } from "./ApplicationSpinner";
-export { default as ConnectedApplicationSpinner } from "./ConnectedApplicationSpinner";
-export { default as WrapInApplicationSpinner } from "./WrapInApplicationSpinner";
+export * from "./Loading";
+export * from "./Spinner";
+export * from "./hocs";
+export * from "./FallbackScreenLoading";
+export * from "./ScreenLoading";
+export * from "./AppLoading";
+export * from "./ConnectedAppLoading";

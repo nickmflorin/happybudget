@@ -1,7 +1,7 @@
 import { isNil } from "lodash";
 
 import { util } from "lib";
-import { DefaultButton } from "components/buttons";
+import { DefaultButton } from "components/buttonsOld";
 import {
   ExportCSVDropdownMenu,
   ToggleColumnsDropdownMenu,

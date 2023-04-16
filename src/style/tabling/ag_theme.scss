@@ -3,13 +3,13 @@
 @import "~ag-grid-community/src/styles/ag-theme-alpine/sass/ag-theme-alpine-mixin";
 
 .ag-theme-alpine {
-  font-family: $roboto;
-
   @include ag-theme-alpine(
     (
       range-selection-border-color: $green,
     )
   );
+
+  font-family: $roboto;
 
   .ag-right-aligned-header div.ag-header-cell-label {
     justify-content: flex-end !important;
@@ -26,68 +26,69 @@
     border: none;
   }
 
-  .ag-cell.ag-cell-last-left-pinned:not(.ag-cell-range-right):not(.ag-cell-range-single-cell) {
+  .ag-cell.ag-cell-last-left-pinned:not(.ag-cell-range-right, .ag-cell-range-single-cell) {
     border-right: solid 1px;
     border-right-color: $table-border-color;
   }
 
   .ag-menu {
+    background: $white;
+    background-color: $white;
     border: $menu-border;
     border-radius: 0px;
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-variant: tabular-nums;
-    font-feature-settings: "tnum";
-    margin-bottom: 0;
-    padding-left: 0;
-    color: $text-secondary;
-    font-size: $medium-text-size;
-    line-height: 0;
-    text-align: left;
-    list-style: none;
-    background: $white;
-    outline: none;
     box-shadow: none !important;
+    box-sizing: border-box;
+    color: $text-secondary;
+    font-feature-settings: "tnum";
+    font-size: $medium-body-font-size;
+    font-variant: tabular-nums;
+    line-height: 0;
+    list-style: none;
+    margin: 0;
+    margin-bottom: 0;
+    outline: none;
+    padding: 0;
+    padding-left: 0;
+    text-align: left;
     transition: background 0.3s, width 0.3s cubic-bezier(0.2, 0, 0, 1) 0s;
-    background-color: $white;
 
     .ag-menu-list {
-      margin-top: 0px !important;
       margin-bottom: 0px !important;
+      margin-top: 0px !important;
       padding: 0px !important;
 
       .ag-menu-option {
-        margin-top: 0px;
         color: $text-secondary !important;
-        font-family: $roboto;
-        font-weight: 400;
-        min-width: 100px;
-        padding: 4px 10px;
-        font-size: $standard-text-size;
-        line-height: 24px;
-        height: 32px;
-        margin-bottom: 0px !important;
-        overflow-y: hidden;
         display: flex;
         flex-direction: row;
+        font-family: $roboto;
+        font-size: $standard-body-font-size;
+        font-weight: 400;
+        height: 32px;
+        line-height: 24px;
+        margin-bottom: 0px !important;
+        margin-top: 0px;
+        min-width: 100px;
+        overflow-y: hidden;
+        padding: 4px 10px;
 
         &:focus,
         &:hover {
           background-color: #fbfbfb !important;
+
           .ag-menu-option-text {
             color: $text-primary !important;
           }
         }
 
         .ag-menu-option-text {
-          padding: 0px !important;
           line-height: 24px;
+          padding: 0px !important;
         }
 
         .ag-menu-option-icon {
-          display: flex;
           align-items: center;
+          display: flex;
           margin-right: 10px;
           padding: 0;
 
@@ -101,11 +102,12 @@
         }
 
         .ag-menu-option-popup-pointer {
-          @include vertical-flex-c();
+          @include vertical-flex-c;
+
           line-height: 24px;
           margin-left: auto;
-          padding-right: 0px;
           padding-left: 10px;
+          padding-right: 0px;
         }
       }
     }
@@ -115,9 +117,10 @@
     .ag-checkbox-input {
       box-shadow: none !important;
     }
+
     &::after {
-      -webkit-text-stroke: 1px white;
       color: $disabled-color;
+      -webkit-text-stroke: 1px white;
     }
 
     &:focus-within {
@@ -125,8 +128,8 @@
     }
 
     &.ag-checked::after {
-      -webkit-text-stroke: 0px;
       color: $blue;
+      -webkit-text-stroke: 0px;
     }
   }
 }

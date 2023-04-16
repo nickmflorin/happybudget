@@ -1,25 +1,25 @@
 .chart-tooltip {
-  padding: 4px 8px;
   background-color: $white;
-  border-radius: 6px;
   border: 1px solid $menu-border-color;
+  border-radius: 6px;
+  padding: 4px 8px;
 
   .tooltip-line {
     display: flex;
 
     .tooltip-line-label {
-      font-size: $medium-text-size;
-      font-weight: 500;
-      font-family: $avenir;
       color: $text-secondary;
+      font-family: $avenir;
+      font-size: $medium-body-font-size;
+      font-weight: 500;
     }
 
     .tooltip-line-value {
-      margin-left: 4px;
-      font-size: $medium-text-size;
-      font-weight: 400;
-      font-family: $avenir;
       color: $text-secondary;
+      font-family: $avenir;
+      font-size: $medium-body-font-size;
+      font-weight: 400;
+      margin-left: 4px;
     }
   }
 }

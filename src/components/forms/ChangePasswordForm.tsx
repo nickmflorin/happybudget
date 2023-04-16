@@ -3,7 +3,7 @@ import React from "react";
 import classNames from "classnames";
 
 import { Form } from "components";
-import { PrimaryButton } from "components/buttons";
+import { PrimaryButton } from "components/buttonsOld";
 import { PasswordInput } from "components/fields";
 
 export type ChangePasswordFormValues = {

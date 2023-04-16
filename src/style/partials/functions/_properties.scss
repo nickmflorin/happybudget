@@ -1,0 +1,62 @@
+@use "sass:map";
+@use "sass:meta";
+
+@use "./core" as fn;
+
+/// Optionally picks or ignores properties from a map based on optionally provided named parameters
+/// "pick" or "ignore".
+@function pick-or-ignore($data, $args...) {
+  $ignore: map.get(meta.keywords($args), "ignore");
+  $pick: map.get(meta.keywords($args), "pick");
+  $strict: if(
+    map.has-key(meta.keywords($args), "strict"),
+    map.get(meta.keywords($args), "strict"),
+    true
+  );
+  @if $ignore and $pick {
+    @return throw.error(
+      "The 'ignore' named argument cannot be provided alongside the 'pick' argument.  If selecting " +
+        "just a subset of parameters, provide the 'pick' argument without the 'ignore' named " +
+        "argument.",
+      $source: "pick-or-ignore()",
+      $pick: $pick,
+      $ignore: $ignore,
+      $data: $data
+    );
+  } @else if $ignore {
+    $ignore: fn.validate-type($ignore, list);
+    @each $ignore-property in $ignore {
+      @if not map.has-key($data, $ignore-property) {
+        @if $strict {
+          @return throw.error(
+            "The ignore property #{$ignore-property} does not exist in the set of typography " +
+              "properties, #{map.keys($properties)}.",
+            $source: "pick-or-ignore()",
+            $ignore: $ignore,
+            $data: $data
+          );
+        }
+      }
+      $data: map.remove($data, $ignore-property);
+    }
+    @return $data;
+  } @else if $pick {
+    $new-data: ();
+    @each $pick-property in $pick {
+      @if not map.has-key($data, $pick-property) {
+        @if $strict {
+          @return throw.error(
+            "The pick property #{$pick-property} does not exist in the set of properties, " +
+              "#{map.keys($data)}.",
+            $source: "pick-or-ignore()",
+            $pick: $pick,
+            $data: $data
+          );
+        }
+      }
+      $new-data: map.set($new-data, $pick-property, fn.map-get($data, $pick-property));
+    }
+    @return $new-data;
+  }
+  @return $data;
+}

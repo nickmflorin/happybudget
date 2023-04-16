@@ -1,6 +1,7 @@
 .landing-form {
   button[type="submit"] {
     width: 100% !important;
+
     &:not(:last-child) {
       margin-bottom: 12px;
     }
@@ -12,24 +13,24 @@
 
   .forgot-password-text {
     text-align: right;
+    @include media("<=xl") {
+      margin-bottom: 45px;
+    }
 
     a {
       font-family: $roboto;
+      font-size: $medium-body-font-size;
       font-weight: 400;
-      font-size: $medium-text-size;
-    }
-    @include media("<=xl") {
-      margin-bottom: 45px;
     }
   }
 
   .link-text-base {
-    font-size: $medium-text-size;
-    text-align: center;
-    margin-top: 12px;
-    font-family: $roboto;
-    font-weight: 400;
     color: $text-secondary;
+    font-family: $roboto;
+    font-size: $medium-body-font-size;
+    font-weight: 400;
+    margin-top: 12px;
+    text-align: center;
   }
 
   .alt-link-text {
@@ -37,8 +38,8 @@
 
     a {
       color: $text-primary;
-      text-decoration: underline;
       margin-left: 4px;
+      text-decoration: underline;
     }
   }
 
@@ -46,11 +47,11 @@
     @extend .link-text-base;
 
     a {
-      margin-left: 6px;
       font-family: $roboto;
+      font-size: $medium-body-font-size;
       font-weight: 400;
-      font-size: $medium-text-size;
       line-height: 15px;
+      margin-left: 6px;
     }
   }
 }

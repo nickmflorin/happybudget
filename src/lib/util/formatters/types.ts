@@ -5,3 +5,5 @@ export type Currency<D extends boolean = false> = D extends false
   : `$${Currency<false>}`;
 
 export type Percent = `% ${number}.${Digit}${Digit}`;
+
+export type DatePrimitive = string | number | Date;

@@ -2,14 +2,14 @@ import { DatumId, ComputedDatum as RootComputedDatum } from "@nivo/pie/dist/type
 
 import * as model from "../../model";
 
-export type Datum = {
+export type ChartDatum = {
   readonly color: string;
   readonly value: number;
   readonly label: DatumId;
   readonly id: DatumId;
 };
 
-export type ComputedDatum<D extends Datum> = RootComputedDatum<D>;
+export type ComputedChartDatum<D extends ChartDatum> = RootComputedDatum<D>;
 
 export type BudgetTotalMetricId = "estimated" | "actual" | "variance";
 

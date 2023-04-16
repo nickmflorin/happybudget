@@ -1,48 +1,92 @@
 import React, { useMemo, forwardRef, ForwardedRef } from "react";
 
-import classNames from "classnames";
-import { isNil } from "lodash";
-import { IconPrefix } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const PrefixMap: { [key in IconWeight]: IconPrefix } = {
-  light: "fal",
-  regular: "far",
-  solid: "fas",
-};
+import { ui } from "lib";
 
-const Icon = forwardRef(
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  (
-    { icon, green, prefix, weight, light, regular, solid, dimension, ...props }: IconProps,
-    ref: ForwardedRef<any>,
-  ) => {
-    const derivedPrefix = useMemo(() => {
-      if (!isNil(prefix)) {
-        return prefix;
-      } else if (!isNil(weight)) {
-        return PrefixMap[weight];
-      } else if (light === true) {
-        return "fal";
-      } else if (solid === true) {
-        return "fas";
-      }
-      return "far";
-    }, [weight, light, regular, solid]);
+import { useIcon } from "./hooks";
 
-    if (!isNil(icon)) {
-      return (
-        <FontAwesomeIcon
-          {...props}
-          style={{ ...props.style, ...dimension }}
-          forwardedRef={ref}
-          className={classNames("icon", { "icon--green": green }, props.className)}
-          icon={typeof icon === "string" ? [derivedPrefix, icon] : icon}
-        />
-      );
-    }
-    return <></>;
-  },
-);
+const _IconComponent = forwardRef(function IconComponent(
+  // The default value for the `axis` here must be consistent with the default value in SASS.
+  {
+    icon,
+    size,
+    axis = ui.SizeAxes.VERTICAL,
+    contain,
+    color = ui.IconColors.GREY,
+    ...props
+  }: ui.IconComponentProps,
+  ref: ForwardedRef<SVGSVGElement>,
+) {
+  const _icon = useMemo(() => ui.getNativeIcon(icon), [icon]);
+  const iconProps = useIcon({ ...props, axis, size, contain, color });
 
-export default React.memo(Icon);
+  /*
+  If the size is provided as a number or a valid CSS value, we cannot dynamically use SASS classes
+  to define the size because there is no way to inform SASS what the provided value is.  However, if
+  the size is provided as a standardized size string - we can just affix the element with the class
+  name - so we do not need to mutate the style.
+  */
+  const style = useMemo(
+    () =>
+      size !== undefined && ui.isCSSSize(size)
+        ? ui.sizeOnAxis(props.style, axis, size)
+        : props.style,
+    [props.style, axis, size],
+  );
+
+  return <FontAwesomeIcon {...props} {...iconProps} style={style} ref={ref} icon={_icon} />;
+});
+
+export const IconComponent = React.memo(_IconComponent);
+
+/**
+ * Renders a FontAwesome icon based on the provided `icon` prop.
+ *
+ * This component represents the primary definition for an icon in the application and the above
+ * <IconComponent /> should not be used outside of this file.
+ *
+ * This <Icon /> component allows the `icon` prop to be provided as either an element,
+ * {@link ui.IconElement}, or a name/prefix definition, {@link ui.BasicIconProp}
+ * (e.g. ["far", "slack"]).  This allows components that accept an `icon` prop to accept it either
+ * as an `<Icon />` rendered element, {@link ui.IconElement}, or a prefix/name combination,
+ * {@link ui.BasicIconProp}, while still rendering the provided prop inside of an `<Icon />`
+ * element it defines:
+ *
+ * type ButtonProps = { ..., icon: IconProp };
+ * const Button = (props: ButtonProps) => {
+ *   ...
+ *   return (
+ *     <div className="button">
+ *       <Icon icon={props.icon} className={"button-icon"} />
+ *       <div className="button-text">{props.children}</div>
+ *     </div>
+ *   )
+ * }
+ *
+ * This is important because it allows an `icon` prop to be used and passed between components in a
+ * way that does not introduce logical concerns if a component further up in the tree specifies
+ * other attributes on the icon and the component on the bottom of the tree still needs to render
+ * it.
+ *
+ * @example
+ * const previousIcon = <Icon className={"icon--previous"} icon={"square"} />;
+ * const finalIcon = <Icon icon={previousIcon} className={"icon--button"} />;
+ *
+ * ReactDOM.render(finalIcon, document.getElementById("#root"));
+ * "<svg class="icon--previous icon--button">...</svg>"
+ */
+const _Icon = forwardRef(function Icon(
+  { icon, ...props }: ui.IconProps,
+  ref: ForwardedRef<SVGSVGElement>,
+) {
+  if (ui.isIconElement(icon)) {
+    return ui.mergeIconElementWithProps(icon, props);
+  }
+  return <IconComponent {...props} ref={ref} icon={icon} />;
+});
+
+/* It is important that we define the displayName and name such that the `_Icon` component above can
+   properly determine whether or not the provided prop is an actual <Icon /> element or the
+   prefix/name traditional specification. */
+export const Icon = Object.assign(React.memo(_Icon), { displayName: "Icon", name: "Icon" });

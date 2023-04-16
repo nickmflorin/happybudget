@@ -16,7 +16,7 @@ export const createLocalizationFormatter = <
   code: C,
 ) => {
   const schema = schemas.createLocalizationSchema(type, code);
-  return formatter.createFormatter<string>(schema);
+  return formatter.createFormatter<types.DatePrimitive>(schema);
 };
 
 export const dateFormatter = (code: config.localization.LocalizationCodes["date"]) =>

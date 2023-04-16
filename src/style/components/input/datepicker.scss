@@ -14,9 +14,10 @@
 
   .react-datepicker {
     @extend .menu-base;
-    font-family: $avenir;
-    box-shadow: none !important;
+
     border: $menu-border;
+    box-shadow: none !important;
+    font-family: $avenir;
     padding: 10px !important;
 
     > .react-datepicker__triangle {
@@ -34,9 +35,9 @@
 
       .react-datepicker {
         &__current-month {
-          font-weight: 500;
           color: $text-primary;
           font-size: 15px;
+          font-weight: 500;
           line-height: 16px;
         }
 
@@ -45,9 +46,9 @@
 
           .react-datepicker__day-name {
             color: $gray;
+            font-size: $standard-body-font-size;
             font-weight: 500;
             margin: 2px;
-            font-size: $standard-text-size;
           }
         }
       }
@@ -66,13 +67,14 @@
       .react-datepicker__month-read-view--down-arrow,
       .react-datepicker__month-year-read-view--down-arrow,
       .react-datepicker__navigation-icon::before {
-        border-width: 2px 2px 0 0;
         border-color: $gray;
+        border-width: 2px 2px 0 0;
       }
 
       .react-datepicker__navigation--previous {
         left: 22px;
       }
+
       .react-datepicker__navigation--next {
         right: 22px;
       }
@@ -82,10 +84,11 @@
       .react-datepicker__day--today {
         font-weight: normal;
       }
+
       .react-datepicker__day--selected {
         background-color: rgba($green, 0.2);
-        color: $green;
         border-radius: 100%;
+        color: $green;
       }
     }
 

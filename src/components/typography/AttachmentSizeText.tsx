@@ -1,24 +1,18 @@
-import React from "react";
-
 import classNames from "classnames";
 
-import { util } from "lib";
-import { Icon } from "components";
+import { ui, model, fs } from "lib";
+import { Icon } from "components/icons";
 
-export interface AttachmentSizeTextProps extends StandardComponentProps {
-  readonly children: Model.Attachment;
-}
+export type AttachmentSizeTextProps = ui.ComponentProps<{
+  readonly model: model.Attachment;
+}>;
 
-const AttachmentSizeText: React.FC<AttachmentSizeTextProps> = ({ children, ...props }) => (
+export const AttachmentSizeText: React.FC<AttachmentSizeTextProps> = ({ model, ...props }) => (
   <div
     {...props}
-    className={classNames("attachment-text", "attachment-size-text", props.className)}
+    className={classNames("attachment-text", "attachment-text--size", props.className)}
   >
-    <div className="content-text">{util.files.fileSizeString(children.size)}</div>
-    <div className="icon-wrapper" style={{ marginLeft: 4 }}>
-      <Icon className="icon--attachment" icon="server" />
-    </div>
+    <div className="attachment-text__sub-text">{fs.fileSizeString(model.size)}</div>
+    <Icon className="icon--attachment" icon={ui.IconNames.SERVER} />
   </div>
 );
-
-export default React.memo(AttachmentSizeText);

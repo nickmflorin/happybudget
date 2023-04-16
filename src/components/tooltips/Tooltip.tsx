@@ -1,14 +1,30 @@
-import ActionTooltip from "./ActionTooltip";
-import InfoTooltip from "./InfoTooltip";
+import React from "react";
 
-const TooltipComponents: { [key in TooltipType]: React.ComponentType<TooltipProps> } = {
+import { ui } from "lib";
+
+import { BrandTooltip, BrandTooltipProps } from "./BrandTooltip";
+import { EntityTooltip, EntityTooltipProps } from "./EntityTooltip";
+import { InfoTooltip, InfoTooltipProps } from "./InfoTooltip";
+
+export type TooltipProps<T extends ui.TooltipType> = {
+  brand: BrandTooltipProps & { readonly type?: T };
+  entity: EntityTooltipProps & { readonly type: T };
+  info: InfoTooltipProps & { readonly type: T };
+}[T];
+
+const Components: {
+  [key in ui.TooltipType]: React.FunctionComponent<TooltipProps<key>>;
+} = {
   info: InfoTooltip,
-  action: ActionTooltip,
+  brand: BrandTooltip,
+  entity: EntityTooltip,
 };
 
-const Tooltip = ({ type = "action", ...props }: TooltipProps): JSX.Element => {
-  const TooltipComponent = TooltipComponents[type];
-  return <TooltipComponent {...props} />;
+export const Tooltip = <T extends ui.TooltipType>({
+  type = ui.TooltipTypes.BRAND as T,
+  ...props
+}: TooltipProps<T>): JSX.Element => {
+  const TooltipComponent: React.FunctionComponent<TooltipProps<T>> = Components[type];
+  type P = React.ComponentProps<typeof TooltipComponent>;
+  return <TooltipComponent {...(props as P)} />;
 };
-
-export default Tooltip;

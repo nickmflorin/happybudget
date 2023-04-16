@@ -1,0 +1,27 @@
+@use "sass:map";
+@use "partials";
+
+.icon--spinner {
+  aspect-ratio: 1;
+  color: partials.$spinner-default-color;
+  height: partials.$spinner-default-size;
+  // This will allow the spinner to be centered in its parent without knowing the parent itself.
+  margin: auto;
+  // The minimums need to account for the padding that may be applied in buttons or other elements
+  // in an effort to shrink the icon or spinner relative to the line height of the accompanying
+  // text.
+  min-height: min(partials.$spinner-size-small, partials.$icon-size-small) - 2 *
+    partials.$button-icon-padding;
+  min-width: min(partials.$spinner-size-small, partials.$icon-size-small) - 2 *
+    partials.$button-icon-padding;
+  // For the spinner case of an icon, we do not want the padding around it.
+  padding: 0;
+  width: auto;
+  z-index: 1000;
+
+  @each $size-name in partials.$spinner-size-names {
+    &--size-#{$size-name} {
+      height: partials.map-get(partials.$spinner-sizes, $size-name);
+    }
+  }
+}

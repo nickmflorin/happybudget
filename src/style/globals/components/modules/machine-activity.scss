@@ -1,0 +1,24 @@
+@use "partials";
+
+.module--machine-activity {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  &__content {
+    column-gap: 36px;
+    display: grid;
+    flex-direction: column;
+    flex-grow: 100;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-bottom: 20px;
+    row-gap: 20px;
+    text-align: left;
+  }
+
+  &__controls {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+  }
+}

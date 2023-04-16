@@ -4,7 +4,7 @@ import { isNil } from "lodash";
 
 import { ui } from "lib";
 import { Icon } from "components";
-import { IconButton } from "components/buttons";
+import { IconButton } from "components/buttonsOld";
 
 import Option, { OptionProps } from "./Option";
 

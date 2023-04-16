@@ -4,12 +4,12 @@ import classNames from "classnames";
 import { Link } from "react-router-dom";
 import { Layout } from "antd";
 
+import * as store from "application/store";
 import { Icon, ShowHide } from "components";
-import { IconButton } from "components/buttons";
+import { IconButton } from "components/buttonsOld";
 import { HelpDropdownMenu, UserDropdownMenu } from "components/dropdowns";
 import { IsAuthenticated } from "components/permissions";
 import { GreenbudgetTextLogo, LeafLogo } from "components/svgs";
-import * as store from "application/store";
 
 export type HeaderProps = StandardComponentProps & {
   readonly showSidebarToggle?: boolean | undefined;

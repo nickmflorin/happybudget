@@ -1,0 +1,88 @@
+@use "sass:map";
+
+@use "../functions" as fn;
+
+$axis-to-flex-direction: (
+  horizontal: row,
+  vertical: column,
+);
+
+@mixin flex-along($axis) {
+  $axis: fn.validate-value($axis, fn.$size-axes);
+
+  display: flex;
+  flex-direction: fn.map-get($axis-to-flex-direction, $axis);
+}
+
+/// Used to vertically center a child element with flex.
+@mixin vertical-flex-c {
+  @include flex-along("vertical");
+
+  justify-content: center;
+}
+
+/// Used to horizontally center a child element with flex.
+@mixin horizontal-flex-c {
+  @include flex-along("horizontal");
+
+  justify-content: center;
+}
+
+/// Used to both horizontally and vertically center a child element of the element that uses this
+/// mixin.
+@mixin flex-c($axis: "vertical") {
+  @include flex-along($axis);
+
+  align-items: center;
+  -webkit-box-align: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+}
+
+/// Used to distribute children elements in the opposite axis while centering each child in the axis
+/// provided.  For instance, if the mixin is used on the `.div` class in the following element
+/// structure:
+///
+/// <div class="div">
+///   <div class="child1">Child 1</div>
+///   <div class="child2">Child 2</div>
+///   <div class="child3">Child 3</div>
+/// </div>
+///
+/// When the $axis is "vertical", each child will be distributed along the horizontal axis with
+/// flex-direction "row" but also centered vertically in the parent `<div class="div">`.
+@mixin flex-c-children($axis: "vertical") {
+  @include flex-along(fn.get-axis($axis, $opposite: true));
+
+  align-items: center;
+  -webkit-box-align: center;
+  -webkit-box-pack: center;
+}
+
+@mixin size($value, $dimension: "both") {
+  @if $dimension == "both" {
+    height: $value;
+    width: $value;
+  } @else {
+    $dimension: fn.validate-value($dimension, fn.$dimensions, "dimension");
+
+    #{$dimension}: $value;
+  }
+}
+
+@mixin fill-parent($dimension: "both") {
+  @include size(100%, $dimension);
+}
+
+///  A mixin that will define the property in the directions associated with the provided axis or
+/// dimension.
+@mixin define-directional-property-on($property, $axis-or-dim, $value, $set-others: 0px) {
+  $dirs: fn.get-directions($axis-or-dim);
+  @each $dir in fn.$property-directions {
+    @if fn.in-list($dir, $dirs) {
+      #{$property}-#{$dir}: #{$value};
+    } @else if $set-others != null {
+      #{$property}-#{$dir}: #{$set-others};
+    }
+  }
+}

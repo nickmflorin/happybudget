@@ -1,0 +1,377 @@
+@use "sass:list";
+@use "sass:map";
+@use "sass:meta";
+
+@use "throw";
+
+$size-axis-to-dimension: (
+  "vertical": "height",
+  "horizontal": "width",
+);
+
+$size-axes: map.keys($size-axis-to-dimension);
+$size-dimensions: map.values($size-axis-to-dimension);
+$property-directions: ("top", "bottom", "left", "right");
+
+/*
+All SASS value types, which do not seem to be accessible directly from SASS as its own imported
+variable.
+https://sass-lang.com/documentation/modules/meta#type-of
+*/
+$sass-types: (number, string, color, list, map, calculation, bool, null, function, arglist);
+
+// SASS value types that are not maps, lists, functions or non-primitive data types.
+$sass-primitives: (number, string, color, calculation, bool, null);
+
+/*
+SASS value types that represent primitive-types for valid CSS property values.  Note that this
+does not mean the property itself is guaranteed to be valid for a specific property name, it just
+means that if we are dynamically defining the value for any CSS property, it must be of these
+types.
+*/
+$sass-css-primitives: (number, string, color, calculation);
+
+/// Returns whether or not the provided value is in the provided list.
+@function in-list($value, $list) {
+  // We cannot use the `validate-type` function here because it will cause a recursion.
+  @if meta.type-of($list) != list and meta.type-of($list) != arglist {
+    @return throw.error(
+      "The provided value '#{meta.inspect($list)}' must be of type 'list', but is '#{type-of($list)}'.",
+      $source: "in-list()",
+      $list: $list
+    );
+  }
+  @return (null != list.index($list, $value));
+}
+
+/// Finds the first key in the provided set of keys that does not exist in the map at the level or
+/// tier of the map it is associated with.
+///
+/// SASS's map.get supports both single key access (map.get("key1")) and nested key access
+/// (map.get($map, "key1", "key2")), but it is not strict.  In other words, it will return null
+/// values in the case that a given key does not exist.  Usually, in the context of this
+/// application, this is bug prone - and this method helps us determine which key is missing when
+/// a provided key does not exist.
+@function missing-map-key($map, $keys...) {
+  $running: $map;
+
+  // The strict parameter can be used to throw the error directly in the function, as opposed to
+  // returning the key that is missing and the level it is missing at.
+  $strict: if(
+    map.has-key(meta.keywords($keys), "strict"),
+    map.get(meta.keywords($keys), "strict"),
+    false
+  );
+
+  $previous: ();
+  @for $i from 1 through list.length($keys) {
+    $k: list.nth($keys, $i);
+    $level: $i;
+    @if meta.type-of($running) != map or not map.has-key($running, $k) {
+      @if $strict {
+        // Here - the additional debugging information is widely helpful.
+        $message: "The provided map, '#{meta.inspect($map)}', does not have key #{$k} " +
+          "(type = #{meta.inspect(meta.type-of($k))}) at level #{$level}";
+        @if list.length($previous) != 0 {
+          // Including the running map is only applicable if there were previous keys, because if
+          // there are no previous keys the running map is the same as the original map.
+          $message: $message +
+            ", (previous keys were #{meta.inspect($previous)}) (map at level is #{meta.inspect($running)})";
+        }
+        @return throw.error($message, $source: "missing-map-key()");
+      }
+      // We are only concerned with identifying the first key that is missing because further keys
+      // will always be missing if a previous one is.
+      @if list.length($previous) != 0 {
+        @return ("level": $level, "key": $k, "previous": $previous);
+      }
+      @return ("level": $level, "key": $k);
+    }
+    $previous: list.append($previous, $k, comma);
+    $running: map.get($running, $k);
+  }
+  @return null;
+}
+
+/// A safer form of SASS's map.get() function that raises errors when keys do not exist, instead of
+/// returning null.
+///
+/// SASS's map.get supports both single key access (map.get("key1")) and nested key access
+/// (map.get($map, "key1", "key2")), but it is not strict.  In other words, it will return null
+/// values in the case that a given key does not exist.  Usually, in the context of this
+/// application, this is bug prone - and we should use this method when we need to be sure that the
+/// key exists.
+@function map-get($map, $keys...) {
+  $map: validate-type($map, map);
+  $_: missing-map-key($map, $keys..., $strict: true);
+  @return map.get($map, $keys...);
+}
+
+/// Returns a mapping of values in the provided list to the number of times the value is in the
+/// provided list.
+///
+/// @param {list} $list
+///   The list that contains the values that should be counted.
+@function list-count($list) {
+  $result: ();
+  @each $li in $list {
+    @if map.has-key($result, $li) {
+      /* stylelint-disable-next-line scss/no-global-function-names */
+      $curr: map-get($result, $li);
+      $result: map.set($result, $li, $curr + 1);
+    } @else {
+      $result: map.set($result, $li, 1);
+    }
+  }
+  @return $result;
+}
+
+/// Returns whether or not there are duplicate values in the provided list.  If the 'value' argument
+/// is provided, the function will only return `true` if the 'value' is in the list multiple times.
+/// Otherwise, it will return `true` if any value is in the list multiple times.
+///
+/// @param {list} $list
+///   The list for which the presence of duplicates should be checked.
+///
+/// @param {} $value
+///   A specific value for which the function should return `true` if present multiple times.
+@function list-contains-duplicates($list, $value: null) {
+  $count: list-count($list);
+  @if $value {
+    $value: validate-value($value, $list);
+    @return map-get($count, $value) > 1;
+  }
+  @each $k in map.keys($count) {
+    @if map-get($count, $k) != 1 {
+      @return true;
+    }
+  }
+  @return false;
+}
+
+/// Given a list of two distinct values, returns the opposite value in the list from the provided
+/// value.
+///
+/// @param {} $value
+///   The value for which the opposite should be returned.
+///
+/// @param {list or arglist} $values
+///   The length-2 list or arglist of values that represent the opposites.
+@function opposite($value, $values...) {
+  @if list.length($values) == 1 and meta.type-of(list.nth($values, 1)) == list {
+    $values: list.nth($values, 1);
+  }
+  @if list.length($values) != 2 {
+    @return throw.error(
+      "The provided list #{meta.inspect($values)} cannot represent opposites because it is of " +
+        "length #{list.length($values)}, not length 2.",
+      $source: "opposite()",
+      $values: $values
+    );
+  } @else if list-contains-duplicates($values) {
+    @return throw.error(
+      "The provided list #{meta.inspect($values)} cannot represent opposites because its values " +
+        "are duplicates.",
+      $source: "opposite()",
+      $values: $values
+    );
+  }
+  $value: validate-value($value, $values);
+  @if $value == list.nth($values, 1) {
+    @return list.nth($values, 2);
+  }
+  @return list.nth($values, 1);
+}
+
+/// Validates whether or not the provided value is of any of the provided types.
+@function validate-type($value, $types, $throw: true) {
+  @if list.length($types) == 0 {
+    @return throw.error(
+      "At least one type must be provided for comparison.",
+      $source: "validate-type()"
+    );
+  } @else if list.length($types) != 1 {
+    @each $tp in $types {
+      $result: validate-type($value, $tp, $throw: false);
+      @if $result {
+        @return $value;
+      }
+    }
+    @return throw.error(
+      "The provided value '#{meta.inspect($value)}' is not a type of any of '#{meta.inspect($types)}'.",
+      $source: "validate-type()",
+      $value: $value
+    );
+  }
+  $type: ensure-sass-primitive(list.nth($types, 1));
+  @if type-of($value) == $value {
+    @return throw.error(
+      "The provided value '#{meta.inspect($value)}' cannot be a type.",
+      $source: "validate-type()",
+      $value: $value
+    );
+  } @else if type-of($value) == $type {
+    @return $value;
+  } @else if not $throw {
+    @return false;
+  }
+  @return throw.error(
+    "The provided value '#{meta.inspect($value)}' is not of type #{meta.inspect($type)}.",
+    $source: "validate-type()",
+    $value: $value
+  );
+}
+
+/// Reverses the provided map such that the values become the keys and the keys become the values.
+///
+/// This should ONLY be used for cases where the map's keys are not maps themselves (i.e. it is a
+/// single level map).
+///
+/// @param {map} $map
+///   The map that should be reversed.
+@function reverse-map($map) {
+  $map: validate-type($map, map);
+
+  // A map cannot be reversed if there are repeated values because it will lead to data loss.
+  @if list-contains-duplicates(map.values($map)) {
+    @return throw.error(
+      "The provided map '#{meta.inspect($map)}' contains duplicate values.  Map reversal does " +
+        "not support duplicate values.",
+      $source: "reverse-map()"
+    );
+  }
+
+  $new-map: ();
+  @each $k in map.keys($map) {
+    /* stylelint-disable-next-line scss/no-global-function-names */
+    $v: map-get($map, $k);
+    @if meta.type-of($v) == map {
+      @return throw.error(
+        "The provided map '#{meta.inspect($map)}' has a value at key '#{meta.inspect($k)}' that " +
+          "is a map. Map reversal does not support nested maps.",
+        $source: "reverse-map()"
+      );
+    }
+    $new-map: map.set($new-map, $v, $k);
+  }
+  @return $new-map;
+}
+
+/// Returns the key in the provided map associated with the provided value.
+///
+/// @param {map} $map
+///   The map that contains the provided value that is being looked up.
+///
+@function map-get-reverse($map, $value) {
+  @return map-get(reverse-map($map), $value);
+}
+
+/// Validates the provided value based on whether or not they exist in a provided list or map, where
+/// the existence in the map case is based on the keys of that map.  The name, which represents what
+/// the value is, can be provided for additional context in the thrown error.
+@function validate-value($value, $values, $reference: "value") {
+  $valid: false;
+
+  @if type-of($values) == map {
+    $valid: in-list($value, map.keys($values));
+  } @else if type-of($values) == list {
+    $valid: in-list($value, $values);
+  } @else {
+    @return throw.error(
+      "The provided values are of type '#{type-of($values)}' when they must be a map or list.",
+      $source: "validate-value()",
+      $values: $values
+    );
+  }
+  @if $valid {
+    @return $value;
+  }
+
+  $invalids: meta.inspect($values);
+  @if meta.type-of($values) == map {
+    $invalids: meta.inspect(map.keys($values));
+  }
+  @return throw.error(
+    "The provided #{$reference} '#{$value}' is invalid, must be one of #{$invalids}.",
+    $source: "validate-value()",
+    $value: $value,
+    $reference: $reference
+  );
+}
+
+@function is-sass-primitive($v) {
+  @return in-list(meta.type-of($v), $sass-primitives);
+}
+
+@function is-sass-css-primitive($v) {
+  @return in-list(meta.type-of($v), $sass-css-primitives);
+}
+
+@function ensure-sass-primitive($v) {
+  @if not is-sass-primitive($v) {
+    $invalid: meta.type-of($v);
+    @return throw.error(
+      "The value #{meta.inspect($v)} is not a SASS primitive, but has type #{$invalid}.",
+      $source: "ensure-sass-primitive()",
+      $value: $v
+    );
+  }
+  @return $v;
+}
+
+@function ensure-sass-css-primitive($v) {
+  @if not is-sass-css-primitive($v) {
+    $invalid: meta.type-of($v);
+    @return throw.error(
+      "The value #{meta.inspect($v)} is not a SASS CSS primitive, but has type #{$invalid}.",
+      $source: "ensure-sass-css-primitive()",
+      $value: $v
+    );
+  }
+  @return $v;
+}
+
+$size-axis-to-directions: (
+  "vertical": (
+    "top",
+    "bottom",
+  ),
+  "horizontal": (
+    "left",
+    "right",
+  ),
+  "both": $property-directions,
+);
+
+@function get-axis($axis-or-dim, $opposite: false) {
+  @if in-list($axis-or-dim, $size-axes) {
+    @return if($opposite, opposite($axis-or-dim, $size-axes), $axis-or-dim);
+  } @else if in-list($axis-or-dim, $size-dimensions) {
+    @return get-axis(map-get-reverse($size-axis-to-dimension, $axis-or-dim), $opposite);
+  } @else {
+    @return throw.error(
+      "The value #{meta.inspect($axis-or-dim)} is not an axis or a dimension.",
+      $source: "get-dimension()",
+      $value: $axis-or-dim
+    );
+  }
+}
+
+@function get-dimension($axis-or-dim, $opposite: false) {
+  @if in-list($axis-or-dim, $size-dimensions) {
+    @return if($opposite, opposite($axis-or-dim, $size-dimensions), $axis-or-dim);
+  } @else if in-list($axis-or-dim, $size-axes) {
+    @return get-dimension(map-get($size-axis-to-dimension, $axis-or-dim), $opposite);
+  } @else {
+    @return throw.error(
+      "The value #{meta.inspect($axis-or-dim)} is not an axis or a dimension.",
+      $source: "get-dimension()",
+      $value: $axis-or-dim
+    );
+  }
+}
+
+@function get-directions($axis-or-dim) {
+  $axis: get-axis($axis-or-dim);
+  @return map-get($size-axis-to-directions, $axis);
+}

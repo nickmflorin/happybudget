@@ -1,0 +1,54 @@
+@use "partials";
+
+.form {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+
+  > .field {
+    width: 100%;
+
+    + .field {
+      margin-top: partials.$form-field-spacing;
+    }
+
+    > * {
+      width: 100%;
+    }
+  }
+
+  .feedback-display--form {
+    width: 100%;
+
+    &--top {
+      margin-bottom: 24px;
+    }
+
+    &--bottom {
+      margin-top: 24px;
+    }
+  }
+
+  .form__footer {
+    display: flex;
+    flex-direction: column;
+    margin-top: 12px;
+    width: 100%;
+
+    > &__buttons {
+      align-items: center;
+      display: flex;
+      margin-top: 12px;
+      width: 100%;
+
+      > * {
+        flex: 1 1 100%;
+
+        + * {
+          margin-left: 12px;
+        }
+      }
+    }
+  }
+}

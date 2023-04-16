@@ -1,0 +1,133 @@
+@use "sass:map";
+@use "sass:string";
+
+@use "../../functions" as fn;
+@use "../colors.module" as colors;
+@use "./typography.module" as typography;
+
+$tooltip-font-size: typography.$standard-body-font-size;
+$tooltip-font-family: typography.$avenir;
+$tooltip-border-radius: 8px;
+$tooltip-font-weight: 500;
+
+$tooltip-default-color: colors.$text-secondary;
+$tooltip-default-border-color: colors.$standard-border-color;
+$tooltip-default-bg-color: colors.$white;
+$tooltip-default-disabled-bg-color: colors.$input-disabled-bg-color;
+$tooltip-default-disabled-color: colors.$standard-disabled-color;
+$tooltip-disabled-border-color: colors.$standard-disabled-border-color;
+
+$tooltip-default-style-properties: (
+  color: $tooltip-default-color,
+  border-color: $tooltip-default-border-color,
+  bg-color: $tooltip-default-bg-color,
+  disabled-bg-color: $tooltip-default-disabled-bg-color,
+  disabled-color: $tooltip-default-disabled-color,
+  disabled-border-color: $tooltip-disabled-border-color,
+);
+
+$tooltip-style-properties: (
+  "brand": (
+    color: colors.$white,
+    border-color: colors.$green,
+    bg-color: colors.$green,
+    disabled-bg-color: colors.$lighter-green,
+    disabled-border-color: colors.$lighter-green,
+  ),
+  "entity": (
+    color: colors.$text-secondary,
+    border-color: colors.$standard-border-color,
+    bg-color: colors.$white,
+    disabled-bg-color: colors.$standard-disabled-bg-color,
+    disabled-border-color: colors.$standard-disabled-border-color,
+    disabled-color: colors.$standard-disabled-color,
+  ),
+  "info": (
+    color: colors.$text-secondary,
+    border-color: colors.$standard-border-color,
+    bg-color: colors.$white,
+    disabled-bg-color: colors.$standard-disabled-bg-color,
+    disabled-border-color: colors.$standard-disabled-border-color,
+    disabled-color: colors.$standard-disabled-color,
+  ),
+);
+
+@mixin tooltip-style(
+  $bg-color: $tooltip-default-bg-color,
+  $color: $tooltip-default-color,
+  $border-color: $tooltip-default-border-color
+) {
+  .ant-tooltip-arrow {
+    display: none !important;
+
+    .ant-tooltip-arrow-content {
+      box-shadow: none !important;
+    }
+  }
+
+  .ant-tooltip-content {
+    font-size: $tooltip-font-size;
+    font-weight: $tooltip-font-weight;
+
+    .ant-tooltip-inner {
+      background-color: $bg-color;
+      border: 1px solid $border-color;
+      border-radius: $tooltip-border-radius;
+      color: $color;
+      font-family: $tooltip-font-family;
+
+      > * {
+        color: $color;
+      }
+    }
+  }
+
+  &.tooltip-lower {
+    padding-top: 10px;
+  }
+}
+
+@mixin tooltip-styles($args...) {
+  $bg-color: fn.get-optional-kwarg("bg-color", $default: $tooltip-default-bg-color, $args...);
+  $border-color: fn.get-optional-kwarg(
+    "border-color",
+    $default: $tooltip-default-border-color,
+    $args...
+  );
+  $color: fn.get-optional-kwarg("color", $default: $tooltip-default-color, $args...);
+  @include tooltip-style($color: $color, $border-color: $border-color, $bg-color: $bg-color);
+
+  @include partials.disabled {
+    $disabled-bg-color: fn.get-optional-kwarg(
+      "disabled-bg-color",
+      $default: $tooltip-default-disabled-bg-color,
+      $args...
+    );
+    $disabled-border-color: fn.get-optional-kwarg(
+      "disabled-border-color",
+      $default: $tooltip-default-disabled-border-color,
+      $args...
+    );
+    $disabled-color: fn.get-optional-kwarg(
+      "disabled-color",
+      $default: $tooltip-default-disabled-color,
+      $args...
+    );
+
+    @include tooltip-style(
+      $color: $disabled-color,
+      $border-color: $disabled-border-color,
+      $bg-color: $disabled-bg-color
+    );
+  }
+}
+
+@mixin tooltip-variant-styles($variant: null) {
+  @if $variant {
+    $variant: fn.validate-value($variant, map.keys($tooltip-style-properties));
+    $properties: fn.map-get($tooltip-style-properties, $variant);
+    @include tooltip-styles($properties...);
+  } @else {
+    @include tooltip-styles($tooltip-default-style-properties);
+  }
+}

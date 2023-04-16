@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { isNil } from "lodash";
 
 import { ShowHide, Form } from "components";
-import { DefaultButton, ClearButton } from "components/buttons";
+import { DefaultButton, ClearButton } from "components/buttonsOld";
 import { Input, HeaderTemplateSelect } from "components/fields";
 
 export type IHeaderTemplateSaveFormRef = {

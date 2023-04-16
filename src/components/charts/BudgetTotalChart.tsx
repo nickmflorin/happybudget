@@ -1,17 +1,17 @@
 import { isNil } from "lodash";
 import { ResponsivePie } from "@nivo/pie";
 
-import { formatters } from "lib";
+import { formatters, ui } from "lib";
 
-import Tooltip from "./Tooltip";
+import { Tooltip } from "./Tooltip";
 
-interface BudgetTotalChartProps<D extends Charts.Datum = Charts.Datum> {
+interface BudgetTotalChartProps<D extends ui.ChartDatum = ui.ChartDatum> {
   readonly data: D[];
-  readonly tooltip?: (datum: Charts.ComputedDatum<D>) => JSX.Element;
-  readonly tooltipLabelPrefix?: (datum: Charts.ComputedDatum<D>) => string;
+  readonly tooltip?: (datum: ui.ComputedChartDatum<D>) => JSX.Element;
+  readonly tooltipLabelPrefix?: (datum: ui.ComputedChartDatum<D>) => string;
 }
 
-const BudgetTotalChart = <D extends Charts.Datum = Charts.Datum>(
+const BudgetTotalChart = <D extends ui.ChartDatum = ui.ChartDatum>(
   props: BudgetTotalChartProps<D>,
 ): JSX.Element => (
   <ResponsivePie<D>
@@ -39,11 +39,11 @@ const BudgetTotalChart = <D extends Charts.Datum = Charts.Datum>(
         itemDirection: "left-to-right",
       },
     ]}
-    tooltip={(params: { datum: Charts.ComputedDatum<D> }): JSX.Element =>
+    tooltip={(params: { datum: ui.ComputedChartDatum<D> }): JSX.Element =>
       !isNil(props.tooltip) ? (
         props.tooltip(params.datum)
       ) : (
-        <Tooltip<Charts.ComputedDatum<D>>
+        <Tooltip<ui.ComputedChartDatum<D>>
           labelPrefix={props.tooltipLabelPrefix?.(params.datum)}
           datum={params.datum}
           valueFormatter={formatters.currencyFormatter}

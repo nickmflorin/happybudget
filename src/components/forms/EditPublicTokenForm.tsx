@@ -4,7 +4,7 @@ import { isNil } from "lodash";
 import { Switch } from "antd";
 
 import { Form, ShowHide } from "components";
-import { ButtonDangerLink } from "components/buttons";
+import { ButtonDangerLink } from "components/buttonsOld";
 import { PublicUrlInput, DatePicker } from "components/fields";
 
 export type EditPublicTokenFormValues = {

@@ -1,4 +1,4 @@
-import { IncludeButtonLink } from "components/buttons";
+import { IncludeButtonLink } from "components/buttonsOld";
 
 type TextWithIncludedLinkProps = {
   readonly includeLink: IncludeLink;

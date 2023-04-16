@@ -1,0 +1,21 @@
+@use "partials";
+
+.button-bar {
+  background-color: partials.$white;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  .button-wrapper {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    padding: 14px 24px 24px;
+    width: 100%;
+
+    .button {
+      margin-left: 40px;
+    }
+  }
+}

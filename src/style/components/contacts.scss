@@ -4,30 +4,30 @@
     flex-direction: row;
 
     .tagged-actuals-title {
-      margin-bottom: 8px;
       flex-grow: 100;
+      margin-bottom: 8px;
       margin-right: 8px;
     }
   }
 }
 
 .tagged-actual {
+  border: $border;
+  border-radius: $input-border-radius;
   display: flex;
   flex-direction: column;
-  border: $border;
   padding: 8px 12px;
-  border-radius: $input-border-radius;
 
   &:not(:last-child) {
     margin-bottom: 8px;
   }
 
   .tagged-actual-title {
-    text-align: left;
-    font-size: $large-text-size;
-    font-weight: 500;
     color: $text-secondary;
+    font-size: $large-body-font-size;
+    font-weight: 500;
     margin-bottom: 8px;
+    text-align: left;
   }
 
   .tagged-actual-details {
@@ -44,14 +44,14 @@
       }
 
       .tagged-actual-detail-field {
-        font-size: $small-text-size;
         color: $text-primary;
+        font-size: $small-body-font-size;
         font-weight: 600;
       }
 
       .tagged-actual-detail-value {
-        font-size: $medium-text-size;
         color: $text-secondary;
+        font-size: $medium-body-font-size;
         font-weight: 500;
       }
     }

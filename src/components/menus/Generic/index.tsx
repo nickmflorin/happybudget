@@ -14,7 +14,7 @@ import { InputRef } from "antd";
 
 import { hooks, ui, util, redux } from "lib";
 import { RenderWithSpinner, ShowHide } from "components";
-import { Button } from "components/buttons";
+import { Button } from "components/buttonsOld";
 import { SearchInput } from "components/fields";
 
 import { ExtraMenuItem, MenuItem } from "./MenuItem";

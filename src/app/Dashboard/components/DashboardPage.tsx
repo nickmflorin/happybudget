@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
 import { Icon, Pagination, NoData, NoDataProps } from "components";
-import { OrderingButtonIconToggle } from "components/buttons";
+import { OrderingButtonIconToggle } from "components/buttonsOld";
 import { OrderingDropdownMenu } from "components/dropdowns";
 import { Input } from "components/fields";
 import { Page } from "components/layout";

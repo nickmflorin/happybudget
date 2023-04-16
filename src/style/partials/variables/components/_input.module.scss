@@ -1,0 +1,50 @@
+@use "sass:color";
+@use "sass:list";
+
+@use "../colors.module" as colors;
+@use "./typography.module" as typography;
+
+$input-color: typography.$body-color;
+$input-font-family: typography.$body-font-family;
+$input-font-size: typography.get-font-size("body", 1);
+$input-font-weight: typography.get-font-weight("body", "regular");
+$input-bg-color: colors.$white;
+
+$input-border-color: colors.$standard-border-color;
+$input-focused-border-color: $input-border-color;
+$input-border-radius: 6px;
+$input-disabled-bg-color: colors.$standard-disabled-bg-color;
+$input-height: 44px;
+
+// $input-affix-color: colors.$blue;
+
+$input-color: colors.$text-primary;
+$input-border: 1px solid $input-border-color;
+$input-placeholder-color: color.change(#606873, $alpha: 0.6);
+
+// $input-caret-color: colors.$brand-green;
+
+$input-height: 44px;
+$text-input-padding: 10px 16px;
+
+// The line height of the text input text should fill up the remaining space after the padding is
+// accounted for.
+$text-input-line-height: $input-height - 2 * list.nth($text-input-padding, 1);
+
+$select-padding: $text-input-padding;
+$select-line-height: $input-height - 2 * list.nth($select-padding, 1);
+
+// The select's options should have the same padding as the select itself, but since they have a
+// slightly smaller height (40px vs. 44px) the line height will be slightly smaller as well. The
+// padding also needs to be adjusted to account for the height of the checkbox for multi-select
+$select-option-padding: 8px 16px;
+$select-option-height: 40px;
+$select-option-line-height: $select-option-height - 2 * list.nth($select-option-padding, 1);
+
+$menu-shadow: 2px 4px 4px rgb(66 66 66 / 5%);
+
+/* ========================================== Exports =========================================== */
+:export {
+  inputBorderColor: $input-border-color;
+  inputColor: $input-color;
+}

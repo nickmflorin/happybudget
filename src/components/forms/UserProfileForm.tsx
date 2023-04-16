@@ -3,7 +3,7 @@ import React from "react";
 import classNames from "classnames";
 
 import { Form } from "components";
-import { PrimaryButton } from "components/buttons";
+import { PrimaryButton } from "components/buttonsOld";
 import { Input, TimezoneSelect } from "components/fields";
 
 const UserProfileForm: React.FC<FormProps<Http.UserPayload>> = (props): JSX.Element => (

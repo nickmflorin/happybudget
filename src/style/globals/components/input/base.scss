@@ -1,0 +1,131 @@
+@use "sass:color";
+@use "partials";
+
+/*
+Provides base styling properties for raw HTML elements that act as the actual HTML input element
+that handles user input.  This should not be used for classes that wrap a native HTML input
+element in a wrapper that acts as the visual "input".
+
+Okay Usage:
+----------
+.my-input {
+  @extends %native-input-base
+}
+
+<input class="my-input" type="text" />
+
+Wrong Usage:
+-----------
+.input {
+  @extends %native-input-base
+}
+
+<div class="input">
+  ...
+  <input type="text" />
+  ...
+</div>
+*/
+%native-input-base {
+  @include partials.transition(none);
+
+  align-items: center;
+  // We need to explicitly set the background color to white (instead of not specifying a background
+  // color) such that auto fill styling applied by Google Chrome (and likely others) does not change
+  // the background.
+  background-color: partials.$input-bg-color;
+  background-image: none !important;
+  border: none;
+  box-shadow: none !important;
+  box-sizing: border-box;
+  caret-color: partials.$input-caret-color;
+  color: partials.$input-color;
+  cursor: text;
+  font-family: partials.$input-font-family;
+  font-size: partials.$input-font-size;
+  font-weight: partials.$input-font-weight;
+  list-style: none;
+  margin: 0;
+  min-width: 0;
+  width: 100%;
+
+  &::placeholder {
+    color: partials.$input-placeholder-color;
+  }
+}
+
+/*
+Provides base styling properties for components that wrap native HTML input-like elements and acts
+as the visual representation of the input to the user.
+
+Ok Usage:
+---------
+.input {
+  @include input-base
+  input {
+    @extends %native-input-base;
+  }
+}
+
+<div class="input">
+  ...
+  <input type="text" />
+  ...
+</div>
+
+Wrong Usage:
+-----------
+.input {
+  @extends %native-input-base
+
+  input {
+    @extends %native-input-base
+  }
+}
+
+<div class="input">
+  ...
+  <input type="text" />
+  ...
+</div>
+*/
+@mixin input-base {
+  $p: &; // Parent selector for use in strings
+  @extend %native-input-base;
+  @include partials.outline(partials.$input-border-color);
+
+  border-radius: partials.$input-border-radius;
+  height: partials.$input-height;
+
+  @include partials.disabled {
+    background-color: partials.$input-disabled-bg-color;
+  }
+
+  @include partials.focused {
+    @include partials.without-selectors((partials.$feedback-types), $prefix: "#{$p}--feedback-") {
+      outline-color: partials.$input-focused-border-color;
+    }
+  }
+
+  @include partials.focused-within {
+    @include partials.without-selectors((partials.$feedback-types), $prefix: "#{$p}--feedback-") {
+      outline-color: partials.$input-focused-border-color;
+    }
+  }
+
+  @include partials.with-feedback-types using ($feedback, $data) {
+    &--feedback-#{$feedback} {
+      outline-color: partials.map-get($data, "input-border-color");
+    }
+  }
+
+  > .native-input {
+    font-size: inherit;
+    line-height: inherit;
+    padding: 0;
+  }
+}
+
+.native-input {
+  @extend %native-input-base;
+}

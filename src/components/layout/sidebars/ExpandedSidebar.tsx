@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 import { ui } from "lib";
 import { Icon, ShowHide } from "components";
-import { IconButton } from "components/buttons";
+import { IconButton } from "components/buttonsOld";
 import { GreenbudgetTextLogo } from "components/svgs";
 
 import ExpandedSidebarItem from "./ExpandedSidebarItem";

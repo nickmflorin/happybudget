@@ -1,0 +1,20 @@
+@use "partials";
+
+.page {
+  max-height: 100%;
+  width: 100%;
+
+  .page__content {
+    @include partials.size(100%);
+
+    padding: 56px 40px 40px;
+
+    > .structural-header {
+      margin-bottom: 32px;
+    }
+
+    > .global-feedback-display--page {
+      margin-bottom: 24px;
+    }
+  }
+}

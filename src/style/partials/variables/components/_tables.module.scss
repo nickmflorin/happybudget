@@ -1,0 +1,80 @@
+@use "sass:map";
+
+@use "node_modules/ag-grid-community/styles" as ag;
+
+@use "../colors.module" as colors;
+@use "./typography.module" as typography;
+
+$table-border-color: #f8f8f8;
+$table-border: 1px solid $table-border-color;
+
+$table-fg-color: colors.$text-primary;
+$table-bg-color: colors.$white;
+$table-border-color: colors.$white;
+$table-header-height: 55px;
+
+// $table-header-bottom-border-color: colors.$brand-green;
+$table-row-height: 70px;
+$table-row-border-color: colors.$standard-border-color;
+
+// Controls how much padding there is between adjacent cells in the same row.
+$table-cell-horizontal-padding: 4px;
+
+$table-body-typography: map.set(
+  typography.get-typography("body", $font-weight-name: "regular", $level: 1),
+  line-height,
+  24px
+);
+
+$table-header-typography: map.merge(
+  typography.get-typography("body", $font-weight-name: "bold", $level: 2),
+  (
+    line-height: 24px,
+    text-transform: uppercase,
+  )
+);
+
+/*
+There are a few properties that would otherwise make sense to include to the 'ag.grid-styles' mixin,
+but we want to exclude them for reasons briefly mentioned below:
+
+1. font-size Properties:  When we provide these to the mixin, AG Grid tries to mutate them by adding
+                          1px of size.  We don't want this, so we don't provide to the mixin.
+2. row-height Properties: When we try to provide these to the mixin, AG Grid tries to mutate them
+                          by adding 1px of size.  We don't want this, so we don't provide to the
+                          mixin but instead explicitly set.
+3. header-height Properties: When we try to provide these to the mixin, AG Grid tries to mutate them
+                             by adding 1px of size.  We don't want this, so we don't provide to the
+                             mixin but instead explicitly set.
+4. row-border-color:  We want to use a box shadow for the row borders such that it does not resize
+                      the cells.
+*/
+$table-brand-theme-vars: (
+  theme: brand,
+  extend-theme: alpine,
+
+  header-foreground-color: colors.$text-grey,
+  header-background-color: $table-bg-color,
+  // This needs to be transparent such that it does not cover up the 2px green border underneath
+  // the header row.
+  header-cell-hover-background-color: transparent,
+  header-cell-moving-background-color: $table-bg-color,
+
+  // We might need to show this when we're doing column resizing.
+  header-column-resize-handle-display: none,
+  header-column-resize-handle-color: $table-fg-color,
+  header-column-resize-handle-height: 80%,
+  header-column-resize-handle-width: 4px,
+
+  foreground-color: $table-fg-color,
+  background-color: $table-bg-color,
+  border-color: $table-border-color,
+  selected-row-background-color: $table-bg-color,
+  row-border-width: 1px,
+  row-hover-color: colors.$highlight-blue,
+  odd-row-background-color: $table-bg-color,
+);
+
+@mixin table-theme-brand {
+  @include ag.grid-styles($table-brand-theme-vars);
+}

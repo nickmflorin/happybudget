@@ -1,0 +1,81 @@
+@use "sass:color";
+@use "partials";
+@use "./icons";
+
+.global-feedback {
+  align-items: center;
+  border-radius: partials.$global-feedback-border-radius;
+  border-width: 1px;
+  display: flex;
+  flex-direction: row;
+  height: partials.$global-feedback-height;
+  padding: partials.$global-feedback-padding;
+  width: 100%;
+
+  @include partials.with-feedback-types using ($feedback, $data) {
+    &--#{$feedback} {
+      @include partials.border(partials.map-get($data, "border-color"));
+
+      background-color: partials.map-get($data, "background-color");
+      color: partials.map-get($data, "color");
+
+      > .button--global-feedback-close {
+        color: partials.map-get($data, "color");
+
+        @include partials.hovered {
+          color: partials.map-get($data, "hover-color");
+        }
+        @include partials.focused {
+          color: partials.map-get($data, "focus-color");
+        }
+      }
+    }
+  }
+
+  > .icon--feedback {
+    $icon-padding: 2px;
+
+    // We want the Icon to be slightly smaller than the line height of the text.  The padding of
+    // an SVG adds height and width to the overall SVG, so when we add the padding we also subtract
+    // the padding from the height and width.
+    height: partials.$global-feedback-line-height - 2 * $icon-padding;
+    margin-right: 12px;
+    padding: $icon-padding;
+    width: partials.$global-feedback-line-height - 2 * $icon-padding;
+  }
+
+  > .global-feedback__text {
+    @include partials.truncate;
+    @include partials.global-feedback-typography;
+
+    color: inherit;
+    flex-grow: 100;
+  }
+
+  > .button--global-feedback-close {
+    // Add a margin-left here instead of a margin-right to the .feedback__text so it spaces out
+    // properly when the close button is not present.
+    margin-left: 16px;
+  }
+}
+
+.global-feedback-display {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  width: 100%;
+
+  .global-feedback + .global-feedback {
+    margin-top: 16px;
+  }
+}
+
+.field-feedback {
+  @include partials.typography-style("body", $level: 4);
+
+  @include partials.with-feedback-types using ($feedback, $data) {
+    &--#{$feedback} {
+      color: partials.map-get($data, "input-border-color");
+    }
+  }
+}

@@ -1,0 +1,10 @@
+@use "~include-media/dist/_include-media";
+
+$breakpoints: (
+  small: 320px,
+  medium: 480px,
+  large: 768px,
+  xl: 1024px,
+  xxl: 1200px,
+  xxxl: 1580px,
+);

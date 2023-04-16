@@ -3,10 +3,10 @@ import React from "react";
 import classNames from "classnames";
 import { Link } from "react-router-dom";
 
-import { Icon } from "components";
-import { IconButton } from "components/buttons";
-import { LeafLogo } from "components/svgs";
 import * as store from "application/store";
+import { Icon } from "components";
+import { IconButton } from "components/buttonsOld";
+import { LeafLogo } from "components/svgs";
 
 import GenericSidebar, { GenericSidebarProps } from "./GenericSidebar";
 import GenericSidebarItem from "./GenericSidebarItem";

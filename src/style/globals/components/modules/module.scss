@@ -1,0 +1,42 @@
+@use "partials";
+
+.module {
+  background-color: partials.$white;
+  border-radius: partials.$module-border-radius;
+  box-shadow: partials.$module-box-shadow;
+  display: flex;
+  flex-direction: column;
+  padding: partials.$module-padding;
+  position: relative;
+  width: 100%;
+
+  > .structural-header {
+    margin-bottom: 30px;
+  }
+
+  > .global-feedback-display {
+    margin-bottom: 30px;
+  }
+
+  &__field {
+    @include partials.typography-style(
+      "body",
+      $font-weight-name: "regular",
+      $level: 1,
+      $ignore: [ "color",
+      "line-height" ]
+    );
+
+    color: partials.$dark-blue;
+    display: flex;
+    flex-direction: column;
+
+    .button {
+      text-align: left;
+    }
+
+    > * {
+      line-height: 24px;
+    }
+  }
+}

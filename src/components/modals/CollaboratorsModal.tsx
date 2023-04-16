@@ -5,7 +5,7 @@ import classNames from "classnames";
 import { map, filter } from "lodash";
 
 import { ui, http, model, redux, util } from "lib";
-import { PrimaryButton } from "components/buttons";
+import { PrimaryButton } from "components/buttonsOld";
 import { CollaboratorsList } from "components/collaboration";
 import { CollaboratorSelect } from "components/fields";
 

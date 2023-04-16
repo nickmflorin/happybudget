@@ -2,28 +2,31 @@ import React from "react";
 
 import classNames from "classnames";
 
-import { EntityText } from "components/typography";
-import { EntityTextProps } from "components/typography/EntityText";
+import { ui } from "lib";
+import { EntityText, EntityTextProps } from "components/typography";
 
-import Button, { ButtonProps } from "./Button";
+import { BareButton, BareButtonProps } from "./BareButton";
 
-export type EntityTextButtonProps = Omit<EntityTextProps, "className" | "style"> &
-  Omit<ButtonProps, "children"> & {
-    readonly fillEmpty?: string;
-  };
+export type EntityTextButtonProps = Omit<EntityTextProps, keyof ui.ComponentProps> &
+  Omit<BareButtonProps, "children" | "dropdownCaret" | "icon" | "iconLocation">;
 
-const EntityTextButton = ({
-  children,
+export const EntityTextButton = ({
   fillEmpty,
+  description,
+  identifier,
+  model,
   ...props
 }: EntityTextButtonProps): JSX.Element => (
-  <Button
+  <BareButton
     {...props}
-    className={classNames("btn--bare btn--entity-text", props.className)}
-    withDropdownCaret={true}
+    className={classNames("btn--bare--entity-text", props.className)}
+    dropdownCaret="right"
   >
-    <EntityText fillEmpty={fillEmpty}>{children}</EntityText>
-  </Button>
+    <EntityText
+      fillEmpty={fillEmpty}
+      model={model}
+      identifier={identifier}
+      description={description}
+    />
+  </BareButton>
 );
-
-export default React.memo(EntityTextButton);

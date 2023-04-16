@@ -8,6 +8,7 @@ form {
 
 .form-label-base {
   @extend .label-base;
+
   height: 22px !important;
 }
 
@@ -23,23 +24,23 @@ form {
 
   .form-header {
     background: $white !important;
-    padding-bottom: 12px;
-    height: auto;
     font-size: 20px;
     font-weight: 600;
+    height: auto;
+    padding-bottom: 12px;
 
     .form-title {
-      display: flex;
       align-items: center;
-      font-size: 24px;
-      line-height: 24px;
-      font-family: $avenir !important;
-      font-weight: 700 !important;
       color: $text-secondary !important;
+      display: flex;
+      font-family: $avenir !important;
+      font-size: 24px;
+      font-weight: 700 !important;
+      line-height: 24px;
 
       .icon {
-        margin-right: 8px;
         color: $text-secondary !important;
+        margin-right: 8px;
       }
     }
   }
@@ -51,6 +52,7 @@ form {
       &:first-child {
         margin-top: 0px !important;
       }
+
       &:last-child {
         margin-bottom: 0px !important;
       }
@@ -60,8 +62,8 @@ form {
   &.ant-form-horizontal {
     .form-item {
       .ant-form-item-control {
-        width: auto !important;
         flex-grow: 100;
+        width: auto !important;
       }
     }
   }
@@ -71,6 +73,7 @@ form {
       .ant-form-item-control {
         width: 100%;
       }
+
       &:last-child {
         margin-bottom: 0px !important;
       }
@@ -84,14 +87,14 @@ form {
       flex-direction: row !important;
 
       .ant-form-item-control {
-        width: auto !important;
         flex-grow: 100;
+        width: auto !important;
       }
 
       .ant-form-item-label {
-        padding-left: 0px !important;
-        margin-right: 10px;
         line-height: 28px;
+        margin-right: 10px;
+        padding-left: 0px !important;
       }
     }
 
@@ -117,6 +120,7 @@ form {
       .input,
       .ant-input-affix-wrapper {
         border: none !important;
+
         .ant-input-prefix {
           color: unset !important;
         }
@@ -132,21 +136,22 @@ form {
     }
 
     .ant-form-item-label {
+      color: $text-secondary !important;
       font-family: $avenir !important;
       font-weight: 400 !important;
-      color: $text-secondary !important;
-      padding-left: 2px;
       padding-bottom: 0px !important;
+      padding-left: 2px;
 
       label,
       .label {
         @extend .form-label-base;
+
         margin-bottom: 2px;
 
         &.ant-form-item-required:not(.ant-form-item-required-mark-optional) {
           margin-left: 0px;
 
-          &:before {
+          &::before {
             content: none;
           }
         }
@@ -155,7 +160,7 @@ form {
       & > label.ant-form-item-required:not(.ant-form-item-required-mark-optional) {
         margin-left: -3px;
 
-        &:before {
+        &::before {
           content: "";
         }
       }
@@ -163,13 +168,14 @@ form {
 
     .ant-form-item-control {
       .ant-form-item-extra {
-        font-size: $medium-text-size;
-        line-height: 12px;
-        min-height: 12px;
-        margin-top: 6px;
         font-family: $roboto;
+        font-size: $medium-body-font-size;
         font-weight: 400;
+        line-height: 12px;
+        margin-top: 6px;
+        min-height: 12px;
       }
+
       .ant-form-item-control-input {
         min-height: 28px;
       }
@@ -178,12 +184,13 @@ form {
     // Alerts/feedback that go underneath the form control.
     .ant-form-item-explain {
       min-height: 12px;
+
       div[role="alert"] {
+        font-size: $small-body-font-size;
         font-weight: 500;
-        margin-top: 5px;
-        font-size: $small-text-size;
         line-height: 12px;
         margin-left: 5px;
+        margin-top: 5px;
       }
     }
   }
@@ -198,6 +205,7 @@ form {
           .ant-input-affix-wrapper:hover {
             border: 1px solid $red;
           }
+
           .ant-input-affix-wrapper {
             .ant-input,
             .ant-input:hover {
@@ -206,6 +214,7 @@ form {
           }
         }
       }
+
       .ant-form-item-explain.ant-form-item-explain-error {
         color: $red;
       }
@@ -223,7 +232,7 @@ form {
   > .ant-form-item-label {
     > label,
     .label {
-      font-size: $standard-text-size !important;
+      font-size: $standard-body-font-size !important;
     }
   }
 }

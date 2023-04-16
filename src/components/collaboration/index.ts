@@ -1,1 +1,1 @@
-export { default as CollaboratorsList } from "./CollaboratorsList";
+export * from "./CollaboratorsList";

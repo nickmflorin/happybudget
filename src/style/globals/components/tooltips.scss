@@ -1,0 +1,48 @@
+@use "partials";
+
+.tooltip {
+  &--info {
+    @include partials.tooltip-variant-styles("info");
+  }
+
+  &--entity {
+    @include partials.tooltip-variant-styles("entity");
+  }
+
+  &--brand {
+    @include partials.tooltip-variant-styles("brand");
+  }
+
+  &:not(.tooltip--brand, .tooltip--info, .tooltip-entity) {
+    @include partials.tooltip-variant-styles;
+  }
+}
+
+.itemized-tooltip-content {
+  display: flex;
+  flex-direction: column;
+
+  > .itemized-tooltip-item {
+    display: flex;
+    flex-direction: row;
+
+    > * {
+      font-size: 12px;
+      line-height: 22px;
+    }
+
+    > * + * {
+      margin-left: 6px;
+    }
+
+    > .itemized-tooltip-item__label {
+      font-weight: 500;
+    }
+
+    > .itemized-tooltip-item__value {
+      flex-grow: 100;
+      font-weight: 400;
+      text-align: right;
+    }
+  }
+}

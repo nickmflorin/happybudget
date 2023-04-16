@@ -1,24 +1,31 @@
 import React, { ReactNode } from "react";
 
-type ShowHideProps = {
-  readonly show?: boolean;
-  readonly hide?: boolean;
+type ShowProps = {
+  readonly show: boolean;
   readonly children: ReactNode;
 };
 
-/**
- * Component that will show or hide it's children depending on the conditionals
- * passed in.  One of `show` or `hide` must be passed in, if neither are passed
- * in the children will be shown regardless.
- */
-const ShowHide = (props: ShowHideProps): JSX.Element => {
-  if (Object.hasOwnProperty.call(props, "show")) {
-    return <>{props.show ? props.children : <></>}</>;
-  } else if (Object.hasOwnProperty.call(props, "hide")) {
-    return <>{!props.hide ? props.children : <></>}</>;
-  } else {
-    return <>{props.children}</>;
-  }
+type HideProps = {
+  readonly hide: boolean;
+  readonly children: ReactNode;
 };
 
-export default React.memo(ShowHide);
+type ShowHideProps = ShowProps | HideProps;
+
+const isShowProps = (props: ShowHideProps): props is ShowProps =>
+  (props as ShowProps).show !== undefined;
+
+const _ShowHide = (props: ShowHideProps): JSX.Element =>
+  isShowProps(props) ? (
+    props.show === true ? (
+      <>{props.children}</>
+    ) : (
+      <></>
+    )
+  ) : props.hide === true ? (
+    <></>
+  ) : (
+    <>{props.children}</>
+  );
+
+export const ShowHide = React.memo(_ShowHide);

@@ -1,0 +1,42 @@
+@use "sass:string";
+
+@use "../../functions" as fn;
+@use "./icons.module" as icons;
+
+$spinner-size-names: ("small", "medium", "large", "fill");
+
+$spinner-size-large: 44px;
+$spinner-size-medium: 32px;
+$spinner-size-small: 24px;
+$spinner-size-fill: 100%;
+
+$spinner-sizes: (
+  "small": $spinner-size-small,
+  "medium": $spinner-size-medium,
+  "large": $spinner-size-large,
+  "fill": $spinner-size-fill,
+);
+
+$spinner-default-size-name: "medium";
+$spinner-default-size: fn.map-get($spinner-sizes, $spinner-default-size-name);
+$spinner-default-color-name: "brand";
+$spinner-default-color: fn.map-get(icons.$icon-colors, $spinner-default-color-name);
+
+// The size of the Spinner that should be used when the entire screen is loading.
+$spinner-size-app: $spinner-size-large;
+
+// The size of the Spinner that should be used when the entire screen is loading and no content is
+// displayed.
+$spinner-size-screen: 48px;
+
+/* ========================================== Exports =========================================== */
+:export {
+  spinnerDefaultColor: $spinner-default-color;
+  spinnerDefaultColorName: string.unquote($spinner-default-color-name);
+  spinnerDefaultSize: $spinner-default-size;
+  spinnerDefaultSizeName: string.unquote($spinner-default-size-name);
+  spinnerSizeLarge: $spinner-size-large;
+  spinnerSizeMedium: $spinner-size-medium;
+  spinnerSizeScreen: $spinner-size-screen;
+  spinnerSizeSmall: $spinner-size-small;
+}

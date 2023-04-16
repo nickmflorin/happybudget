@@ -1,20 +1,16 @@
-import React from "react";
+import { ui, formatters } from "lib";
 
-import { map } from "lodash";
-
-import ItemizedTooltipItem from "./ItemizedTooltipItem";
+import { ItemizedTooltipItem } from "./ItemizedTooltipItem";
 
 type ItemizedTooltipContentProps = {
-  readonly items: IItemizedTooltipItem[];
-  readonly formatter?: NativeFormatter<string | number>;
+  readonly items: ui.ItemizedTooltipItem[];
+  readonly formatter?: formatters.Formatter<string | number>;
 };
 
-const ItemizedTooltipContent = (props: ItemizedTooltipContentProps): JSX.Element => (
+export const ItemizedTooltipContent = (props: ItemizedTooltipContentProps): JSX.Element => (
   <div className="itemized-tooltip-content">
-    {map(props.items, (item: IItemizedTooltipItem, i: number) => (
+    {props.items.map((item: ui.ItemizedTooltipItem, i: number) => (
       <ItemizedTooltipItem {...item} formatter={item.formatter || props.formatter} key={i} />
     ))}
   </div>
 );
-
-export default React.memo(ItemizedTooltipContent);

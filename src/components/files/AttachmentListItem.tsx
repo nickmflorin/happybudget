@@ -4,7 +4,7 @@ import classNames from "classnames";
 
 import { util } from "lib";
 import { Icon } from "components";
-import { IconButton, TrashButton } from "components/buttons";
+import { IconButton, TrashButton } from "components/buttonsOld";
 import { FileIcon } from "components/icons";
 import { Link } from "components/links";
 

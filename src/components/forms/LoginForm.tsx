@@ -2,12 +2,12 @@ import React from "react";
 
 import classNames from "classnames";
 
+import * as config from "application/config";
 import { util } from "lib";
 import { Form, ShowHide } from "components";
-import { PrimaryButton, SocialButton } from "components/buttons";
+import { PrimaryButton, SocialButton } from "components/buttonsOld";
 import { PasswordInput, EmailInput } from "components/fields";
 import { RouterLink } from "components/links";
-import * as config from "application/config";
 
 export type ILoginFormValues = {
   readonly email?: string;

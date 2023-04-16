@@ -1,0 +1,30 @@
+.collaborators-list {
+  > .collaborator-list-item {
+    display: flex;
+
+    &.loading {
+      opacity: 0.6;
+    }
+
+    > * {
+      &:not(:last-child) {
+        margin-right: 8px;
+      }
+    }
+
+    > .collaborator-list-item__user-image-or-initials-container {
+      height: 32px;
+      width: 32px;
+    }
+
+    > .collaborator-list-item__name-container {
+      flex-grow: 100;
+      font-weight: 500;
+      line-height: 32px;
+    }
+
+    &:not(:last-child) {
+      margin-bottom: 8px;
+    }
+  }
+}

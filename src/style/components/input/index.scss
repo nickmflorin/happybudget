@@ -39,16 +39,16 @@ textarea:focus,
 .ant-input-affix-wrapper-focused,
 select:-webkit-autofill:focus {
   box-shadow: 0 0 0px 1000px $gray-light inset !important;
-  -webkit-box-shadow: 0 0 0px 1000px $gray-light inset !important;
+  box-shadow: 0 0 0px 1000px $gray-light inset !important;
 }
 
 input:-webkit-autofill::first-line {
-  font-size: $medium-text-size;
   color: $text-primary !important;
   font-family: $avenir;
+  font-size: $medium-body-font-size;
   font-weight: 500;
-  width: 100%;
   line-height: 16px;
+  width: 100%;
 }
 
 input:focus-visible {
@@ -61,7 +61,7 @@ input:focus-visible {
 
 .input {
   @extend .input-base;
-  @include input_size_standard();
+  @include input_size_standard;
 }
 
 // The generic `input` class is applied to the wrapping component.  The actual
@@ -69,10 +69,11 @@ input:focus-visible {
 // wrapping component.
 span.input {
   @extend .input-base;
-  @include input_size_standard();
+  @include input_size_standard;
 
   .ant-input-prefix {
     margin-right: 10px;
+
     svg {
       color: #c6c6c6;
     }
@@ -80,9 +81,10 @@ span.input {
 
   > input {
     @extend .input-base;
+
+    border-radius: 0px !important;
     font-size: inherit !important;
     height: 100%;
-    border-radius: 0px !important;
     line-height: inherit !important;
   }
 }
@@ -95,6 +97,7 @@ span.input {
 
   input {
     @extend .input-base;
+
     height: 100%;
   }
 
@@ -103,18 +106,18 @@ span.input {
   // it's propogation stopped.  This is required to allow clickable elements to
   // be rendered inside the `input-div`.
   .input-div-content {
-    width: fit-content;
     // Line height of input text.  This is required so that the "input" AKA div
     // does not change height when the input is hidden.
     height: 22px !important;
     line-height: 22px !important;
+    width: fit-content;
 
     > * {
-      line-height: 24px;
       font-family: $avenir;
+      font-size: $medium-body-font-size;
       font-weight: 500;
-      font-size: $medium-text-size;
       letter-spacing: normal;
+      line-height: 24px;
       padding-left: 2px;
       vertical-align: unset !important;
     }
@@ -124,16 +127,17 @@ span.input {
 // The textarea element only supports one size for now, the standard size.
 textarea.text-area {
   @extend .input-base;
-  @include input_framework();
+  @include input_framework;
+
   min-height: $standard-size !important;
 }
 
 .image-and-name {
   display: flex;
-  height: 100%;
   font-size: 24px;
-  line-height: 64px;
   font-weight: 700 !important;
+  height: 100%;
+  line-height: 64px;
   width: 100%;
 
   .user-image-uploader {
@@ -141,9 +145,9 @@ textarea.text-area {
   }
 
   .name-wrapper {
-    margin-left: 12px;
     display: flex;
     height: 100%;
+    margin-left: 12px;
 
     .name {
       &:not(:first-child) {

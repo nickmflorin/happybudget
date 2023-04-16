@@ -1,0 +1,100 @@
+@use "sass:map";
+@use "sass:string";
+
+@use "../../functions" as fn;
+@use "../colors.module" as colors;
+
+$icon-contain-names: ("square", "fit");
+
+$icon-size-small: 16px;
+$icon-size-medium: 20px;
+$icon-size-large: 24px;
+$icon-size-fill: 100%;
+
+$icon-sizes: (
+  "small": $icon-size-small,
+  "medium": $icon-size-medium,
+  "large": $icon-size-large,
+  "fill": $icon-size-fill,
+);
+$icon-size-names: map.keys($icon-sizes);
+
+$icon-color-brand: colors.$green;
+$icon-color-grey: colors.$text-grey;
+$icon-color-blue: colors.$blue;
+$icon-color-white: colors.$white;
+
+$icon-root-colors: (
+  "brand": $icon-color-brand,
+  "grey": $icon-color-grey,
+  "blue": $icon-color-blue,
+  "white": $icon-color-white,
+);
+$icon-color-names: map.keys($icon-root-colors);
+
+$icon-colors: map.merge(
+  $icon-root-colors,
+  (
+    "hovered": (
+      "brand": colors.$dark-green,
+      "grey": colors.$grey,
+      "blue": colors.$dark-blue,
+    ),
+    "focused": (
+      "brand": colors.$dark-green,
+      "grey": colors.$grey,
+      "blue": colors.$dark-blue,
+    ),
+    "disabled": (
+      "brand": colors.$disabled-color,
+      "grey": colors.$disabled-color,
+      "blue": colors.$disabled-color,
+    ),
+  )
+);
+
+@function get-icon-color($name, $state: null) {
+  // If there is not a state-ful color associated with the icon, just return its normal color.
+  @if $state and map.has-key($icon-colors, $state) {
+    $state-map: fn.map-get($icon-colors, $state);
+    @if map.has-key($state-map, $name) {
+      @return fn.map-get($state-map, $name);
+    }
+  }
+  @return fn.map-get($icon-colors, $name);
+}
+
+@mixin with-icon-colors {
+  @each $key in map.keys($icon-root-colors) {
+    $c: get-icon-color($key);
+
+    // Provide all states in the extra data, regardless of state requested as parameter.
+    $extra: (
+      "name": $key,
+      "regular": get-icon-color($key),
+      "focused": get-icon-color($key, "focused"),
+      "hovered": get-icon-color($key, "hovered"),
+      "disabled": get-icon-color($key, "disabled"),
+    );
+
+    @content ($c, $extra);
+  }
+}
+
+/* -------------------------------------------- Defaults ---------------------------------------- */
+$icon-default-size-contain: "fit";
+$icon-default-size-axis: "vertical";
+
+/* ========================================== Exports =========================================== */
+:export {
+  iconColorBlue: $icon-color-blue;
+  iconColorBrand: $icon-color-brand;
+  iconColorGrey: $icon-color-grey;
+  iconColorWhite: $icon-color-white;
+  iconDefaultSizeAxis: string.unquote($icon-default-size-axis);
+  iconDefaultSizeContain: string.unquote($icon-default-size-contain);
+  iconSizeFill: $icon-size-fill;
+  iconSizeLarge: $icon-size-large;
+  iconSizeMedium: $icon-size-medium;
+  iconSizeSmall: $icon-size-small;
+}

@@ -1,0 +1,81 @@
+@use "partials";
+
+.modal-wrapper {
+  height: 100vh;
+  position: relative;
+  width: 100%;
+  z-index: 50;
+}
+
+.modal-bg {
+  background-color: partials.$overlay-color;
+  bottom: 0;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+}
+
+.modal-panel-wrapper {
+  align-items: center;
+  bottom: 0px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 100%;
+}
+
+.modal {
+  align-items: center;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 100%;
+
+  > div {
+    align-items: flex-start;
+    background-color: partials.$white;
+    border-radius: partials.$modal-border-radius;
+    display: flex;
+    flex-direction: column;
+    max-height: 100vh;
+    min-width: partials.$modal-content-min-width;
+
+    .panel-header {
+      align-items: center;
+      display: flex;
+      flex-direction: row;
+      height: partials.$modal-header-height;
+      justify-content: space-between;
+      padding: partials.$modal-header-padding;
+      position: sticky;
+      width: 100%;
+    }
+
+    .panel-content {
+      overflow-y: scroll;
+      padding: partials.$modal-content-padding;
+      width: 100%;
+    }
+
+    .button-bar {
+      border-bottom-left-radius: partials.$modal-border-radius;
+      border-bottom-right-radius: partials.$modal-border-radius;
+      bottom: 0;
+      position: sticky;
+
+      .separator {
+        margin-top: 0;
+      }
+    }
+  }
+}

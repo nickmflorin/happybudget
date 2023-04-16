@@ -1,0 +1,110 @@
+/**
+This file should house all root color variables and constants used in the application.   A root
+color variable is defined as a SASS variable that references a raw color value, such as the
+hexademical color code or a transformation of a hexadecimal color code.
+
+This file should not contain any color variables that are specific to components.  Those should
+live in the `_components.scss` file.
+
+Best attempts to maintain consistency with existing nomenclature should be made, and new
+nomenclature patterns should be referenced here.
+*/
+@use "sass:color";
+
+$white: #ffffff;
+$off-white: #fbfbfb;
+$black: #000000;
+$transparent: rgb(0 0 0 / 0%);
+$standard-border-color: #cbd5e1;
+$standard-hover-color: rgb(232 232 232 / 50%);
+$standard-active-hover-color: #f1f1f1;
+$standard-disabled-color: #d3d3d3;
+$standard-disabled-bg-color: #efefef;
+$standard-disabled-border-color: #d3d3d3;
+
+/* ----------------------------------------- Greens --------------------------------------------- */
+$green: #0fb767;
+$lighter-green: color.change($green, $alpha: 0.6);
+$dark-green: #05a479;
+$light-green: #32d387;
+$faded-green: #f6ffed;
+
+/* ----------------------------------------- Blues ---------------------------------------------- */
+$dark-blue: #0a2e3b;
+$lighter-dark-blue: color.change($dark-blue, $alpha: 0.6);
+$blue: #1378ff;
+$lighter-blue: color.change($medium-blue, $alpha: 0.6);
+$light-blue: #37adeb;
+$link-blue: #167fa6;
+$lighter-light-blue: color.change($light-blue, $alpha: 0.5);
+
+/* ------------------------------------------ Greys --------------------------------------------- */
+$grey: #979797;
+$light-grey: #ececec;
+$darker-light-grey: color.darken($light-grey, 10%);
+$lighter-grey: color.change($grey, $alpha: 0.6);
+$text-primary: #404152;
+$text-secondary: $dark-blue;
+$text-grey: #646f79;
+$text-light: #b5b5b5;
+
+/* ------------------------------------------- Reds --------------------------------------------- */
+$red: #d73a49;
+$lighter-red: color.change($red, $alpha: 0.8);
+$lighter-lighter-red: color.change($red, $alpha: 0.6);
+$dark-red: #c1272d;
+
+/* ----------------------------------------- Oranges -------------------------------------------- */
+$orange: #fd905f;
+$lighter-orange: color.change($red, $alpha: 0.8);
+$lighter-lighter-orange: color.change($red, $alpha: 0.6);
+
+/* ----------------------------------------- Purples -------------------------------------------- */
+$purple: #8850d0;
+$lighter-purple: color.change($purple, $alpha: 0.6);
+
+/* ----------------------------------------- Yellows -------------------------------------------- */
+$yellow: #efcd5d;
+$lighter-yellow: color.change($yellow, $alpha: 0.6);
+
+/* ========================================== Exports =========================================== */
+
+:export {
+  black: $black;
+  blue: $blue;
+  darkBlue: $dark-blue;
+  darkGreen: $dark-green;
+  darkRed: $dark-red;
+  darkerLightGrey: $darker-light-grey;
+  fadedGreen: $faded-green;
+  green: $green;
+  grey: $grey;
+  lightBlue: $light-blue;
+  lightGreen: $light-green;
+  lightGrey: $light-grey;
+  lighterDarkBlue: $lighter-dark-blue;
+  lighterGreen: $lighter-green;
+  lighterGrey: $lighter-grey;
+  lighterLightBlue: $lighter-light-blue;
+  lighterLighterOrange: $lighter-lighter-orange;
+  lighterLighterRed: $lighter-lighter-red;
+  lighterOrange: $lighter-orange;
+  lighterPurple: $lighter-purple;
+  lighterRed: $lighter-red;
+  lighterYellow: $lighter-yellow;
+  linkBlue: $link-blue;
+  offWhite: $off-white;
+  orange: $orange;
+  purple: $purple;
+  red: $red;
+  standardActiveHoverColor: $standard-active-hover-color;
+  standardBorderColor: $standard-border-color;
+  standardDisabledColor: $standard-disabled-color;
+  standardHoverColor: $standard-hover-color;
+  textGrey: $textGrey;
+  textPrimary: $text-primary;
+  textSecondary: $text-secondary;
+  transparent: $transparent;
+  white: $white;
+  yellow: $yellow;
+}

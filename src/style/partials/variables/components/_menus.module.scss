@@ -1,0 +1,4 @@
+@use "../colors.module" as colors;
+
+$menu-border-color: colors.$standard-border-color;
+$menu-border: 1px solid $menu-border-color;

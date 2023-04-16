@@ -2,27 +2,29 @@
 @import "./mixins";
 
 .link {
-  @include btn-link-base();
+  @include btn-link-base;
+
+  background-color: $transparent;
+  border: none !important;
+  color: $blue;
   font-family: $roboto;
   font-weight: 400;
-  transition: none;
-  background-color: $transparent;
   padding: 0;
-  border: none !important;
+  transition: none;
 
   .icon {
+    color: inherit;
     height: 1.5rem;
     width: 1.5rem;
-    color: inherit;
   }
 
-  color: $blue;
   &:hover {
     color: lighten($blue, 10%);
   }
 
   &--dark {
     @extend .link;
+
     color: $text-primary;
     text-transform: none !important;
 
@@ -33,25 +35,27 @@
 
   &--inline {
     @extend .link;
+
     font-size: inherit !important;
   }
 
   &--help {
     @extend .link;
+
     display: flex;
 
     .icon {
       color: $icon-color;
       height: 16px;
-      width: 16px;
       margin-right: 6px;
+      width: 16px;
     }
 
     .text-container {
       color: $text-secondary;
       display: none;
       font-family: $roboto;
-      font-size: $medium-text-size;
+      font-size: $medium-body-font-size;
       font-weight: 500;
       line-height: $standard-size;
       text-transform: uppercase;
@@ -65,13 +69,14 @@
   &--account-circle {
     @extend .link;
     @include standard_size("large");
-    font-family: $avenir;
-    font-size: $large-text-size;
-    display: block;
+
     border-radius: 100%;
-    overflow: hidden;
-    text-align: center;
     border-width: 1px;
+    display: block;
+    font-family: $avenir;
+    font-size: $large-body-font-size;
+    overflow: hidden;
     position: relative;
+    text-align: center;
   }
 }

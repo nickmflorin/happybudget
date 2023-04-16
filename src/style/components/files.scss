@@ -3,41 +3,42 @@
   flex-direction: column;
 
   .attachment-list-item {
+    border-top: 1px solid #efefef;
     display: flex;
     height: 37px;
     padding-top: 4px;
-    border-top: 1px solid #efefef;
 
     &.disabled {
       opacity: 0.4;
     }
 
     .text-wrapper {
-      font-size: $medium-text-size;
-      font-family: $avenir;
-      font-weight: 500;
       color: $text-secondary;
+      font-family: $avenir;
+      font-size: $medium-body-font-size;
+      font-weight: 500;
       line-height: $standard-size;
-      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      white-space: nowrap;
 
       &.size {
-        text-align: right;
         flex-grow: 100;
+        text-align: right;
         text-overflow: initial;
       }
     }
 
     .link {
       line-height: $standard-size;
-      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .file-action-wrapper {
-      @include vertical-flex-c();
+      @include vertical-flex-c;
+
       height: $standard-size;
       margin-right: 6px;
 
@@ -48,14 +49,15 @@
     }
 
     .button-action-wrapper {
-      @include vertical-flex-c();
+      @include vertical-flex-c;
+
       height: $standard-size;
       margin-left: 4px;
 
       .btn {
         height: 22px;
-        width: 22px;
         padding: 2px;
+        width: 22px;
       }
     }
   }

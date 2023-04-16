@@ -1,0 +1,23 @@
+/**
+Globally defined styles that pertain to a specific components or set of components should be put in
+a file in this folder.
+
+File names should be in hyphen-case, and all lowercase.  Each component or type of component have
+a dedicated global component style file.
+
+The various component global style files should all be imported in this index.scss file.
+*/
+@use "./icons"; // This must come first to avoid issues overriding styles.
+@use "./buttons";
+@use "./forms";
+@use "./layout";
+@use "./loading";
+@use "./feedback";
+@use "./structural";
+@use "./input";
+@use "./tables";
+@use "./typography";
+@use "./modules";
+@use "./modals";
+@use "./tooltips";
+@use "./collaboration";

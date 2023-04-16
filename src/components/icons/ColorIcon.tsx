@@ -1,20 +1,18 @@
-import React, { useMemo } from "react";
-
 import classNames from "classnames";
-import { isNil } from "lodash";
 
+import { ui } from "lib";
 import { Colors } from "style/constants";
 
-export type ColorIconProps = StandardComponentProps & {
-  readonly color?: string | null | undefined;
+export type ColorIconProps = ui.ComponentProps<{
+  readonly color?: ui.HexColor | null;
   readonly size: number;
   readonly selected?: boolean;
   readonly selectable?: boolean;
-  readonly selectedColor?: Style.HexColor;
-  readonly useDefault?: string | boolean;
-};
+  readonly selectedColor?: ui.HexColor;
+  readonly useDefault?: ui.HexColor | boolean;
+}>;
 
-const ColorIcon = ({
+export const ColorIcon = ({
   color,
   useDefault,
   selectedColor = "#6eb6ff",
@@ -23,14 +21,15 @@ const ColorIcon = ({
   size,
   ...props
 }: ColorIconProps) => {
-  const c = useMemo(() => {
-    if (isNil(color) && (useDefault === true || typeof useDefault === "string")) {
-      return typeof useDefault === "string" ? useDefault : Colors.COLOR_NO_COLOR;
-    }
-    return color;
-  }, [color, useDefault]);
+  const c =
+    (color === undefined || color === null) &&
+    (useDefault === true || typeof useDefault === "string")
+      ? typeof useDefault === "string"
+        ? useDefault
+        : Colors.COLOR_NO_COLOR
+      : color;
 
-  if (!isNil(c)) {
+  if (c !== null && c !== undefined) {
     return (
       <svg
         {...props}
@@ -52,5 +51,3 @@ const ColorIcon = ({
   }
   return <></>;
 };
-
-export default React.memo(ColorIcon);

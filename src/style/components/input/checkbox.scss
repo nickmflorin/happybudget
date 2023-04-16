@@ -14,7 +14,7 @@
 .ant-checkbox-wrapper {
   color: $text-secondary;
   font-family: $avenir;
-  font-size: $medium-text-size;
+  font-size: $medium-body-font-size;
   font-weight: 500 !important;
 }
 
@@ -25,9 +25,9 @@
     @include size(16px);
 
     .ant-checkbox {
-      font-size: $xlarge-text-size;
-      line-height: 1;
       display: block;
+      font-size: $xlarge-body-font-size;
+      line-height: 1;
       top: 0;
     }
   }

@@ -1,0 +1,79 @@
+@use "sass:map";
+@use "sass:math";
+
+@use "throw";
+
+@use "../../functions" as fn;
+@use "./icons.module" as icons;
+
+$corsha-logo-svg-name: "corsha-logo";
+
+$svg-bases: (
+  $corsha-logo-svg-name: (
+    height: 22.21px,
+    width: 25px,
+  ),
+);
+
+@function get-svg-base($name) {
+  $base: map.get($svg-bases, $name);
+  @if not $base {
+    @return throw.error(
+      "The provided SVG name, #{$name}, does not have an associated base defined."
+    );
+  } @else if not map.has-key($base, "height") or not map.has-key($base, "width") {
+    @return throw.error("The base for the provided SVG name, #{$name}, is invalid.");
+  }
+  @return $base;
+}
+
+@function get-svg-height($name) {
+  $bases: get-svg-base($name);
+  @return fn.map-get($bases, "height");
+}
+
+@function get-svg-width($name) {
+  $bases: get-svg-base($name);
+  @return fn.map-get($bases, "width");
+}
+
+@mixin svg-contain-square($name) {
+  $base: get-svg-base($name);
+
+  $base-height: fn.map-get($base, "height");
+  $base-width: fn.map-get($base, "width");
+
+  aspect-ratio: 1;
+  height: max($base-width, $base-height);
+  width: auto;
+
+  @if $base-height < $base-width {
+    padding-bottom: 0.5 * ($base-width - $base-height);
+    padding-top: 0.5 * ($base-width - $base-height);
+  } @else if $base-height > $base-width {
+    padding-left: 0.5 * ($base-height - $base-width);
+    padding-right: 0.5 * ($base-height - $base-width);
+  }
+}
+
+@mixin svg-contain-fit($name) {
+  $base: get-svg-base($name);
+
+  $base-height: fn.map-get($base, "height");
+  $base-width: fn.map-get($base, "width");
+
+  aspect-ratio: math.div($base-width, $base-height);
+  height: $base-height;
+  width: auto;
+}
+
+@mixin svg-contain($name, $contain: icons.$icon-default-size-contain) {
+  $base: get-svg-base($name);
+  $contain: fn.validate-value($contain, ("square", "fit"));
+
+  @if $contain == "square" {
+    @include svg-contain-square($name);
+  } @else {
+    @include svg-contain-fit($name);
+  }
+}

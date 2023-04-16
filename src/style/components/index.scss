@@ -1,7 +1,6 @@
 @import "./billing";
 @import "./buttons";
 @import "./charts";
-@import "./collaboration";
 @import "./contacts";
 @import "./containers";
 @import "./dropdowns";
@@ -21,11 +20,9 @@
 @import "./pdf";
 @import "./popovers";
 @import "./tagging";
-@import "./tooltips";
-@import "./typography";
 
 .separator {
-  width: 100%;
   border-bottom: 1px solid $separator-color;
   margin: 10px auto;
+  width: 100%;
 }

@@ -1,0 +1,9 @@
+@use "./input.module" as input;
+
+$separator-default-color: input.$input-border-color;
+$separator-border: 1px solid $separator-default-color;
+
+/* ========================================== Exports =========================================== */
+:export {
+  separatorDefaultColor: $separator-default-color;
+}

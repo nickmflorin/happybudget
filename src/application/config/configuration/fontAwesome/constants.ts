@@ -45,7 +45,7 @@ validation logic will throw an Error during the icon registration process.
        with the icon being removed.
 */
 /* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
-import { enumeratedLiterals } from "lib/util/util";
+import { enumeratedLiterals } from "lib/util/literals";
 
 export const IconPrefixes = enumeratedLiterals(["far", "fab", "fas"] as const);
 
@@ -60,42 +60,51 @@ export const IconCodes = enumeratedLiterals(["solid", "regular", "brand"] as con
    exists, it is because the Icon's name is associated with multiple prefixes and the name does not
    need to be re-added to this array a second time.  This array should be unique. */
 export const IconNames = enumeratedLiterals([
-  "slack",
   "arrow-down",
-  "circle-notch",
+  "arrow-up",
   "ellipsis",
   "database",
-  "chart-simple",
-  "circle-nodes",
-  "shield",
-  "user-group",
-  "triangle-exclamation",
-  "file-lines",
   "circle-question",
   "circle-exclamation",
   "circle-check",
   "xmark",
   "circle-user",
-  "bell",
   "chevron-down",
-  "pencil",
-  "pause",
-  "arrow-rotate-left",
-  "circle-stop",
-  "play",
+  "file-csv",
+  "file-excel",
+  "file-pdf",
+  "file-powerpoint",
+  "file-word",
+  "file-image",
+  "file-audio",
+  "file-video",
+  "file-archive",
+  "file",
+  "bank",
+  "file-import",
+  "circle-notch",
+  "server",
+  "caret-down",
+  "caret-up",
+  "times-circle",
 ] as const);
 
 /* When an Icon is added to the registry, the name must be added to the appropriate IconCode key
    in this object type. */
 export const Icons = {
-  [IconCodes.REGULAR]: [IconNames.FILE_LINES, IconNames.CIRCLE_QUESTION] as const,
+  [IconCodes.REGULAR]: [
+    IconNames.CIRCLE_QUESTION,
+    IconNames.FILE_ARCHIVE,
+    IconNames.FILE_AUDIO,
+    IconNames.FILE_EXCEL,
+    IconNames.FILE_IMAGE,
+    IconNames.FILE_PDF,
+    IconNames.FILE_POWERPOINT,
+    IconNames.FILE_VIDEO,
+    IconNames.FILE_WORD,
+    IconNames.FILE,
+  ] as const,
   [IconCodes.SOLID]: [
-    IconNames.CIRCLE_NOTCH,
-    IconNames.CIRCLE_NODES,
-    IconNames.SHIELD,
-    IconNames.USER_GROUP,
-    IconNames.TRIANGLE_EXCLAMATION,
-    IconNames.CHART_SIMPLE,
     IconNames.DATABASE,
     IconNames.ARROW_DOWN,
     IconNames.ELLIPSIS,
@@ -103,13 +112,15 @@ export const Icons = {
     IconNames.CIRCLE_EXCLAMATION,
     IconNames.XMARK,
     IconNames.CIRCLE_USER,
-    IconNames.BELL,
     IconNames.CHEVRON_DOWN,
-    IconNames.PENCIL,
-    IconNames.PAUSE,
-    IconNames.ARROW_ROTATE_LEFT,
-    IconNames.CIRCLE_STOP,
-    IconNames.PLAY,
+    IconNames.FILE_CSV,
+    IconNames.BANK,
+    IconNames.FILE_IMPORT,
+    IconNames.CIRCLE_NOTCH,
+    IconNames.SERVER,
+    IconNames.CARET_UP,
+    IconNames.CARET_DOWN,
+    IconNames.TIMES_CIRCLE,
   ] as const,
-  [IconCodes.BRAND]: [IconNames.SLACK] as const,
+  [IconCodes.BRAND]: [] as const,
 };

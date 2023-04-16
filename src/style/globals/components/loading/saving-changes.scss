@@ -1,0 +1,46 @@
+@use "partials";
+
+.saving-changes {
+  display: flex;
+  height: partials.$large-size;
+  // We want to keep the width of the component constant such that when it
+  // shifts between "Saving Changes" and "Changes Saved" it does not reposition
+  // other elements it is adjacent to.
+  width: 136px;
+
+  .spinner-wrapper {
+    @include partials.size(22px);
+
+    margin-right: 4px;
+    position: relative;
+
+    .saving-changes-spinner {
+      color: partials.$light-grey;
+      height: 22px;
+      width: auto;
+    }
+  }
+
+  .check-wrapper {
+    @include partials.size(22px);
+
+    margin-right: 4px;
+    padding: 3px;
+
+    svg {
+      color: partials.$green;
+      height: auto;
+      width: 16px;
+    }
+  }
+
+  .text-container {
+    color: partials.$text-grey;
+    font-family: partials.$roboto;
+    font-size: partials.$medium-body-font-size;
+    font-weight: 500;
+    line-height: partials.$large-size;
+    text-transform: uppercase;
+    width: 105px;
+  }
+}

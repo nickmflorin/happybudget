@@ -1,0 +1,253 @@
+@use "sass:map";
+
+@use "partials";
+
+@include partials.font-face("Avenir", "Light", 300 399);
+@include partials.font-face("Avenir", "Regular", 400 499);
+@include partials.font-face("Avenir", "Regular", 400 499, italic);
+@include partials.font-face("Avenir", "Medium", 500 599);
+@include partials.font-face("Avenir", "SemiBold", 600 699);
+@include partials.font-face("Avenir", "SemiBold", 600 699, italic);
+@include partials.font-face("Avenir", "Bold", 700);
+@include partials.font-face("Avenir", "Bold", 700, italic);
+
+@include partials.font-face("Roboto", "Light", 300 399);
+@include partials.font-face("Roboto", "Light", 300 399, italic);
+@include partials.font-face("Roboto", "Regular", 400 499);
+@include partials.font-face("Roboto", "Medium", 500 699);
+@include partials.font-face("Roboto", "Medium", 500 699, italic);
+@include partials.font-face("Roboto", "Bold", 700);
+@include partials.font-face("Roboto", "Bold", 700, italic);
+
+%typography-base {
+  font-feature-settings: "tnum" on, "lnum" on;
+  font-style: normal !important;
+  font-variant: tabular-nums;
+  margin: 0;
+  padding: 0;
+
+  em,
+  b {
+    font-style: normal !important;
+  }
+
+  i {
+    font-style: normal !important;
+  }
+}
+
+%body-defaults {
+  @include partials.body-font-weight;
+  @include partials.body-font-size;
+  @include partials.body-font-color;
+  @include partials.body-font-family;
+}
+
+%heading-defaults {
+  @include partials.heading-font-weight;
+  @include partials.heading-font-size;
+  @include partials.heading-font-color;
+  @include partials.heading-font-family;
+}
+
+.strikethrough {
+  color: $gray;
+  text-decoration: line-through;
+}
+
+html,
+body {
+  @extend %typography-base;
+
+  font-family: partials.$body-font-family-name, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+}
+
+p {
+  @extend %typography-base;
+  @extend %body-defaults;
+
+  em,
+  b {
+    font-family: inherit;
+    font-style: inherit;
+    font-weight: inherit;
+  }
+}
+
+label:not(.checkbox) {
+  @include partials.label;
+
+  display: flex;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @extend %typography-base;
+  @extend %heading-defaults;
+
+  em,
+  b {
+    font-family: inherit;
+    font-style: inherit;
+    font-weight: inherit;
+  }
+}
+
+@mixin typography-type-variants($type) {
+  @each $level in map.get(partials.$typography-levels, $type) {
+    &--#{$level} {
+      // This will include the default font weight name for the given level.
+      @include partials.font($type, $level: $level);
+    }
+  }
+  @each $font-weight-name in partials.$font-weight-names {
+    &--weight-type-#{$font-weight-name} {
+      @include partials.font-weight($type, $font-weight-name: $font-weight-name);
+    }
+  }
+}
+
+.heading {
+  @extend %typography-base;
+  @extend %heading-defaults;
+  @include typography-type-variants("heading");
+
+  width: 100%;
+}
+
+.label {
+  @extend %typography-base;
+  @extend %heading-defaults;
+  @include typography-type-variants("label");
+
+  width: 100%;
+
+  &--transform-underline {
+    text-decoration: underline;
+  }
+
+  &--transform-caps {
+    text-transform: uppercase;
+  }
+}
+
+.body {
+  @extend %typography-base;
+  @include typography-type-variants("body");
+
+  &--transform-underline {
+    text-decoration: underline;
+  }
+
+  &--transform-caps {
+    text-transform: uppercase;
+  }
+}
+
+.date {
+  @extend %typography-base;
+
+  color: partials.$dark-blue;
+  font-weight: partials.get-font-weight("body", $level: 2, $font-weight-name: "regular");
+  line-height: 24px;
+}
+
+.time {
+  @extend %typography-base;
+
+  color: partials.$text-grey;
+  font-weight: partials.get-font-weight("body", $level: 2, $font-weight-name: "regular");
+  line-height: 24px;
+}
+
+.datetime {
+  @extend %typography-base;
+
+  display: flex;
+  font-weight: partials.get-font-weight("body", $level: 2, $font-weight-name: "regular");
+  line-height: 24px;
+
+  &:not(.datetime--stacked) {
+    flex-direction: row;
+
+    > .date {
+      + .time {
+        margin-left: 8px;
+      }
+    }
+  }
+
+  &--stacked {
+    flex-direction: column;
+  }
+
+  > * {
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+  }
+}
+
+.entity-text {
+  @include partials.font-weight("body", $font-weight-name: "bold");
+  @include partials.truncate;
+
+  font-family: partials.$body-font-family-name;
+  font-size: partials.$entity-text-font-size;
+  width: 100%;
+
+  > .entity-text__identifier {
+    color: partials.$entity-text-identifier-color;
+    font-weight: 600;
+  }
+
+  > .entity-text__description {
+    color: partials.$entity-text-description-color;
+    font-weight: 600;
+
+    &--with-identifier {
+      margin-left: 5px;
+    }
+  }
+}
+
+.attachment-text {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  height: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+
+  > * + * {
+    margin-left: 4px;
+  }
+
+  > .icon {
+    @include partials.size(14px);
+
+    color: partials.map-get(partials.$icon-colors, "grey");
+    vertical-align: -0.125em !important;
+  }
+
+  > .attachment-text__sub-text {
+    @include partials.font("body", $font-weight-name: "regular", $level: 4);
+  }
+}
+
+// We want to delete this.
+.text-with-included-link {
+  .link,
+  .btn {
+    font-size: $medium-body-font-size;
+    line-height: 16px;
+    vertical-align: 0.225rem;
+  }
+}

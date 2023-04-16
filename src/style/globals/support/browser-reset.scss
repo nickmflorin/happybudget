@@ -1,0 +1,53 @@
+@use "partials";
+@use "../components/typography";
+
+/*
+There are several browsers, notably Google Chrome, that seem to believe they are allowed to just
+manipulate the styling of certain input and button elements for purposes of auto-fill, not matter
+how terrible it looks.
+
+Not only do they make a lot of effort to do this, but they do it in a way that makes it nearly
+impossible to override or stop.  Certain tricks have been passed down throughout the years, and
+this file represents one of them: using a box-shadow that insets towards the inside of the component
+that masks (covers) the styling that those browsers apply on auto-fill.
+*/
+@mixin remove-browser-autofill {
+  // The actual value of the box-shadow spread (1000px) doesn't matter outside of the fact that it
+  // must be large enough to cover the inside of the element.
+  $box-shadow-mask: 0 0 0px 1000px partials.$input-bg-color inset;
+
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -webkit-box-shadow: $box-shadow-mask !important;
+  box-shadow: $box-shadow-mask !important;
+}
+
+@mixin reset-browser-autofill($elements...) {
+  @each $element in $elements {
+    #{$element} {
+      &:-webkit-autofill {
+        @include remove-browser-autofill;
+
+        &:focus {
+          @include remove-browser-autofill;
+        }
+
+        &:hover {
+          @include remove-browser-autofill;
+        }
+
+        &::first-line {
+          color: partials.$input-color;
+          font-family: partials.$input-font-family;
+          font-weight: partials.$input-font-weight;
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+@include reset-browser-autofill("input", "textarea", "select");
+
+input:focus-visible {
+  outline: none !important;
+}

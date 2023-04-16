@@ -1,22 +1,21 @@
-import React from "react";
-
 import classNames from "classnames";
-import { map } from "lodash";
 
-import CollaboratorListItem from "./CollaboratorListItem";
+import { model, ui } from "lib";
 
-type CollaboratorsListProps = StandardComponentProps & {
-  readonly collaborators: Model.Collaborator[];
+import { CollaboratorListItem } from "./CollaboratorListItem";
+
+type CollaboratorsListProps = ui.ComponentProps<{
+  readonly collaborators: model.Collaborator[];
   readonly onChangeAccessType: (
-    c: Model.Collaborator,
-    ac: Model.CollaboratorAccessType["id"],
+    c: model.Collaborator,
+    ac: model.CollaboratorAccessType["id"],
   ) => void;
-  readonly onRemoveCollaborator: (c: Model.Collaborator) => void;
+  readonly onRemoveCollaborator: (c: model.Collaborator) => void;
   readonly isDeleting: (id: number) => boolean;
   readonly isUpdating: (id: number) => boolean;
-};
+}>;
 
-const CollaboratorsList = ({
+export const CollaboratorsList = ({
   collaborators,
   isDeleting,
   isUpdating,
@@ -25,17 +24,15 @@ const CollaboratorsList = ({
   ...props
 }: CollaboratorsListProps) => (
   <div {...props} className={classNames("collaborators-list", props.className)}>
-    {map(collaborators, (c: Model.Collaborator, i: number) => (
+    {collaborators.map((c: model.Collaborator, i: number) => (
       <CollaboratorListItem
         key={i}
         collaborator={c}
         deleting={isDeleting(c.id)}
         updating={isUpdating(c.id)}
-        onChangeAccessType={(ac: Model.CollaboratorAccessType["id"]) => onChangeAccessType(c, ac)}
+        onChangeAccessType={(ac: model.CollaboratorAccessType["id"]) => onChangeAccessType(c, ac)}
         onDelete={() => onRemoveCollaborator(c)}
       />
     ))}
   </div>
 );
-
-export default React.memo(CollaboratorsList);

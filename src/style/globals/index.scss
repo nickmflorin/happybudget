@@ -1,0 +1,15 @@
+/**
+Styles that are defined globally should be placed in this file, a file in the same folder or a file
+in the `components` sub-directory.
+
+All file names should be hyphen-case with all lowercase characters.  There should not be any
+locally scoped component files (`.module.scss`) files in this directory.
+
+For more information, see src/styles/ReadMe.md.
+*/
+@use "./components";
+@use "./support";
+
+* {
+  box-sizing: border-box;
+}

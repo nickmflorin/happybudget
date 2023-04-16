@@ -1,16 +1,17 @@
 .notification {
-  padding: 8px;
   border-radius: 6px;
   display: flex;
+  padding: 8px;
 
   .notification-left {
     @include size(22px);
-    padding: 3px;
+    @include vertical-flex-c;
+
     margin-right: 6px;
-    @include vertical-flex-c();
+    padding: 3px;
 
     .icon {
-      font-size: $xlarge-text-size;
+      font-size: $xlarge-body-font-size;
     }
   }
 
@@ -20,36 +21,38 @@
     flex-grow: 100;
 
     .notification-message {
-      font-weight: 500;
-      font-size: $standard-text-size;
-      line-height: 22px;
       color: $text-primary;
       font-family: $avenir;
+      font-size: $standard-body-font-size;
+      font-weight: 500;
+      line-height: 22px;
     }
 
     .notification-detail {
-      margin-top: 2px;
-      font-size: $medium-text-size;
-      line-height: 16px;
-      font-family: $avenir;
-      font-weight: 400;
       color: $text-secondary;
+      font-family: $avenir;
+      font-size: $medium-body-font-size;
+      font-weight: 400;
+      line-height: 16px;
+      margin-top: 2px;
     }
   }
 
   .notification-right {
     @include size(18px);
-    padding: 3px;
+
     margin-left: 6px;
+    padding: 3px;
 
     .icon {
-      font-size: $xlarge-text-size;
+      font-size: $xlarge-body-font-size;
     }
   }
 
   &.warning {
     background-color: $warning-background-color;
     border: 1px solid $warning-border-color;
+
     .notification-left {
       .icon {
         color: darken($warning-border-color, 30%);
@@ -60,6 +63,7 @@
   &.error {
     background-color: $error-background-color;
     border: 1px solid $error-border-color;
+
     .notification-left {
       .icon {
         color: darken($error-border-color, 30%);
@@ -70,6 +74,7 @@
   &.info {
     background-color: $info-background-color;
     border: 1px solid $info-border-color;
+
     .notification-left {
       .icon {
         color: darken($info-border-color, 30%);
@@ -80,6 +85,7 @@
   &.success {
     background-color: $success-background-color;
     border: 1px solid $success-border-color;
+
     .notification-left {
       .icon {
         color: darken($success-border-color, 30%);
@@ -105,8 +111,8 @@
 }
 
 .input-field-notifications {
-  margin-top: 8px !important;
   margin-bottom: 2px !important;
+  margin-top: 8px !important;
 
   > .notification {
     &:not(:last-child) {
@@ -116,12 +122,14 @@
 
   .notification-left {
     @include size(16px);
-    padding: 2px;
+
     margin-right: 4px;
+    padding: 2px;
 
     .icon {
-      font-size: $medium-text-size;
       @include size(12px);
+
+      font-size: $medium-body-font-size;
     }
   }
 
@@ -131,30 +139,31 @@
     flex-grow: 100;
 
     .notification-message {
-      font-weight: 500;
-      font-size: $medium-text-size;
-      line-height: 16px;
       color: $text-primary;
       font-family: $avenir;
+      font-size: $medium-body-font-size;
+      font-weight: 500;
+      line-height: 16px;
     }
 
     .notification-detail {
-      margin-top: 2px;
-      font-size: $small-text-size;
-      line-height: 16px;
-      font-family: $avenir;
-      font-weight: 400;
       color: $text-secondary;
+      font-family: $avenir;
+      font-size: $small-body-font-size;
+      font-weight: 400;
+      line-height: 16px;
+      margin-top: 2px;
     }
   }
 
   .notification-right {
     @include size(14px);
-    padding: 3px;
+
     margin-left: 4px;
+    padding: 3px;
 
     .icon {
-      font-size: $medium-text-size;
+      font-size: $medium-body-font-size;
     }
   }
 }
@@ -162,17 +171,17 @@
 .banner-notifications {
   .notification {
     border-radius: 0px;
-    padding: 4px;
     margin-bottom: 0px !important;
+    padding: 4px;
 
     .notification-middle {
       flex-direction: row;
 
       .notification-detail {
-        margin-left: 6px;
         // Add 1px more than 22px to get it to align to the baseline of the
         // message.
         line-height: 23px;
+        margin-left: 6px;
         margin-top: 0px;
       }
     }
@@ -180,33 +189,33 @@
 }
 
 .table-notifications {
+  left: 30px;
+  position: absolute;
   width: auto;
   z-index: 10000;
-  position: absolute;
-  left: 30px;
 
   .notification {
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgb(0 0 0 / 60%);
+    border: none !important;
     max-width: 320px;
     padding: 6px 10px;
-    border: none !important;
 
     .icon {
       color: $white !important;
     }
 
     .notification-message {
-      font-size: $standard-text-size;
-      font-weight: 500;
-      font-family: $avenir;
       color: $white;
+      font-family: $avenir;
+      font-size: $standard-body-font-size;
+      font-weight: 500;
     }
 
     .notification-detail {
-      font-size: $small-text-size;
-      font-weight: 400;
       color: $white;
       font-family: $avenir;
+      font-size: $small-body-font-size;
+      font-weight: 400;
     }
 
     &:not(:last-child) {

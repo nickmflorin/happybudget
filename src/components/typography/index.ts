@@ -1,4 +1,9 @@
-export { default as EntityText } from "./EntityText";
 export { default as TextWithIncludedLink } from "./TextWithIncludedLink";
-export { default as AttachmentText } from "./AttachmentText";
-export { default as AttachmentSizeText } from "./AttachmentSizeText";
+export * from "./AttachmentText";
+export * from "./AttachmentSizeText";
+export * from "./BodyText";
+export * from "./Date";
+export * from "./DateTime";
+export * from "./EntityText";
+export * from "./HeadingText";
+export * from "./Label";

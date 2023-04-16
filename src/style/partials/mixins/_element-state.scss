@@ -1,0 +1,84 @@
+@use "sass:list";
+@use "sass:map";
+@use "sass:meta";
+@use "sass:selector";
+
+@use "./selectors" as selectors;
+
+$disabled-selectors: (":disabled", ".disabled");
+$hovered-selectors: (":hover");
+$focused-selectors: (":focus");
+$focused-within-selectors: (":focus-within");
+$visited-selectors: (":visited");
+
+/// Should be used when defining the properties of an element that it will have when it is focused.
+@mixin focused($args...) {
+  @include selectors.with-selectors($focused-selectors, $args...) {
+    @include selectors.without-selectors($disabled-selectors, $args...) {
+      @content;
+    }
+  }
+}
+
+/// Should be used when defining the properties of an element that it will have when it is NOT
+/// focused.
+@mixin not-focused($args...) {
+  @include selectors.without-selectors($focused-selectors, $args...) {
+    @content;
+  }
+}
+
+/// Should be used when defining the properties of an element that it will have when a child
+/// element is focused.
+@mixin focused-within($args...) {
+  @include selectors.with-selectors($focused-within-selectors, $args...) {
+    @include selectors.without-selectors($disabled-selectors, $args...) {
+      @content;
+    }
+  }
+}
+
+/// Should be used when defining the properties of an element that it will have when it is disabled.
+@mixin disabled($args...) {
+  @include selectors.with-selectors($disabled-selectors, $args...) {
+    cursor: not-allowed !important;
+    // Turning off pointer-events with `pointer-events: none` prevents the disabled cursor from
+    // appearing.
+    pointer-events: auto !important;
+    @content;
+  }
+}
+
+/// Should be used when defining the properties of an element that it will have when it is NOT
+/// disabled.
+@mixin not-disabled($args...) {
+  @include selectors.without-selectors($disabled-selectors, $args...) {
+    @content;
+  }
+}
+
+/// Should be used when defining the properties of an element that it will have when it is hovered.
+@mixin hovered($args...) {
+  @include selectors.with-selectors($hovered-selectors, $args...) {
+    @include selectors.without-selectors($disabled-selectors, $args...) {
+      @content;
+    }
+  }
+}
+
+/// Should be used when defining the properties of an element that it will have when it is both
+/// hovered and focused.
+@mixin focused-hovered($args...) {
+  @include selectors.with-selectors($focused-selectors, $args...) {
+    @include selectors.without-selectors($disabled-selectors, $args...) {
+      @content;
+    }
+  }
+}
+
+/// Should be used when defining the properties of an element that it will have when it is visited.
+@mixin visited($args...) {
+  @include selectors.with-selectors($visited-selectors, $args...) {
+    @content;
+  }
+}

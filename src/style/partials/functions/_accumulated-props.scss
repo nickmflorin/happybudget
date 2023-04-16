@@ -1,0 +1,267 @@
+/*
+The contents of this file are specific to the 'accumulated-props' function.  That is the
+only function that should used externally and all other functions are local to this file only.
+*/
+@use "sass:list";
+@use "sass:map";
+@use "sass:meta";
+@use "sass:string";
+
+@use "throw";
+
+@use "./core" as fn;
+@use "./lists" as lists;
+
+@function remove-keys-with-map-values($mapping) {
+  $updated: ();
+  @each $key in map.keys($mapping) {
+    @if meta.type-of(fn.map-get($mapping, $key)) != map {
+      $updated: map.set($updated, $key, fn.map-get($mapping, $key));
+    }
+  }
+  @return $updated;
+}
+
+@function map-keys-with-non-primitive-values($mapping) {
+  $keys: ();
+  // note that normally it has to be either a map with non map keys or a map with only map keys
+  @each $key in map.keys($mapping) {
+    $value: fn.map-get($mapping, $key);
+    @if not fn.is-sass-css-primitive($value) {
+      $keys: list.append($keys, $key);
+    }
+  }
+  @if list.length($keys) == 0 {
+    @return false;
+  }
+  @return $keys;
+}
+
+@function map-keys-with-primitive-values($mapping) {
+  $keys: ();
+  @each $key in map.keys($mapping) {
+    $value: fn.map-get($mapping, $key);
+    @if fn.is-sass-css-primitive($value) {
+      $keys: list.append($keys, $key);
+    }
+  }
+  @if list.length($keys) == 0 {
+    @return false;
+  }
+  @return $keys;
+}
+
+/// The base-map is the map of properties that are present at the root of a given tier, and these
+/// properties apply to all tiers on that level unless overridden:
+/// (
+///   color: red, => Base Map Property
+///   line-height: 10px, => Base Map Property
+///   tier1: (...),
+///   tier2: (...),
+/// )
+@function get-base-map($mapping) {
+  $base-map: ();
+
+  $base-keys: map-keys-with-primitive-values($mapping);
+  // If there are no base-keys, then there is no base-map.
+  @if $base-keys != false {
+    @each $base-k in $base-keys {
+      $base-map: map.set($base-map, $base-k, fn.map-get($mapping, $base-k));
+    }
+  }
+  @return $base-map;
+}
+
+/*
+This function is only intended for private scope inside of this file.  Using it elsewhere would be
+out of context and potentially hazardous.  It is only meant to be used as a utility here in cases
+where other checks had already been performed.
+*/
+@function tier-is-nullish($tier) {
+  @if meta.type-of($tier) == number {
+    @return false;
+  } @else if meta.type-of($tier) == string {
+    @return string.length($tier) == 0;
+  } @else {
+    @return not $tier and meta.type-of($tier) != bool;
+  }
+}
+
+@function construct-at-tier($mapping, $tier: null) {
+  $base-map: get-base-map($mapping);
+
+  @if not tier-is-nullish($tier) {
+    @if not map.has-key($mapping, $tier) {
+      @return throw.error(
+        "The provided mapping does not have key, '#{$tier}', keys are '#{meta.inspect(map.keys($mapping))}' " +
+          ", type of tier is '#{meta.inspect(meta.type-of($tier))}'.",
+        $source: "accumulated-props()",
+        $keys: map.keys($mapping),
+        $tier: $tier
+      );
+    }
+    // When the method returns, it must indicate both what the map values are at the tier (with the
+    // base map values as defaults) with nested maps removed, and what the overall map at the
+    // tier was (without nested maps removed).
+    $map-at-tier: fn.map-get($mapping, $tier);
+    $properties-at-tier: remove-keys-with-map-values($map-at-tier);
+    @return (map.merge($base-map, $properties-at-tier), $map-at-tier);
+  }
+  // If the tier is not provided, we want to just return the mapping defined by the base-key. The
+  // second element of the list is null because there was no map at a provided tier - there was no
+  // tier.
+  @return ($base-map, null);
+}
+
+@function validate-tiers($tiers...) {
+  $validated-tiers: ();
+  // Keeps track of whether or not we have intercepted a null-valued tier yet.
+  $last-tier-intercepted: false;
+
+  // The tier can be provided as a list of tiers, a single string, a list of tiers with just one
+  // element (the tier), or not provided at all.  In each case, tiers at the end that are null will
+  // be ignored.
+  $tiers: lists.arglist-to-list($tiers...);
+  $tiers: if(list.length($tiers) == 0, (null), $tiers);
+
+  // First, we must validate the tiers to make sure they are of the correct type and form.  Null
+  // valued tiers can only be in the provided arguments if they are all last.
+  @for $i from 1 through list.length($tiers) {
+    $tier: list.nth($tiers, $i);
+    $loc: "'#{$i}/#{list.length($tiers)}'";
+    @if tier-is-nullish($tier) {
+      $last-tier-intercepted: true;
+    } @else if meta.type-of($tier) != string and meta.type-of($tier) != number {
+      @return (
+        "tier": $tier,
+        "error": "The tier provided at index #{$loc}, '#{$tier}', is of type " +
+          "'#{meta.inspect(meta.type-of($tier))}', but it must be a string or number."
+      );
+      // Tiers must always be string values unless they are the last tier in the list - which is
+      // allowed for flexibility (i.e. the tiers ("tier1", "tier2", null, null) is the same
+      // thing as ("tier1", "tier2").
+    } @else if $last-tier-intercepted {
+      @return (
+        "tier": $tier,
+        "error":
+          "The tier provided at index #{$loc}, '#{$tier}' is non-null, but follows previously null tiers. " +
+          "Null valued tiers are only allowed as the last argument(s)."
+      );
+    } @else {
+      $validated-tiers: list.append($validated-tiers, $tier);
+    }
+  }
+  @return $validated-tiers;
+}
+
+/// Constructs a set of CSS properties from a tiered property map.
+///
+/// @param {map} $mapping
+///   The tiered property map that will be used to construct the subset of properties.
+/// @param {list or string} $tiers
+///   Either a single tier as a string, or a list of tiers, for which the properties should be
+///   constructed along the path represented by the tiers.
+/// @return {map}
+///   A set of CSS properties constructed from the path represented by the tiers in the provided
+///   tiered property map.
+///
+/// It is best to explain the behavior of this function with an example.  Consider the following
+/// map, which we refer to as the "tiered property map":
+///
+/// $mapping: (
+///   line-height: 20px,
+///   font-size: 20px,
+///   tier1: (
+///      border-color: #efefef,
+///      height: 22px,
+///      font-size: 22px,
+///      tier1-1: (
+///        font-size: 24px,
+///        line-height: 10px,
+///      ),
+///   ),
+/// );
+///
+/// In a "tiered property map" - the properties defined at the root of each "level" of the map
+/// correspond to the defaults that are used for any tier in that level.  Properties defined deeper
+/// in the tree will override properties defined before.
+///
+/// Usages
+/// ------
+/// - accumulated-props($mapping)
+///   If we use the function as accumulated-props($mapping), it returns just the top root:
+///
+///   => ( line-height: 20px; font-size: 20px );
+///
+/// - accumulated-props($mapping, "tier1")
+///   If we provide a tier, it will include the root level properties for that tier, which override
+///   the previous root level properties:
+///
+///   => ( line-height: 20px; font-size: 22px; height: 22px; border-color: #efefef );
+///
+/// - accumulated-props($mapping, "tier1", "tier1-1");
+///   If we provide multiple tiers, the same logic is used - the function just looks one level
+///   deeper:
+///
+///   => ( line-height: 10px; font-size: 24px; height: 22px; border-color: #efefef );
+@function accumulated-props($mapping, $tiers...) {
+  // First, we must validate the tiers to make sure they are of the correct type and form.  Null
+  // valued tiers can only be in the provided arguments if they are all last.
+  $validated-tiers: validate-tiers($tiers...);
+  // If the result of the validation method is a map, it is a map of the error message and tier.
+  @if meta.type-of($validated-tiers) == map {
+    @return throw.error(
+      fn.map-get($validated-tiers, "error"),
+      $source: "accumulated-props()",
+      $tier: fn.map-get($validated-tiers, "tier")
+    );
+  } @else if list.length($validated-tiers) == 0 {
+    $validated-tiers: (null);
+  }
+
+  $curr: $mapping;
+  $running: ();
+  @for $i from 1 through list.length($validated-tiers) {
+    $tier: list.nth($validated-tiers, $i);
+    $update: construct-at-tier($curr, $tier: $tier);
+    // Update the running map of CSS properties with the CSS properties at the given tier.
+    $running: map.merge($running, list.nth($update, 1));
+    // If we are at the last tier, the second result will be null - so we just return the running
+    // map of CSS properties that have been accumulated so far.
+    @if not list.nth($update, 2) {
+      // Before deeming that we are at the last layer, we need to check if there are more tiers and
+      // throw an error if there are - because it is unexpected.
+      @if list.length($validated-tiers) > $i {
+        @return throw.error(
+          "The provided mapping stops at tier, '#{$tier}', tier '#{list.nth($validated-tiers, $i + 1)}' " +
+            "is not present on the path.",
+          $source: "accumulated-props()",
+          $tier: $tier
+        );
+      }
+      @return $running;
+    }
+    // Update the current sub-map that is "in focus".  This is the map that is being referenced as
+    // the current map as we progress from the upper level tiers down through the lower level tiers.
+    $curr: list.nth($update, 2);
+    // If the current sub-map does not have any keys corresponding to CSS values, we are at the
+    // end - and we just return the accumulated map of CSS properties merged with the last layer of
+    // CSS Properties.
+    $nested-map-keys: map-keys-with-non-primitive-values($curr);
+    @if not $nested-map-keys {
+      // Before deeming that we are at the last layer, we need to check if there are more tiers and
+      // throw an error if there are - because it is unexpected.
+      @if list.length($validated-tiers) > $i {
+        @return throw.error(
+          "The provided mapping stops at tier, '#{$tier}', tier '#{list.nth($validated-tiers, $i + 1)}' " +
+            "is not present on the path.",
+          $source: "accumulated-props()",
+          $tier: $tier
+        );
+      }
+      @return map.merge($running, $curr);
+    }
+  }
+  $update: construct-at-tier($curr);
+  @return map.merge($running, list.nth($update, 1));
+}

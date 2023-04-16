@@ -1,0 +1,65 @@
+@use "../../functions" as fn;
+
+@use "../colors.module" as colors;
+@use "./buttons.module" as buttons;
+
+// Old variables - not sure if we will still use these.
+$xlarge-size: 40px;
+$large-size: 36px;
+$standard-size: 32px;
+$medium-size: 30px;
+$small-size: 28px;
+$xsmall-size: 24px;
+
+$content-bg-color: #f9f9f9;
+
+$sidebar-width: 70px;
+$sidebar-bg-color: colors.$green;
+
+$sidebar-anchor-size: 50px;
+$sidebar-anchor-separation: 24px;
+
+// The size of the icon in the anchor elements in the sidebar.
+$sidebar-anchor-icon-size: 18px;
+
+// For cases where we want the icon in the sidebar anchor to be slightly larger.
+$sidebar-anchor-icon-emphasis-size: 20px;
+
+// The padding specified by the design that corresponds to the distance between the bottom of the
+// sidebar and the bottom edge of the *icon* of the last anchor element present.  Note that this
+// is not the distance from the bottom edge of the sidebar to the bottom edge of the last anchor
+// element itself.
+$sidebar-naive-padding-bottom: 42px;
+
+// The padding specified by the design that corresponds to the distance between the top of the
+// sidebar and the top edge of the *icon* of the first anchor or SVG element present.  Note that
+// this is not the distance from the bottom edge of the sidebar to the bottom edge of the last
+// anchor element itself.
+$sidebar-naive-padding-top: 50px;
+
+$header-height: 50px;
+$header-bg-color: colors.$white;
+$header-item-spacing: 30px;
+$header-horizontal-padding: 44px;
+
+/*
+The dropdown buttons that go into the header element have icons that must be sized at 24px.  This
+means that the buttons will have size "large" (since they are action buttons), which have a size
+of 28px (24px + 2px of padding on each side).  If the $header-item-size is the same as this
+value, the top and bottom padding of the header will perfectly touch the top and bottom edges
+of the items the header contains.
+
+While the "large" button size is manually provided to the dropdown buttons in the header as a prop,
+we want to ensure consistency in SASS.
+*/
+$header-item-size: fn.map-get(buttons.$button-action-bare-sizes, "large");
+$header-vertical-padding: 0.5 * ($header-height - $header-item-size);
+$header-padding: $header-vertical-padding $header-horizontal-padding;
+
+/* ========================================== Exports =========================================== */
+:export {
+  headerBgColor: $header-bg-color;
+  headerHeight: $header-height;
+  sidebarBgColor: $sidebar-bg-color;
+  sidebarWidth: $sidebar-width;
+}

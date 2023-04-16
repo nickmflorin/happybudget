@@ -6,7 +6,7 @@ import { Page } from "react-pdf/dist/esm/entry.webpack";
 
 import { util, hooks } from "lib";
 import { Pagination } from "components";
-import { Button, PrimaryButton } from "components/buttons";
+import { Button, PrimaryButton } from "components/buttonsOld";
 import { registerFonts } from "style/pdf";
 
 import EmptyDocument from "./EmptyDocument";
