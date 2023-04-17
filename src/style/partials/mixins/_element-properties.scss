@@ -2,7 +2,6 @@
 @use "sass:meta";
 
 @use "../functions" as fn;
-@use "../variables/index.module" as variables;
 
 @mixin border($c, $w: 1px) {
   border: $w solid $c;

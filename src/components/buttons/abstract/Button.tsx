@@ -1,4 +1,4 @@
-import React, { ReactNode, ForwardedRef, useMemo } from "react";
+import React, { ForwardedRef, useMemo } from "react";
 
 import classNames from "classnames";
 
@@ -7,7 +7,7 @@ import { Link, LinkProps } from "components/compat";
 import { ConditionalTooltip } from "components/tooltips";
 
 type _ClickableProps<V extends ui.ButtonVariant = ui.ButtonVariant> = ui.ComponentProps & {
-  readonly children: ReactNode;
+  readonly children: string | JSX.Element;
   readonly style?: Omit<ui.Style, "backgroundColor" | "color" | ui.CSSSizeProperties>;
   readonly variant?: V;
   readonly size?: ui.ButtonSize;
@@ -24,6 +24,7 @@ type _ClickableProps<V extends ui.ButtonVariant = ui.ButtonVariant> = ui.Compone
   readonly locked?: boolean;
   readonly loading?: boolean;
   readonly tooltip?: ui.Tooltip;
+  readonly cornerStyle?: ui.ButtonCornerStyle;
 };
 
 export type ButtonProps<V extends ui.ButtonVariant = ui.ButtonVariant> = _ClickableProps<V> & {
@@ -67,6 +68,7 @@ const useClickableProps = <V extends ui.ButtonVariant = ui.ButtonVariant>(
         { disabled: props.disabled },
         { "button--locked": props.locked === true || props.loading === true },
         { "button--loading": props.loading === true },
+        `button--corner-style-${props.cornerStyle || ui.ButtonCornerStyles.NORMAL}`,
         props.variant !== undefined && `button--${props.variant}`,
         props.size !== undefined && `button--${props.size}`,
         props.className,

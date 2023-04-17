@@ -19,7 +19,7 @@ export const EntityTextButton = ({
 }: EntityTextButtonProps): JSX.Element => (
   <BareButton
     {...props}
-    className={classNames("btn--bare--entity-text", props.className)}
+    className={classNames("button--entity-text", props.className)}
     dropdownCaret="right"
   >
     <EntityText

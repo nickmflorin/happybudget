@@ -14,6 +14,7 @@ import {
   faFileExcel,
   faFileWord,
   faFile,
+  faTrashAlt,
 } from "@fortawesome/pro-regular-svg-icons";
 import {
   faArrowDown,
@@ -33,6 +34,9 @@ import {
   faCaretDown,
   faCaretUp,
   faTimesCircle,
+  faPlusCircle,
+  faFilter,
+  faSortAmountDown,
 } from "@fortawesome/pro-solid-svg-icons";
 
 export const PRO_ICON_REGISTRY = [
@@ -63,4 +67,8 @@ export const PRO_ICON_REGISTRY = [
   faCaretDown,
   faCaretUp,
   faTimesCircle,
+  faPlusCircle,
+  faTrashAlt,
+  faFilter,
+  faSortAmountDown,
 ] as const;

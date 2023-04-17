@@ -42,3 +42,12 @@ export type UserWithImage =
 
 export const isUserWithImage = (user: User | SimpleUser | contact.Contact): user is UserWithImage =>
   contact.isContact(user) ? user.image !== null : user.profile_image !== null;
+
+export const fullName = (user: User | SimpleUser | contact.Contact): string => {
+  if (user.first_name !== null && user.last_name !== null) {
+    return `${user.first_name} ${user.last_name}`;
+  } else if (user.first_name !== null) {
+    return user.first_name;
+  }
+  return user.last_name || "";
+};

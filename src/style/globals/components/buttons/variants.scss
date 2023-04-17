@@ -5,53 +5,10 @@
 
 @use "partials";
 
-$button-locked-class: ".button--locked";
-$button-loading-class: ".button--loading";
-
-@mixin hovered {
-  @include partials.hovered {
-    @include partials.without-selectors(($button-loading-class, $button-locked-class)) {
-      @content;
-    }
+@mixin solid-variant() {
+  @each $variant in fn.map-get(partials.$button-variant-map, "solid") {
+    @include partials.button-colors($variant: "solid", $sub-variant: $variant);
   }
-}
-
-@mixin focused {
-  @include partials.focused {
-    @include partials.without-selectors(($button-loading-class, $button-locked-class)) {
-      @content;
-    }
-  }
-}
-
-@mixin focused-hovered {
-  @include partials.focused-hovered {
-    @include partials.without-selectors(($button-loading-class, $button-locked-class)) {
-      @content;
-    }
-  }
-}
-
-@mixin button-state-properties($tiers...) {
-  @include partials.mapped-properties(partials.$button-state-properties, $tiers...);
-}
-
-// Primary, Secondary, Bare & Alternate
-@mixin content-variant {
-  > .button__content {
-    > .button__content--string {
-      font-size: inherit;
-      line-height: inherit;
-    }
-  }
-}
-
-@mixin solid-variant {
-  @include content-variant;
-
-  font-weight: partials.$button-font-weight;
-  outline: partials.$button-outline-width solid transparent;
-  outline-offset: -1 * partials.$button-outline-width;
 
   /*
   Do not default the size of the button or anchor - this will prevent SASS from overriding the size
@@ -60,157 +17,14 @@ $button-loading-class: ".button--loading";
   */
   @each $size in map.keys(partials.$button-solid-sizes) {
     &.button--#{$size} {
-      $padding: partials.map-get(partials.$button-solid-padding, $size);
-      $height: partials.map-get(partials.$button-solid-sizes, $size);
-
-      $vertical-padding: list.nth($padding, 1);
-      $line-height: $height - 2 * $vertical-padding;
-
-      font-size: partials.map-get(partials.$button-solid-font-sizes, $size);
-
-      /*
-      Usually, the height of the button would just be determined by the combination of the vertical
-      padding and line-height (i.e. height = 2 * vertical-padding + line-height).  However, we need
-      to constrain the height (and not allow it to be "auto") such that the SVG icons or spinners
-      can properly fill up the available height and size responsively.  If we did not define the
-      height explicitly, this would not work.
-
-      So instead of calculating the height based on the padding and line-height, we calculate the
-      line-height based on the padding and height - and all 3 consistent with each other while still
-      allowing the height to be constrained.
-      */
-      height: $height;
-      line-height: $line-height;
-      padding: $padding;
-    }
-  }
-}
-
-@mixin danger-variant {
-  @include solid-variant;
-
-  background-color: partials.map-get(partials.$button-bg-colors, "danger");
-  color: partials.map-get(partials.$button-colors, "danger");
-  outline: partials.$button-outline-width solid
-    partials.map-get(partials.$button-border-colors, "danger");
-
-  @include hovered {
-    background-color: partials.$dark-red;
-  }
-
-  @include focused {
-    background-color: partials.$dark-red;
-  }
-
-  @include partials.disabled {
-    background-color: partials.$disabled-color;
-    outline: partials.$button-outline-width solid partials.$disabled-color;
-  }
-
-  @include focused-hovered {
-    background-color: partials.$dark-red;
-  }
-}
-
-@mixin primary-variant {
-  @include solid-variant;
-
-  background-color: partials.map-get(partials.$button-bg-colors, "primary");
-  color: partials.map-get(partials.$button-colors, "primary");
-  outline: partials.$button-outline-width solid
-    partials.map-get(partials.$button-border-colors, "primary");
-
-  @include hovered {
-    background-color: partials.$dark-green;
-  }
-
-  @include focused {
-    background-color: partials.$dark-green;
-  }
-
-  @include partials.disabled {
-    background-color: partials.$disabled-color;
-    outline: partials.$button-outline-width solid partials.$disabled-color;
-  }
-
-  @include focused-hovered {
-    background-color: partials.$dark-green;
-  }
-}
-
-@mixin secondary-variant {
-  @include solid-variant;
-
-  background-color: partials.map-get(partials.$button-bg-colors, "secondary");
-  color: partials.map-get(partials.$button-colors, "secondary");
-  outline: partials.$button-outline-width solid
-    partials.map-get(partials.$button-border-colors, "secondary");
-
-  @include focused {
-    background-color: partials.$highlight-blue;
-  }
-
-  @include hovered {
-    background-color: partials.$highlight-blue;
-  }
-
-  @include partials.disabled {
-    color: partials.$disabled-color;
-    outline: partials.$button-outline-width solid partials.$disabled-color;
-  }
-
-  @include focused-hovered {
-    background-color: partials.$highlight-blue;
-    outline: partials.$button-outline-width solid partials.$brand-green;
-  }
-}
-
-@mixin bare-variant {
-  @include solid-variant;
-
-  background-color: partials.map-get(partials.$button-bg-colors, "bare");
-  color: partials.$link-blue;
-  outline: partials.$button-outline-width solid
-    partials.map-get(partials.$button-border-colors, "bare");
-
-  @include hovered {
-    color: partials.$brand-mid-blue;
-  }
-
-  @include focused {
-    color: partials.$brand-mid-blue;
-  }
-
-  &.button--bare--danger {
-    color: partials.$red;
-
-    @include hovered {
-      color: partials.$dark-red;
-    }
-
-    @include focused {
-      color: partials.$dark-red;
+      @include partials.button-solid-size($size);
     }
   }
 }
 
 @mixin alternate-variant {
-  @include content-variant;
-
-  background-color: partials.map-get(partials.$button-bg-colors, "alternate");
-  color: partials.map-get(partials.$button-colors, "alternate");
-  font-weight: partials.get-font-weight("body", "bold");
-  outline: partials.$button-outline-width solid
-    partials.map-get(partials.$button-border-colors, "alternate");
+  font-weight: partials.get-font-weight("body", $weight-name: "bold");
   padding: 0;
-
-  @include hovered {
-    color: partials.$brand-mid-blue;
-  }
-
-  @include focused {
-    color: partials.$brand-mid-blue;
-  }
 
   /*
   Do not default the size of the button or anchor - this will prevent SASS from overriding the size
@@ -225,20 +39,13 @@ $button-loading-class: ".button--loading";
     }
   }
 
-  &.button--alternate--inline {
-    color: partials.$link-blue;
-    font-weight: partials.get-font-weight("body", "regular");
+  @each $variant in fn.map-get(partials.$button-variant-map, "alternate") {
+    @include partials.button-colors($variant: "alternate", $sub-variant: $variant);
+  }
+
+  &.button--alternate--link {
+    font-weight: partials.get-font-weight("body", $weight-name: "regular");
     text-decoration: underline;
-
-    @include hovered {
-      font-weight: partials.get-font-weight("body", "bold");
-      text-decoration: none;
-    }
-
-    @include focused {
-      font-weight: partials.get-font-weight("body", "bold");
-      text-decoration: none;
-    }
 
     /*
     We use this hidden psuedo-element to establish the width of the text the button or anchor
@@ -247,32 +54,33 @@ $button-loading-class: ".button--loading";
     of the button and/or anchor does not change.
     */
     .button__text::before {
-      font-weight: partials.get-font-weight("body", "bold");
+      font-weight: partials.get-font-weight("body", $weight-name: "bold");
+    }
+  }
+}
+
+@mixin action-secondary-variant {
+  @include partials.button-colors($variant: "action", $sub-variant: "secondary");
+
+  padding: partials.$button-action-secondary-padding;
+
+  /*
+  Do not default the size of the button or anchor - this will prevent SASS from overriding the
+  size of the button in classes or elements that use the button.  Only size the button and/or
+  anchor if the class exists on the element (which happens when the `size` prop is provided).
+  */
+  @each $size in map.keys(partials.$button-action-secondary-sizes) {
+    &.button--#{$size} {
+      height: partials.map-get(partials.$button-action-secondary-sizes, $size);
+      width: partials.map-get(partials.$button-action-secondary-sizes, $size);
     }
   }
 }
 
 @mixin action-primary-variant {
-  background-color: partials.map-get(partials.$button-bg-colors, "action", "primary");
-  color: partials.map-get(partials.$button-colors, "action", "primary");
-  outline: partials.$button-action-outline-width solid
-    partials.map-get(partials.$button-border-colors, "action", "primary");
+  @include partials.button-colors($variant: "action", $sub-variant: "primary");
+
   padding: partials.$button-action-primary-padding;
-
-  @include partials.disabled {
-    color: partials.$disabled-color;
-    outline: partials.$button-action-outline-width solid partials.$disabled-color;
-  }
-
-  @include focused {
-    color: partials.$dark-blue;
-    outline: partials.$button-action-outline-width solid partials.$dark-blue;
-  }
-
-  @include hovered {
-    color: partials.$dark-blue;
-    outline: partials.$button-action-outline-width solid partials.$dark-blue;
-  }
 
   /*
   Do not default the size of the button or anchor - this will prevent SASS from overriding the
@@ -288,9 +96,8 @@ $button-loading-class: ".button--loading";
 }
 
 @mixin action-bare-variant {
-  background-color: partials.map-get(partials.$button-bg-colors, "action", "bare");
-  outline: partials.$button-action-outline-width solid
-    partials.map-get(partials.$button-border-colors, "action", "bare");
+  @include partials.button-colors($variant: "action", $sub-variant: "bare");
+
   padding: partials.$button-action-bare-padding;
 
   @include partials.with-icon-colors using ($value, $data) {
@@ -323,38 +130,6 @@ $button-loading-class: ".button--loading";
       width: partials.map-get(partials.$button-action-bare-sizes, $size);
     }
   }
-
-  &--sidebar {
-    @include partials.size(partials.$sidebar-anchor-size);
-    @include partials.flex-c;
-
-    background-color: transparent;
-    border-radius: partials.$sidebar-anchor-border-radius;
-    color: partials.$sidebar-anchor-color;
-    padding: 0.5 * (partials.$sidebar-anchor-size - partials.$sidebar-anchor-icon-size);
-
-    @include focused {
-      color: partials.$sidebar-anchor-color;
-    }
-
-    @include hovered {
-      color: partials.$sidebar-anchor-color;
-    }
-
-    @include partials.disabled {
-      color: partials.$sidebar-anchor-color;
-    }
-
-    &--active {
-      background-color: partials.$sidebar-anchor-active-bg-color;
-    }
-
-    &--emphasize {
-      // For cases where we want the icon in the sidebar anchor to be slightly larger, we decrease
-      // the padding.
-      padding: 0.5 * (partials.$sidebar-anchor-size - partials.$sidebar-anchor-icon-emphasis-size);
-    }
-  }
 }
 
 @mixin action-variant-properties($variant) {
@@ -362,22 +137,24 @@ $button-loading-class: ".button--loading";
     @include action-bare-variant;
   } @else if string.quote($variant) == "primary" {
     @include action-primary-variant;
+  } @else if string.quote($variant) == "secondary" {
+    @include action-secondary-variant;
   } @else {
-    @error "The provided variant #{meta.inspect($variant)} is not expected.";
+    @error "The provided variant #{meta.inspect($variant)} is not a supported action variant.";
   }
 }
 
 @mixin action-variant {
+  $action-variants: partials.map-get(partials.$button-variant-map, "action");
+  $default-sub-variant: partials.map-get(partials.$button-default-sub-variants, "action");
+
   aspect-ratio: 1;
 
-  @include partials.without-selectors(
-    partials.$button-action-variants,
-    $prefix: ".button--action--"
-  ) {
-    @include action-variant-properties(partials.$button-action-default-variant);
+  @include partials.without-selectors(partials.$action-variants, $prefix: ".button--action--") {
+    @include action-variant-properties($default-sub-variant);
   }
 
-  @each $variant in partials.$button-action-variants {
+  @each $variant in $action-variants {
     &.button--action--#{$variant} {
       @include action-variant-properties($variant);
     }
@@ -385,17 +162,14 @@ $button-loading-class: ".button--loading";
 }
 
 @mixin button-variant($variant) {
-  $variant: partials.validate-value($variant, partials.$button-variants);
-
-  @if $variant == partials.$button-variant-primary {
-    @include primary-variant;
-  } @else if $variant == partials.$button-variant-secondary {
-    @include secondary-variant;
-  } @else if $variant == partials.$button-variant-alternate {
+  $variant: partials.validate-value($variant, partials.$button-primary-variants);
+  @if string.quote($variant) == "solid" {
+    @include solid-variant;
+  } @else if string.quote($variant) == "alternate" {
     @include alternate-variant;
-  } @else if $variant == partials.$button-variant-bare {
-    @include bare-variant;
+  } @else if string.quote($variant) == "action" {
+    @include action;
   } @else {
-    @include action-variant;
+    @error "The provided variant #{meta.inspect($variant)} is not a supported primary variant.";
   }
 }

@@ -1,11 +1,9 @@
 import React from "react";
 
-import { isNil } from "lodash";
+import { ImageClearButton } from "components/buttons";
+import { Icon } from "components/icons";
 
-import { Icon } from "components";
-import { ImageClearButton } from "components/buttonsOld";
-
-import ImageOverlay, { ImageOverlayProps } from "./ImageOverlay";
+import { ImageOverlay, ImageOverlayProps } from "./ImageOverlay";
 
 type EditImageOverlayProps = Omit<ImageOverlayProps, "children"> & {
   readonly onClear?: () => void;

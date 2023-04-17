@@ -1,7 +1,7 @@
 import React from "react";
 
-import { Icon } from "components";
-import { IconButton } from "components/buttonsOld";
+import { ui } from "lib";
+import { NewRowButton } from "components/buttons";
 
 interface NewRowCellProps
   extends Table.CellProps<
@@ -15,12 +15,10 @@ interface NewRowCellProps
 }
 
 const NewRowCell = (props: NewRowCellProps): JSX.Element => (
-  <IconButton
-    className="btn--new-row"
-    size="medium"
-    icon={<Icon icon="plus-circle" weight="solid" />}
-    style={{ margin: "0 auto" }}
+  <NewRowButton
+    size={ui.ButtonSizes.MEDIUM}
     onClick={() => props.onNewRow()}
+    style={{ margin: "0 auto" }}
   />
 );
 

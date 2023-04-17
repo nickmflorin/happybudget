@@ -14,33 +14,25 @@ button {
 
   @include partials.disabled;
 
+  outline-offset: -1 * partials.$button-outline-width;
+
   @include partials.with-selectors(
     (variants.$button-locked-class, variants.$button-loading-class)
   ) {
     pointer-events: none;
   }
 
-  /*
-  For each variant, use the variant mixin that it is associated with as long as it is the only
-  variant (i.e. distinct) on the class:
-
-  &--primary:not(&--alternate, &--secondary, &--action, &--bare) {
-    ...
-  }
-  */
-  @each $variant in partials.$button-variants {
-    @include partials.with-distinct-selector(
-      $variant,
-      partials.$button-variants,
-      $prefix: ".button--"
-    ) {
-      @include variants.button-variant($variant);
-    }
-  }
-
   // Use the default button variant if no variant class is on the element.
-  @include partials.without-selectors(partials.$button-variants, $prefix: ".button--") {
-    @include variants.button-variant(partials.$button-default-variant);
+  @include partials.without-selectors(partials.$button-primary-variants, $prefix: ".button--") {
+    @include variants.button-variant(partials.$button-default-primary-variant);
+  }
+
+  &--corner-style-square {
+    border-radius: 0px !important;
+  }
+
+  &--corner-style-rounded {
+    border-radius: 50px !important;
   }
 
   > .button__content {
@@ -68,6 +60,11 @@ button {
         altered - the width is already consistent with what it would otherwise be before it was
         altered and the overall width of the button and/or anchor does not change.
         */
+        font-size: inherit;
+        line-height: inherit;
+        text-align: inherit;
+        text-transform: inherit;
+
         &::before {
           content: attr(title);
           display: block;
@@ -108,5 +105,143 @@ button {
 
   .icon {
     color: inherit;
+    filter: inherit;
+  }
+
+  /*
+  For each variant, use the variant mixin that it is associated with as long as it is the only
+  variant (i.e. distinct) on the class:
+
+  &--primary:not(&--alternate, &--secondary, &--action, &--bare) {
+    ...
+  }
+  */
+  @each $variant in partials.$button-primary-variants {
+    @include partials.with-distinct-selector(
+      $variant,
+      partials.$button-primary-variants,
+      $prefix: ".button--"
+    ) {
+      @include variants.button-variant($variant);
+    }
   }
 }
+
+.button--entity-text {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.button--new-row {
+  @include partials.size(18px);
+
+  padding: 0;
+}
+
+.button--image-clear {
+  @include partials.button-colors(
+    $color: partials.$text-primary,
+    $hovered: (
+      $color: partials.$white,
+    )
+  );
+
+  > .icon {
+    color: $white;
+  }
+
+  &:hover {
+    .icon {
+      color: $white;
+    }
+  }
+}
+
+.button--clear,
+.button--accept {
+  @include partials.button-colors(
+    $color: partials.$grey,
+    $hovered: (
+      $color: partials.$medium-grey,
+    )
+  );
+}
+
+.button--landing {
+  width: 230px !important;
+}
+
+.button--login,
+.button--reset,
+.button--register {
+  font-size: 18px;
+}
+
+.button--account-circle {
+  @include partials.size(32px);
+
+  border-radius: 100%;
+  display: block;
+  font-size: partials.$large-body-font-size;
+  overflow: hidden;
+  position: relative;
+  text-align: center;
+}
+
+.button--help {
+  display: flex;
+  text-transform: uppercase;
+
+  > .button__content {
+    > .button__sub-content {
+      display: none;
+      @include partials.media(">=large") {
+        display: block;
+      }
+    }
+  }
+}
+
+.button--inline {
+  font-family: inherit;
+  font-size: inherit;
+  font-style: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+
+// &.ag-grid-action-button {
+//   .icon {
+//     color: $green;
+//   }
+
+//   &:hover {
+//     background-color: rgba($green, 0.3);
+//   }
+
+//   &.disabled,
+//   &:disabled,
+//   &.fake-disabled {
+//     .icon {
+//       color: $disabled-color !important;
+//     }
+
+//     &:hover {
+//       background-color: transparent !important;
+//     }
+//   }
+// }
+
+// &.budget-table-menu {
+//   @include bare_color_set($text-secondary);
+// }
+
+// &--edit-group {
+//   &:hover {
+//     filter: brightness(95%);
+
+//     .icon {
+//       filter: brightness(95%);
+//     }
+//   }
+// }

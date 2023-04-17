@@ -70,8 +70,10 @@ $visited-selectors: (":visited");
 /// hovered and focused.
 @mixin focused-hovered($args...) {
   @include selectors.with-selectors($focused-selectors, $args...) {
-    @include selectors.without-selectors($disabled-selectors, $args...) {
-      @content;
+    @include selectors.with-selectors($hovered-selectors, $args...) {
+      @include selectors.without-selectors($disabled-selectors, $args...) {
+        @content;
+      }
     }
   }
 }

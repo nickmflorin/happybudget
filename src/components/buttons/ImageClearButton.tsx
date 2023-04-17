@@ -4,10 +4,10 @@ import { ui } from "lib";
 
 import { BareActionButton, BareActionButtonProps } from "./BareActionButton";
 
-export const ClearButton = (props: Omit<BareActionButtonProps, "icon">): JSX.Element => (
+export const ImageClearButton = (props: Omit<BareActionButtonProps, "icon">): JSX.Element => (
   <BareActionButton
     {...props}
-    className={classNames("button--clear", props.className)}
+    className={classNames("button--image-clear", props.className)}
     icon={ui.IconNames.TIMES_CIRCLE}
   />
 );

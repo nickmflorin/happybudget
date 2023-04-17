@@ -87,6 +87,10 @@ export const IconNames = enumeratedLiterals([
   "caret-down",
   "caret-up",
   "times-circle",
+  "plus-circle",
+  "trash-alt",
+  "filter",
+  "sort-amount-down"
 ] as const);
 
 /* When an Icon is added to the registry, the name must be added to the appropriate IconCode key
@@ -103,6 +107,7 @@ export const Icons = {
     IconNames.FILE_VIDEO,
     IconNames.FILE_WORD,
     IconNames.FILE,
+    IconNames.TRASH_ALT,
   ] as const,
   [IconCodes.SOLID]: [
     IconNames.DATABASE,
@@ -121,6 +126,9 @@ export const Icons = {
     IconNames.CARET_UP,
     IconNames.CARET_DOWN,
     IconNames.TIMES_CIRCLE,
+    IconNames.PLUS_CIRCLE,
+    IconNames.FILTER,
+    IconNames.SORT_AMOUNT_DOWN,
   ] as const,
   [IconCodes.BRAND]: [] as const,
 };

@@ -39,7 +39,8 @@ $link-blue: #167fa6;
 $lighter-light-blue: color.change($light-blue, $alpha: 0.5);
 
 /* ------------------------------------------ Greys --------------------------------------------- */
-$grey: #979797;
+$grey: #a5a5a5;
+$medium-grey: #d2d2d2;
 $light-grey: #ececec;
 $darker-light-grey: color.darken($light-grey, 10%);
 $lighter-grey: color.change($grey, $alpha: 0.6);

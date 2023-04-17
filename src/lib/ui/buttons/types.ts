@@ -58,8 +58,12 @@ export const ButtonSolidVariants = enumeratedLiterals([
   "secondary",
   "bare",
   "danger",
+  "white",
 ] as const);
 export type ButtonSolidVariant = EnumeratedLiteralType<typeof ButtonSolidVariants>;
 
-export const ButtonAlternateVariants = enumeratedLiterals(["link", "danger", "inline"] as const);
+export const ButtonAlternateVariants = enumeratedLiterals(["link", "danger"] as const);
 export type ButtonAlternateVariant = EnumeratedLiteralType<typeof ButtonAlternateVariants>;
+
+export const ButtonCornerStyles = enumeratedLiterals(["rounded", "square", "normal"] as const);
+export type ButtonCornerStyle = EnumeratedLiteralType<typeof ButtonCornerStyles>;

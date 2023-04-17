@@ -1,20 +1,16 @@
-import React from "react";
-
 import classNames from "classnames";
 
-export type ImageOverlayProps = StandardComponentWithChildrenProps & {
-  readonly visible?: boolean;
-};
+import { ui } from "lib";
 
-const ImageOverlay = (props: ImageOverlayProps): JSX.Element => {
+export type ImageOverlayProps = ui.ComponentProps<{
+  readonly visible?: boolean;
+}>;
+
+export const ImageOverlay = (props: ImageOverlayProps): JSX.Element => {
   if (props.visible === false) {
     return <></>;
   }
   return (
-    <div className={classNames("img-overlay", props.className)} style={props.style}>
-      {props.children}
-    </div>
+    <div {...props} className={classNames("img-overlay", props.className)} style={props.style} />
   );
 };
-
-export default React.memo(ImageOverlay);

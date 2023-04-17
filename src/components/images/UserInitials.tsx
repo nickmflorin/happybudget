@@ -1,23 +1,54 @@
-import React, { useMemo } from "react";
-
 import classNames from "classnames";
-import { isNil } from "lodash";
 
-import { ShowHide } from "components";
+import { model, ui } from "lib";
+import { ShowHide } from "components/util";
 
-export type UserInitialsProps = StandardComponentProps & {
-  readonly user?: Model.User | Model.SimpleUser | Model.Contact;
-  readonly circle?: boolean;
+export type UserInitialsProps = ui.ComponentProps<{
+  readonly user?: model.User | model.SimpleUser | model.Contact;
+  readonly circle?: true;
   readonly initials?: string | null;
   readonly firstName?: string | null;
   readonly lastName?: string | null;
   readonly renderNoInitials?: JSX.Element;
   readonly hideOnNoInitials?: boolean;
   readonly overlay?: () => JSX.Element;
+}>;
+
+const getFirstName = (props: Pick<UserInitialsProps, "firstName" | "user">) =>
+  props.firstName !== undefined
+    ? props.firstName
+    : props.user !== undefined
+    ? props.user.first_name
+    : null;
+
+const getLastName = (props: Pick<UserInitialsProps, "lastName" | "user">) =>
+  props.lastName !== undefined
+    ? props.lastName
+    : props.user !== undefined
+    ? props.user.last_name
+    : null;
+
+const getInitials = (
+  props: Pick<UserInitialsProps, "initials" | "user" | "firstName" | "lastName">,
+) => {
+  if (props.initials !== undefined) {
+    return props.initials;
+  }
+  const firstName = getFirstName(props);
+  const lastName = getLastName(props);
+  if (firstName !== null && lastName !== null) {
+    return firstName.charAt(0) + lastName.charAt(0);
+  } else if (firstName !== null) {
+    return firstName.charAt(0);
+  } else if (lastName !== null) {
+    return lastName.charAt(0);
+  }
+  return "";
 };
 
-const UserInitials = ({
+export const UserInitials = ({
   user,
+  circle,
   initials,
   firstName,
   lastName,
@@ -25,59 +56,23 @@ const UserInitials = ({
   hideOnNoInitials,
   overlay,
   ...props
-}: Omit<UserInitialsProps, "src">): JSX.Element => {
-  const userFirstName = useMemo<string | null>(() => {
-    if (!isNil(firstName)) {
-      return firstName;
-    } else if (!isNil(user)) {
-      return user.first_name;
-    }
-    return null;
-  }, [user, firstName]);
-
-  const userLastName = useMemo<string | null>(() => {
-    if (!isNil(lastName)) {
-      return lastName;
-    } else if (!isNil(user)) {
-      return user.last_name;
-    }
-    return null;
-  }, [user, lastName]);
-
-  const userInitials = useMemo<string>(() => {
-    if (!isNil(initials)) {
-      return initials;
-    } else {
-      if (!isNil(userFirstName) && !isNil(userLastName)) {
-        /* First name and last name will always be present for a User, but not
-					 necessarily a Contact. */
-        return userFirstName.charAt(0) + userLastName.charAt(0);
-      } else if (!isNil(userFirstName)) {
-        return userFirstName.charAt(0);
-      } else if (!isNil(userLastName)) {
-        return userLastName.charAt(0);
-      } else {
-        return "";
-      }
-    }
-  }, [initials, userFirstName, userLastName]);
-
+}: UserInitialsProps): JSX.Element => {
+  const _initials = getInitials({ user, firstName, lastName, initials });
   return (
-    <ShowHide hide={hideOnNoInitials === true && userInitials === ""}>
+    <ShowHide hide={hideOnNoInitials === true && _initials === ""}>
       <div
-        className={classNames("user-initials", { circle: props.circle }, props.className)}
+        {...props}
+        className={classNames("user-initials", { circle }, props.className)}
         style={props.style}
       >
-        {!isNil(overlay) && overlay()}
-        <ShowHide show={isNil(renderNoInitials) || userInitials !== ""}>
-          <div className="user-initials-text">{userInitials}</div>
+        {overlay !== undefined && overlay()}
+        <ShowHide show={renderNoInitials === undefined || _initials !== ""}>
+          <div className="user-initials__text">{_initials}</div>
         </ShowHide>
-        <ShowHide show={!isNil(renderNoInitials) && userInitials === ""}>
+        <ShowHide show={renderNoInitials !== undefined && _initials === ""}>
           {renderNoInitials}
         </ShowHide>
       </div>
     </ShowHide>
   );
 };
-
-export default React.memo(UserInitials);

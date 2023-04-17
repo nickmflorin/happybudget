@@ -1,5 +1,4 @@
 @import "./billing";
-@import "./buttons";
 @import "./charts";
 @import "./contacts";
 @import "./containers";
@@ -20,9 +19,3 @@
 @import "./pdf";
 @import "./popovers";
 @import "./tagging";
-
-.separator {
-  border-bottom: 1px solid $separator-color;
-  margin: 10px auto;
-  width: 100%;
-}
