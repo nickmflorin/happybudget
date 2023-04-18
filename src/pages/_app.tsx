@@ -1,10 +1,10 @@
-import { http } from "lib";
+import { api } from "application";
 import { AppProps } from "lib/compat";
 import { AppConfig } from "components/config";
-import "styles/globals/index.scss";
+import "style/globals/index.scss";
 
 const CorshaConsole = ({ Component, pageProps }: AppProps) => {
-  if (pageProps.statusCode === http.STATUS_CODES.HTTP_404_NOT_FOUND) {
+  if (pageProps.statusCode === api.STATUS_CODES.HTTP_404_NOT_FOUND) {
     return <Component {...pageProps} />;
   }
   return (

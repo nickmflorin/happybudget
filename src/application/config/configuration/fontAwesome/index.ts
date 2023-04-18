@@ -69,7 +69,7 @@ import { getIconCode } from "lib/ui/icons/util";
 /* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { findDuplicates } from "lib/util/arrays";
 
-import { Icons, IconNames, IconPrefixes } from "./constants";
+import { Icons, IconNames, IconPrefixes, LicensedIcon } from "./constants";
 import { NaiveFAIconDefinition, NaiveFAConfig } from "./types";
 
 /**
@@ -142,7 +142,16 @@ export const configure = (__options__?: ConfigurationOptions) => {
 
   const iconsMapCodes = (name: string): string[] =>
     Object.keys(Icons).reduce((curr: string[], k: string) => {
-      if ((Icons as { [key: string]: readonly string[] })[k].includes(name)) {
+      const namesForCode: (LicensedIcon<string> | string)[] = Icons[
+        k as keyof typeof Icons
+      ].slice() as (LicensedIcon<string> | string)[];
+      const names = namesForCode.reduce((prev: string[], i: LicensedIcon<string> | string) => {
+        if (typeof i === "string") {
+          return [...prev, i];
+        }
+        return [...prev, i.name];
+      }, []);
+      if (names.includes(name)) {
         return [...curr, k];
       }
       return curr;

@@ -1,7 +1,7 @@
 import React from "react";
 
 import { budgeting } from "lib";
-import { Portal, BreadCrumbs } from "components/layout";
+import { Portal, BreadCrumbs } from "components/layoutOld";
 
 interface AnalysisPageProps {
   readonly budget: Model.Budget | null;

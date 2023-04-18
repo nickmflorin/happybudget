@@ -1,30 +1,32 @@
 .root {
+  background: $app-background-color;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  background: $app-background-color;
   font-family: $avenir;
   font-weight: 400;
+  min-height: 100vh;
   overflow-y: hidden;
 
   #application-spinner-container {
-    z-index: 1000;
     @include size(30px);
+
+    left: calc(50vw - 15px);
     position: fixed;
     top: calc(50vh - 15px);
-    left: calc(50vw - 15px);
+    z-index: 1000;
 
     .application-spinner {
-      z-index: 1000;
       @include size(30px);
+
+      z-index: 1000;
 
       .anticon {
         @include size(100%);
 
         svg {
+          color: $green !important;
           height: 100%;
           width: auto;
-          color: $green !important;
         }
       }
     }
@@ -58,6 +60,7 @@
         height: $header-h;
         width: $width !important;
       }
+
       .content {
         overflow-y: hidden;
       }
@@ -66,6 +69,24 @@
 
   @mixin calculate_layout_dimensions($collapsed, $sidebar_hidden, $mobile: false, $sidebar: true) {
     $sidebar-width: 0px;
+
+    $sidebar-margin-left: 0px;
+
+    @include include_content_layout_dimensions($sidebar-width, $sidebar_hidden, $header-height);
+
+    .sidebar-container {
+      margin-left: $sidebar-margin-left;
+      max-width: $sidebar-width; // Might not be needed?
+      width: $sidebar-width;
+    }
+
+    &.layout--budget {
+      @include include_content_layout_dimensions(
+        $sidebar-width,
+        $sidebar_hidden,
+        calc(#{$header-height} + 30px)
+      );
+    }
 
     @if $sidebar {
       $sidebar-width: 260px;
@@ -77,25 +98,8 @@
         $sidebar-width: 100%;
       }
     }
-
-    $sidebar-margin-left: 0px;
     @if $sidebar_hidden {
       $sidebar-margin-left: -#{$sidebar-width};
-    }
-
-    .sidebar-container {
-      max-width: $sidebar-width; // Might not be needed?
-      width: $sidebar-width;
-      margin-left: $sidebar-margin-left;
-    }
-
-    @include include_content_layout_dimensions($sidebar-width, $sidebar_hidden, $header-height);
-    &.layout--budget {
-      @include include_content_layout_dimensions(
-        $sidebar-width,
-        $sidebar_hidden,
-        calc(#{$header-height} + 30px)
-      );
     }
   }
 
@@ -108,6 +112,7 @@
 
   @mixin layout_dimensions($collapsed, $sidebar: true) {
     @include device_layout_dimensions($collapsed, true, $sidebar);
+
     &.sidebar-visible {
       @include device_layout_dimensions($collapsed, false, $sidebar);
     }
@@ -124,13 +129,14 @@
   // App Content - Container for the main content that gets displayed inside
   // the logged in application.
   .layout {
-    height: 100vh;
-    overflow-y: hidden;
-    min-height: 100vh;
+    @include expanded_layout_dimensions;
 
-    @include expanded_layout_dimensions();
+    height: 100vh;
+    min-height: 100vh;
+    overflow-y: hidden;
+
     &--collapsed {
-      @include collapsed_layout_dimensions();
+      @include collapsed_layout_dimensions;
 
       &.without-sidebar {
         @include collapsed_layout_dimensions(false);
@@ -143,29 +149,30 @@
     }
 
     .sidebar-container {
-      background: $app-alt-background-color;
-      position: fixed;
-      height: 100vh;
       @include transition(margin-left 0.2s ease-out);
+
+      background: $app-alt-background-color;
+      height: 100vh;
+      position: fixed;
     }
 
     .layout-content {
-      display: flex;
-      flex-direction: column;
-      overflow-y: hidden;
-      height: 100vh;
-
       @include transition(margin-left 0.2s ease-out);
 
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow-y: hidden;
+
       .header {
-        margin-top: 0;
+        @include transition(width 0.2s ease-out);
+
+        background-color: $header-background-color !important;
         line-height: unset !important;
-        top: 0 !important;
+        margin-top: 0;
         padding-left: 15px;
         padding-right: 20px;
-        background-color: $header-background-color !important;
-
-        @include transition(width 0.2s ease-out);
+        top: 0 !important;
       }
 
       .content {
@@ -174,19 +181,20 @@
         flex-grow: 100;
 
         .drawer {
-          max-width: 300px;
-          overflow-y: hidden;
+          border: $border;
           display: flex;
           flex-direction: column;
-          padding: 35px 15px 15px 15px;
-          border: $border;
+          max-width: 300px;
+          overflow-y: hidden;
+          padding: 35px 15px 15px;
           position: relative;
 
           .btn--drawer-close {
-            position: absolute;
-            top: 5px;
-            right: 5px;
             @include size(26px);
+
+            position: absolute;
+            right: 5px;
+            top: 5px;
           }
 
           .drawer-content {
@@ -197,11 +205,11 @@
         }
 
         .sub-content {
-          overflow-y: hidden;
           display: flex;
           flex-direction: column;
-          padding: 10px 15px;
           flex-grow: 100;
+          overflow-y: hidden;
+          padding: 10px 15px;
 
           .page {
             display: flex;
@@ -209,9 +217,9 @@
             flex-grow: 100;
 
             .page-content {
-              width: 100%;
               flex-grow: 100;
               overflow-x: hidden;
+              width: 100%;
 
               &.scrollable {
                 overflow-y: scroll;

@@ -1,11 +1,12 @@
 import React from "react";
 
 import * as api from "api";
+
 import { ui, notifications } from "lib";
 import { Tile } from "components/containers";
 import { ChangePasswordForm } from "components/forms";
 import { ChangePasswordFormValues } from "components/forms/ChangePasswordForm";
-import { Page } from "components/layout";
+import { Page } from "components/layoutOld";
 
 const Security = (): JSX.Element => {
   const form = ui.form.useForm<ChangePasswordFormValues>();

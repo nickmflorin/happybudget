@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
 import { tabling } from "lib";
-import { Page } from "components/layout";
+import { Page } from "components/layoutOld";
 import { ContactsTable, connectTableToAuthenticatedStore } from "components/tabling";
 
 import { actions, sagas } from "../store";

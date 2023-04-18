@@ -8,7 +8,7 @@ import { Icon, Pagination, NoData, NoDataProps } from "components";
 import { OrderingButtonIconToggle } from "components/buttonsOld";
 import { OrderingDropdownMenu } from "components/dropdowns";
 import { Input } from "components/fields";
-import { Page } from "components/layout";
+import { Page } from "components/layoutOld";
 
 const selectBudgets = <
   B extends Model.SimpleBudget | Model.SimpleCollaboratingBudget | Model.SimpleTemplate,

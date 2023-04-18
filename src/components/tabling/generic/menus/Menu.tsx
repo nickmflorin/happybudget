@@ -6,7 +6,7 @@ import { isNil, filter, map } from "lodash";
 import { tabling } from "lib";
 import { ShowHide, SavingChanges } from "components";
 import { SearchInput } from "components/fields";
-import { Portal } from "components/layout";
+import { Portal } from "components/layoutOld";
 
 export type Toolbar<
   T extends Table.PublicMenuActionParams<R, M>,

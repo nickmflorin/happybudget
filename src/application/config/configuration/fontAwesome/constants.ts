@@ -46,6 +46,8 @@ validation logic will throw an Error during the icon registration process.
 */
 /* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { enumeratedLiterals } from "lib/util/literals";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { EnumeratedLiteralType } from "lib/util/types/literals";
 
 export const IconPrefixes = enumeratedLiterals(["far", "fab", "fas"] as const);
 
@@ -90,8 +92,43 @@ export const IconNames = enumeratedLiterals([
   "plus-circle",
   "trash-alt",
   "filter",
-  "sort-amount-down"
+  "sort-amount-down",
+  "camera-alt",
+  "folder-open",
+  "copy",
+  "users",
+  "book-open",
+  "address-book",
+  "book",
 ] as const);
+
+export const IconLicenses = enumeratedLiterals(["free", "pro", "both"] as const);
+export type IconLicense = EnumeratedLiteralType<typeof IconLicenses>;
+
+export type LicensedIcon<
+  N extends string,
+  LICENSE extends IconLicense = "both",
+> = LICENSE extends IconLicense
+  ? {
+      readonly name: N;
+      readonly license: LICENSE;
+    }
+  : never;
+
+export function licensedIcon<N extends string>(name: N): LicensedIcon<N, "both">;
+export function licensedIcon<N extends string, LICENSE extends IconLicense = "both">(
+  name: N,
+  license: LICENSE,
+): LicensedIcon<N, LICENSE>;
+export function licensedIcon<N extends string, LICENSE extends IconLicense = "both">(
+  name: N,
+  license?: LICENSE,
+): LicensedIcon<N, LICENSE> {
+  if (license === undefined) {
+    return { name, license: IconLicenses.BOTH } as LicensedIcon<N, LICENSE>;
+  }
+  return { name, license } as LicensedIcon<N, LICENSE>;
+}
 
 /* When an Icon is added to the registry, the name must be added to the appropriate IconCode key
    in this object type. */
@@ -108,6 +145,9 @@ export const Icons = {
     IconNames.FILE_WORD,
     IconNames.FILE,
     IconNames.TRASH_ALT,
+    IconNames.FOLDER_OPEN,
+    licensedIcon(IconNames.BOOK_OPEN, IconLicenses.PRO),
+    licensedIcon(IconNames.BOOK, IconLicenses.PRO),
   ] as const,
   [IconCodes.SOLID]: [
     IconNames.DATABASE,
@@ -129,6 +169,13 @@ export const Icons = {
     IconNames.PLUS_CIRCLE,
     IconNames.FILTER,
     IconNames.SORT_AMOUNT_DOWN,
+    IconNames.BOOK_OPEN,
+    IconNames.ADDRESS_BOOK,
+    IconNames.USERS,
+    IconNames.COPY,
+    IconNames.FOLDER_OPEN,
+    IconNames.CAMERA_ALT,
+    IconNames.BOOK,
   ] as const,
   [IconCodes.BRAND]: [] as const,
 };

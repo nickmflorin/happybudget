@@ -6,8 +6,10 @@ import { Redirect, Switch, useHistory, useLocation, useRouteMatch } from "react-
 
 import { budgeting } from "lib";
 import { Icon } from "components";
-import { BudgetLayout } from "components/layout";
+import { BudgetLayout } from "components/layoutOld";
 import { Route, PathParamsRoute } from "components/routes";
+
+import { actions, selectors } from "../store";
 
 import Account from "./Account";
 import Accounts from "./Accounts";
@@ -15,7 +17,6 @@ import Actuals from "./Actuals";
 import Analysis from "./Analysis";
 import { BudgetPreviewModal } from "./PreviewModals";
 import SubAccount from "./SubAccount";
-import { actions, selectors } from "../store";
 
 type BudgetProps = {
   readonly budgetId: number;

@@ -1,6 +1,6 @@
 import { Switch } from "react-router-dom";
 
-import { Page } from "components/layout";
+import { Page } from "components/layoutOld";
 import { Route } from "components/routes";
 
 import Billing from "./Billing";

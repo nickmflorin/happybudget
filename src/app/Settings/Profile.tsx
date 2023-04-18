@@ -1,15 +1,15 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 
+import * as api from "api";
 import { isNil } from "lodash";
 
-import * as api from "api";
+import * as store from "application/store";
 import { ui, model, notifications } from "lib";
 import { Tile } from "components/containers";
 import { ImageAndName } from "components/fields";
 import { IImageAndNameRef } from "components/fields/ImageAndName";
 import { UserProfileForm } from "components/forms";
-import { Page } from "components/layout";
-import * as store from "application/store";
+import { Page } from "components/layoutOld";
 
 const Profile = (): JSX.Element => {
   const form = ui.form.useForm<Http.UserPayload>();

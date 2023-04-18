@@ -9,13 +9,83 @@ import * as types from "./types";
  * Returns the internal icon `code` for the provided icon, {@link types.Icon}, or icon type,
  * {@link types.IconType}.
  */
-export const getIconCode = (i: types.Icon | types.IconType): types.IconCode => {
+export const getIconCode = <
+  T extends types.IconCode,
+  N extends types.GetIconName<T>,
+  P extends types.GetIconPrefix<T>,
+>(
+  i: types.Icon<T, N> | P | T,
+): T => {
   if (typeguards.isIconPrefix(i)) {
-    return types.IconCodeMap[i];
+    return types.IconCodeMap[i] as T;
   } else if (typeguards.isIconCode(i)) {
     return i;
   }
-  return i.type;
+  // I do not understand why we have to coerce this.
+  return getIconCode(i.type as T);
+};
+
+/**
+ * Returns the Font Awesome `prefix` for the provided icon, {@link types.Icon}, or icon type,
+ * {@link types.IconType}.
+ */
+export const getIconPrefix = <
+  T extends types.IconCode,
+  N extends types.GetIconName<T>,
+  P extends types.GetIconPrefix<T>,
+>(
+  i: types.Icon<T, N> | P | T,
+): P => {
+  if (typeguards.isIconPrefix(i)) {
+    return i;
+  } else if (typeguards.isIconCode(i)) {
+    return types.IconPrefixMap[i] as P;
+  } else {
+    // I do not understand why we have to coerce this.
+    return getIconPrefix<T, N, P>(i.type as T);
+  }
+};
+
+export const getIconLicense = <T extends types.IconCode, N extends types.GetIconName<T>>(
+  i: types.Icon<T, N> | N,
+): types.IconLicense => {
+  // This will throw an error if an IconName is associated with multiple weights.
+  const ic = typeof i === "string" ? getIcon<T, N>({ name: i }) : (i as types.Icon<T, N>);
+
+  let found: types.IconLicense[] = [];
+
+  const isIconName = (v: types.LicensedIcon<types.IconName> | types.IconName): v is N =>
+    typeof v === "string" && v === ic.name;
+
+  const isLicensedIcon = (
+    v: types.LicensedIcon<types.IconName> | types.IconName,
+  ): v is types.LicensedIcon<N> => typeof v !== "string" && v.name === ic.name;
+
+  const arr: (types.LicensedIcon<types.IconName> | types.IconName)[] = types.Icons[
+    ic.type
+  ].slice() as (types.LicensedIcon<types.IconName> | types.IconName)[];
+  for (let i = 0; i < arr.length; i++) {
+    const iteree: types.LicensedIcon<types.IconName> | types.IconName = arr[i];
+    if (isIconName(iteree)) {
+      found = [...found, types.IconLicenses.BOTH];
+    } else if (isLicensedIcon(iteree)) {
+      found = [...found, iteree.license];
+    }
+  }
+  if (found.length === 0) {
+    throw new Error(
+      "Error Finding Icon License: Could not find any references to an Icon with name " +
+        `'${ic.name}', type '${ic.type}'.  The original provided icon was specified as ` +
+        `'${JSON.stringify(i)}.'`,
+    );
+  } else if (found.length !== 1) {
+    throw new Error(
+      "Error Finding Icon License: Found multiple references to an Icon with name " +
+        `'${ic.name}', type '${ic.type}'.  The original provided icon was specified as ` +
+        `'${JSON.stringify(i)}.'`,
+    );
+  }
+  return found[0];
 };
 
 /**
@@ -24,20 +94,6 @@ export const getIconCode = (i: types.Icon | types.IconType): types.IconCode => {
  */
 export const DEFAULT_ICON_PREFIX = types.IconPrefixes.FAS as types.IconPrefix;
 export const DEFAULT_ICON_CODE = getIconCode(DEFAULT_ICON_PREFIX);
-
-/**
- * Returns the Font Awesome `prefix` for the provided icon, {@link types.Icon}, or icon type,
- * {@link types.IconType}.
- */
-export const getIconPrefix = (i: types.Icon | types.IconType): types.IconPrefix => {
-  if (typeguards.isIconPrefix(i)) {
-    return i;
-  } else if (typeguards.isIconCode(i)) {
-    return types.IconPrefixMap[i];
-  } else {
-    return types.IconPrefixMap[i.type];
-  }
-};
 
 export const getIconName = (v: types.Icon): types.IconName => v.name;
 
@@ -54,30 +110,16 @@ export const getIconName = (v: types.Icon): types.IconName => v.name;
  *
  * @returns {types.IconCode[]}
  */
-export const getIconCodes = (name: types.IconName): types.IconCode[] =>
+export const getIconCodes = <N extends types.IconName = types.IconName>(
+  name: N,
+): types.GetIconCode<N>[] =>
   Object.keys(types.Icons).reduce(
-    (curr: types.IconCode[], k: string) =>
-      (types.Icons[k as types.IconCode] as readonly types.IconName[]).includes(name)
-        ? [...curr, k as types.IconCode]
+    (curr: types.GetIconCode<N>[], k: string): types.GetIconCode<N>[] =>
+      (types.Icons[k as types.GetIconCode<N>] as readonly types.IconName[]).includes(name)
+        ? ([...curr, k] as types.GetIconCode<N>[])
         : curr,
-    [],
+    [] as types.GetIconCode<N>[],
   );
-
-/**
- * Returns the prefixes, {@link types.IconPrefix[]}, for icons that are registered in the global
- * library with the provided name, {@link types.IconName}.
- *
- * A given name, {@link types.IconName}, can be associated with multiple prefixes,
- *  {@link types.IconPrefix[]}, if the same icon is registered in the library from multiple Font
- * Awesome style packages.
- *
- * @param {types.IconName} name
- *   The name for which the registered prefixes should be returned.
- *
- * @returns {types.IconPrefix[]}
- */
-export const getIconPrefixes = (name: types.IconName): types.IconPrefix[] =>
-  getIconCodes(name).map((i: types.IconCode) => getIconPrefix(i));
 
 /**
  * Returns a set icons, {@link types.Icon[]}, based on the provided lookup.  If the lookup is not
@@ -93,7 +135,18 @@ export function getIcons<T extends types.IconCode, N extends types.IconName>(
   lookup?: { name?: N; type: T } | { name: N },
 ): types.Icon[] {
   let icons = Object.keys(types.Icons).reduce((curr: types.Icon[], k: string): types.Icon[] => {
-    const names: readonly types.IconName[] = types.Icons[k as types.IconCode];
+    const names: types.IconName[] = (
+      types.Icons[k as types.IconCode].slice() as (
+        | types.IconName
+        | types.LicensedIcon<types.IconName>
+      )[]
+    ).reduce(
+      (
+        prev: types.IconName[],
+        curr: types.IconName | types.LicensedIcon<types.IconName>,
+      ): types.IconName[] => (typeof curr === "string" ? [...prev, curr] : [...prev, curr.name]),
+      [] as types.IconName[],
+    );
     return [...curr, ...names.map((n: types.IconName) => ({ type: k, name: n } as types.Icon))];
   }, []);
   if (
@@ -123,7 +176,7 @@ export function getIcons<T extends types.IconCode, N extends types.IconName>(
  *
  * @returns {types.Icon<T, N>}
  */
-export const getIcon = <T extends types.IconCode, N extends types.IconName<T>>(
+export const getIcon = <T extends types.IconCode, N extends types.GetIconName<T>>(
   lookup: { name: N; type: T } | { name: N },
 ): types.Icon<T, N> => {
   const icons = getIcons(lookup);
@@ -152,9 +205,14 @@ export const getIcon = <T extends types.IconCode, N extends types.IconName<T>>(
  *
  * @returns {[types.IconPrefix, types.IconName]}
  */
-export const getNativeIcon = (
-  name: types.IconName | types.Icon,
-): [types.IconPrefix, types.IconName] => {
+export const getNativeIcon = <
+  I extends types.Icon<T, N>,
+  T extends types.IconCode,
+  N extends types.GetIconName<T>,
+  P extends types.GetIconPrefix<T>,
+>(
+  name: N | I,
+): [P, N] => {
   if (typeguards.isIconName(name)) {
     const availableCodes = getIconCodes(name);
     if (availableCodes.length === 0) {
@@ -163,12 +221,12 @@ export const getNativeIcon = (
           "means that the registered icons were not properly validated before registering with " +
           "the library.",
       );
-    } else if (availableCodes.includes(DEFAULT_ICON_CODE)) {
-      return [getIconPrefix(DEFAULT_ICON_CODE), name];
+    } else if (availableCodes.includes(DEFAULT_ICON_CODE as typeof availableCodes[number])) {
+      return [getIconPrefix<T, N, P>(DEFAULT_ICON_CODE as T), name];
     }
-    return [getIconPrefix(availableCodes[0]), name];
+    return [getIconPrefix<T, N, P>(([...availableCodes] as T[])[0]), name];
   }
-  return [getIconPrefix(name.type), name.name];
+  return [getIconPrefix<T, N, P>(name.type), name.name as N];
 };
 
 /**

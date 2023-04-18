@@ -8,6 +8,8 @@ import {
   IconNames,
   IconPrefixes,
   Icons,
+  LicensedIcon,
+  IconLicense,
 } from "application/config/configuration/fontAwesome/constants";
 
 import { enumeratedLiterals, EnumeratedLiteralType } from "../../util";
@@ -15,6 +17,18 @@ import * as types from "../types";
 
 /* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 export * from "application/config/configuration/fontAwesome/constants";
+
+export type IconLibrary = typeof Icons;
+
+export type IconLibraryNameTransform<
+  T extends Readonly<(LicensedIcon<string, IconLicense> | string)[]>,
+> = {
+  [I in keyof T]: T[I] extends { name: infer N }
+    ? N
+    : T[I] extends infer N extends string
+    ? N
+    : never;
+};
 
 export const IconPrefixMap = {
   [IconCodes.BRAND]: IconPrefixes.FAB,
@@ -28,7 +42,7 @@ export const IconCodeMap = {
   fas: IconCodes.SOLID,
 };
 
-type IconNameMap = { [key in keyof typeof Icons]: typeof Icons[key] };
+type IconNameMap = { [key in keyof IconLibrary]: IconLibraryNameTransform<IconLibrary[key]> };
 
 type IconNameReverseMap<N extends IconName> = keyof {
   [key in keyof IconNameMap as N extends IconNameMap[key][number]
@@ -41,39 +55,12 @@ type IconNameReverseMap<N extends IconName> = keyof {
  * by the name, {@link IconName}) can be registered under.
  *
  * This type will typically take on values such as "far", "fab" or "fas".
- *
- * Usage
- * -----
- * The {@link IconPrefix} type can be used to extract the prefix in a variety of ways, depending on
- * the generic type argument, {@link C}:
- *
- * 1. All Prefixes
- *    type All = IconPrefix; // "far" | "fab" | "fas";
- *
- * 2. Prefix for Specific Code
- *    type P = IconPrefix<"brand">; // "fab";
- *
- * 3. Prefix for Icon
- *    type P = IconPrefix<{ type: "regular", name: "arrow-circle-up" | "ellipsis" }; // "far"
- *
- * 4. Prefixes for Icon Name
- *    type P = IconPrefix<"arrow-circle-up">; // "far";
- *
- *    Note that if the name, {@link IconName}, is associated with multiple prefixes, the resulting
- *    type will be a union of those prefixes.
  */
-export type IconPrefix<C extends IconType | Icon | IconName | undefined = undefined> =
-  C extends undefined
-    ? EnumeratedLiteralType<typeof IconPrefixes>
-    : C extends IconPrefix
-    ? C
-    : C extends IconCode
-    ? typeof IconPrefixMap[C]
-    : C extends Icon
-    ? IconPrefix<C["type"]>
-    : C extends IconName
-    ? IconPrefix<IconNameReverseMap<C>>
-    : never;
+export type IconPrefix = EnumeratedLiteralType<typeof IconPrefixes>;
+
+export type GetIconPrefix<C extends IconCode> = C extends IconCode
+  ? typeof IconPrefixMap[C]
+  : never;
 
 /**
  * Represents a more intuitive, human readable form of a FontAwesome prefix, {@link IconPrefix}.
@@ -89,9 +76,6 @@ export type IconPrefix<C extends IconType | Icon | IconName | undefined = undefi
  * 1. All Codes
  *    type All = IconCode; // "regular" | "solid" | "brand";
  *
- * 2. Code for Specific Prefix
- *    type P = IconCode<"fab">; // "brand";
- *
  * 3. Code for Icon
  *    type P = IconCode<{ type: "regular", name: "arrow-circle-up" | "ellipsis" }; // "regular"
  *
@@ -101,18 +85,11 @@ export type IconPrefix<C extends IconType | Icon | IconName | undefined = undefi
  *    Note that if the name, {@link IconName}, is associated with multiple codes, the resulting
  *    type will be a union of those codes.
  */
-export type IconCode<C extends IconType | Icon | IconName | undefined = undefined> =
-  C extends undefined
-    ? EnumeratedLiteralType<typeof IconCodes>
-    : C extends IconPrefix
-    ? typeof IconCodeMap[C]
-    : C extends IconCode
-    ? C
-    : C extends Icon
-    ? IconCode<C["type"]>
-    : C extends IconName
-    ? IconNameReverseMap<C>
-    : never;
+export type IconCode = EnumeratedLiteralType<typeof IconCodes>;
+export type GetIconCode<T extends IconName> = IconNameReverseMap<T>;
+export type GetIconCodeFromPrefix<T extends IconPrefix> = T extends IconPrefix
+  ? typeof IconCodeMap[T]
+  : never;
 
 export type IconType = IconPrefix | IconCode;
 
@@ -140,34 +117,20 @@ export type IconType = IconPrefix | IconCode;
  * @see IconPrefix
  * @see IconCode
  */
-export type IconName<C extends IconType | undefined = undefined> = C extends undefined
-  ? EnumeratedLiteralType<typeof IconNames>
-  : C extends IconCode
-  ? IconNameMap[C][number]
-  : C extends IconPrefix
-  ? IconNameMap[IconCode<C>][number]
-  : never;
-
-type _DistributeIcon<T, N> = T extends IconCode
-  ? N extends IconName<T>
-    ? { type: T; name: N }
-    : never
-  : never;
+export type IconName = EnumeratedLiteralType<typeof IconNames>;
+export type GetIconName<C extends IconCode> = C extends IconCode ? IconNameMap[C][number] : never;
 
 /**
  * Represents the information that is used to render an icon in the application.
  */
 export type Icon<
-  T extends IconType | undefined = undefined,
-  N extends IconName<T> | undefined = undefined,
-> = T extends undefined
-  ? _DistributeIcon<IconCode, IconName>
-  : T extends IconPrefix
-  ? _DistributeIcon<IconCode<T>, N>
-  : T extends IconCode
-  ? _DistributeIcon<T, N>
-  : N extends undefined
-  ? _DistributeIcon<T, IconName<T>>
+  T extends IconCode = IconCode,
+  N extends GetIconName<T> = GetIconName<T>,
+> = T extends IconCode
+  ? {
+      type: T;
+      name: N;
+    }
   : never;
 
 /**
@@ -197,7 +160,10 @@ export type IconElement = ReactElement<
  *
  * @see IconType
  */
-export type BasicIconProp = IconName | Icon;
+export type BasicIconProp<
+  T extends IconCode = IconCode,
+  N extends GetIconName<T> = GetIconName<T>,
+> = N | Icon<T, N>;
 
 /**
  * The way that an "Icon" should be defined in the props for components in the application.
@@ -211,7 +177,9 @@ export type BasicIconProp = IconName | Icon;
  *
  *    <Button icon={<Icon className={"specific-icon"} /> } />
  */
-export type IconProp = BasicIconProp | IconElement;
+export type IconProp<T extends IconCode = IconCode, N extends GetIconName<T> = GetIconName<T>> =
+  | BasicIconProp<T, N>
+  | IconElement;
 
 export const IconSizes = enumeratedLiterals(["small", "medium", "large", "fill"] as const);
 export type IconSize = EnumeratedLiteralType<typeof IconSizes>;
@@ -283,7 +251,10 @@ export type SVGProps = types.ComponentProps<
   { external: Omit<React.SVGAttributes<SVGElement>, "fill" | "height" | "width" | "viewBox"> }
 >;
 
-type _BaseIconProps = types.ComponentProps<
+type _BaseIconProps<
+  T extends IconCode = IconCode,
+  N extends GetIconName<T> = GetIconName<T>,
+> = types.ComponentProps<
   BaseSVGProps & {
     /**
      * The size of the Icon, provided as either as a valid CSS specification {@link CSSSize},
@@ -330,6 +301,7 @@ type _BaseIconProps = types.ComponentProps<
       types.Style,
       types.CSSSizeProperties | types.CSSDirectionalProperties<"padding"> | "color"
     >;
+    readonly fallbackLicenseIcon?: BasicIconProp<T, N>;
   },
   { external: Pick<FontAwesomeIconProps, "spin"> }
 >;
@@ -338,14 +310,20 @@ type _BaseIconProps = types.ComponentProps<
  * The props that the component responsible for rendering the Icon component, without the recursive
  * {@link IconElement} value allowed for the `icon` prop.
  */
-export type IconComponentProps = _BaseIconProps & {
-  readonly icon: Exclude<IconProp, IconElement>;
+export type IconComponentProps<
+  T extends IconCode = IconCode,
+  N extends GetIconName<T> = GetIconName<T>,
+> = _BaseIconProps<T, N> & {
+  readonly icon: BasicIconProp<T, N>;
 };
 
 /**
  * The props that the <Icon /> component accepts, which allows the `icon` prop to be provided by
  * the traditional means, {@link BasicIconProp}, or a nested element, {@link IconElement}.
  */
-export type IconProps = _BaseIconProps & {
-  readonly icon: IconProp;
+export type IconProps<
+  T extends IconCode = IconCode,
+  N extends GetIconName<T> = GetIconName<T>,
+> = _BaseIconProps<T, N> & {
+  readonly icon: IconProp<T, N>;
 };

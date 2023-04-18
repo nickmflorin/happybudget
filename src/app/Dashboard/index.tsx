@@ -4,12 +4,12 @@ import { useDispatch } from "react-redux";
 import { Route, Switch, useHistory, useLocation } from "react-router-dom";
 import { Dispatch } from "redux";
 
-import { model } from "lib";
-import { Icon } from "components";
-import { ExpandedLayout } from "components/layout";
-import { CreateBudgetModal } from "components/modals";
 import * as config from "application/config";
 import * as store from "application/store";
+import { model } from "lib";
+import { Icon } from "components";
+import { ExpandedLayout } from "components/layoutOld";
+import { CreateBudgetModal } from "components/modals";
 
 import { Contacts, Templates, Budgets } from "./components";
 import { actions } from "./store";

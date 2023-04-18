@@ -15,6 +15,9 @@ import {
   faFileWord,
   faFile,
   faTrashAlt,
+  faBookOpen as faBookOpenRegular,
+  faFolderOpen as faRegularFolderOpen,
+  faBook as faBookRegular,
 } from "@fortawesome/pro-regular-svg-icons";
 import {
   faArrowDown,
@@ -37,6 +40,13 @@ import {
   faPlusCircle,
   faFilter,
   faSortAmountDown,
+  faCameraAlt,
+  faCopy,
+  faUsers,
+  faAddressBook,
+  faFolderOpen as faSolidFolderOpen,
+  faBookOpen as faBookOpenSolid,
+  faBook as faBookSolid,
 } from "@fortawesome/pro-solid-svg-icons";
 
 export const PRO_ICON_REGISTRY = [
@@ -71,4 +81,14 @@ export const PRO_ICON_REGISTRY = [
   faTrashAlt,
   faFilter,
   faSortAmountDown,
+  faCameraAlt,
+  faSolidFolderOpen,
+  faRegularFolderOpen,
+  faCopy,
+  faUsers,
+  faBookOpenSolid,
+  faBookOpenRegular,
+  faAddressBook,
+  faBookSolid,
+  faBookRegular
 ] as const;

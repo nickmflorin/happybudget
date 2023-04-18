@@ -1,14 +1,17 @@
+import { logger } from "internal";
 import { validators } from "lib";
 
 import * as types from "./types";
 
 /**
- * Returns whether or not the given page, {@link types.SidebarPage}, should be hidden and not
- * accessible from the layout's sidebar.
+ * Returns whether or not the sidebar item associated with the provided item configuration,
+ * {@link types.SidebarItemConfig}, should be hidden and not accessible from the layout's sidebar.
  *
- * Hiding a page from the sidebar should be used in cases where conditional logic, such as
+ * Hiding an item from the sidebar should be used in cases where conditional logic, such as
  * permissions based controls, warrant that a given user should not have access to a given page
- * and thus, should not be allowed to navigate to the page via the sidebar.
+ * and thus, should not be allowed to navigate to the page via the sidebar.  It does not prevent
+ * that page from being accessed, it merely hides the clickable item associated with that page in
+ * the sidebar.
  *
  * @param {string} currentPath
  *   The path as shown in the browser including the search params and respecting the trailingSlash
@@ -25,42 +28,73 @@ import * as types from "./types";
  *
  * @returns {bool}
  */
-export const sidebarPageIsHidden = <
-  I extends types.SidebarPageId = types.SidebarPageId,
-  P extends string = string,
->(
+export const sidebarItemIsHidden = <T extends types.SidebarId, P extends string = string>(
   currentPath: string,
-  props: Pick<types.SidebarPage<I, P>, "hidden">,
+  sidebarItem: Pick<types.SidebarItemConfig<T, P>, "hidden">,
 ): boolean => {
-  switch (typeof props.hidden) {
+  switch (typeof sidebarItem.hidden) {
     case "function":
-      return props.hidden(currentPath);
+      return sidebarItem.hidden(currentPath);
     case "boolean":
-      return props.hidden;
+      return sidebarItem.hidden;
     default:
       return false;
   }
 };
 
+export const sidebarItemControlIsActive = <P extends string = string>(
+  control: types.SidebarItemActiveStateControl<P>,
+  path: string,
+): boolean => {
+  if (typeof control === "boolean") {
+    return control;
+  } else if (!Array.isArray(control)) {
+    switch (typeof control) {
+      case "function":
+        return control(path);
+      case "string":
+        return path === control;
+      default:
+        return control.test(path);
+    }
+  }
+  return validators.validateAny(control, (a: types.SidebarItemActiveStateControl<P>) =>
+    sidebarItemControlIsActive<P>(a, path),
+  );
+};
+
 /**
- * Returns whether or not the given page, {@link types.SidebarPage}, is active based on the current
- * path as shown in the browser.
+ * Returns whether or not the sidebar item associated with the provided item configuration,
+ * {@link types.SidebarItemConfig}, is active based on the current path in the browser.
  *
- * By default, a given page, {@link types.SidebarPage}, will be treated as being "active" if its
- * `pathname` is equal to the current path, {@link string}.  However, the `pathname` refers to the
- * path that should be navigated too when the associated sidebar item is clicked - and it will
- * almost always be the case that the sidebar page, {@link types.SidebarPage}, should be treated as
- * "active" for other cases.
+ * A given sidebar item, {@link types.SidebarItemConfig}, will be treated as active if the
+ * 'active' property is defined and it evaluates to 'true'.  This 'active' property can be defined
+ * as any of the following:
  *
- * For instance, if we have a page, {@link types.SidebarPage}, that has a `pathname` value of
- * "/machines", it is likely the case that we will want this to be considered "active" if the
- * current path as shown in the browser is also, say, "/machines/<id>".
+ * 1. A string path name {@link string}
+ *    In this case, the sidebar item, {@link types.SidebarItemConfig}, will be treated as active
+ *    if the 'active' property is equal to the current path as seen in the browser.
  *
- * For this reason, the `active` attribute is exposed on the page, {@link types.SidebarPage}, which
- * can control the "active" state of a given page, {@link types.SidebarPage}, when it differs from
- * just the page's `pathname` alone.
+ * 2. A regular expression {@link RegExp}
+ *    In this case, the sidebar item, {@link types.SidebarItemConfig}, will be treated as active
+ *    if the regular expression matches the current pathname as seen in the browser.
  *
- * @param {string} currentPath
+ * 3. A callback function {@link SidebarPagePathCallback}
+ *    In this case, the sidebar item, {@link types.SidebarItemConfig}, will be treated as active
+ *    if the callback function returns 'true' when called with the current path as seen in the
+ *    browser as its first and only argument.
+ *
+ * 4. An array of regular expressions, string pathnames and/or callback functions,
+ *    {@link (string | RegExp | SidebarPagePathCallback)[]}.  In this case, the sidebar item,
+ *    {@link types.SidebarItemConfig}, will be treated as active if any of the regular expressions
+ *    in the array match the current pathname as seen in the browser, if any of the string values
+ *    in the array equal the current pathname as seen in the browser, or if any of the callback
+ *    functions, {@link SidebarPagePathCallback}, in the array evaluate to 'true' when called with
+ *    the current path as seen in the browser as its first and only argument.
+ *
+ * @see {BaseSidebarItemConfig}
+ *
+ * @param {string} path
  *   The path as shown in the browser including the search params and respecting the trailingSlash
  *   configuration. basePath and locale are not included.
  *
@@ -69,36 +103,25 @@ export const sidebarPageIsHidden = <
  *
  *   Reference: https://nextjs.org/docs/api-reference/next/router#router-object
  *
- * @param {Pick<types.SidebarPage<I, P, N>, "pathname" | "active">} page
- *   The page, {@link types.SidebarPage}, corresponding to the page whose "active" state is being
- *   determined by the method.
+ * @param {types.SidebarItemConfig<T, P>,} sidebarItem
+ *   The configuration representing the sidebar item whose 'active' state is being determined by the
+ *   method.
  *
  * @returns {bool}
  */
-export const sidebarPageIsActive = <
-  I extends types.SidebarPageId = types.SidebarPageId,
-  P extends string = string,
->(
-  currentPath: string,
-  page: Pick<types.SidebarPage<I, P>, "pathname" | "active">,
+export const sidebarItemIsActive = <T extends types.SidebarId, P extends string = string>(
+  sidebarItem: types.SidebarItemConfig<T, P>,
+  path: string,
 ): boolean => {
-  /* If the `active` property of the page is undefined, the determination of an "active" state
-     should be made solely from the page's `pathname`. */
-  const activeControl = page.active === undefined ? page.pathname : page.active;
-  if (activeControl === false) {
-    return false;
+  if (sidebarItem.active !== undefined) {
+    return sidebarItemControlIsActive(sidebarItem.active, path);
   }
-  if (!Array.isArray(activeControl)) {
-    switch (typeof activeControl) {
-      case "function":
-        return activeControl(currentPath);
-      case "string":
-        return currentPath === activeControl;
-      default:
-        return activeControl.test(currentPath);
-    }
+  const subMenu = (sidebarItem as types.DashboardSidebarItemConfig<P>).subMenu;
+  if (subMenu !== undefined) {
+    return validators.validateAny(subMenu, (a: types.DashboardSidebarSubItemConfig) =>
+      sidebarItemIsActive(a, path),
+    );
   }
-  return validators.validateAny(activeControl, (a: types.SidebarPagePathSelector<P>) =>
-    sidebarPageIsActive<I, P>(currentPath, { pathname: page.pathname, active: a }),
-  );
+  logger.warn("The sidebar item does not define an active state control, it will never be active.");
+  return false;
 };

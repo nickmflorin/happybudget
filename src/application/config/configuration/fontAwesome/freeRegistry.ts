@@ -14,6 +14,7 @@ import {
   faFileWord,
   faFile,
   faTrashAlt,
+  faFolderOpen as faRegularFolderOpen,
 } from "@fortawesome/free-regular-svg-icons";
 import {
   faArrowDown,
@@ -36,6 +37,13 @@ import {
   faPlusCircle,
   faFilter,
   faSortAmountDown,
+  faCameraAlt,
+  faFolderOpen as faSolidFolderOpen,
+  faCopy,
+  faUsers,
+  faBookOpen,
+  faAddressBook,
+  faBook,
 } from "@fortawesome/free-solid-svg-icons";
 
 export const FREE_ICON_REGISTRY = [
@@ -70,4 +78,12 @@ export const FREE_ICON_REGISTRY = [
   faTrashAlt,
   faFilter,
   faSortAmountDown,
+  faCameraAlt,
+  faRegularFolderOpen,
+  faSolidFolderOpen,
+  faCopy,
+  faUsers,
+  faBookOpen,
+  faAddressBook,
+  faBook,
 ] as const;
