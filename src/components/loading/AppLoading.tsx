@@ -2,7 +2,7 @@ import React from "react";
 
 import classNames from "classnames";
 
-import { Portal } from "components/layoutOld";
+import { Portal } from "deprecated/components/layoutOld";
 
 import { Loading, LoadingProps } from "./Loading";
 

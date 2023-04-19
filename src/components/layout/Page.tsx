@@ -1,14 +1,13 @@
 import React, { useMemo } from "react";
 
 import classNames from "classnames";
-
 import * as config from "config";
-import { feedback as Feedback, errors } from "lib";
 
+import { feedback as Feedback, errors } from "lib";
 import { Head } from "components/compat";
 import { GlobalFeedbackDisplay } from "components/feedback";
 import { withLoading, WithLoadingProps } from "components/loading";
-import { Header } from "components/structural";
+import { Header } from "deprecated/components/structural";
 
 type _BasePageProps<I extends config.PageId> = {
   readonly id: I;

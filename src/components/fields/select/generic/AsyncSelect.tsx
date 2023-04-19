@@ -7,7 +7,7 @@ import RCAsyncSelect, { AsyncProps } from "react-select/async";
 import Select from "react-select/dist/declarations/src/Select";
 
 import { ConditionalWrapper } from "components";
-import { InputFieldNotifications } from "components/notifications";
+import { InputFieldNotifications } from "deprecated/components/notifications";
 
 import { Option } from "./options";
 import { useSelectRef } from "./Select";

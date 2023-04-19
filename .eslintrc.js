@@ -145,7 +145,13 @@ module.exports = {
   extends: EXTENSIONS,
   rules: BASE_RULES,
   // The "!.*" is included such that ESLint doesn't (by default) ignore files that start with ".".
-  ignorePatterns: ["next-env.d.ts", "!.*", "package.json", "package-lock.json"],
+  ignorePatterns: [
+    "next-env.d.ts",
+    "!.*",
+    "package.json",
+    "package-lock.json",
+    "src/deprecated/**/*",
+  ],
   overrides: [
     {
       files: ["**/*.ts", "**/*.tsx"],

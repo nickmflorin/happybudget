@@ -267,7 +267,7 @@ const _ContentButtonSubContent = (props: ContentButtonSubContentProps): JSX.Elem
   );
 };
 
-const ContentButtonSubContent = React.memo(_ContentButtonSubContent);
+export const ContentButtonSubContent = React.memo(_ContentButtonSubContent);
 
 type ContentProps<
   P extends ButtonProps<V> | AnchorProps<V>,

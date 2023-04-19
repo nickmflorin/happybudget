@@ -2,12 +2,11 @@ import { useRouter } from "next/router";
 import React from "react";
 
 import classNames from "classnames";
-
 import * as config from "config";
-import { ui } from "lib";
 
+import { ui } from "lib";
 import { CorshaLogo } from "components/icons";
-import { Separator } from "components/structural";
+import { Separator } from "deprecated/components/structural";
 
 import { SidebarRoutes } from "./SidebarRoutes";
 

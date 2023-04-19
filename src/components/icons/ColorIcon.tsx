@@ -1,7 +1,7 @@
 import classNames from "classnames";
 
 import { ui } from "lib";
-import { Colors } from "style/constants";
+import { Colors } from "deprecated/style/constants";
 
 export type ColorIconProps = ui.ComponentProps<{
   readonly color?: ui.HexColor | null;

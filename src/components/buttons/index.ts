@@ -16,5 +16,5 @@ export * from "./PrimaryButton";
 export * from "./PrimaryButtonIconToggle";
 export * from "./SecondaryButton";
 export * from "./SecondaryButtonIconToggle";
-export * from "./SidebarAnchor";
 export * from "./TrashButton";
+export * from "./sidebar";

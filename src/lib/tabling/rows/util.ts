@@ -1,4 +1,4 @@
-import { Colors } from "style/constants";
+import { Colors } from "deprecated/style/constants";
 
 import * as model from "../../model";
 import * as ui from "../../ui";

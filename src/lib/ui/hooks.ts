@@ -5,7 +5,7 @@ import { isEqual, forEach, isNil, debounce, uniqueId } from "lodash";
 import { useMediaQuery } from "react-responsive";
 
 import { notifications } from "lib";
-import { Breakpoints } from "style/constants";
+import { Breakpoints } from "deprecated/style/constants";
 
 export * from "./tsxHooks";
 

@@ -29,8 +29,8 @@ import * as types from "./types";
  * @returns {bool}
  */
 export const sidebarItemIsHidden = <T extends types.SidebarId, P extends string = string>(
-  currentPath: string,
   sidebarItem: Pick<types.SidebarItemConfig<T, P>, "hidden">,
+  currentPath: string,
 ): boolean => {
   switch (typeof sidebarItem.hidden) {
     case "function":

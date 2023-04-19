@@ -1,7 +1,7 @@
 import { isNil } from "lodash";
 
 import { tabling, util } from "lib";
-import { DEFAULT_COLOR_SCHEME, Colors } from "style/constants";
+import { DEFAULT_COLOR_SCHEME, Colors } from "deprecated/style/constants";
 
 import * as typeguards from "./typeguards";
 

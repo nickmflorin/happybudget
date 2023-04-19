@@ -1,0 +1,73 @@
+import { useEffect } from "react";
+
+import { useSelector, useDispatch } from "react-redux";
+import { Redirect, Switch } from "react-router-dom";
+
+import { PublicBudgetLayout } from "deprecated/components/layoutOld";
+import { Route, PathParamsRoute } from "deprecated/components/routes";
+
+import { actions, selectors } from "../store";
+
+import Account from "./Account";
+import Accounts from "./Accounts";
+import SubAccount from "./SubAccount";
+
+type PublicBudgetProps = {
+  readonly budgetId: number;
+  readonly tokenId: string;
+};
+
+const PublicBudget = (props: PublicBudgetProps): JSX.Element => {
+  const dispatch = useDispatch();
+  const budget = useSelector((s: Application.Store) =>
+    selectors.selectBudgetDetail<Model.Budget, true>(s, { domain: "budget", public: true }),
+  );
+  const budgetLoading = useSelector((s: Application.Store) =>
+    selectors.selectBudgetLoading(s, { domain: "budget", public: true }),
+  );
+
+  useEffect(() => {
+    dispatch(
+      actions.pub.requestBudgetAction(null, {
+        budgetId: props.budgetId,
+        domain: "budget",
+        public: true,
+      }),
+    );
+  }, [props.budgetId]);
+
+  return (
+    <PublicBudgetLayout budgetLoading={budgetLoading}>
+      <Switch>
+        <Redirect
+          exact
+          from="/pub/:tokenId/budgets/:budgetId"
+          to="/pub/:tokenId/budgets/:budgetId/accounts"
+        />
+        <PathParamsRoute<{ accountId: number }>
+          pub={true}
+          params={["accountId"]}
+          path="/pub/:tokenId/budgets/:budgetId/accounts/:accountId"
+          render={(params: { accountId: number }) => (
+            <Account {...props} id={params.accountId} budget={budget} />
+          )}
+        />
+        <Route
+          pub={true}
+          path="/pub/:tokenId/budgets/:budgetId/accounts"
+          render={() => <Accounts {...props} budget={budget} />}
+        />
+        <PathParamsRoute<{ subaccountId: number }>
+          pub={true}
+          params={["subaccountId"]}
+          path="/pub/:tokenId/budgets/:budgetId/subaccounts/:subaccountId"
+          render={(params: { subaccountId: number }) => (
+            <SubAccount {...props} id={params.subaccountId} budget={budget} />
+          )}
+        />
+      </Switch>
+    </PublicBudgetLayout>
+  );
+};
+
+export default PublicBudget;

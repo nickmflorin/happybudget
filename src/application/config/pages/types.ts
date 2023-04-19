@@ -89,6 +89,7 @@ export type BaseSidebarItemConfig<P extends string = string> = {
    * be used for both the "active" and the "inactive" states.
    */
   readonly activeIcon?: ui.IconProp;
+  readonly tooltip?: ui.Tooltip;
 };
 
 export type DashboardSidebarSubItemConfig<

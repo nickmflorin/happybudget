@@ -3,7 +3,7 @@ import React from "react";
 import classNames from "classnames";
 
 import { ui } from "lib";
-import { GoogleIcon } from "components/svgs";
+import { GoogleIcon } from "deprecated/components/svgs";
 
 import { SolidButton, SolidButtonProps } from "./abstract";
 

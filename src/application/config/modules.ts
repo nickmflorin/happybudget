@@ -4,8 +4,8 @@ import {
   BudgetReduxConfig,
   TemplateReduxConfig,
   PublicBudgetReduxConfig,
-} from "app/Budgeting/config";
-import DashboardReduxConfig from "app/Dashboard/config";
+} from "deprecated/app/Budgeting/config";
+import DashboardReduxConfig from "deprecated/app/Dashboard/config";
 
 /* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { Reducer, Action } from "../store/types";

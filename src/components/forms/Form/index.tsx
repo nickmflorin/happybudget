@@ -6,7 +6,7 @@ import { Form as RootForm, InputRef } from "antd";
 
 import { ui } from "lib";
 import { RenderWithSpinner } from "components";
-import { Notifications } from "components/notifications";
+import { Notifications } from "deprecated/components/notifications";
 
 import FieldError from "./FieldError";
 import Footer from "./Footer";

@@ -5,7 +5,7 @@ import RCSelect, { Props, GroupBase } from "react-select";
 
 import { notifications } from "lib";
 import { ConditionalWrapper } from "components";
-import { InputFieldNotifications } from "components/notifications";
+import { InputFieldNotifications } from "deprecated/components/notifications";
 
 import Option from "./options/Option";
 
