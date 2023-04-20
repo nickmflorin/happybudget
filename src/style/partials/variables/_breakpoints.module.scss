@@ -1,10 +1,28 @@
 @use "~include-media/dist/_include-media";
 
+$small-breakpoint: 320px;
+$medium-breakpoint: 480px;
+$large-breakpoint: 768px;
+$xl-breakpoint: 1024px;
+$xxl-breakpoint: 1200px;
+$xxxl-breakpoint: 1580px;
+
 $breakpoints: (
-  small: 320px,
-  medium: 480px,
-  large: 768px,
-  xl: 1024px,
-  xxl: 1200px,
-  xxxl: 1580px,
+  "small": $small-breakpoint,
+  "medium": $medium-breakpoint,
+  "large": $large-breakpoint,
+  "xl": $xl-breakpoint,
+  "xxl": $xxl-breakpoint,
+  "xxxl": $xxxl-breakpoint,
 );
+
+/* ========================================== Exports =========================================== */
+
+:export {
+  largeBreakpoint: $large-breakpoint;
+  mediumBreakpoint: $medium-breakpoint;
+  smallBreakpoint: $small-breakpoint;
+  xLargeBreakpoint: $xl-breakpoint;
+  xxLargeBreakpoint: $xxl-breakpoint;
+  xxxLargeBreakpoint: $xxxl-breakpoint;
+}

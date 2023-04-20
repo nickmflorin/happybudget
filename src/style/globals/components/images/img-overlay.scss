@@ -1,0 +1,19 @@
+@use "partials";
+
+.img-overlay {
+  @include partials.size(100%);
+  @include partials.vertical-flex-c;
+
+  align-items: center;
+  background-color: partials.$img-overlay-bg-color;
+  color: partials.$white;
+  left: 0;
+  position: absolute;
+  text-align: center;
+  top: 0;
+  z-index: 1000;
+
+  svg {
+    color: inherit;
+  }
+}

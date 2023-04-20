@@ -5,7 +5,7 @@ import { Tooltip as AntdTooltip } from "antd";
 
 import { logger } from "internal";
 import { ui } from "lib";
-import { TextWithIncludedLink } from "components/typography";
+// import { TextWithIncludedLink } from "components/typography";
 
 import { ItemizedTooltipContent } from "./ItemizedTooltipContent";
 
@@ -18,13 +18,13 @@ export const RootTooltip = ({
       logger.warn("Cannot include link in tooltip when the title is not a string.");
     }
     if (typeof props.content === "string") {
-      if (props.includeLink !== undefined) {
-        return (
-          <TextWithIncludedLink includeLink={props.includeLink}>
-            {props.content}
-          </TextWithIncludedLink>
-        );
-      }
+      /* if (props.includeLink !== undefined) {
+           return (
+             <TextWithIncludedLink includeLink={props.includeLink}>
+               {props.content}
+             </TextWithIncludedLink>
+           );
+         } */
       return props.content;
     } else if (Array.isArray(props.content)) {
       return <ItemizedTooltipContent items={props.content} formatter={props.valueFormatter} />;

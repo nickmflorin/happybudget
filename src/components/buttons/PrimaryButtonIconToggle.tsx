@@ -1,12 +1,11 @@
-import React from "react";
-
 import { ui, removeObjAttributes } from "lib";
+import { constants } from "style";
 
 import { PrimaryActionButton } from "./PrimaryActionButton";
 import { PrimaryButtonProps, PrimaryButton } from "./PrimaryButton";
 
 type BaseProps = Omit<PrimaryButtonProps, "icon"> & {
-  readonly breakpoint: ui.BreakpointId;
+  readonly breakpoint: constants.BreakpointId;
   readonly breakpointStyle?: ui.Style;
 };
 

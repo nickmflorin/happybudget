@@ -22,7 +22,8 @@ export const synchronouslyLoadFile = <S extends true | undefined>(
   if (xmlhttp.status == 200 && xmlhttp.readyState == 4) {
     return xmlhttp.responseText;
   } else if (options?.strict) {
-    throw new errors.FileLoadError(`The file at ${filePath} could not be loaded.`, {
+    throw new errors.FileLoadError({
+      message: `The file at ${filePath} could not be loaded.`,
       statusCode: xmlhttp.status,
     });
   }

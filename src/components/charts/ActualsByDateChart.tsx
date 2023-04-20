@@ -38,7 +38,7 @@ export const ActualsByDateChart = <D extends ui.ChartDatum = ui.ChartDatum>(
       !isNil(props.tooltip) ? (
         props.tooltip(params)
       ) : (
-        <Tooltip<BarTooltipProps<D>>
+        <Tooltip<D, formatters.Currency>
           labelPrefix={props.tooltipLabelPrefix?.(params)}
           label={params.indexValue}
           value={params.value}

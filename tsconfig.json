@@ -17,6 +17,6 @@
     "incremental": true
   },
   "include": ["next-env.d.ts", "additional-env.d.ts", "src"],
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "src/deprecated"],
   "files": ["node_modules/jest-expect-message/types/index.d.ts"]
 }

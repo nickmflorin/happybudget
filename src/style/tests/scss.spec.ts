@@ -22,10 +22,10 @@ describe("SASS", () => {
   const sassTestFiles = glob.sync(path.resolve(process.cwd(), testPath));
   sassTestFiles.forEach((file: string) =>
     runSass(
-      { file: file },
       /* Provide the "sass-true" engine the `describe` and `it` Jest methods, such that it can
          turn them into SASS mixins. */
       { describe, it },
+      file,
     ),
   );
 });

@@ -1,7 +1,7 @@
 import classNames from "classnames";
 
 import { ui } from "lib";
-import { Colors } from "deprecated/style/constants";
+import { constants } from "style";
 
 export type ColorIconProps = ui.ComponentProps<{
   readonly color?: ui.HexColor | null;
@@ -26,7 +26,7 @@ export const ColorIcon = ({
     (useDefault === true || typeof useDefault === "string")
       ? typeof useDefault === "string"
         ? useDefault
-        : Colors.COLOR_NO_COLOR
+        : constants.colors.lightGrey
       : color;
 
   if (c !== null && c !== undefined) {

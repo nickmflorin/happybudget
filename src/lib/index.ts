@@ -1,5 +1,4 @@
 export * as core from "./core";
-export * as context from "./context";
 export * as cookies from "./cookies";
 export * as feedback from "./feedback";
 export * as fs from "./fs";

@@ -1,7 +1,8 @@
 import { find } from "lodash";
 
-import { inferModelFromName, InferModelFromNameOptions } from "../../deprecated/lib/model/lookup";
 import { toLiteralAccessor, type LiteralsAccessor, ExtractValues } from "../util";
+
+import { inferModelFromName, InferModelFromNameOptions } from "./lookup";
 
 export type Choice<
   I extends number = number,

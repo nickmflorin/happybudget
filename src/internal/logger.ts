@@ -142,7 +142,8 @@ export type Logger = typeof _LOGGER & {
     A extends import("application/store/types/actions").BasicAction<P> | string,
     P,
   >(
-    params: InconsistentReduxStateErrorParams<A, P>,
+    params: InconsistentReduxStateErrorParams<A, P> | LogMessageContext,
+    additionalContext?: string | LogMessageContext,
     message?: string,
   ) => void;
 };
@@ -152,29 +153,44 @@ const LOGGER: Logger = {
   inconsistentReduxStateError<
     A extends import("application/store/types/actions").BasicAction<P> | string,
     P,
-  >(this: Logger, params: InconsistentReduxStateErrorParams<A, P>, message?: string) {
+  >(
+    this: Logger,
+    params: InconsistentReduxStateErrorParams<A, P> | LogMessageContext,
+    additionalContext?: string | LogMessageContext,
+    message?: string,
+  ) {
     /* eslint-disable-next-line @typescript-eslint/no-var-requires */
     const { toSentence } = require("lib/util/formatters/formal");
 
-    const { action, payload, ...context } = params;
-    let updatedContext = { ...context };
+    let updatedContext =
+      typeof additionalContext === "string" || typeof additionalContext === "undefined"
+        ? {}
+        : { ...additionalContext };
+
+    const isAction = (v: LogContextValue | A | undefined): v is Exclude<A, string> =>
+      typeof v === "object" && v !== null && (v as Exclude<A, string>).type !== undefined;
+
+    const isPayload = (v: LogContextValue | P | undefined): v is P =>
+      typeof v === "object" && v !== null;
 
     updatedContext =
-      typeof action === "string"
-        ? { ...updatedContext, action }
-        : typeof action !== "undefined"
-        ? { ...updatedContext, action: action.type }
+      typeof params.action === "string"
+        ? { ...updatedContext, action: params.action }
+        : isAction(params.action)
+        ? { ...updatedContext, action: params.action.type }
         : updatedContext;
 
-    updatedContext =
-      payload !== undefined
-        ? { ...updatedContext, payload: JSON.stringify(payload) }
-        : typeof action !== "string" && typeof action !== "undefined"
-        ? { ...updatedContext, payload: JSON.stringify(action.payload) }
-        : updatedContext;
+    updatedContext = isPayload(params.payload)
+      ? { ...updatedContext, payload: JSON.stringify(params.payload) }
+      : isAction(params.action)
+      ? { ...updatedContext, payload: JSON.stringify(params.action.payload) }
+      : updatedContext;
 
-    const updatedMessage =
-      message !== undefined ? `Inconsistent State: ${toSentence(message)}` : "Inconsistent State";
+    let updatedMessage = typeof additionalContext === "string" ? additionalContext : message;
+    updatedMessage =
+      updatedMessage !== undefined
+        ? `Inconsistent State: ${toSentence(updatedMessage)}`
+        : "Inconsistent State";
 
     this.warn(updatedContext, updatedMessage);
   },

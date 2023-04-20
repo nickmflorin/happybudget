@@ -92,17 +92,6 @@ export const useDropdownIfNotDefined = (
   return returnRef;
 };
 
-export const useLessThanBreakpoint = (id: Style.BreakpointId): boolean =>
-  useMediaQuery({ query: `(max-width: ${Breakpoints[id]}px)` });
-
-export const useGreaterThanBreakpoint = (id: Style.BreakpointId): boolean =>
-  useMediaQuery({ query: `(min-width: ${Breakpoints[id]}px)` });
-
-const createRootElement = (id: string | number): HTMLElement => {
-  const rootContainer = document.createElement("div");
-  rootContainer.setAttribute("id", String(id));
-  return rootContainer;
-};
 
 const addRootElement = (rootElem: Element): void => {
   if (!isNil(document.body.lastElementChild)) {
@@ -158,20 +147,6 @@ export const usePortalReference = (id: string | number) => {
   };
 
   return getRootElem();
-};
-
-export const usePortal = (id: string | number | undefined): Element | null => {
-  const [parent, setParent] = useState<Element | null>(null);
-
-  useEffect(() => {
-    if (!isNil(id)) {
-      const existingParent = document.querySelector(`#${id}`);
-      const parentElem = existingParent || createRootElement(id);
-      setParent(parentElem);
-    }
-  }, [id]);
-
-  return parent;
 };
 
 export interface SearchOptions {

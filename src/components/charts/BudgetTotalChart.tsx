@@ -43,7 +43,7 @@ const BudgetTotalChart = <D extends ui.ChartDatum = ui.ChartDatum>(
       !isNil(props.tooltip) ? (
         props.tooltip(params.datum)
       ) : (
-        <Tooltip<ui.ComputedChartDatum<D>>
+        <Tooltip<ui.ComputedChartDatum<D>, formatters.Currency>
           labelPrefix={props.tooltipLabelPrefix?.(params.datum)}
           datum={params.datum}
           valueFormatter={formatters.currencyFormatter}

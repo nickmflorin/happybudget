@@ -11,12 +11,10 @@ export interface PortalProps {
   children: ReactNode;
 }
 
-const Portal = ({ id, children, visible }: PortalProps): JSX.Element => {
+export const Portal = ({ id, children, visible }: PortalProps): JSX.Element => {
   const target = ui.usePortal(id);
   if (!isNil(target) && visible !== false) {
     return createPortal(children, target);
   }
   return <></>;
 };
-
-export default Portal;

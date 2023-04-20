@@ -1,0 +1,22 @@
+@use "partials";
+
+.user-initials {
+  @include partials.vertical-flex-c;
+  @include partials.size(100%);
+
+  @include partials.image-overlay-on-hover;
+
+  background-color: partials.$light-grey;
+  border-radius: 100%;
+
+  &.circle {
+    clip-path: circle(50%);
+  }
+
+  > .user-initials__text {
+    @include partials.font("body", $font-weight-name: "medium", $ignore: [line-height]);
+
+    line-height: 1;
+    text-align: center;
+  }
+}

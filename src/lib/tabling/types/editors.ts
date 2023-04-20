@@ -13,7 +13,7 @@ import * as table from "./table";
 export interface AgEditorRef<
   R extends rows.Row = rows.Row,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
-  T = cells.CellValue<R, N>,
+  T extends cells.CellValue<R, N> = cells.CellValue<R, N>,
 > {
   // Should return the final value to the grid, the result of the editing
   getValue(): T;
@@ -39,7 +39,7 @@ export interface EditorProps<
   R extends rows.Row = rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
   N extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
-  T = cells.CellValue<R, N>,
+  T extends cells.CellValue<R, N> = cells.CellValue<R, N>,
   C extends table.TableContext = table.TableContext,
   S extends store.TableStore<R> = store.TableStore<R>,
 > extends Omit<ICellEditorParams<R, T>, "column"> {

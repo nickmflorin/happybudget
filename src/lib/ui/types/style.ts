@@ -11,11 +11,6 @@ export type Font = { family: FontFamily; weight: FontWeightName; italic?: boolea
 
 export type FontFace = { family: FontFamily; variants: FontVariant[] };
 
-export type Breakpoint = 320 | 480 | 768 | 1024 | 1200 | 1580;
-export type BreakpointId = "small" | "medium" | "large" | "xl" | "xxl" | "xxxl";
-
-export type Breakpoints = Record<BreakpointId, Breakpoint>;
-
 export const CSSSizeUnits = ["px", "%", "rem", "em", "vh", "vw"] as const;
 export type CSSSizeUnit = typeof CSSSizeUnits[number];
 

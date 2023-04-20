@@ -1,8 +1,5 @@
 import { useRef } from "react";
 
-import { logger } from "internal";
-import { notifications } from "lib";
-
 import * as model from "../model";
 
 import * as rows from "./rows";
@@ -17,22 +14,20 @@ export const useDataGrid = (): NonNullRef<types.DataGridInstance> =>
 
 export const InitialTableRef: types.TableInstance<rows.Row> = {
   ...InitialGridRef,
-  notifications: [],
+  // notifications: [],
   /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   saving: () => {},
-  notify: () => {
-    logger.warn(
-      `Cannot dispatch notifications ${notifications.objToJson(
-        notifications,
-      )} to table because table ref has not been attached yet.`,
-    );
-    return [];
-  },
+  // notify: () => {
+  //   logger.warn(
+  //     "Cannot dispatch notifications to table because table ref has not been attached yet.",
+  //   );
+  //   return [];
+  // },
+  // /* eslint-disable-next-line @typescript-eslint/no-empty-function */
+  // clearNotifications: () => {},
+  // lookupAndNotify: () => [],
   /* eslint-disable-next-line @typescript-eslint/no-empty-function */
-  clearNotifications: () => {},
-  lookupAndNotify: () => [],
-  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
-  handleRequestError: () => [],
+  // handleRequestError: () => [],
   getColumns: () => [],
   getFocusedRow: () => null,
   getRow: () => null,

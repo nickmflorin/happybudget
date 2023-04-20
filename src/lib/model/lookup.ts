@@ -2,10 +2,9 @@ import { find } from "lodash";
 
 import { store } from "application";
 import { logger } from "internal";
-import { model, notifications } from "lib";
 
 import * as reference from "./reference";
-import * as types from "../../../lib/model/types";
+import * as types from "./types";
 
 type BaseParams<M extends types.Model> = Omit<GetModelOptions<M>, "onMissing"> & {
   readonly caseInsensitive?: boolean;
@@ -138,17 +137,17 @@ const onMissing =
   (params: OnModelMissingCallbackParams<M>) => {
     const mutatedWarningData = {
       reason: `${params.ref} does not exist in state when it is expected to.`,
-      ids: notifications.objToJson(data.map((mi: M) => mi.id)),
+      ids: JSON.stringify(data.map((mi: M) => mi.id)),
       ...warningData,
     };
     const lookup = params.lookup;
     if (typeof lookup === "function") {
-      notifications.internal.inconsistentStateError({
+      logger.inconsistentReduxStateError({
         ...mutatedWarningData,
-        evaluatedCallback: notifications.objToJson(data.map((mi: M) => lookup(mi))),
+        evaluatedCallback: JSON.stringify(data.map((mi: M) => lookup(mi))),
       });
     } else {
-      notifications.internal.inconsistentStateError({ ...mutatedWarningData, id: params.lookup });
+      logger.inconsistentReduxStateError({ ...mutatedWarningData, id: lookup });
     }
   };
 
@@ -215,7 +214,7 @@ export const getModelsInState = <M extends types.Model>(
   id: ModelLookup<M>[],
   options?: GetReduxModelOptions<M>,
 ): M[] =>
-  model.getModels<M>(data, id, {
+  getModels<M>(data, id, {
     ...options,
     onMissing: onMissing(data, { action: options?.action, ...options?.warningData }),
   });

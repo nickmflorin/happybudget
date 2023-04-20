@@ -8,7 +8,7 @@ import {
 import DashboardReduxConfig from "deprecated/app/Dashboard/config";
 
 /* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
-import { Reducer, Action } from "../store/types";
+import { Reducer, Action } from "../../application/store/types";
 
 export const moduleConfig = <
   S,

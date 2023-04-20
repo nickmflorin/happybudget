@@ -3,7 +3,7 @@ import { CancelToken } from "axios";
 
 import { http } from "lib";
 
-import { useModel, ModelHookOptions } from "../../lib/model/hooks";
+import { useModel, ModelHookOptions } from "../lib/model/hooks";
 
 export const useMarkup = (
   id: number,

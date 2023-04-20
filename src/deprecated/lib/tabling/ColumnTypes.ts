@@ -1,4 +1,4 @@
-import * as types from "./types";
+import * as types from "../../../lib/tabling/columns/types";
 
 const ColumnTypes: types.ColumnDataType[] = [
   {

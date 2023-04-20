@@ -1,0 +1,46 @@
+@use "partials";
+
+.img-wrapper {
+  @include partials.flex-c;
+
+  @include partials.image-overlay-on-hover;
+  @include partials.size(100%);
+
+  aspect-ratio: 1;
+  position: relative;
+  text-align: center;
+
+  &.circle {
+    clip-path: circle(50%);
+  }
+
+  &--with-icon-fallback {
+    background-color: partials.$light-grey;
+  }
+
+  .img {
+    height: 100%;
+    width: auto;
+
+    &.circle {
+      border-radius: 100%;
+    }
+
+    .image-tint {
+      @include partials.size(100%);
+
+      background-color: rgb(15 15 15 / 4%);
+      left: 0;
+      position: absolute;
+      top: 0;
+    }
+
+    &--user {
+      left: 0;
+      object-fit: contain;
+      position: absolute;
+      text-align: center;
+      top: 0;
+    }
+  }
+}

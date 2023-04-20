@@ -5,15 +5,25 @@ import { parsers, stringIsInteger } from "../util";
 import { isCSSSizeUnit } from "./typeguards";
 import * as types from "./types";
 
-type ParsedSize<U extends types.CSSSizeUnit | number> = [number, U] | number;
+type ParseSizeOptions = {
+  readonly strict?: false;
+};
 
-export const parseSize = <E extends types.CSSSize<U>, U extends types.CSSSizeUnit | number>(
-  size: E,
-): ParsedSize<U> => {
+type ParseSizeReturn<U extends types.CSSSizeUnit | number, O extends ParseSizeOptions> = O extends {
+  readonly strict: false;
+}
+  ? [number, U] | number | null
+  : [number, U] | number;
+
+// TODO: Convert to a Zod Schema
+export const parseSize = <U extends types.CSSSizeUnit | number, O extends ParseSizeOptions>(
+  size: string | number,
+  options?: O,
+): ParseSizeReturn<U, O> => {
   if (typeof size === "number") {
-    return size;
+    return size as ParseSizeReturn<U, O>;
   } else if (stringIsInteger(size)) {
-    return parsers.parseInteger(size) as number;
+    return parsers.parseInteger(size) as ParseSizeReturn<U, O>;
   } else {
     for (const key of types.CSSSizeUnits) {
       if (size.endsWith(key)) {
@@ -24,13 +34,19 @@ export const parseSize = <E extends types.CSSSize<U>, U extends types.CSSSizeUni
            another unit. */
         if (stringIsInteger(stringNumber)) {
           if (!isCSSSizeUnit(unit)) {
+            if (options?.strict === false) {
+              return null as ParseSizeReturn<U, O>;
+            }
             throw new Error(
               `The provided size '${size}' does not have a valid CSS unit, '${unit}'.`,
             );
           }
-          return [parsers.parseInteger(stringNumber) as number, unit as U];
+          return [parsers.parseInteger(stringNumber) as number, unit as U] as ParseSizeReturn<U, O>;
         }
       }
+    }
+    if (options?.strict === false) {
+      return null as ParseSizeReturn<U, O>;
     }
     throw new Error(`The provided size '${size}' is not valid.`);
   }
@@ -59,7 +75,7 @@ export const alterCSSSize = <E extends types.CSSSize<U>, U extends types.CSSSize
   size: E,
   alteration: (v: number) => number,
 ): E => {
-  const parsed = parseSize<E, U>(size);
+  const parsed = parseSize(size);
   const numeric = typeof parsed === "number" ? parsed : parsed[0];
   return typeof parsed === "number"
     ? typeof size === "string"

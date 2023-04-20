@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import React from "react";
 
-const GoogleIcon = (): JSX.Element => (
+export const GoogleIcon = (): JSX.Element => (
   <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg">
     <g fill="#000" fillRule="evenodd">
       <path
@@ -24,5 +24,3 @@ const GoogleIcon = (): JSX.Element => (
     </g>
   </svg>
 );
-
-export default React.memo(GoogleIcon);

@@ -34,22 +34,21 @@ export type TableInstanceAttachmentAction = () => void;
 export type TableInstance<
   R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
-> = DataGridInstance &
-  UINotificationsManager & {
-    readonly saving: (v: boolean) => void;
-    readonly getColumns: () => columns.ModelColumn<R, M>[];
-    readonly getFocusedRow: () => rows.RowSubType<R, rows.BodyRowType> | null;
-    readonly getRow: (
-      id: rows.RowId<rows.BodyRowType>,
-    ) => rows.RowSubType<R, rows.BodyRowType> | null;
-    readonly getRows: () => rows.RowSubType<R, rows.BodyRowType>[];
-    readonly getRowsAboveAndIncludingFocusedRow: () => rows.RowSubType<R, rows.BodyRowType>[];
-    readonly dispatchEvent: (event: SingleOrArray<events.TableEvent>) => void;
-    readonly changeColumnVisibility: (
-      changes: SingleOrArray<columns.ColumnVisibilityChange>,
-      sizeToFit?: boolean,
-    ) => void;
-  };
+> = DataGridInstance & { // UINotificationsManager & {
+  readonly saving: (v: boolean) => void;
+  readonly getColumns: () => columns.ModelColumn<R, M>[];
+  readonly getFocusedRow: () => rows.RowSubType<R, rows.BodyRowType> | null;
+  readonly getRow: (
+    id: rows.RowId<rows.BodyRowType>,
+  ) => rows.RowSubType<R, rows.BodyRowType> | null;
+  readonly getRows: () => rows.RowSubType<R, rows.BodyRowType>[];
+  readonly getRowsAboveAndIncludingFocusedRow: () => rows.RowSubType<R, rows.BodyRowType>[];
+  readonly dispatchEvent: (event: SingleOrArray<events.TableEvent>) => void;
+  readonly changeColumnVisibility: (
+    changes: SingleOrArray<columns.ColumnVisibilityChange>,
+    sizeToFit?: boolean,
+  ) => void;
+};
 
 /*
 We have to allow the onClick prop and ID prop to pass through the entire component to the render
@@ -150,30 +149,30 @@ export type FooterGridConfig<
   readonly getFooterColumn: (column: columns.DataColumn<R, M>) => columns.FooterColumn<R, M> | null;
 };
 
-// Either the TopSheet page or an ID of the account.
-export type PdfBudgetTableOption = "topsheet" | number;
+/* Either the TopSheet page or an ID of the account.
+   export type PdfBudgetTableOption = "topsheet" | number; */
 
-export type PdfBudgetTableHeaderOptions = {
-  readonly header: ui.HTMLPdfNode[];
-  readonly left_image: fs.UploadedImage | fs.SavedImage | null;
-  readonly left_info: ui.HTMLPdfNode[] | null;
-  readonly right_image: fs.UploadedImage | fs.SavedImage | null;
-  readonly right_info: ui.HTMLPdfNode[] | null;
-};
+/* export type PdfBudgetTableHeaderOptions = {
+     readonly header: ui.HTMLPdfNode[];
+     readonly left_image: fs.UploadedImage | fs.SavedImage | null;
+     readonly left_info: ui.HTMLPdfNode[] | null;
+     readonly right_image: fs.UploadedImage | fs.SavedImage | null;
+     readonly right_info: ui.HTMLPdfNode[] | null;
+   }; */
 
-export type PdfBudgetTableOptions = {
-  readonly date: string;
-  readonly header: PdfBudgetTableHeaderOptions;
-  readonly columns: string[];
-  readonly tables?: PdfBudgetTableOption[] | null | undefined;
-  readonly excludeZeroTotals: boolean;
-  readonly notes?: ui.HTMLPdfNode[];
-  readonly includeNotes: boolean;
-};
+/* export type PdfBudgetTableOptions = {
+     readonly date: string;
+     readonly header: PdfBudgetTableHeaderOptions;
+     readonly columns: string[];
+     readonly tables?: PdfBudgetTableOption[] | null | undefined;
+     readonly excludeZeroTotals: boolean;
+     readonly notes?: ui.HTMLPdfNode[];
+     readonly includeNotes: boolean;
+   }; */
 
-export type PdfActualsTableOptions = {
-  readonly date: string;
-  readonly header: ui.HTMLPdfNode[];
-  readonly columns: string[];
-  readonly excludeZeroTotals: boolean;
-};
+/* export type PdfActualsTableOptions = {
+     readonly date: string;
+     readonly header: ui.HTMLPdfNode[];
+     readonly columns: string[];
+     readonly excludeZeroTotals: boolean;
+   }; */

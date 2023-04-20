@@ -52,7 +52,7 @@ export const Image = ({ onError, ...props }: ImageProps): JSX.Element => {
         "img-wrapper",
         {
           circle: props.circle,
-          "with-icon-fallback": props.fallbackIcon !== undefined && useFallback,
+          "img-wrapper--with-icon-fallback": props.fallbackIcon !== undefined && useFallback,
         },
         props.wrapperClassName,
       )}
@@ -60,7 +60,7 @@ export const Image = ({ onError, ...props }: ImageProps): JSX.Element => {
       onClick={props.onClick}
     >
       {props.overlay !== undefined && props.overlay()}
-      <ShowHide show={props.tint}>
+      <ShowHide show={props.tint === true}>
         <div className="image-tint"></div>
       </ShowHide>
       {props.fallbackIcon !== undefined && useFallback ? (

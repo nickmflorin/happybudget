@@ -1,9 +1,9 @@
 import { isNil, reduce, filter, includes } from "lodash";
 
-import * as tabling from "../tabling";
+import * as tabling from "../../../../lib/model/tabling";
 
-import * as typeguards from "./typeguards";
-import * as types from "./types";
+import * as typeguards from "../../../../lib/model/budgeting/typeguards";
+import * as types from "../../../../lib/model/budgeting/types";
 
 type GroupObj<R extends types.BudgetRowData> = tabling.GroupRow<R> | types.Group;
 

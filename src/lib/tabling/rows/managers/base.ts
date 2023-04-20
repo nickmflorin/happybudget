@@ -1,6 +1,5 @@
 import { logger } from "internal";
 
-import * as notifications from "../../../../deprecated/lib/notifications";
 import * as model from "../../../model";
 import * as columns from "../../columns";
 import { CellValue } from "../../types";
@@ -132,9 +131,7 @@ export abstract class BodyRowManager<
             /* If the field is not on the model, then there is a problem with the column
                configurations.  Log an error and set the value on the row to the nullValue. */
             logger.error(
-              `Could not obtain row value for field ${col.field}, ${notifications.objToJson(
-                args,
-              )}!`,
+              `Could not obtain row value for field ${col.field}, ${JSON.stringify(args)}!`,
             );
             return { ...prev, [col.field]: col.nullValue };
           }

@@ -1,6 +1,4 @@
-import React from "react";
-
-import { find, orderBy } from "lodash";
+import { orderBy } from "lodash";
 
 import { logger } from "internal";
 
@@ -9,7 +7,6 @@ import { removeObjAttributes } from "../../util";
 import * as rows from "../rows";
 import { CellValue } from "../types";
 
-import ColumnTypes from "./ColumnTypes";
 import * as typeguards from "./typeguards";
 import * as types from "./types";
 
@@ -536,34 +533,34 @@ export const normalizePdfColumnWidths = <
   return [...columns] as types.BodyColumn<R, M, N, T>[];
 };
 
-type ColumnTypeVariantOptions = {
-  header?: boolean;
-  pdf?: boolean;
-};
+/* type ColumnTypeVariantOptions = {
+     header?: boolean;
+     pdf?: boolean;
+   }; */
 
-export const getColumnTypeCSSStyle = (
-  type: types.ColumnDataTypeId | types.ColumnDataType,
-  options: ColumnTypeVariantOptions = { header: false, pdf: false },
-): React.CSSProperties => {
-  let colType: types.ColumnDataType;
-  if (typeof type === "string") {
-    const ct: types.ColumnDataType | undefined = find(ColumnTypes, { id: type });
-    if (ct === undefined) {
-      return {};
-    }
-    colType = ct;
-  } else {
-    colType = type;
-  }
-  let style = colType.style || {};
-  if (options.header === true && colType.headerOverrides !== undefined) {
-    style = { ...style, ...(colType.headerOverrides.style || {}) };
-  }
-  if (options.pdf === true && colType.pdfOverrides !== undefined) {
-    style = { ...style, ...(colType.pdfOverrides.style || {}) };
-  }
-  return style;
-};
+/* export const getColumnTypeCSSStyle = (
+     type: types.ColumnDataTypeId | types.ColumnDataType,
+     options: ColumnTypeVariantOptions = { header: false, pdf: false },
+   ): React.CSSProperties => {
+     let colType: types.ColumnDataType;
+     if (typeof type === "string") {
+       const ct: types.ColumnDataType | undefined = find(ColumnTypes, { id: type });
+       if (ct === undefined) {
+         return {};
+       }
+       colType = ct;
+     } else {
+       colType = type;
+     }
+     let style = colType.style || {};
+     if (options.header === true && colType.headerOverrides !== undefined) {
+       style = { ...style, ...(colType.headerOverrides.style || {}) };
+     }
+     if (options.pdf === true && colType.pdfOverrides !== undefined) {
+       style = { ...style, ...(colType.pdfOverrides.style || {}) };
+     }
+     return style;
+   }; */
 
 type ColumnUpdate<
   C extends types.RealColumn<R, M, N, T>,

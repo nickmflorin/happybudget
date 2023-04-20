@@ -13,7 +13,10 @@ export type SingleFile = File | FilepondFile;
 export type UploadableFileProp = SingleFile | FileList | SingleFile[];
 
 export const isSingleFile = (f: UploadableFileProp): f is SingleFile =>
-  typeof f === "object" && (f as SingleFile).name !== undefined;
+  typeof f === "object" &&
+  !Array.isArray(f) &&
+  !(f instanceof FileList) &&
+  (f as SingleFile).name !== undefined;
 
 export const isFiles = (f: UploadableFileProp): f is SingleFile[] => Array.isArray(f);
 

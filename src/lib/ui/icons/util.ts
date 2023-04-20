@@ -99,7 +99,7 @@ export const getIconCodes = <N extends types.IconName = types.IconName>(
 ): types.GetIconCode<N>[] =>
   Object.keys(types.Icons).reduce(
     (curr: types.GetIconCode<N>[], k: string): types.GetIconCode<N>[] =>
-      (types.Icons[k as types.GetIconCode<N>] as readonly types.IconName[]).includes(name)
+      (types.Icons[k as keyof typeof types.Icons] as readonly types.IconName[]).includes(name)
         ? ([...curr, k] as types.GetIconCode<N>[])
         : curr,
     [] as types.GetIconCode<N>[],

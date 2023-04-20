@@ -1,9 +1,8 @@
 import { filter, reduce, includes } from "lodash";
 
-import * as tabling from "../../tabling";
-import * as tableModels from "../tabling";
-
 import * as businessLogic from "./businessLogic";
+import * as tabling from "../../../../lib/tabling";
+import * as tableModels from "../../../../lib/model/tabling";
 
 export const estimatedValueGetter = <R extends tableModels.BudgetRowData>(
   row: tabling.Row<tabling.BodyRowType, R>,

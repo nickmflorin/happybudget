@@ -1,4 +1,4 @@
-import { Colors } from "deprecated/style/constants";
+import { constants } from "style";
 
 import * as model from "../../model";
 import * as ui from "../../ui";
@@ -29,7 +29,7 @@ export const getGroupColorDefinition = <R extends types.RowData>(
     };
   }
   return {
-    backgroundColor: Colors.COLOR_NO_COLOR,
-    color: colors.contrastedForegroundColor(Colors.COLOR_NO_COLOR),
+    backgroundColor: constants.colors.lightGrey,
+    color: colors.contrastedForegroundColor(constants.colors.lightGrey),
   };
 };

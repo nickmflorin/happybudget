@@ -1,0 +1,13 @@
+@mixin image-overlay-on-hover() {
+  .img-overlay {
+    display: none;
+  }
+
+  &:hover {
+    .img-overlay {
+      display: flex;
+    }
+  }
+}
+
+$img-overlay-bg-color: rgb(0 0 0 / 80%);

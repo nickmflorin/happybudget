@@ -61,11 +61,11 @@ const reduceChangesForRow = <R extends rows.Row>(
   for (key in ch.data) {
     const cellChange = ch.data[key];
     if (cellChange !== undefined) {
-      rowChange = addCellChangeToRowChange(rowChange, {
+      rowChange = addCellChangeToRowChange<R>(rowChange, {
         ...cellChange,
         field: key,
         id: rowChange.id,
-      });
+      } as types.SoloCellChange<R>);
     }
   }
   return rowChange;

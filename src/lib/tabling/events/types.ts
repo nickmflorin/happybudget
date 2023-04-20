@@ -98,9 +98,10 @@ export type CellChange<
 export type SoloCellChange<
   R extends rows.Row,
   K extends columns.ColumnFieldName<R> = columns.ColumnFieldName<R>,
+  ID extends rows.MarkupRowId | rows.ModelRowId = rows.MarkupRowId | rows.ModelRowId,
 > = CellChange<R, K> & {
   readonly field: K;
-  readonly id: rows.RowSubType<R, rows.EditableRowType>["id"];
+  readonly id: ID;
 };
 
 export type RowChangeData<

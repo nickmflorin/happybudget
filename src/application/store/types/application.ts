@@ -3,8 +3,6 @@ import { type Saga } from "redux-saga";
 
 import { model } from "lib";
 
-import * as config from "../../config";
-
 import { Action } from "./actions";
 import * as store from "./store";
 import * as tabling from "./tabling";
@@ -88,11 +86,13 @@ export type BudgetStoreLookup<
   ? BudgetStore | PublicBudgetStore | TemplateStore
   : never;
 
-export type PublicStore = config.PublicModuleStores & {
+// export type PublicStore = config.PublicModuleStores & {
+export type PublicStore = {
   readonly tokenId: string | null;
 };
 
-export type ApplicationStore = config.AuthenticatedModuleStores & {
+// export type ApplicationStore = config.AuthenticatedModuleStores & {
+export type ApplicationStore = {
   readonly loading: boolean;
   readonly user: model.User | null;
   readonly contacts: store.AuthenticatedApiModelListStore<model.Contact>;

@@ -1,7 +1,6 @@
 import { model, tabling } from "lib";
 
 import * as api from "../api";
-import * as config from "../config";
 
 import * as types from "./types";
 
@@ -60,7 +59,7 @@ export const initialDetailResponseState = <
 export const createApplicationInitialState = (
   storeConfig: types.StoreConfig,
 ): types.ApplicationStore => ({
-  ...config.AUTH_MODULE_INITIAL_STATE,
+  // ...config.AUTH_MODULE_INITIAL_STATE,
   user: storeConfig.user,
   loading: false,
   drawerOpen: false,
@@ -71,7 +70,7 @@ export const createApplicationInitialState = (
   actualTypes: initialApiModelListResponseState<model.ActualType>(),
   productPermissionModalOpen: false,
   public: {
-    ...config.PUBLIC_MODULE_INITIAL_STATE,
+    // ...config.PUBLIC_MODULE_INITIAL_STATE,
     tokenId: storeConfig.tokenId,
   } as types.PublicStore,
 });

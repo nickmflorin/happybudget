@@ -16,7 +16,7 @@ export const isIconCodeForName = <
   name: N,
 ): code is T =>
   isIconCode(code) &&
-  (types.Icons[code] as readonly types.GetIconName<T>[]).includes(name as types.GetIconName<T>);
+  (types.Icons[code] as readonly string[]).includes(name as types.GetIconName<T>);
 
 export const isIconName = (i: unknown): i is types.IconName => types.IconNames.contains(i);
 

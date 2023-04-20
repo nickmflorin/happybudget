@@ -5,3 +5,4 @@ export * from "./FeedbackIcon";
 export * from "./FileIcon";
 export * from "./Icon";
 export * from "./OrderingArrowIcon";
+export * from "./svgs";

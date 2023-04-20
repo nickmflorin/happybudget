@@ -2,10 +2,10 @@ import { uniq } from "lodash";
 
 import { logger } from "internal";
 
-import { formatters, removeObjAttributes } from "../../../lib/util";
+import { formatters, removeObjAttributes } from "../util";
 
-import * as typeguards from "../../../lib/model/typeguards";
-import * as types from "../../../lib/model/types";
+import * as typeguards from "./typeguards";
+import * as types from "./types";
 
 const ModelTypeNameMap: { [key in types.ApiModelType]: string } = {
   subaccount: "Sub Account",
@@ -21,6 +21,8 @@ const ModelTypeNameMap: { [key in types.ApiModelType]: string } = {
   budget: "Budget",
   template: "Template",
   "pdf-budget": "PDF Budget",
+  "subaccount-unit": "Sub Account Unit",
+  "actual-type": "Actual Type",
 };
 
 export const modelReferenceType = <M extends types.Model>(m: M): string => {

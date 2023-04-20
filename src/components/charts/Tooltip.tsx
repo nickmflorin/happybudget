@@ -1,13 +1,15 @@
 import { ui, formatters } from "lib";
 
-type TooltipLineProps<D extends ui.ChartDatum = ui.ChartDatum> = {
+type TooltipLineProps<D extends ui.ChartDatum = ui.ChartDatum, S extends string = string> = {
   readonly label: string | number;
   readonly value: D["value"] | string;
   readonly labelPrefix?: string;
-  readonly valueFormatter?: formatters.Formatter<D["value"] | string>;
+  readonly valueFormatter?: formatters.Formatter<S, D["value"] | string>;
 };
 
-const TooltipLine = (props: TooltipLineProps): JSX.Element => (
+const TooltipLine = <D extends ui.ChartDatum = ui.ChartDatum, S extends string = string>(
+  props: TooltipLineProps<D, S>,
+): JSX.Element => (
   <div className="tooltip-line">
     <div className="tooltip-line-label">
       {props.labelPrefix === undefined ? `${props.label}:` : `${props.labelPrefix} ${props.label}:`}
@@ -20,16 +22,16 @@ const TooltipLine = (props: TooltipLineProps): JSX.Element => (
   </div>
 );
 
-type TooltipProps<D extends ui.ChartDatum = ui.ChartDatum> = {
+type TooltipProps<D extends ui.ChartDatum = ui.ChartDatum, S extends string = string> = {
   readonly datum?: D;
   readonly label?: string | number;
   readonly value?: D["value"] | string;
   readonly labelPrefix?: string;
-  readonly valueFormatter?: formatters.Formatter<D["value"] | string>;
+  readonly valueFormatter?: formatters.Formatter<S, D["value"] | string>;
 };
 
-export const Tooltip = <D extends ui.ChartDatum = ui.ChartDatum>(
-  props: TooltipProps<D>,
+export const Tooltip = <D extends ui.ChartDatum = ui.ChartDatum, S extends string = string>(
+  props: TooltipProps<D, S>,
 ): JSX.Element => (
   <div className="chart-tooltip">
     <TooltipLine
