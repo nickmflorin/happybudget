@@ -5,9 +5,9 @@ import { isNil } from "lodash";
 
 import * as store from "application/store";
 import { ui, model, notifications } from "lib";
-import { ImageAndName } from "components/fields";
-import { IImageAndNameRef } from "components/fields/ImageAndName";
-import { UserProfileForm } from "components/forms";
+import { ImageAndName } from "deprecated/components/fields";
+import { IImageAndNameRef } from "deprecated/components/fields/ImageAndName";
+import { UserProfileForm } from "deprecated/components/forms";
 import { Page } from "deprecated/components/layoutOld";
 import { Tile } from "deprecated/components/containers";
 

@@ -1,6 +1,6 @@
 import { Optional, OptionalKeys } from "utility-types";
 
-import { model } from "lib";
+import { model, ui } from "lib";
 
 import * as api from "../../api";
 
@@ -143,7 +143,7 @@ export type AuthenticatedApiModelListActionPayloadMap<M extends model.ApiModel> 
     readonly addToState: M;
     readonly updateInState: UpdateModelPayload<M>;
     readonly setSearch: string;
-    readonly setPagination: Pagination;
+    readonly setPagination: ui.Pagination;
     readonly updateOrdering: UpdateOrderingPayload<string>;
   };
 

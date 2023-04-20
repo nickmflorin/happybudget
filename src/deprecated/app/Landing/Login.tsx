@@ -6,8 +6,8 @@ import { useHistory, useLocation } from "react-router-dom";
 
 import * as config from "application/config";
 import { ui, notifications } from "lib";
-import { LoginForm } from "components/forms";
-import { ILoginFormValues } from "components/forms/LoginForm";
+import { LoginForm } from "deprecated/components/forms";
+import { ILoginFormValues } from "deprecated/components/forms/LoginForm";
 import { LandingFormContainer } from "deprecated/components/containers";
 
 import {

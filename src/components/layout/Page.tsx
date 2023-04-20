@@ -1,13 +1,13 @@
 import React, { useMemo } from "react";
 
 import classNames from "classnames";
-import * as config from "config";
 
-import { feedback as Feedback, errors } from "lib";
+import { errors, config } from "application";
+import { feedback as Feedback } from "lib";
 import { Head } from "components/compat";
 import { GlobalFeedbackDisplay } from "components/feedback";
 import { withLoading, WithLoadingProps } from "components/loading";
-import { Header } from "deprecated/components/structural";
+import { Header } from "components/structural";
 
 type _BasePageProps<I extends config.PageId> = {
   readonly id: I;
@@ -32,9 +32,12 @@ const mergeHead = <I extends config.PageId>(
   props: Pick<_PageProps<I>, "id" | "head" | "params">,
 ): config.HeadOptions => {
   const page = config.Pages[props.id];
-  if (typeof page.head === "function" && props.params !== undefined) {
-    return { ...props.head, ...page.head(props.params) };
-  } else if (typeof page.head !== "function") {
+  /* if (typeof page.head === "function" && props.params !== undefined) {
+       return { ...props.head, ...page.head(props.params) };
+     } else if (typeof page.head !== "function") {
+       return { ...props.head, ...page.head };
+     } */
+  if (typeof page.head !== "function") {
     return { ...props.head, ...page.head };
   }
   return { ...props.head };
@@ -46,11 +49,16 @@ const mergeTitle = <I extends config.PageId>(
   const page = config.Pages[props.id];
   if (props.title !== undefined) {
     return props.title;
-  } else if (typeof page.title === "function" && props.params !== undefined) {
-    return page.title(props.params);
-  } else if (typeof page.title === "string") {
+  }
+  /* } else if (typeof page.title === "function" && props.params !== undefined) {
+       return page.title(props.params);
+     } else if (typeof page.title === "string") {
+       return page.title;
+     } */
+  if (typeof page.title !== "function") {
     return page.title;
   }
+
   return undefined;
 };
 

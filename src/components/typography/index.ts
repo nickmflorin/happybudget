@@ -1,4 +1,3 @@
-export { default as TextWithIncludedLink } from "./TextWithIncludedLink";
 export * from "./AttachmentText";
 export * from "./AttachmentSizeText";
 export * from "./BodyText";

@@ -1,9 +1,11 @@
 import { type Reducer } from "react";
 
-import * as errors from "../../errors";
+import { errors } from "application";
+
 import * as constants from "../constants";
 import * as typeguards from "../typeguards";
 import * as types from "../types";
+
 import { addFieldFeedbackReducer } from "./addFieldFeedbackReducer";
 import { createAddGlobalFeedbackReducer } from "./addGlobalFeedbackReducer";
 import { clearFeedbackReducer } from "./clearFeedbackReducer";
@@ -27,7 +29,9 @@ export const createFeedbackReducer = <N extends string = string>(
     if (action.type === FeedbackActionTypes.CLEAR) {
       return clearFeedbackReducer<N>(state, action);
     }
-    const feedback = Array.isArray(action.feedback) ? action.feedback : [action.feedback];
+    const feedback = Array.isArray(action.payload.feedback)
+      ? action.payload.feedback
+      : [action.payload.feedback];
 
     const fieldFeedbackElements: (
       | errors.ApiFieldError

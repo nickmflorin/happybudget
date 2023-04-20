@@ -1,4 +1,5 @@
-import { notifications, model } from "lib";
+import { logger } from "internal";
+import { model } from "lib";
 
 import * as types from "../types";
 
@@ -17,10 +18,12 @@ export const modelListActionReducer = <M extends model.Model = model.Model>(
     if (!st.current.includes(action.id)) {
       return { ...st, current: [...st.current, action.id] };
     }
-    notifications.internal.inconsistentStateError({
-      action: "Adding to model list action state.",
-      reason: "The instance already exists in state when it is expected to.",
-    });
+    logger.inconsistentReduxStateError(
+      {
+        action: "Adding to model list action state.",
+      },
+      "The instance already exists in state when it is expected to.",
+    );
     return st;
   } else {
     if (st.current.includes(action.id)) {
@@ -31,10 +34,12 @@ export const modelListActionReducer = <M extends model.Model = model.Model>(
         completed: action.success !== false ? [...st.completed, action.id] : st.completed,
       };
     }
-    notifications.internal.inconsistentStateError({
-      action: "Removing from model list action state.",
-      reason: "The instance does not exist in state when it is expected to.",
-    });
+    logger.inconsistentReduxStateError(
+      {
+        action: "Removing from model list action state.",
+      },
+      "The instance does not exist in state when it is expected to.",
+    );
     return st;
   }
 };

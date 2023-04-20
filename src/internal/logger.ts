@@ -113,7 +113,7 @@ const messageContextErrorProcessor: TransformMessageFunction<LogMessageContext> 
   };
 };
 
-export default Logger.child<LogMessageContext>(messageContextErrorProcessor).child(message => {
+const _LOGGER = Logger.child<LogMessageContext>(messageContextErrorProcessor).child(message => {
   const inter = intersection(Object.keys(message.context), RESTRICTED_LOG_CONTEXT);
   if (inter.length > 0) {
     throw new TypeError(`The log context key(s) '${inter.join(", ")} are restricted.`);
@@ -128,3 +128,56 @@ export default Logger.child<LogMessageContext>(messageContextErrorProcessor).chi
     },
   };
 });
+
+type InconsistentReduxStateErrorParams<
+  A extends import("application/store/types/actions").BasicAction<P> | string,
+  P,
+> = {
+  readonly action?: A;
+  readonly payload?: P;
+};
+
+export type Logger = typeof _LOGGER & {
+  readonly inconsistentReduxStateError: <
+    A extends import("application/store/types/actions").BasicAction<P> | string,
+    P,
+  >(
+    params: InconsistentReduxStateErrorParams<A, P>,
+    message?: string,
+  ) => void;
+};
+
+const LOGGER: Logger = {
+  ..._LOGGER,
+  inconsistentReduxStateError<
+    A extends import("application/store/types/actions").BasicAction<P> | string,
+    P,
+  >(this: Logger, params: InconsistentReduxStateErrorParams<A, P>, message?: string) {
+    /* eslint-disable-next-line @typescript-eslint/no-var-requires */
+    const { toSentence } = require("lib/util/formatters/formal");
+
+    const { action, payload, ...context } = params;
+    let updatedContext = { ...context };
+
+    updatedContext =
+      typeof action === "string"
+        ? { ...updatedContext, action }
+        : typeof action !== "undefined"
+        ? { ...updatedContext, action: action.type }
+        : updatedContext;
+
+    updatedContext =
+      payload !== undefined
+        ? { ...updatedContext, payload: JSON.stringify(payload) }
+        : typeof action !== "string" && typeof action !== "undefined"
+        ? { ...updatedContext, payload: JSON.stringify(action.payload) }
+        : updatedContext;
+
+    const updatedMessage =
+      message !== undefined ? `Inconsistent State: ${toSentence(message)}` : "Inconsistent State";
+
+    this.warn(updatedContext, updatedMessage);
+  },
+} as Logger;
+
+export default LOGGER;

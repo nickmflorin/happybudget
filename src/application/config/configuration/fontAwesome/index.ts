@@ -69,6 +69,8 @@ import { getIconCode } from "lib/ui/icons/util";
 /* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { findDuplicates } from "lib/util/arrays";
 
+import { parseEnvVar } from "../../util";
+
 import { Icons, IconNames, IconPrefixes, LicensedIcon } from "./constants";
 import { NaiveFAIconDefinition, NaiveFAConfig } from "./types";
 
@@ -275,7 +277,25 @@ export const configure = (__options__?: ConfigurationOptions) => {
  * reduce the bundle size sent to the browser on the initial page load.
  */
 export const configureAsync = async (): Promise<void> => {
-  const { ICON_REGISTRY } = await import("./registry");
+  const { importRegistry } = await import("./registry");
   const { library, config } = await import("@fortawesome/fontawesome-svg-core");
-  return configure({ registry: ICON_REGISTRY.slice() as NaiveFAIconDefinition[], library, config });
+
+  const PRO_FONT_AWESOME = parseEnvVar(
+    process.env.NEXT_PUBLIC_PRO_FONT_AWESOME,
+    "NEXT_PUBLIC_PRO_FONT_AWESOME",
+    { type: "boolean", required: true },
+  );
+
+  let licenseType: "pro" | "free";
+  if (PRO_FONT_AWESOME === true) {
+    if (process.env.FONTAWESOME_NPM_AUTH_TOKEN === undefined) {
+      throw new TypeError("'FONTAWESOME_NPM_AUTH_TOKEN' is not present in the environment.");
+    }
+    licenseType = "pro";
+  } else {
+    licenseType = "free";
+  }
+
+  const registry = await importRegistry(licenseType);
+  return configure({ registry, library, config });
 };

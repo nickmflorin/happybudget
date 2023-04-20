@@ -14,6 +14,9 @@ export * from "./urls";
 export const HttpMethods = enumeratedLiterals(["GET", "POST", "PATCH", "DELETE"] as const);
 export type HttpMethod = EnumeratedLiteralType<typeof HttpMethods>;
 
+export const RequestCredentials = enumeratedLiterals(["same-origin", "include", "omit"] as const);
+export type RequestCredential = EnumeratedLiteralType<typeof RequestCredentials>;
+
 export enum STATUS_CODES {
   HTTP_200_OK = 200,
   HTTP_201_OK = 201,

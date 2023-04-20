@@ -10,7 +10,6 @@ export * from "./sagas";
 export * from "./store";
 export * from "./tasks";
 export * from "./tabling";
-export * from "./typeguards";
 
 export type Dispatch = RootDispatch<Action>;
 

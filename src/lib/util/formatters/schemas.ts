@@ -1,7 +1,4 @@
-import moment from "moment-timezone";
 import { z } from "zod";
-
-import { config } from "application";
 
 import * as types from "./types";
 
@@ -118,77 +115,6 @@ export const PercentToDecimalSchema = z
     });
     return z.NEVER;
   });
-
-const DateLikeSchema = z.union([z.number(), z.string(), z.date()]);
-export const DateSchema = DateLikeSchema.pipe(z.coerce.date());
-
-export const createLocalizationSchema = <
-  T extends config.localization.LocalizationType,
-  C extends config.localization.LocalizationCodes[T],
->(
-  type: T,
-  localizationCode: C,
-) => {
-  const localizationFormat = config.localization.getLocalization<T, C>(type, localizationCode);
-  return DateSchema.transform<types.DatePrimitive>((value): string =>
-    moment(value).format(localizationFormat),
-  );
-};
-
-export const createDateLocalizationSchema = <
-  C extends config.localization.LocalizationCodes["date"],
->(
-  localizationCode: C,
-) => createLocalizationSchema("date", localizationCode);
-
-export const createDateTimeLocalizationSchema = <
-  C extends config.localization.LocalizationCodes["datetime"],
->(
-  localizationCode: C,
-) => createLocalizationSchema("datetime", localizationCode);
-
-export const createTimeLocalizationSchema = <
-  C extends config.localization.LocalizationCodes["time"],
->(
-  localizationCode: C,
-) => createLocalizationSchema("time", localizationCode);
-
-// TODO: Incorporate timezone.
-export const DateTimeDifferenceSchema = DateSchema.transform<string>(value => {
-  const now = moment(Date.now());
-  const provided = moment(value);
-
-  const duration = moment.duration(now.diff(provided));
-  let days = duration.days();
-  if (days < 1) {
-    let hours = duration.asHours();
-    if (hours < 1) {
-      const minutes = duration.asMinutes();
-      if (minutes < 1) {
-        const seconds = duration.asSeconds();
-        if (parseInt(String(seconds)) === 1) {
-          return "1 second ago";
-        }
-        return `${parseInt(String(seconds))} seconds ago`;
-      }
-      if (parseInt(String(minutes)) === 1) {
-        return "1 minute ago";
-      }
-      return `${parseInt(String(minutes))} minutes ago`;
-    } else {
-      hours = parseInt(String(hours));
-      if (hours === 1) {
-        return "1 hour ago";
-      }
-      return `${hours} hours ago`;
-    }
-  }
-  days = parseInt(String(days));
-  if (days === 1) {
-    return "1 day ago";
-  }
-  return `${days} days ago`;
-});
 
 export const PhoneNumberSchema = z.union([z.string(), z.number()]).transform<string>(v => {
   const numeric = String(v).replace(/\D/g, "");

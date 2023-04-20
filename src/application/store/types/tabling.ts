@@ -184,8 +184,8 @@ export type TableReducerConfig<
 > = Omit<TableTaskConfig<R, M, S, C, MP, A>, "table" | "selectStore"> & {
   readonly initialState: S;
   readonly columns: tabling.ModelColumn<R, M>[];
-  readonly defaultDataOnCreate?: DefaultDataOnCreate<R>;
-  readonly defaultDataOnUpdate?: DefaultDataOnUpdate<R>;
+  readonly defaultDataOnCreate?: tabling.DefaultDataOnCreate<R>;
+  readonly defaultDataOnUpdate?: tabling.DefaultDataOnUpdate<R>;
   readonly getModelRowChildren?: (m: M) => number[];
 };
 

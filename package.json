@@ -7,7 +7,7 @@
   },
   "engineStrict": true,
   "scripts": {
-    "requirements-check": "ts-node --compilerOptions='{\"module\":\"commonjs\"}' src/support/enforce-node-version.ts",
+    "requirements-check": "ts-node --compilerOptions='{\"module\":\"commonjs\"}' src/application/support/enforce-node-version.ts",
     "setup-env": "npm run requirements-check",
     "preupdate-package-versions-to-latest": "npm run setup-env",
     "preinstall": "npm run setup-env",
@@ -124,6 +124,7 @@
     "@types/node": "^18.15.2",
     "@types/react": "^18.0.28",
     "@types/react-datepicker": "^4.10.0",
+    "@types/react-is": "^17.0.3",
     "@types/react-pdf": "^6.2.0",
     "@types/react-redux": "^7.1.25",
     "@types/react-router-dom": "^5.3.3",

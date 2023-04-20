@@ -2,8 +2,8 @@ import { SWRConfig as RootSWRConfig } from "swr";
 import { PublicConfiguration } from "swr/_internal";
 import { z } from "zod";
 
+import { errors } from "application";
 import { logger } from "internal";
-import { errors } from "lib";
 
 const SWR_CONFIG_SCHEMA = z
   .object({

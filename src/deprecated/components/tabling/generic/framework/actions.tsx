@@ -6,8 +6,8 @@ import {
   ExportCSVDropdownMenu,
   ToggleColumnsDropdownMenu,
   ShareDropdownMenu,
-} from "components/dropdowns";
-import { ShareDropdownMenuProps } from "components/dropdowns/ShareDropdownMenu";
+} from "deprecated/components/dropdowns";
+import { ShareDropdownMenuProps } from "deprecated/components/dropdowns/ShareDropdownMenu";
 
 export const ExportPdfAction = (onExport: () => void): Table.MenuActionObj => ({
   icon: "print",

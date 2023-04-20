@@ -1,39 +1,39 @@
 import { type Dispatch } from "react";
 
-import { Action } from "../../core";
-import * as errors from "../../errors";
-import { enumeratedLiteralsMap, OneOrMany } from "../../util";
+import { store, errors } from "application";
+
+import { enumeratedLiterals, OneOrMany } from "../../util";
 import * as types from "../types";
 
-export const FeedbackActionTypes = enumeratedLiteralsMap(["clear", "add", "set"] as const);
+export const FeedbackActionTypes = enumeratedLiterals(["clear", "add", "set"] as const);
 
-export type ClearFeedbackAction<N extends string = string> = Action<
-  typeof FeedbackActionTypes.CLEAR,
+export type ClearFeedbackAction<N extends string = string> = store.BasicAction<
   {
     readonly options?: types.ClearFeedbackOptions<types.FeedbackType, N>;
-  }
+  },
+  typeof FeedbackActionTypes.CLEAR
 >;
 
-export type AddFeedbackAction<N extends string = string> = Action<
-  typeof FeedbackActionTypes.ADD,
+export type AddFeedbackAction<N extends string = string> = store.BasicAction<
   {
     readonly feedback:
       | errors.HttpError
       | OneOrMany<types.GlobalFeedback | types.FieldFeedback<types.FeedbackType, N>>;
     readonly dispatch: Dispatch<ClearFeedbackAction<N>>;
     readonly options?: Partial<types.GlobalManagedFeedbackConfig>;
-  }
+  },
+  typeof FeedbackActionTypes.ADD
 >;
 
-export type SetFeedbackAction<N extends string = string> = Action<
-  typeof FeedbackActionTypes.SET,
+export type SetFeedbackAction<N extends string = string> = store.BasicAction<
   {
     readonly feedback:
       | errors.HttpError
       | OneOrMany<types.GlobalFeedback | types.FieldFeedback<types.FeedbackType, N>>;
     readonly dispatch: Dispatch<ClearFeedbackAction<N>>;
     readonly options?: Partial<types.GlobalManagedFeedbackConfig>;
-  }
+  },
+  typeof FeedbackActionTypes.SET
 >;
 
 export type FeedbackAction<N extends string = string> =

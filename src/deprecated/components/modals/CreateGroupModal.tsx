@@ -1,4 +1,4 @@
-import { GroupForm } from "components/forms";
+import { GroupForm } from "deprecated/components/forms";
 
 import { CreateModelModal, CreateModelModalProps, CreateModelCallbacks } from "./generic";
 

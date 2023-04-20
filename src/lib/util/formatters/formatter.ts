@@ -14,7 +14,8 @@ type BaseFormatterLaxOptions = {
 
 type FormatterLaxOptions<
   T,
-  P extends Optional<FormatterParams<T>, "value"> = Optional<FormatterParams<T>, "value">,
+  S = unknown,
+  P extends Optional<FormatterParams<T, S>, "value"> = Optional<FormatterParams<T, S>, "value">,
 > = P extends never ? never : P & BaseFormatterLaxOptions;
 
 type BaseFormatterFallbackOptions<T> = {
@@ -25,65 +26,72 @@ type BaseFormatterFallbackOptions<T> = {
 
 type FormatterFallbackOptions<
   T,
-  P extends Optional<FormatterParams<T>, "value"> = Optional<FormatterParams<T>, "value">,
+  S = unknown,
+  P extends Optional<FormatterParams<T, S>, "value"> = Optional<FormatterParams<T, S>, "value">,
 > = P extends never ? never : P & BaseFormatterFallbackOptions<T>;
 
 export type LazyFormatterOptions<T> = BaseFormatterFallbackOptions<T> | BaseFormatterLaxOptions;
 
-export type FormatterOptions<T, P extends FormatterParams<T> = FormatterParams<T>> =
+export type FormatterOptions<
+  T,
+  S = unknown,
+  P extends FormatterParams<T, S> = FormatterParams<T, S>,
+> =
   | (P & { readonly errorPrefix?: string })
-  | FormatterFallbackOptions<T, P>
-  | FormatterLaxOptions<T, P>;
+  | FormatterFallbackOptions<T, S, P>
+  | FormatterLaxOptions<T, S, P>;
 
-export type NativeFormatterParams = {
-  readonly value: unknown;
+export type NativeFormatterParams<S = unknown> = {
+  readonly value: S;
 };
 
 export type TableFormatterParams<T> = tabling.TableValueFormatterParams<tabling.Row, string, T>;
 
-export type FormatterParams<T> = NativeFormatterParams | TableFormatterParams<T>;
+export type FormatterParams<T, S> = NativeFormatterParams<S> | TableFormatterParams<T>;
 
-export const formatterOptionsAreLax = <T, P extends FormatterParams<T>>(
-  options: FormatterOptions<T, P>,
-): options is FormatterLaxOptions<T, P> => (options as FormatterLaxOptions<T, P>).strict === false;
+export const formatterOptionsAreLax = <T, S, P extends FormatterParams<T, S>>(
+  options: FormatterOptions<T, S, P>,
+): options is FormatterLaxOptions<T, S, P> =>
+  (options as FormatterLaxOptions<T, S, P>).strict === false;
 
-export const formatterOptionsAreFallback = <T, P extends FormatterParams<T>>(
-  options: FormatterOptions<T, P>,
-): options is FormatterFallbackOptions<T, P> =>
-  (options as FormatterFallbackOptions<T, P>).fallbackValue !== undefined;
+export const formatterOptionsAreFallback = <T, S, P extends FormatterParams<T, S>>(
+  options: FormatterOptions<T, S, P>,
+): options is FormatterFallbackOptions<T, S, P> =>
+  (options as FormatterFallbackOptions<T, S, P>).fallbackValue !== undefined;
 
 export type FormatterReturn<
-  OPTS extends LazyFormatterOptions<T> | FormatterOptions<T, P>,
+  OPTS extends LazyFormatterOptions<T> | FormatterOptions<T, S, P>,
   T,
-  P extends FormatterParams<T> = FormatterParams<T>,
+  S = unknown,
+  P extends FormatterParams<T, S> = FormatterParams<T, S>,
 > = OPTS extends BaseFormatterLaxOptions
   ? T | null
   : OPTS extends BaseFormatterFallbackOptions<T>
   ? T
   : T;
 
-type LazyFormatter<T> = {
+type LazyFormatter<T, S = unknown> = {
   <Ol extends LazyFormatterOptions<T>>(options: Ol): (
-    params: FormatterParams<T>,
-  ) => FormatterReturn<Ol, T>;
+    params: FormatterParams<T, S>,
+  ) => FormatterReturn<Ol, T, S>;
 };
 
-export type Formatter<T> = {
-  <O extends FormatterOptions<T, P>, P extends FormatterParams<T>>(options: O): FormatterReturn<
-    O,
-    T,
-    P
-  >;
-  lazy: LazyFormatter<T>;
-};
-
-export function createFormatter<T>(schema: z.ZodType<T, z.ZodTypeDef, unknown>): Formatter<T> {
-  const formatter = <O extends FormatterOptions<T, P>, P extends FormatterParams<T>>(
+export type Formatter<T, S = unknown> = {
+  <O extends FormatterOptions<T, S, P>, P extends FormatterParams<T, S>>(
     options: O,
-  ): FormatterReturn<O, T, P> => {
+  ): FormatterReturn<O, T, S, P>;
+  lazy: LazyFormatter<T, S>;
+};
+
+export function createFormatter<T, S = unknown>(
+  schema: z.ZodType<T, z.ZodTypeDef, S>,
+): Formatter<T, S> {
+  const formatter = <O extends FormatterOptions<T, S, P>, P extends FormatterParams<T, S>>(
+    options: O,
+  ): FormatterReturn<O, T, S, P> => {
     const parsed = schema.safeParse(options.value);
     if (parsed.success) {
-      return parsed.data as FormatterReturn<O, T, P>;
+      return parsed.data as FormatterReturn<O, T, S, P>;
     }
     const err = new errors.MalformedDataSchemaError({
       error: parsed.error,
@@ -94,18 +102,18 @@ export function createFormatter<T>(schema: z.ZodType<T, z.ZodTypeDef, unknown>):
       if (options.logError !== false) {
         logger.error({ e: err }, "");
       }
-      return null as FormatterReturn<O, T, P>;
+      return null as FormatterReturn<O, T, S, P>;
     } else if (formatterOptionsAreFallback(options)) {
       if (options.logError !== false) {
         logger.error({ e: err }, "");
       }
-      return options.fallbackValue as FormatterReturn<O, T, P>;
+      return options.fallbackValue as FormatterReturn<O, T, S, P>;
     }
     throw err;
   };
   formatter.lazy =
     <Ol extends LazyFormatterOptions<T>>(options: Ol) =>
-    (value: unknown) =>
-      formatter({ ...options, value });
+    (params: FormatterParams<T, S>) =>
+      formatter({ ...options, ...params });
   return formatter;
 }

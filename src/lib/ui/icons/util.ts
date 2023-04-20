@@ -9,57 +9,41 @@ import * as types from "./types";
  * Returns the internal icon `code` for the provided icon, {@link types.Icon}, or icon type,
  * {@link types.IconType}.
  */
-export const getIconCode = <
-  T extends types.IconCode,
-  N extends types.GetIconName<T>,
-  P extends types.GetIconPrefix<T>,
->(
-  i: types.Icon<T, N> | P | T,
-): T => {
+export const getIconCode = (i: types.Icon | types.IconType): types.IconCode => {
   if (typeguards.isIconPrefix(i)) {
-    return types.IconCodeMap[i] as T;
+    return types.IconCodeMap[i];
   } else if (typeguards.isIconCode(i)) {
     return i;
   }
-  // I do not understand why we have to coerce this.
-  return getIconCode(i.type as T);
+  return getIconCode(i.type);
 };
 
 /**
  * Returns the Font Awesome `prefix` for the provided icon, {@link types.Icon}, or icon type,
  * {@link types.IconType}.
  */
-export const getIconPrefix = <
-  T extends types.IconCode,
-  N extends types.GetIconName<T>,
-  P extends types.GetIconPrefix<T>,
->(
-  i: types.Icon<T, N> | P | T,
-): P => {
+export const getIconPrefix = (i: types.Icon | types.IconType): types.IconPrefix => {
   if (typeguards.isIconPrefix(i)) {
     return i;
   } else if (typeguards.isIconCode(i)) {
-    return types.IconPrefixMap[i] as P;
-  } else {
-    // I do not understand why we have to coerce this.
-    return getIconPrefix<T, N, P>(i.type as T);
+    return types.IconPrefixMap[i];
   }
+  return getIconPrefix(i.type);
 };
 
-export const getIconLicense = <T extends types.IconCode, N extends types.GetIconName<T>>(
-  i: types.Icon<T, N> | N,
-): types.IconLicense => {
+export const getIconLicense = (i: types.Icon | types.IconName): types.IconLicense => {
   // This will throw an error if an IconName is associated with multiple weights.
-  const ic = typeof i === "string" ? getIcon<T, N>({ name: i }) : (i as types.Icon<T, N>);
+  const ic = typeguards.isIconName(i) ? getIcon(i) : i;
 
   let found: types.IconLicense[] = [];
 
-  const isIconName = (v: types.LicensedIcon<types.IconName> | types.IconName): v is N =>
-    typeof v === "string" && v === ic.name;
+  const isIconName = (
+    v: types.LicensedIcon<types.IconName> | types.IconName,
+  ): v is types.IconName => typeof v === "string" && v === ic.name;
 
   const isLicensedIcon = (
     v: types.LicensedIcon<types.IconName> | types.IconName,
-  ): v is types.LicensedIcon<N> => typeof v !== "string" && v.name === ic.name;
+  ): v is types.LicensedIcon<types.IconName> => typeof v !== "string" && v.name === ic.name;
 
   const arr: (types.LicensedIcon<types.IconName> | types.IconName)[] = types.Icons[
     ic.type
@@ -122,19 +106,13 @@ export const getIconCodes = <N extends types.IconName = types.IconName>(
   );
 
 /**
- * Returns a set icons, {@link types.Icon[]}, based on the provided lookup.  If the lookup is not
- * provided, all icons will be returned.
- *
- * @param {{ name?: N; type: T } | { name: N } } lookup
- *   Either an optional name, {@link types.IconName}, and type, {@link types.IconCode}, or just the
- *   name, {@link types.IconName}, that should be used to filter the set of returned icons.
+ * Returns a set icons, {@link types.Icon[]}, based on the provided name, {@link types.IconName}.
+ * If the name is not provided, all icons will be returned.
  *
  * @returns {types.Icon[]}
  */
-export function getIcons<T extends types.IconCode, N extends types.IconName>(
-  lookup?: { name?: N; type: T } | { name: N },
-): types.Icon[] {
-  let icons = Object.keys(types.Icons).reduce((curr: types.Icon[], k: string): types.Icon[] => {
+export function getIcons(name?: types.IconName): types.Icon[] {
+  const icons = Object.keys(types.Icons).reduce((curr: types.Icon[], k: string): types.Icon[] => {
     const names: types.IconName[] = (
       types.Icons[k as types.IconCode].slice() as (
         | types.IconName
@@ -149,43 +127,27 @@ export function getIcons<T extends types.IconCode, N extends types.IconName>(
     );
     return [...curr, ...names.map((n: types.IconName) => ({ type: k, name: n } as types.Icon))];
   }, []);
-  if (
-    lookup === undefined ||
-    ((lookup as { name?: N; type: T }).type === undefined && lookup.name === undefined)
-  ) {
-    return icons;
-  } else if ((lookup as { name?: N; type: T }).type !== undefined) {
-    icons = icons.filter((i: types.Icon) => i.type === (lookup as { name?: N; type: T }).type);
-  }
-  if (lookup.name !== undefined) {
-    return icons.filter((i: types.Icon) => i.name === lookup.name);
+  if (name !== undefined) {
+    return icons.filter((i: types.Icon) => i.name === name);
   }
   return icons;
 }
 
 /**
- * Returns a specific icon, {@link types.Icon}, based on the provided lookup.  If the lookup
- * is associated with multiple icons, or the lookup is associated with no icon, an error will be
- * thrown.
- *
- * @param {{ name: N; type: T } | { name: N } } lookup
- *   Either the name, {@link types.IconName}, and type, {@link types.IconCode}, of the icon, or just
- *   the name, {@link types.IconName}, of the icon that should be returned.  If only the name is
- *   provided, the lookup will throw an {@link Error} if the icon, {@link types.Icon}, is associated
- *   with multiple types.
+ * Returns a specific icon, {@link types.Icon}, based on the provided name, {@link types.IconName}.
+ * If the name is associated with multiple icons, or the lookup is associated with no icon, an error
+ * will be thrown.
  *
  * @returns {types.Icon<T, N>}
  */
-export const getIcon = <T extends types.IconCode, N extends types.GetIconName<T>>(
-  lookup: { name: N; type: T } | { name: N },
-): types.Icon<T, N> => {
-  const icons = getIcons(lookup);
+export const getIcon = <N extends types.IconName>(name: N): types.IconForName<N> => {
+  const icons = getIcons(name);
   if (icons.length === 0) {
-    throw new Error(`An icon does not exist for the provided lookup: ${JSON.stringify(lookup)}.`);
+    throw new Error(`An icon does not exist for the provided name '${name}'.`);
   } else if (icons.length !== 1) {
-    throw new Error(`Multiple icons exist for the provided lookup: ${JSON.stringify(lookup)}.`);
+    throw new Error(`Multiple icons exist for the provided name '${name}'.`);
   }
-  return icons[0] as types.Icon<T, N>;
+  return icons[0] as types.IconForName<N>;
 };
 
 /**
@@ -205,14 +167,9 @@ export const getIcon = <T extends types.IconCode, N extends types.GetIconName<T>
  *
  * @returns {[types.IconPrefix, types.IconName]}
  */
-export const getNativeIcon = <
-  I extends types.Icon<T, N>,
-  T extends types.IconCode,
-  N extends types.GetIconName<T>,
-  P extends types.GetIconPrefix<T>,
->(
-  name: N | I,
-): [P, N] => {
+export const getNativeIcon = (
+  name: types.IconName | types.Icon,
+): [types.IconPrefix, types.IconName] => {
   if (typeguards.isIconName(name)) {
     const availableCodes = getIconCodes(name);
     if (availableCodes.length === 0) {
@@ -222,11 +179,11 @@ export const getNativeIcon = <
           "the library.",
       );
     } else if (availableCodes.includes(DEFAULT_ICON_CODE as typeof availableCodes[number])) {
-      return [getIconPrefix<T, N, P>(DEFAULT_ICON_CODE as T), name];
+      return [getIconPrefix(DEFAULT_ICON_CODE), name];
     }
-    return [getIconPrefix<T, N, P>(([...availableCodes] as T[])[0]), name];
+    return [getIconPrefix(availableCodes[0]), name];
   }
-  return [getIconPrefix<T, N, P>(name.type), name.name as N];
+  return [getIconPrefix(name.type), name.name];
 };
 
 /**

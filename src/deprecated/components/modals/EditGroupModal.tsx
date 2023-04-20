@@ -1,6 +1,6 @@
 import * as api from "api";
 import { ui } from "lib";
-import { GroupForm } from "components/forms";
+import { GroupForm } from "deprecated/components/forms";
 
 import { EditModelModal, EditModelModalProps, UpdateModelCallbacks } from "./generic";
 

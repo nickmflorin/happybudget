@@ -2,7 +2,8 @@ import classNames from "classnames";
 
 import { ui } from "lib";
 
-import { Header } from "../Header";
+// import { Header } from "../Header";
+
 import { Content } from "./Content";
 
 export type MainProps = ui.ComponentProps<{ readonly children: JSX.Element }>;
@@ -13,7 +14,7 @@ export type MainProps = ui.ComponentProps<{ readonly children: JSX.Element }>;
  */
 export const Main = (props: MainProps): JSX.Element => (
   <main {...props} className={classNames("main", props.className)}>
-    <Header />
+    {/* <Header /> */}
     <Content>{props.children}</Content>
   </main>
 );

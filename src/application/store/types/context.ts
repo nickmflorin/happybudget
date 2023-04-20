@@ -65,7 +65,7 @@ export type SubAccountActionContext<
 > = actions.WithActionContext<SubAccountContext<B, PUBLIC>>;
 
 export type SubAccountsTableContext<
-  B extends model.UserBudget | model.Template = model.UserBudget | model.Template,
+  B extends model.Budget | model.Template = model.Budget | model.Template,
   P extends model.Account | model.SubAccount = model.Account | model.SubAccount,
   PUBLIC extends boolean = boolean,
 > = BudgetContext<B, PUBLIC> & {

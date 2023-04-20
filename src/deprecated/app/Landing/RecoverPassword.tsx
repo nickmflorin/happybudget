@@ -3,8 +3,8 @@ import { useState } from "react";
 import * as api from "api";
 
 import { ui } from "lib";
-import { RecoverPasswordForm } from "components/forms";
-import { IRecoverPasswordFormValues } from "components/forms/RecoverPasswordForm";
+import { RecoverPasswordForm } from "deprecated/components/forms";
+import { IRecoverPasswordFormValues } from "deprecated/components/forms/RecoverPasswordForm";
 import { LandingFormContainer } from "deprecated/components/containers";
 
 const RecoverPassword = (): JSX.Element => {

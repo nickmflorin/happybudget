@@ -63,7 +63,11 @@ export const parseObjectOfType = <P>(
   };
 };
 
-export const assertObjectOfType = <P>(
+type AssertObjectOfType = {
+  <P>(value: unknown, schema: z.ZodSchema<P>, options?: ObjectParserOptions): asserts value is P;
+};
+
+export const assertObjectOfType: AssertObjectOfType = <P>(
   obj: unknown,
   schema: z.ZodSchema<P>,
   options?: ObjectParserOptions,

@@ -10,7 +10,7 @@ import { AntDConfig } from "./AntDConfig";
 import { SWRConfig } from "./SWRConfig";
 
 type ConfigureModule = {
-  default: () => Promise<void>;
+  configureAsync: () => Promise<void>;
 };
 
 export const AppConfig = (props: { children: JSX.Element }) => {
@@ -27,7 +27,7 @@ export const AppConfig = (props: { children: JSX.Element }) => {
        */
     import("application/config/configuration/fontAwesome").then((module: ConfigureModule) => {
       module
-        .default()
+        .configureAsync()
         .then(() => {
           setFontAwesomeConfigured(true);
         })

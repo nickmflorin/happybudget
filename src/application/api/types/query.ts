@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { model } from "lib";
+import { model, schemas } from "lib";
 
 export type Order = 1 | -1 | 0;
 
@@ -89,10 +89,12 @@ export function safeQueryOrdering<F extends string = string>(
 ): Ordering<F> | Ordering<string> {
   if (fields) {
     const schema = getQueryOrderingSchema(fields);
-    return model.ensureObjectOfType<Ordering<F>>(param, schema);
+    schemas.assertObjectOfType<Ordering<string>>(param, schema);
+    return param;
   }
   const schema = getQueryOrderingSchema();
-  return model.ensureObjectOfType<Ordering<string>>(param, schema);
+  schemas.assertObjectOfType<Ordering<string>>(param, schema);
+  return param;
 }
 
 export function queryParamIsOrdering<F extends string = string>(
@@ -108,8 +110,8 @@ export function queryParamIsOrdering<F extends string = string>(
 ): param is Ordering<F> | Ordering<string> {
   if (fields) {
     const schema = getQueryOrderingSchema(fields);
-    return model.isObjectOfType<Ordering<F>>(param, schema) !== false;
+    return schemas.isObjectOfType<Ordering<F>>(param, schema) !== false;
   }
   const schema = getQueryOrderingSchema();
-  return model.isObjectOfType<Ordering<string>>(param, schema) !== false;
+  return schemas.isObjectOfType<Ordering<string>>(param, schema) !== false;
 }

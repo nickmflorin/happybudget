@@ -4,7 +4,7 @@ import * as api from "api";
 import { useHistory } from "react-router-dom";
 
 import { ui, notifications } from "lib";
-import SignupForm, { ISignupFormValues } from "components/forms/SignupForm";
+import SignupForm, { ISignupFormValues } from "deprecated/components/forms/SignupForm";
 import { LandingFormContainer } from "deprecated/components/containers";
 
 import { UnverifiedEmailNotification, UserNotOnWaitlistNotification } from "./Notifications";

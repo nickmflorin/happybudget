@@ -6,7 +6,7 @@ import { isNil, map, filter } from "lodash";
 
 import * as store from "application/store";
 import { ui, tabling, pdf, util, http } from "lib";
-import { ExportActualsPdfForm } from "components/forms";
+import { ExportActualsPdfForm } from "deprecated/components/forms";
 import { PreviewModal } from "components/modals";
 import { ActualsTable } from "deprecated/components/tabling";
 

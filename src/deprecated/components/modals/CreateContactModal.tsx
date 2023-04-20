@@ -4,9 +4,9 @@ import { isNil } from "lodash";
 
 import * as api from "api";
 import { ui } from "lib";
-import { ImageAndName } from "components/fields";
-import { IImageAndNameRef } from "components/fields/ImageAndName";
-import { ContactForm } from "components/forms";
+import { ImageAndName } from "deprecated/components/fields";
+import { IImageAndNameRef } from "deprecated/components/fields/ImageAndName";
+import { ContactForm } from "deprecated/components/forms";
 
 import { CreateModelModal, CreateModelModalProps } from "./generic";
 

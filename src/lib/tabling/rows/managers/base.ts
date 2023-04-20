@@ -1,7 +1,7 @@
 import { logger } from "internal";
 
+import * as notifications from "../../../../deprecated/lib/notifications";
 import * as model from "../../../model";
-import * as notifications from "../../../notifications";
 import * as columns from "../../columns";
 import { CellValue } from "../../types";
 import * as ids from "../ids";

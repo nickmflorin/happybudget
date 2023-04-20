@@ -1,7 +1,7 @@
 import { find, uniq } from "lodash";
 
 import { logger } from "internal";
-import { notifications, model, replaceInArray, SingleOrArray } from "lib";
+import { model, replaceInArray, SingleOrArray, ui } from "lib";
 
 import * as api from "../../api";
 import * as types from "../types";
@@ -248,10 +248,10 @@ export const createAuthenticatedModelListReducer = <
         warnOnMissing: false,
       });
       if (existing !== undefined) {
-        notifications.internal.inconsistentStateError({
-          action,
-          reason: "Instance already exists in state when it is not expected to.",
-        });
+        logger.inconsistentReduxStateError(
+          { action },
+          "Instance already exists in state when it is not expected to.",
+        );
         return state;
       }
       return reorderIfApplicable({
@@ -264,10 +264,10 @@ export const createAuthenticatedModelListReducer = <
         field: action.payload.field as keyof M & string,
       }) as api.FieldOrder<string & keyof M> | undefined;
       if (existing !== undefined) {
-        notifications.internal.inconsistentStateError({
-          action,
-          reason: "Ordering for field does not exist in state when it is expected to.",
-        });
+        logger.inconsistentReduxStateError(
+          { action },
+          "Ordering for field does not exist in state when it is expected to.",
+        );
         return state;
       }
       return {
@@ -361,7 +361,7 @@ export type SelectionHandlers<M extends model.Model> = {
 };
 
 export const createSelectionHandlers = <M extends model.Model>(
-  mode: ModelSelectionMode,
+  mode: ui.ModelSelectionMode,
 ): SelectionHandlers<M> => {
   type S = SelectionState<M>;
 
@@ -405,7 +405,7 @@ export const createSelectionHandlers = <M extends model.Model>(
 };
 
 export const createSelectionReducer = <M extends model.Model>(
-  mode: ModelSelectionMode,
+  mode: ui.ModelSelectionMode,
   initialState: SelectionState<M>,
 ): types.BasicReducer<M["id"][], SelectionAction<M>> => {
   const handlers = createSelectionHandlers<M>(mode);

@@ -5,11 +5,11 @@ import { isNil } from "lodash";
 
 import * as api from "api";
 import { ui, http } from "lib";
-import { EditPublicTokenForm } from "components/forms";
+import { EditPublicTokenForm } from "deprecated/components/forms";
 import {
   EditPublicTokenFormValues,
   IEditPublicTokenFormRef,
-} from "components/forms/EditPublicTokenForm";
+} from "deprecated/components/forms/EditPublicTokenForm";
 
 import ContentMenu from "./ContentMenu";
 

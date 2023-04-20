@@ -2,8 +2,8 @@ import classNames from "classnames";
 
 import { ui, model } from "lib";
 import { ClearButton } from "components/buttons";
-import { CollaboratorAccessTypeSelect } from "components/fields";
 import { UserImageOrInitials } from "components/images";
+import { CollaboratorAccessTypeSelect } from "deprecated/components/fields";
 
 type CollaboratorListItemProps = ui.ComponentProps<{
   readonly deleting: boolean;

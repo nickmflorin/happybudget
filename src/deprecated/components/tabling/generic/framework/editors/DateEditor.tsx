@@ -2,7 +2,7 @@ import { forwardRef, useState, useEffect, useMemo, useImperativeHandle, Forwarde
 
 import { isNil } from "lodash";
 
-import { DatePicker } from "components/fields";
+import { DatePicker } from "deprecated/components/fields";
 
 const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;

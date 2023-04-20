@@ -67,7 +67,7 @@ export const DashboardSidebarItemAnchor = <I extends app.PageId, P extends strin
               <DashboardSidebarSubItemAnchor
                 key={i}
                 config={subItem}
-                closeSidebarOnClick={closeSidebarOnClick}
+                // closeSidebarOnClick={closeSidebarOnClick}
               />
             ))}
           </div>

@@ -9,17 +9,16 @@ The various component global style files should all be imported in this index.sc
 */
 @use "./icons"; // This must come first to avoid issues overriding styles.
 @use "./buttons";
-@use "./forms";
-@use "./layout";
-@use "./loading";
-@use "./feedback";
-@use "./structural";
-@use "./input";
-@use "./tables";
-@use "./typography";
-@use "./modules";
-@use "./modals";
-@use "./tooltips";
-@use "./image";
 @use "./collaboration";
 @use "./empty";
+@use "./feedback";
+@use "./forms";
+@use "./image";
+@use "./input";
+@use "./layout";
+@use "./loading";
+@use "./modals";
+@use "./structural";
+@use "./tables";
+@use "./tooltips";
+@use "./typography";

@@ -5,7 +5,7 @@ import { isNil, filter, map } from "lodash";
 
 import { tabling } from "lib";
 import { ShowHide, SavingChanges } from "components";
-import { SearchInput } from "components/fields";
+import { SearchInput } from "deprecated/components/fields";
 import { Portal } from "deprecated/components/layoutOld";
 
 export type Toolbar<

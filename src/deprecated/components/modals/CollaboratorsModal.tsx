@@ -7,7 +7,7 @@ import { map, filter } from "lodash";
 import { ui, http, model, redux, util } from "lib";
 import { PrimaryButton } from "components/buttonsOld";
 import { CollaboratorsList } from "components/collaboration";
-import { CollaboratorSelect } from "components/fields";
+import { CollaboratorSelect } from "deprecated/components/fields";
 
 import { Modal } from "./generic";
 

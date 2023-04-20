@@ -3,8 +3,8 @@ import React from "react";
 import * as api from "api";
 
 import { ui, notifications } from "lib";
-import { ChangePasswordForm } from "components/forms";
-import { ChangePasswordFormValues } from "components/forms/ChangePasswordForm";
+import { ChangePasswordForm } from "deprecated/components/forms";
+import { ChangePasswordFormValues } from "deprecated/components/forms/ChangePasswordForm";
 import { Page } from "deprecated/components/layoutOld";
 import { Tile } from "deprecated/components/containers";
 

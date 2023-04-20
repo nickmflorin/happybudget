@@ -6,7 +6,7 @@ import { useHistory } from "react-router-dom";
 
 import { Icon, Pagination, NoData, NoDataProps } from "components";
 import { OrderingButtonIconToggle } from "components/buttonsOld";
-import { Input } from "components/fields";
+import { Input } from "deprecated/components/fields";
 import { Page } from "deprecated/components/layoutOld";
 import { OrderingDropdownMenu } from "deprecated/components/dropdowns";
 

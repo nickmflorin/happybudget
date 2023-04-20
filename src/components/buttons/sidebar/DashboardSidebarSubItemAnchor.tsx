@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 import classNames from "classnames";
 
-import { config as app, store } from "application";
+import { config as app } from "application";
 import { ShowHide } from "components/util";
 
 import { ContentAnchorProps, ContentButtonSubContent } from "../abstract";
@@ -21,7 +21,7 @@ export const DashboardSidebarSubItemAnchor = <I extends app.PageId, P extends st
   ...props
 }: DashboardSidebarSubItemAnchorProps<I, P>): JSX.Element => {
   const page = useMemo(() => app.Pages[config.page], [config.page]);
-  const [user] = store.hooks.useLoggedInUser();
+  // const [user] = store.hooks.useLoggedInUser();
 
   const { hidden, ...anchorProps } = useSidebarItemAnchorProps({
     config,
@@ -41,7 +41,7 @@ export const DashboardSidebarSubItemAnchor = <I extends app.PageId, P extends st
           {config.label}
           <ShowHide show={config.tagText !== undefined}>
             <div className="sidebar-menu-item-tag-container">
-              <div className="sidebar-menu-item-tag">{config.tagText?.(user)}</div>
+              {/* <div className="sidebar-menu-item-tag">{config.tagText?.(user)}</div> */}
             </div>
           </ShowHide>
         </>

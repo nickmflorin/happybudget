@@ -1,10 +1,10 @@
-import { isNil, find } from "lodash";
+import { find } from "lodash";
 import { Moment } from "moment";
 import moment from "moment-timezone";
 import Cookies from "universal-cookie";
 
 import { logger } from "internal";
-import { model, dates, parsers } from "lib";
+import { model, formatters, parsers } from "lib";
 
 const cookies = new Cookies();
 
@@ -67,11 +67,12 @@ const parseDurationSinceLastIdentify = (id: PluginId, user: model.User): number 
   const now = moment();
 
   // Do not log a warning if the date is invalid because it is stored in cookies, it can be anything
-  const lastIdentifiedMmt = dates.toLocalizedMoment(lastIdentifiedTime, {
-    warnOnInvalid: false,
-    tz: user.timezone,
+  const lastIdentifiedMmt = formatters.localizedMomentFormatter(user.timezone)({
+    value: lastIdentifiedTime,
+    strict: false,
+    logError: false,
   });
-  if (!isNil(lastIdentifiedMmt)) {
+  if (lastIdentifiedMmt !== null) {
     return moment.duration(now.diff(lastIdentifiedMmt)).minutes();
   }
   return null;
@@ -111,10 +112,10 @@ const identifyRequired = (id: PluginId, user: model.User): boolean => {
     const userId = parseLastIdentifiedUser(id);
     const delta = parseDurationSinceLastIdentify(id, user);
     return (
-      isNil(userId) ||
-      isNil(delta) ||
-      (!isNil(delta) && delta > 6) ||
-      (!isNil(userId) && userId !== user.id)
+      userId === null ||
+      delta === null ||
+      (delta !== null && delta > 6) ||
+      (userId !== null && userId !== user.id)
     );
   }
   return false;
@@ -146,11 +147,12 @@ const identifyPlugin = <O extends IdentifyOptions>(
       );
       return doNotRetryIdentification(options.pluginId, user);
     } else if (BOOLEAN_FLAG === true) {
-      const userJoined = dates.toLocalizedMoment(user.date_joined, {
-        warnOnInvalid: false,
-        tz: user.timezone,
+      const userJoined = formatters.localizedMomentFormatter(user.timezone)({
+        value: user.date_joined,
+        strict: false,
+        logError: false,
       });
-      if (userJoined === undefined) {
+      if (userJoined === null) {
         logger.warn(
           { userId: user.id, dateJoined: user.date_joined, pluginId: options.pluginId },
           `Error Performing Identification Process for ${options.pluginId}: ` +

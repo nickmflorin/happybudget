@@ -10,7 +10,7 @@ export const register = client.createPostService<model.User, types.RegistrationP
 export const searchUsers = (
   search: string,
   query?: Omit<types.ApiModelListQuery<model.SimpleUser>, "search">,
-  options?: types.ClientRequestOptions<{ query: types.ApiModelListQuery<model.SimpleUser> }>,
+  options?: types.ExposedClientRequestOptions<{ query: types.ApiModelListQuery<model.SimpleUser> }>,
 ): Promise<types.ClientResponse<types.ApiListResponse<model.SimpleUser>>> =>
   client.list<model.SimpleUser, types.ApiModelListQuery<model.SimpleUser>>("/users", {
     ...options,

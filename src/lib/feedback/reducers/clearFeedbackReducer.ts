@@ -7,6 +7,7 @@ import * as constants from "../constants";
 import * as typeguards from "../typeguards";
 import * as types from "../types";
 import * as util from "../util";
+
 import { ClearFeedbackAction } from "./types";
 
 const removeGlobalFeedback = <N extends string = string>(
@@ -79,7 +80,7 @@ export const clearFeedbackReducer = <N extends string = string>(
   state: types.FeedbackManagerFeedback<N>,
   action: ClearFeedbackAction<N>,
 ): types.FeedbackManagerFeedback<N> => {
-  const options = action.options;
+  const options = action.payload.options;
   if (options !== undefined && typeguards.isClearFeedbackTypeOptions(options)) {
     if (options.meta === "global") {
       return removeGlobalFeedback(

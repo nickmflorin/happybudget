@@ -6,8 +6,8 @@ import moment from "moment";
 import * as api from "api";
 import { ui, model, http } from "lib";
 import { Modal } from "components";
-import { ImportActualsPlaidForm } from "components/forms";
-import { ImportActualsPlaidFormValues } from "components/forms/ImportActualsPlaidForm";
+import { ImportActualsPlaidForm } from "deprecated/components/forms";
+import { ImportActualsPlaidFormValues } from "deprecated/components/forms/ImportActualsPlaidForm";
 
 type ImportActualsPlaidModalProps = Omit<ModalProps, "title" | "onOk"> & {
   readonly budgetId: number;

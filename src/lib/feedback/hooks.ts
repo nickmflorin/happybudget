@@ -31,8 +31,7 @@ export const createFeedbackHook = <N extends string = string>(
       if (initialFeedback !== undefined) {
         dispatch({
           type: reducers.FeedbackActionTypes.SET,
-          feedback: initialFeedback,
-          dispatch,
+          payload: { feedback: initialFeedback, dispatch },
         });
       }
       /* eslint-disable-next-line react-hooks/exhaustive-deps */
@@ -42,17 +41,22 @@ export const createFeedbackHook = <N extends string = string>(
       () => ({
         feedback,
         addFeedback: (f, options?) =>
-          dispatch({ type: reducers.FeedbackActionTypes.ADD, options, feedback: f, dispatch }),
+          dispatch({
+            type: reducers.FeedbackActionTypes.ADD,
+            payload: { options, feedback: f, dispatch },
+          }),
         setFeedback: (f, options?) => {
           dispatch({
             type: reducers.FeedbackActionTypes.SET,
-            options,
-            feedback: f,
-            dispatch,
+            payload: {
+              options,
+              feedback: f,
+              dispatch,
+            },
           });
         },
         clearFeedback: (options?) =>
-          dispatch({ type: reducers.FeedbackActionTypes.CLEAR, options }),
+          dispatch({ type: reducers.FeedbackActionTypes.CLEAR, payload: { options } }),
       }),
       [feedback],
     );

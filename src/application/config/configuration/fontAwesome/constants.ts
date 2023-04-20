@@ -49,14 +49,40 @@ import { enumeratedLiterals } from "lib/util/literals";
 /* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { EnumeratedLiteralType } from "lib/util/types/literals";
 
-export const IconPrefixes = enumeratedLiterals(["far", "fab", "fas"] as const);
+export const IconPrefixes = enumeratedLiterals(["far", "fas"] as const);
+
+/**
+ * Represents a given code that FontAwesome uses to reference the form that a given Icon (identified
+ * by the name, {@link IconName}) can be registered under.
+ *
+ * This type will typically take on values such as "far", "fab" or "fas".
+ */
+export type IconPrefix = EnumeratedLiteralType<typeof IconPrefixes>;
 
 /**
  * An {@link IconCode} represents a more intuitive, human readable form of the FontAwesome prefix
  * values.  For instance, "far" corresponds to the "regular" FontAwesome library, so the code is
  * "regular".
  */
-export const IconCodes = enumeratedLiterals(["solid", "regular", "brand"] as const);
+export const IconCodes = enumeratedLiterals(["solid", "regular"] as const);
+
+/**
+ * Represents a more intuitive, human readable form of a FontAwesome prefix, {@link IconPrefix}.
+ * For instance, "far" corresponds to the "regular" FontAwesome library, so the code is "regular".
+ *
+ * @see IconPrefix
+ */
+export type IconCode = EnumeratedLiteralType<typeof IconCodes>;
+
+export const IconPrefixMap = {
+  [IconCodes.REGULAR]: IconPrefixes.FAR,
+  [IconCodes.SOLID]: IconPrefixes.FAS,
+};
+
+export const IconCodeMap = {
+  far: IconCodes.REGULAR,
+  fas: IconCodes.SOLID,
+};
 
 /* When an Icon is added to the registry, the name must be added to this array.  If the name already
    exists, it is because the Icon's name is associated with multiple prefixes and the name does not
@@ -100,14 +126,15 @@ export const IconNames = enumeratedLiterals([
   "book-open",
   "address-book",
   "book",
+  "triangle-exclamation",
 ] as const);
 
 export const IconLicenses = enumeratedLiterals(["free", "pro", "both"] as const);
 export type IconLicense = EnumeratedLiteralType<typeof IconLicenses>;
 
 export type LicensedIcon<
-  N extends string,
-  LICENSE extends IconLicense = "both",
+  N extends string = string,
+  LICENSE extends IconLicense = IconLicense,
 > = LICENSE extends IconLicense
   ? {
       readonly name: N;
@@ -144,8 +171,11 @@ export const Icons = {
     IconNames.FILE_VIDEO,
     IconNames.FILE_WORD,
     IconNames.FILE,
+    IconNames.COPY,
     IconNames.TRASH_ALT,
     IconNames.FOLDER_OPEN,
+    IconNames.CAMERA_ALT,
+    IconNames.USERS,
     licensedIcon(IconNames.BOOK_OPEN, IconLicenses.PRO),
     licensedIcon(IconNames.BOOK, IconLicenses.PRO),
   ] as const,
@@ -176,6 +206,6 @@ export const Icons = {
     IconNames.FOLDER_OPEN,
     IconNames.CAMERA_ALT,
     IconNames.BOOK,
+    IconNames.TRIANGLE_EXCLAMATION,
   ] as const,
-  [IconCodes.BRAND]: [] as const,
 };

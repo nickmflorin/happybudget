@@ -5,9 +5,9 @@ import { isNil } from "lodash";
 import * as api from "api";
 import { notifications } from "lib";
 import { Separator } from "components";
-import { ImageAndName } from "components/fields";
-import { IImageAndNameRef } from "components/fields/ImageAndName";
-import { ContactForm } from "components/forms";
+import { ImageAndName } from "deprecated/components/fields";
+import { IImageAndNameRef } from "deprecated/components/fields/ImageAndName";
+import { ContactForm } from "deprecated/components/forms";
 import { TaggedActuals } from "deprecated/components/model/contacts";
 
 import { EditModelModal, EditModelModalProps } from "./generic";

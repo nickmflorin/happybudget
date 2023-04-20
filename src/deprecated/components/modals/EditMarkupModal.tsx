@@ -4,8 +4,8 @@ import { isNil } from "lodash";
 
 import * as api from "api";
 import { model } from "lib";
-import { MarkupForm } from "components/forms";
-import { IMarkupForm } from "components/forms/MarkupForm";
+import { MarkupForm } from "deprecated/components/forms";
+import { IMarkupForm } from "deprecated/components/forms/MarkupForm";
 
 import { EditModelModal, EditModelModalProps, UpdateModelCallbacks } from "./generic";
 

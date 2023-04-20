@@ -1,5 +1,5 @@
 import { ui, notifications } from "lib";
-import { EditAttachments, EditAttachmentsProps } from "components/files";
+import { EditAttachments, EditAttachmentsProps } from "deprecated/components/files";
 
 import { Modal } from "./generic";
 

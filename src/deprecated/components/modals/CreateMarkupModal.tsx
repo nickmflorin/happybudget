@@ -1,5 +1,5 @@
 import { model } from "lib";
-import { MarkupForm } from "components/forms";
+import { MarkupForm } from "deprecated/components/forms";
 
 import { CreateModelModal, CreateModelModalProps, CreateModelCallbacks } from "./generic";
 

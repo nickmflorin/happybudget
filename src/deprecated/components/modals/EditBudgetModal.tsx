@@ -4,7 +4,7 @@ import { isNil } from "lodash";
 
 import * as api from "api";
 import { model } from "lib";
-import { BudgetForm } from "components/forms";
+import { BudgetForm } from "deprecated/components/forms";
 
 import { EditModelModal, EditModelModalProps } from "./generic";
 

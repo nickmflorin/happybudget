@@ -74,7 +74,15 @@ const useClickableProps = <V extends ui.ButtonVariant = ui.ButtonVariant>(
         props.className,
       ),
     }),
-    [props.size, props.locked, props.loading, props.variant, props.className, props.disabled],
+    [
+      props.size,
+      props.locked,
+      props.loading,
+      props.variant,
+      props.className,
+      props.disabled,
+      props.cornerStyle,
+    ],
   );
 
 export const Button = <V extends ui.ButtonVariant = ui.ButtonVariant>({

@@ -5,8 +5,8 @@ import { isNil, includes } from "lodash";
 import { Redirect, useLocation } from "react-router-dom";
 
 import { ui } from "lib";
-import { ResetPasswordForm } from "components/forms";
-import { IResetPasswordFormValues } from "components/forms/ResetPasswordForm";
+import { ResetPasswordForm } from "deprecated/components/forms";
+import { IResetPasswordFormValues } from "deprecated/components/forms/ResetPasswordForm";
 import { LandingFormContainer } from "deprecated/components/containers";
 
 import { UITokenNotificationRedirectData } from "./Notifications";

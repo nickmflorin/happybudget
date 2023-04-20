@@ -1,4 +1,4 @@
-import { type Store as RootStore, type ReducersMapObject } from "redux";
+import { type Store as RootStore } from "redux";
 import { type Saga } from "redux-saga";
 
 import { model } from "lib";

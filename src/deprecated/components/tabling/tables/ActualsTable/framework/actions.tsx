@@ -2,8 +2,8 @@ import * as api from "api";
 import * as config from "application/config";
 import { model } from "lib";
 import { Icon } from "components";
-import { ImportActualsDropdownMenu } from "components/dropdowns";
-import { ImportActualsMenuItemModel } from "components/dropdowns/ImportActualsDropdownMenu";
+import { ImportActualsDropdownMenu } from "deprecated/components/dropdowns";
+import { ImportActualsMenuItemModel } from "deprecated/components/dropdowns/ImportActualsDropdownMenu";
 
 type ImportActualsActionProps<
   R extends Table.RowData,

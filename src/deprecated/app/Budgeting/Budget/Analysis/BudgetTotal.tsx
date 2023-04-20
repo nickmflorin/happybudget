@@ -7,7 +7,7 @@ import { useHistory } from "react-router-dom";
 import { redux, model, hooks, util, ui, formatters } from "lib";
 import { NoData } from "components";
 import { BudgetTotalChart } from "components/charts";
-import { BudgetTotalChartForm, BudgetTotalChartFormValues } from "components/forms";
+import { BudgetTotalChartForm, BudgetTotalChartFormValues } from "deprecated/components/forms";
 import { DEFAULT_COLOR_SCHEME, Colors } from "deprecated/style/constants";
 import { Tile } from "deprecated/components/containers";
 

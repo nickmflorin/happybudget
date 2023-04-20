@@ -1,10 +1,10 @@
 import type { NextPage } from "next";
 
-import * as config from "application/config";
-import { Page } from "deprecated/components/layoutOld";
+import { config } from "application";
+import { Page } from "components/layout";
 
 const Dashboard: NextPage = () => (
-  <Page id={config.PageIds.DASHBOARD}>
+  <Page id={config.PageIds.BUDGETS}>
     <h4>Welcome to HappyBudget</h4>
   </Page>
 );

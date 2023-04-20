@@ -1,9 +1,7 @@
 import { orderBy as rootOrderBy, sortBy, findIndex } from "lodash";
-import { Moment } from "moment";
 
-import { type Ordering, type FieldOrder } from "api";
-
-import { dates } from "../util";
+import { api } from "application";
+import { logger } from "internal";
 
 import { ApiModel } from "./types";
 import { User } from "./user";
@@ -33,25 +31,26 @@ import { User } from "./user";
  */
 export const orderModelsBy = <M extends ApiModel, F extends string & keyof M>(
   data: M[],
-  ordering: Ordering<F>,
+  ordering: api.Ordering<F>,
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars -- We need to reincorporate timezone support for user. */
   user?: User | null,
 ): M[] => {
   // We are only concerned with fields in the ordering that have a non-0 order.
   const fields = ordering
-    .filter((o: FieldOrder<F>) => o.order !== 0)
-    .map((o: FieldOrder<F>) => o.field);
+    .filter((o: api.FieldOrder<F>) => o.order !== 0)
+    .map((o: api.FieldOrder<F>) => o.field);
 
   /* The lodash orderBy method requires that we specify the ordering as "asc" or "desc". */
   const directions: ("asc" | "desc")[] = ordering
-    .filter((o: FieldOrder<F>) => o.order !== 0)
-    .map((o: FieldOrder<F>) => (o.order === 1 ? "asc" : "desc"));
+    .filter((o: api.FieldOrder<F>) => o.order !== 0)
+    .map((o: api.FieldOrder<F>) => (o.order === 1 ? "asc" : "desc"));
 
   /* A model that is comprised of the numeric ID and any field-value pairs indicated by the fields
      of the ordering. */
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   // type ModelFromOrderedFields = HttpModel & { [key in F]: any };
 
-  type ModelWithOrderableFields = { id: M["id"] } & { [key in F]: M[key] | Moment };
+  type ModelWithOrderableFields = { id: M["id"] } & { [key in F]: M[key] | Date };
 
   /* Using each provided original model and the fields in the provided ordering,
      create a new object that contains the ID of the original model and the
@@ -66,14 +65,17 @@ export const orderModelsBy = <M extends ApiModel, F extends string & keyof M>(
         (prevModel: ModelWithOrderableFields, f: F): ModelWithOrderableFields => {
           const v = m[f as keyof M];
           /* If the value of the model field can be treated as a date, we should convert it to a
-             date such that the Moment object is what the field is ordered by. */
+             date such that the Date object is what the field is ordered by. */
           if (typeof v === "string") {
-            const vAsDate = dates.toLocalizedMoment(v, {
-              warnOnInvalid: false,
-              tz: user?.timezone,
-            });
-            if (vAsDate !== undefined) {
-              return { ...prevModel, [f]: vAsDate };
+            // TODO: Incorporate User's TimeZone
+            const timestamp = Date.parse(v);
+            if (!isNaN(timestamp)) {
+              return { ...prevModel, [f]: new Date(timestamp) };
+            } else {
+              logger.warn(
+                { id: m.id, field: f, value: v, model: JSON.stringify(m) },
+                `Detected an invalid date '${v}' for field '${f}' of model with ID '${m.id}'`,
+              );
             }
           }
           return { ...prevModel, [f]: v };
