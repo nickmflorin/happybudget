@@ -109,7 +109,7 @@
         flex-direction: column;
 
         .ag-header {
-          box-shadow: inset 0 -2px 0 partials.$table-header-bottom-border-color;
+          // box-shadow: inset 0 -2px 0 partials.$table-header-bottom-border-color;
           height: partials.$table-header-height !important;
           max-height: partials.$table-header-height !important;
           min-height: partials.$table-header-height !important;

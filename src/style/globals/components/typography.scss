@@ -2,22 +2,22 @@
 
 @use "partials";
 
-@include partials.font-face("Avenir", "Light", 300 399);
-@include partials.font-face("Avenir", "Regular", 400 499);
-@include partials.font-face("Avenir", "Regular", 400 499, italic);
-@include partials.font-face("Avenir", "Medium", 500 599);
-@include partials.font-face("Avenir", "SemiBold", 600 699);
-@include partials.font-face("Avenir", "SemiBold", 600 699, italic);
-@include partials.font-face("Avenir", "Bold", 700);
-@include partials.font-face("Avenir", "Bold", 700, italic);
+@include partials.font-face("avenir", "Light", 300 399);
+@include partials.font-face("avenir", "Regular", 400 499);
+@include partials.font-face("avenir", "Regular", 400 499, italic);
+@include partials.font-face("avenir", "Medium", 500 599);
+@include partials.font-face("avenir", "SemiBold", 600 699);
+@include partials.font-face("avenir", "SemiBold", 600 699, italic);
+@include partials.font-face("avenir", "Bold", 700);
+@include partials.font-face("avenir", "Bold", 700, italic);
 
-@include partials.font-face("Roboto", "Light", 300 399);
-@include partials.font-face("Roboto", "Light", 300 399, italic);
-@include partials.font-face("Roboto", "Regular", 400 499);
-@include partials.font-face("Roboto", "Medium", 500 699);
-@include partials.font-face("Roboto", "Medium", 500 699, italic);
-@include partials.font-face("Roboto", "Bold", 700);
-@include partials.font-face("Roboto", "Bold", 700, italic);
+@include partials.font-face("roboto", "Light", 300 399);
+@include partials.font-face("roboto", "Light", 300 399, italic);
+@include partials.font-face("roboto", "Regular", 400 499);
+@include partials.font-face("roboto", "Medium", 500 699);
+@include partials.font-face("roboto", "Medium", 500 699, italic);
+@include partials.font-face("roboto", "Bold", 700);
+@include partials.font-face("roboto", "Bold", 700, italic);
 
 %typography-base {
   font-feature-settings: "tnum" on, "lnum" on;
@@ -234,20 +234,9 @@ h6 {
     @include partials.size(14px);
 
     color: partials.get-icon-color("grey");
-    vertical-align: -0.125em !important;
   }
 
   > .attachment-text__sub-text {
     @include partials.font("body", $font-weight-name: "regular", $level: 4);
-  }
-}
-
-// We want to delete this.
-.text-with-included-link {
-  .link,
-  .btn {
-    font-size: $medium-body-font-size;
-    line-height: 16px;
-    vertical-align: 0.225rem;
   }
 }
