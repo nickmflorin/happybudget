@@ -13,7 +13,7 @@ $font-family-folder-names: (
   "avenir": "AvenirNext",
   "roboto": "Roboto",
 );
-$font-family-style-folder-namess: (
+$font-family-style-folder-names: (
   "avenir": (
     "Bold",
     "Light",
@@ -84,16 +84,16 @@ $typography-default-levels: (
 /* -------------------------------------- Font Families ----------------------------------------- */
 $font-family-avenir: avenir;
 $font-family-roboto: roboto;
-$font-family-names: ($font-family-avenir, $font-family-roboto);
+$font-families: ($font-family-avenir, $font-family-roboto);
 
-$heading-font-family-name: $font-family-avenir;
-$body-font-family-name: $font-family-avenir;
-$label-font-family-name: $font-family-avenir;
+$heading-font-family: $font-family-avenir;
+$body-font-family: $font-family-avenir;
+$label-font-family: $font-family-avenir;
 
 $typography-font-families: (
-  "heading": $heading-font-family-name,
-  "body": $body-font-family-name,
-  "label": $label-font-family-name,
+  "heading": $heading-font-family,
+  "body": $body-font-family,
+  "label": $label-font-family,
 );
 
 @function get-font-family($type) {
@@ -175,11 +175,13 @@ $label-line-heights: (
 $large-heading-font-size: 32px;
 $medium-heading-font-size: 24px;
 $small-heading-font-size: 20px;
+$xsmall-heading-font-size: 18px;
 
 $heading-font-size-scale: (
   "large": $large-heading-font-size,
   "medium": $medium-heading-font-size,
   "small": $small-heading-font-size,
+  "xsmall": $xsmall-heading-font-size,
 );
 
 $heading-font-sizes: (
@@ -208,14 +210,14 @@ $typography-line-heights: (
   "label": $label-line-heights,
 );
 
-@function get-font-size($type, $level: null) {
+@function get-font-size($type, $args...) {
   $type: fn.validate-value($type, $typography-types);
-  @return fn.map-get($typography-font-sizes, $type, $level: parse-level($type, $level: $level));
+  @return fn.map-get($typography-font-sizes, $type, parse-level($type, $args...));
 }
 
-@function get-line-height($type, $level: null) {
+@function get-line-height($type, $args...) {
   $type: fn.validate-value($type, $typography-types);
-  @return fn.map-get($typography-line-heights, $type, $level: parse-level($type, $level: $level));
+  @return fn.map-get($typography-line-heights, $type, parse-level($type, $args...));
 }
 
 @mixin font-size($type, $level: null) {
@@ -312,7 +314,7 @@ $font-family-weights: (
 );
 
 @function get-font-family-weight($family, $weight-name) {
-  $family: fn.validate-value($family, $font-family-names);
+  $family: fn.validate-value($family, $font-families);
   $weight-name: fn.validate-value($weight-name, $font-weight-names);
   @return fn.map-get($font-family-weights, $family, $weight-name);
 }
@@ -362,7 +364,7 @@ $font-family-styles: (
 );
 
 @function font-family-style-is-supported($family, $font-style, $throw: true) {
-  $family: fn.validate-value($family, $font-family-names);
+  $family: fn.validate-value($family, $font-families);
   $font-style: fn.validate-value($font-style, (normal, italic));
   @if fn.in-list($font-style, fn.map-get($font-family-styles, $family)) {
     @return true;
@@ -400,7 +402,7 @@ $label-font-weight-names: (
   3: "regular",
 );
 
-$font-weight-names: (
+$typography-weight-names: (
   "label": $label-font-weight-names,
   "body": $body-font-weight-names,
   "heading": $heading-font-weight-names,
@@ -408,17 +410,16 @@ $font-weight-names: (
 
 @function parse-weight-name($type, $args...) {
   $type: fn.validate-value($type, $typography-types);
-  $level: parse-level($type, $level: $level);
-  $default-weight-name: get-font-weight-name($type, $level);
+  $default-weight-name: get-font-weight-name($type, $args...);
   $weight-name: fn.get-optional-kwarg("font-weight-name", $default: $default-weight-name, $args...);
   $weight-name: fn.validate-value($weight-name, $font-weight-names);
   @return $weight-name;
 }
 
-@function get-font-weight-name($type, $level: null) {
+@function get-font-weight-name($type, $args...) {
   $type: fn.validate-value($type, $typography-types);
-  $level: parse-level($type, $level: $level);
-  @return fn.map-get($default-font-weight-names, $type, $level);
+  $level: parse-level($type, $args...);
+  @return fn.map-get($typography-weight-names, $type, $level);
 }
 
 @function get-font-weight($type, $args...) {
@@ -443,13 +444,13 @@ $font-weight-names: (
   font-weight: get-font-weight("label", $args...);
 }
 
-@function get-font($type, $level: null, $font-weight-name: null, $args...) {
+@function get-font($type, $args...) {
   $properties: (
-    font-family: get-font-family($type, $level),
-    font-weight: get-font-weight($type, $level: $level, $font-weight-name: $font-weight-name),
-    color: fn.get-optional-arg("color", $default: get-font-color($type), $args...),
-    line-height: get-line-height($type, $level: $level),
-    font-size: get-font-size($type, $level: $level),
+    font-family: get-font-family($type),
+    font-weight: get-font-weight($type, $args...),
+    color: fn.get-optional-kwarg(color, $default: get-font-color($type), $args...),
+    line-height: get-line-height($type, $args...),
+    font-size: get-font-size($type, $args...),
   );
   $overrides: map.get(meta.keywords($args), "override");
   @if $overrides {
@@ -481,7 +482,7 @@ $font-weight-names: (
 }
 
 @function font-file-path($family, $style, $extension, $font-style: normal) {
-  $family: fn.validate-value($family, $font-family-names);
+  $family: fn.validate-value($family, $font-families);
   $font-style: fn.validate-value($font-style, $font-family-font-styles);
   $style-folder-name: fn.validate-value(
     $style,
@@ -496,7 +497,7 @@ $font-weight-names: (
 }
 
 @function font-url($family, $style, $extension, $font-style: normal) {
-  $family: fn.validate-value($family, $font-family-names);
+  $family: fn.validate-value($family, $font-families);
   $font-style: fn.validate-value($font-style, $font-family-font-styles);
   $style: fn.validate-value($style, fn.map-get($font-family-style-folder-names, $family));
   $extension: fn.validate-value($extension, $font-family-extensions);
@@ -510,7 +511,7 @@ $font-weight-names: (
 @function font-src($family, $style, $font-style: normal) {
   $src: null;
   $font-style: fn.validate-value($font-style, $font-family-font-styles);
-  $family: fn.validate-value($family, $font-family-names);
+  $family: fn.validate-value($family, $font-families);
   $style: fn.validate-value($style, fn.map-get($font-family-style-folder-names, $family));
   @each $ext in $font-family-extensions {
     $src: list.append($src, font-url($family, $style, $ext, $font-style), comma);

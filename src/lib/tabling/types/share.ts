@@ -15,5 +15,5 @@ export type ShareConfig<
   readonly onCreated?: (token: model.PublicToken) => void;
   readonly onUpdated?: (token: model.PublicToken) => void;
   readonly onDeleted?: () => void;
-  readonly create: typeof api.createBudgetPublicToken
+  readonly create: typeof api.createBudgetPublicToken;
 };

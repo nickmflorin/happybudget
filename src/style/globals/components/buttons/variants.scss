@@ -6,7 +6,7 @@
 @use "partials";
 
 @mixin solid-variant() {
-  @each $variant in fn.map-get(partials.$button-variant-map, "solid") {
+  @each $variant in partials.map-get(partials.$button-variant-map, "solid") {
     @include partials.button-colors($variant: "solid", $sub-variant: $variant);
   }
 
@@ -39,7 +39,7 @@
     }
   }
 
-  @each $variant in fn.map-get(partials.$button-variant-map, "alternate") {
+  @each $variant in partials.map-get(partials.$button-variant-map, "alternate") {
     @include partials.button-colors($variant: "alternate", $sub-variant: $variant);
   }
 
@@ -105,11 +105,11 @@
     &.button--action--bare--color-#{$name} {
       color: $value;
 
-      @include focused {
+      @include partials.button-focused {
         color: partials.map-get($data, "focused");
       }
 
-      @include hovered {
+      @include partials.button-hovered {
         color: partials.map-get($data, "hovered");
       }
 
@@ -150,7 +150,7 @@
 
   aspect-ratio: 1;
 
-  @include partials.without-selectors(partials.$action-variants, $prefix: ".button--action--") {
+  @include partials.without-selectors($action-variants, $prefix: ".button--action--") {
     @include action-variant-properties($default-sub-variant);
   }
 
@@ -168,7 +168,7 @@
   } @else if string.quote($variant) == "alternate" {
     @include alternate-variant;
   } @else if string.quote($variant) == "action" {
-    @include action;
+    @include action-variant;
   } @else {
     @error "The provided variant #{meta.inspect($variant)} is not a supported primary variant.";
   }

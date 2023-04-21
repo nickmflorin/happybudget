@@ -21,42 +21,22 @@ $global-feedback-line-height: $global-feedback-height - 2 * $global-feedback-pad
   line-height: $global-feedback-line-height;
 }
 
-$success-border-color: #219653;
-$success-color: colors.$brand-dark-green;
-
-// $success-hover-color: color.adjust($success-color, $lightness: -30%);
-$success-bg-color: color.change($success-border-color, $alpha: 0.05);
-$success-input-border-color: colors.$brand-green;
-$success-icon-color: $success-color;
-
-$error-color: #ed4e69;
-$error-border-color: #eb5757;
-$error-bg-color: #fef6f6;
-$error-icon-color: $error-color;
-$error-input-border-color: colors.$red;
-
-$warning-input-border-color: #e0b223;
-$warning-border-color: #e0b223;
-$warning-color: colors.$text-grey;
-$warning-bg-color: #fffbec;
-$warning-icon-color: $warning-border-color;
-
 $feedback-input-border-colors: (
-  "warning": $warning-input-border-color,
-  "error": $error-input-border-color,
-  "success": $success-input-border-color,
+  "warning": colors.$warning-input-border-color,
+  "error": colors.$error-input-border-color,
+  "success": colors.$success-input-border-color,
 );
 
 $feedback-border-colors: (
-  "warning": $warning-border-color,
-  "error": $error-border-color,
-  "success": $success-border-color,
+  "warning": colors.$warning-border-color,
+  "error": colors.$error-border-color,
+  "success": colors.$success-border-color,
 );
 
 $feedback-colors: (
-  "warning": $warning-color,
-  "error": $error-color,
-  "success": $success-color,
+  "warning": colors.$warning-color,
+  "error": colors.$error-color,
+  "success": colors.$success-color,
 );
 
 // The Design Comps do not include hovered or focused variations for colors that might be used in
@@ -67,15 +47,15 @@ $feedback-colors: (
 }
 
 $feedback-icon-colors: (
-  "warning": $warning-icon-color,
-  "error": $error-icon-color,
-  "success": $success-icon-color,
+  "warning": colors.$warning-icon-color,
+  "error": colors.$error-icon-color,
+  "success": colors.$success-icon-color,
 );
 
 $feedback-bg-colors: (
-  "warning": $warning-bg-color,
-  "error": $error-bg-color,
-  "success": $success-bg-color,
+  "warning": colors.$warning-bg-color,
+  "error": colors.$error-bg-color,
+  "success": colors.$success-bg-color,
 );
 
 @mixin with-feedback-types() {
@@ -91,20 +71,4 @@ $feedback-bg-colors: (
     );
     @content ($feedback, $data);
   }
-}
-
-/* ========================================== Exports =========================================== */
-:export {
-  errorBgColor: $error-bg-color;
-  errorBorderColor: $error-border-color;
-  errorColor: $error-color;
-  errorInputBorderColor: $error-input-border-color;
-  successBgColor: $success-bg-color;
-  successBorderColor: $success-border-color;
-  successColor: $success-color;
-  successInputBorderColor: $success-input-border-color;
-  warningBgColor: $warning-bg-color;
-  warningBorderColor: $warning-border-color;
-  warningColor: $warning-color;
-  warningInputBorderColor: $warning-input-border-color;
 }

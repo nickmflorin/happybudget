@@ -208,7 +208,7 @@ $catch-errors: false !default;
 /// thrown.  This mixin does not allow the `catch` parameter to be controlled on a case-by-case
 /// basis because a mixin does not return, making the intended purpose of using the `catch`
 /// parameter in effect pointless.
-@mixin error($message, $args...) {
+@mixin error-mixin($message, $args...) {
   @if map.get(meta.keywords($args), "catch") {
     @error "Errors cannot be caught via a mixin.";
   }

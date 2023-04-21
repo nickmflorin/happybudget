@@ -34,7 +34,8 @@ export type TableInstanceAttachmentAction = () => void;
 export type TableInstance<
   R extends rows.Row,
   M extends model.RowTypedApiModel = model.RowTypedApiModel,
-> = DataGridInstance & { // UINotificationsManager & {
+> = DataGridInstance & {
+  // UINotificationsManager & {
   readonly saving: (v: boolean) => void;
   readonly getColumns: () => columns.ModelColumn<R, M>[];
   readonly getFocusedRow: () => rows.RowSubType<R, rows.BodyRowType> | null;

@@ -36,10 +36,7 @@ export const isCSSSizeUnit = (value: string): value is types.CSSSizeUnit =>
  * @returns {value is types.CSSSize}
  */
 export const isCSSSize = (value: string | number): value is types.CSSSize => {
-  if (
-    typeof value === "number" ||
-    (typeof value === "string" && stringIsInteger(value))
-  ) {
+  if (typeof value === "number" || (typeof value === "string" && stringIsInteger(value))) {
     return true;
   }
   return validators.validateAny(
@@ -50,10 +47,7 @@ export const isCSSSize = (value: string | number): value is types.CSSSize => {
       if (tail.length === 0) {
         throw new Error("CSS Units cannot be empty strings.");
       }
-      return (
-        value.endsWith(tail) &&
-        stringIsInteger(value.slice(0, Math.max(tail.length - 1, 1)))
-      );
+      return value.endsWith(tail) && stringIsInteger(value.slice(0, Math.max(tail.length - 1, 1)));
     },
   );
 };

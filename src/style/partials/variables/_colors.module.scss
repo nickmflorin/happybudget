@@ -16,11 +16,13 @@ $off-white: #fbfbfb;
 $black: #000000;
 $transparent: rgb(0 0 0 / 0%);
 $standard-border-color: #cbd5e1;
-$standard-hover-color: rgb(232 232 232 / 50%);
-$standard-active-hover-color: #f1f1f1;
+$standard-hover-bg-color: rgb(232 232 232 / 50%);
+$standard-active-hover-bg-color: #f1f1f1;
 $standard-disabled-color: #d3d3d3;
 $standard-disabled-bg-color: #efefef;
 $standard-disabled-border-color: #d3d3d3;
+
+$content-bg-color: #f9f9f9;
 
 /* ----------------------------------------- Greens --------------------------------------------- */
 $green: #0fb767;
@@ -68,6 +70,27 @@ $lighter-purple: color.change($purple, $alpha: 0.6);
 $yellow: #efcd5d;
 $lighter-yellow: color.change($yellow, $alpha: 0.6);
 
+/* ----------------------------------------- States --------------------------------------------- */
+$success-border-color: #219653;
+$success-color: $dark-green;
+
+// $success-hover-color: color.adjust($success-color, $lightness: -30%);
+$success-bg-color: color.change($success-border-color, $alpha: 0.05);
+$success-input-border-color: $green;
+$success-icon-color: $success-color;
+
+$error-color: #ed4e69;
+$error-border-color: #eb5757;
+$error-bg-color: #fef6f6;
+$error-icon-color: $error-color;
+$error-input-border-color: $red;
+
+$warning-input-border-color: #e0b223;
+$warning-border-color: #e0b223;
+$warning-color: $text-grey;
+$warning-bg-color: #fffbec;
+$warning-icon-color: $warning-border-color;
+
 /* ========================================== Exports =========================================== */
 
 :export {
@@ -77,6 +100,10 @@ $lighter-yellow: color.change($yellow, $alpha: 0.6);
   darkGreen: $dark-green;
   darkRed: $dark-red;
   darkerLightGrey: $darker-light-grey;
+  errorBgColor: $error-bg-color;
+  errorBorderColor: $error-border-color;
+  errorColor: $error-color;
+  errorInputBorderColor: $error-input-border-color;
   fadedGreen: $faded-green;
   green: $green;
   grey: $grey;
@@ -98,14 +125,22 @@ $lighter-yellow: color.change($yellow, $alpha: 0.6);
   orange: $orange;
   purple: $purple;
   red: $red;
-  standardActiveHoverColor: $standard-active-hover-color;
+  standardActiveHoverBgColor: $standard-active-hover-bg-color;
   standardBorderColor: $standard-border-color;
   standardDisabledColor: $standard-disabled-color;
-  standardHoverColor: $standard-hover-color;
-  textGrey: $textGrey;
+  standardHoverBgColor: $standard-hover-bg-color;
+  successBgColor: $success-bg-color;
+  successBorderColor: $success-border-color;
+  successColor: $success-color;
+  successInputBorderColor: $success-input-border-color;
+  textGrey: $text-grey;
   textPrimary: $text-primary;
   textSecondary: $text-secondary;
   transparent: $transparent;
+  warningBgColor: $warning-bg-color;
+  warningBorderColor: $warning-border-color;
+  warningColor: $warning-color;
+  warningInputBorderColor: $warning-input-border-color;
   white: $white;
   yellow: $yellow;
 }

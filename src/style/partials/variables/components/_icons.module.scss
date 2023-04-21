@@ -46,9 +46,9 @@ $icon-colors: map.merge(
       "blue": colors.$dark-blue,
     ),
     "disabled": (
-      "brand": colors.$disabled-color,
-      "grey": colors.$disabled-color,
-      "blue": colors.$disabled-color,
+      "brand": colors.$standard-disabled-color,
+      "grey": colors.$standard-disabled-color,
+      "blue": colors.$standard-disabled-color,
     ),
   )
 );

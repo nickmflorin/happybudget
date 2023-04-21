@@ -17,7 +17,7 @@ button {
   outline-offset: -1 * partials.$button-outline-width;
 
   @include partials.with-selectors(
-    (variants.$button-locked-class, variants.$button-loading-class)
+    (partials.$button-locked-class, partials.$button-loading-class)
   ) {
     pointer-events: none;
   }
@@ -142,19 +142,9 @@ button {
   @include partials.button-colors(
     $color: partials.$text-primary,
     $hovered: (
-      $color: partials.$white,
+      color: partials.$white,
     )
   );
-
-  > .icon {
-    color: $white;
-  }
-
-  &:hover {
-    .icon {
-      color: $white;
-    }
-  }
 }
 
 .button--clear,
@@ -162,7 +152,7 @@ button {
   @include partials.button-colors(
     $color: partials.$grey,
     $hovered: (
-      $color: partials.$medium-grey,
+      color: partials.$medium-grey,
     )
   );
 }
@@ -192,14 +182,14 @@ button {
   display: flex;
   text-transform: uppercase;
 
-  > .button__content {
-    > .button__sub-content {
-      display: none;
-      @include partials.media(">=large") {
-        display: block;
-      }
-    }
-  }
+  // > .button__content {
+  //   > .button__sub-content {
+  //     display: none;
+  //     @include partials.media(">=large") {
+  //       display: block;
+  //     }
+  //   }
+  // }
 }
 
 .button--inline {
@@ -223,7 +213,7 @@ button {
 //   &:disabled,
 //   &.fake-disabled {
 //     .icon {
-//       color: $disabled-color !important;
+//       color: $standard-disabled-color !important;
 //     }
 
 //     &:hover {

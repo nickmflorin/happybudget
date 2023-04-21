@@ -73,16 +73,3 @@ $axis-to-flex-direction: (
 @mixin fill-parent($dimension: "both") {
   @include size(100%, $dimension);
 }
-
-///  A mixin that will define the property in the directions associated with the provided axis or
-/// dimension.
-@mixin define-directional-property-on($property, $axis-or-dim, $value, $set-others: 0px) {
-  $dirs: fn.get-directions($axis-or-dim);
-  @each $dir in fn.$property-directions {
-    @if fn.in-list($dir, $dirs) {
-      #{$property}-#{$dir}: #{$value};
-    } @else if $set-others != null {
-      #{$property}-#{$dir}: #{$set-others};
-    }
-  }
-}

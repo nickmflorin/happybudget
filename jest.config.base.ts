@@ -35,13 +35,14 @@ const createBaseConfig = (
      other conflicting versions. */
   prettierPath: `${__dirname}/node_modules/.bin/prettier`,
   testEnvironment: "jest-environment-jsdom",
-  globalSetup: `${__dirname}/src/support/global-test-setup.ts`,
+  globalSetup: `${__dirname}/src/application/support/global-test-setup.ts`,
   // This is required to support absolute imports in tests.
   moduleDirectories: [`${__dirname}/node_modules`, `${__dirname}/src`, `${__dirname}/src/style`],
   // Jest does not let us exclude `js` as a `moduleFileExtension` - the others make sense.
   moduleFileExtensions: ["ts", "js", "tsx", "scss"],
   testPathIgnorePatterns: [
     `${__dirname}/node_modules/`,
+    `${__dirname}/src/deprecated/`,
     `${__dirname}/.next/`,
     ...(mergeOverrides?.testPathIgnorePatterns || []),
   ],
@@ -114,7 +115,7 @@ export const withTypescriptConfig = (
   ...config,
   setupFilesAfterEnv: [
     ...(config.setupFilesAfterEnv || []),
-    "./src/support/global-ts-test-setup.ts",
+    "./src/application/support/global-ts-test-setup.ts",
     "jest-expect-message",
   ],
 });

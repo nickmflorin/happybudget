@@ -7,10 +7,10 @@
 $checkbox-size: 24px;
 $checkbox-border-radius: 3px;
 $checkbox-unchecked-border-color: input.$input-border-color;
-$checkbox-unchecked-background-color: #ffffff;
-$checkbox-checked-border-color: colors.$brand-mid-blue;
-$checkbox-checked-background-color: colors.$brand-mid-blue;
-$checkbox-checked-color: #ffffff;
+$checkbox-unchecked-background-color: colors.$white;
+$checkbox-checked-border-color: colors.$dark-green;
+$checkbox-checked-background-color: colors.$dark-green;
+$checkbox-checked-color: colors.$white;
 $checkbox-disabled-color: color.adjust(#606873, $alpha: -0.4);
 
 /*
@@ -18,8 +18,8 @@ These values were taken from AntD because there are no colors provided in design
 okay but may change in the future.
 */
 $checkbox-disabled-border-color: colors.$standard-border-color;
-$checkbox-disabled-background-color: #efefef;
-$checkbox-states: (checked, unchecked, disabled);
+$checkbox-disabled-background-color: colors.$light-grey;
+$checkbox-states: ("checked", "unchecked", "disabled");
 
 /* Internal properties that need to be defined to override AntD properties for each state. */
 $checkbox-state-properties: (

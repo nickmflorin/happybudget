@@ -44,7 +44,7 @@ $button-locked-class: ".button--locked";
 $button-loading-class: ".button--loading";
 
 /*
-Buttons and Anchors need to leverage an "outline" instead of a border, because an "outline" is inset
+Buttons and Anchors need to leverage an outline instead of a border, because an outline is inset
 and a border is outset.  In other words, the border will contribute size to the overall Button or
 Anchor, while the outline will not.
 */
@@ -167,20 +167,17 @@ $button-variant-colors: (
       "hovered": (
         background-color: colors.$dark-green,
         outline-color: colors.$dark-green,
-        outline: $button-outline-width solid colors.$dark-green,
       ),
       "focused": (
         background-color: colors.$dark-green,
         outline-color: colors.$dark-green,
-        outline: $button-outline-width solid colors.$dark-green,
       ),
       // We may want to treat disabled states for different variant colors differently in the
       // future, but for now they are mostly the same.
       "disabled":
         (
           color: colors.$standard-disabled-color,
-          outline-color: colors.$standard-disabled-border-olor,
-          outline: $button-outline-width solid colors.$standard-disabled-border-color,
+          outline-color: colors.$standard-disabled-border-color,
           background-color: colors.$standard-disabled-bg-color,
         ),
     ),
@@ -191,20 +188,17 @@ $button-variant-colors: (
       "hovered": (
         background-color: colors.$darker-light-grey,
         outline-color: colors.$darker-light-grey,
-        outline: $button-outline-width solid colors.$darker-light-grey,
       ),
       "focused": (
         background-color: colors.$darker-light-grey,
         outline-color: colors.$darker-light-grey,
-        outline: $button-outline-width solid colors.$darker-light-grey,
       ),
       // We may want to treat disabled states for different variant colors differently in the
       // future, but for now they are mostly the same.
       "disabled":
         (
           color: colors.$standard-disabled-color,
-          outline-color: colors.$standard-disabled-border-olor,
-          outline: $button-outline-width solid colors.$standard-disabled-border-color,
+          outline-color: colors.$standard-disabled-border-color,
           background-color: colors.$standard-disabled-bg-color,
         ),
     ),
@@ -232,20 +226,17 @@ $button-variant-colors: (
       "hovered": (
         background-color: colors.$dark-red,
         outline-color: colors.$dark-red,
-        outline: $button-outline-width solid colors.$dark-red,
       ),
       "focused": (
         background-color: colors.$dark-red,
         outline-color: colors.$dark-red,
-        outline: $button-outline-width solid colors.$dark-red,
       ),
       // We may want to treat disabled states for different variant colors differently in the
       // future, but for now they are mostly the same.
       "disabled":
         (
           color: colors.$standard-disabled-color,
-          outline-color: colors.$standard-disabled-border-olor,
-          outline: $button-outline-width solid colors.$standard-disabled-border-color,
+          outline-color: colors.$standard-disabled-border-color,
           background-color: colors.$standard-disabled-bg-color,
         ),
     ),
@@ -255,19 +246,16 @@ $button-variant-colors: (
       outline-color: colors.$light-grey,
       "hovered": (
         outline-color: colors.$grey,
-        outline: $button-outline-width solid colors.$grey,
       ),
       "focused": (
         outline-color: colors.$grey,
-        outline: $button-outline-width solid colors.$grey,
       ),
       // We may want to treat disabled states for different variant colors differently in the
       // future, but for now they are mostly the same.
       "disabled":
         (
           color: colors.$standard-disabled-color,
-          outline-color: colors.$standard-disabled-border-olor,
-          outline: $button-outline-width solid colors.$standard-disabled-border-color,
+          outline-color: colors.$standard-disabled-border-color,
         ),
     ),
   ),
@@ -279,20 +267,17 @@ $button-variant-colors: (
       "hovered": (
         background-color: colors.$dark-green,
         outline-color: colors.$dark-green,
-        outline: $button-outline-width solid colors.$dark-green,
       ),
       "focused": (
         background-color: colors.$dark-green,
         outline-color: colors.$dark-green,
-        outline: $button-outline-width solid colors.$dark-green,
       ),
       // We may want to treat disabled states for different variant colors differently in the
       // future, but for now they are mostly the same.
       "disabled":
         (
           color: colors.$standard-disabled-color,
-          outline-color: colors.$standard-disabled-border-olor,
-          outline: $button-outline-width solid colors.$standard-disabled-border-color,
+          outline-color: colors.$standard-disabled-border-color,
           background-color: colors.$standard-disabled-bg-color,
         ),
     ),
@@ -303,20 +288,17 @@ $button-variant-colors: (
       "hovered": (
         background-color: colors.$darker-light-grey,
         outline-color: colors.$darker-light-grey,
-        outline: $button-outline-width solid colors.$darker-light-grey,
       ),
       "focused": (
         background-color: colors.$darker-light-grey,
         outline-color: colors.$darker-light-grey,
-        outline: $button-outline-width solid colors.$darker-light-grey,
       ),
       // We may want to treat disabled states for different variant colors differently in the
       // future, but for now they are mostly the same.
       "disabled":
         (
           color: colors.$standard-disabled-color,
-          outline-color: colors.$standard-disabled-border-olor,
-          outline: $button-outline-width solid colors.$standard-disabled-border-color,
+          outline-color: colors.$standard-disabled-border-color,
           background-color: colors.$standard-disabled-bg-color,
         ),
     ),
@@ -347,20 +329,17 @@ $button-variant-colors: (
       "hovered": (
         background-color: colors.$dark-red,
         outline-color: colors.$dark-red,
-        outline: $button-outline-width solid colors.$dark-red,
       ),
       "focused": (
         background-color: colors.$dark-red,
         outline-color: colors.$dark-red,
-        outline: $button-outline-width solid colors.$dark-red,
       ),
       // We may want to treat disabled states for different variant colors differently in the
       // future, but for now they are mostly the same.
       "disabled":
         (
           color: colors.$standard-disabled-color,
-          outline-color: colors.$standard-disabled-border-olor,
-          outline: $button-outline-width solid colors.$standard-disabled-border-color,
+          outline-color: colors.$standard-disabled-border-color,
           background-color: colors.$standard-disabled-bg-color,
         ),
     ),
@@ -403,42 +382,81 @@ $button-variant-colors: (
   ),
 );
 
+$button-state-names: ("hovered", "focused", "disabled");
+
+@function map-has-state-key($data) {
+  @each $state-name in $button-state-names {
+    @if map.has-key($data, $state-name) {
+      @return true;
+    }
+  }
+  @return false;
+}
+
+@function parse-state-colors($attributes, $state-name, $args...) {
+  $state-name: fn.validate-value($state-name, $button-state-names);
+  $arguments: meta.keywords($args);
+  @if map.has-key($arguments, $state-name) {
+    $state: fn.map-get($arguments, $state-name);
+    @if map-has-state-key($state) {
+      @return throw.error(
+        "Detected nested state key(s) in state attribute #{$state-name}.  This will cause an infinite recursion.",
+        $source: "button-colors()"
+      );
+    }
+    // If the state defines an override for the outline-color, we need to also override the outline
+    // because it will have been defaulted in the original base set of attributes based on the
+    // outline color of the base state.
+    @if map.has-key($state, outline-color) and not map.has-key($state, outline) {
+      $state: map.set(
+        $state,
+        outline,
+        $button-outline-width solid fn.map-get($state, outline-color)
+      );
+    }
+
+    @return map.merge($attributes, $state);
+  }
+  @return null;
+}
+
 @mixin button-colors($args...) {
   $arguments: meta.keywords($args);
 
   @if map.has-key($arguments, "variant") {
     @if not map.has-key($arguments, "sub-variant") {
-      @return throw.error(
+      @include throw.error-mixin(
         "If the variant argument is provided, the 'sub-variant' must also be provided.",
         $source: "button-colors()",
         $variant: fn.map-get($arguments, "variant")
       );
+    } @else {
+      $variant: fn.validate-value(fn.map-get($arguments, "variant"), $button-primary-variants);
+      $sub-variant: fn.validate-value(
+        fn.map-get($arguments, "sub-variant"),
+        fn.map-get($button-variant-map, $variant)
+      );
+      $colors: fn.map-get($button-variant-colors, $variant, $sub-variant);
+      @include button-colors($colors...);
     }
-    $variant: fn.validate-value(fn.map-get($arguments, "variant"), $button-primary-variants);
-    $sub-variant: fn.validate-value(
-      fn.map-get($arguments, "sub-variant"),
-      fn.map-get($button-variant-map, $variant)
-    );
-    $colors: fn.map-get($button-variant-colors, $variant, $sub-variant);
-    @include button-colors($colors...);
   } @else {
     $background-color: fn.get-optional-kwarg(
-      "background-color",
+      background-color,
       $default: colors.$transparent,
       $args...
     );
-    $outline-color: fn.get-optional-kwarg("outline-color", $default: $background-color, $args...);
+    $outline-color: fn.get-optional-kwarg(outline-color, $default: $background-color, $args...);
     $outline: fn.get-optional-kwarg(
-      "outline",
+      outline,
       $default: $button-outline-width solid $outline-color,
       $args...
     );
 
-    $attibutes: (
+    $attributes: (
       background-color: $background-color,
       outline-color: $outline-color,
       outline: $outline,
-      color: fn.get-optional-kwarg("color", $default: null, $args...),
+      color: fn.get-optional-kwarg(color, $default: null, $args...),
     );
 
     @each $attr in map.keys($attributes) {
@@ -449,60 +467,33 @@ $button-variant-colors: (
     }
     // If a 'hovered' argument is provided, include this mixin recursively to define the colors of
     // the button when it is hovered.
-    @if map.has-key($arguments, "hovered") {
-      $hovered: fn.map-get($arguments, "hovered");
-      @if map.has-key($hovered, "hovered") or
-        map.has-key($hovered, "focused") or
-        map.has-key($hovered, "disabled")
-      {
-        @return throw.error(
-          "Detected nested state key(s) in hovered state attribute.  This will cause an infinite recursion.",
-          $source: "button-colors()"
-        );
-      }
+    $hovered: parse-state-colors($attributes, "hovered", $args...);
+    @if $hovered {
       @include button-hovered {
-        // Use the original, non-hovered and non-focused attributes as defaults such that only the
-        // hovered attributes that are provided are overridden when the button is hovered.
+        // Use the original, non-hovered and non-focused attributes as defaults such that only
+        // the hovered attributes that are provided are overridden when the button is hovered.
         $hovered: map.merge($attributes, $hovered);
         @include button-colors($hovered...);
       }
     }
     // If a 'focused' argument is provided, include this mixin recursively to define the colors of
     // the button when it is focused.
-    @if map.has-key($arguments, "focused") {
-      $focused: fn.map-get($arguments, "focused");
-      @if map.has-key($hovered, "hovered") or
-        map.has-key($hovered, "focused") or
-        map.has-key($hovered, "disabled")
-      {
-        @return throw.error(
-          "Detected nested state key(s) in focused state attribute.  This will cause an infinite recursion.",
-          $source: "button-colors()"
-        );
-      }
+    $focused: parse-state-colors($attributes, "focused", $args...);
+    @if $focused {
       @include button-focused {
-        // Use the original, non-hovered and non-focused attributes as defaults such that only the
-        // focused attributes that are provided are overridden when the button is focused.
+        // Use the original, non-hovered and non-focused attributes as defaults such that only
+        // the hovered attributes that are provided are overridden when the button is hovered.
         $focused: map.merge($attributes, $focused);
         @include button-colors($focused...);
       }
     }
-    // If a 'focused' argument is provided, include this mixin recursively to define the colors of
-    // the button when it is focused.
-    @if map.has-key($arguments, "disabled") {
-      $disabled: fn.map-get($arguments, "disabled");
-      @if map.has-key($hovered, "hovered") or
-        map.has-key($hovered, "focused") or
-        map.has-key($hovered, "disabled")
-      {
-        @return throw.error(
-          "Detected nested state key(s) in disabled state attribute.  This will cause an infinite recursion.",
-          $source: "button-colors()"
-        );
-      }
+    // If a 'disabled' argument is provided, include this mixin recursively to define the colors
+    // of the button when it is disabled.
+    $disabled: parse-state-colors($attributes, "disabled", $args...);
+    @if $disabled {
       @include mixins.disabled {
-        // Use the original, non-hovered and non-focused attributes as defaults such that only the
-        // focused attributes that are provided are overridden when the button is focused.
+        // Use the original, non-hovered and non-focused attributes as defaults such that only
+        // the hovered attributes that are provided are overridden when the button is hovered.
         $disabled: map.merge($attributes, $disabled);
         @include button-colors($disabled...);
       }

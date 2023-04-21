@@ -51,7 +51,7 @@
 }
 
 .strikethrough {
-  color: $gray;
+  color: partials.$text-grey;
   text-decoration: line-through;
 }
 
@@ -59,8 +59,8 @@ html,
 body {
   @extend %typography-base;
 
-  font-family: partials.$body-font-family-name, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  font-family: partials.$body-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
 }
 
 p {
@@ -197,7 +197,7 @@ h6 {
   @include partials.font-weight("body", $font-weight-name: "bold");
   @include partials.truncate;
 
-  font-family: partials.$body-font-family-name;
+  font-family: partials.$body-font-family;
   font-size: partials.$entity-text-font-size;
   width: 100%;
 
@@ -233,7 +233,7 @@ h6 {
   > .icon {
     @include partials.size(14px);
 
-    color: partials.map-get(partials.$icon-colors, "grey");
+    color: partials.get-icon-color("grey");
     vertical-align: -0.125em !important;
   }
 

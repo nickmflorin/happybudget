@@ -35,11 +35,13 @@
   }
 
   .text-container {
-    color: partials.$text-grey;
-    font-family: partials.$roboto;
-    font-size: partials.$medium-body-font-size;
-    font-weight: 500;
-    line-height: partials.$large-size;
+    @include partials.font(
+      "body",
+      $level: 3,
+      $font-weight-name: "medium",
+      $overrides: (color: partials.$text-grey, font-family: partials.$font-family-roboto)
+    );
+
     text-transform: uppercase;
     width: 105px;
   }

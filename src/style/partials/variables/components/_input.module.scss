@@ -1,7 +1,9 @@
 @use "sass:color";
 @use "sass:list";
 
+@use "../../functions" as fn;
 @use "../colors.module" as colors;
+@use "./icons.module" as icons;
 @use "./typography.module" as typography;
 
 $input-color: typography.$body-color;
@@ -12,17 +14,17 @@ $input-bg-color: colors.$white;
 
 $input-border-color: colors.$standard-border-color;
 $input-focused-border-color: $input-border-color;
-$input-border-radius: 6px;
+$input-border-radius: 4px;
 $input-disabled-bg-color: colors.$standard-disabled-bg-color;
 $input-height: 44px;
 
-// $input-affix-color: colors.$blue;
+$input-affix-color: fn.map-get(icons.$icon-colors, "grey");
 
 $input-color: colors.$text-primary;
 $input-border: 1px solid $input-border-color;
 $input-placeholder-color: color.change(#606873, $alpha: 0.6);
 
-// $input-caret-color: colors.$brand-green;
+$input-caret-color: fn.map-get(icons.$icon-colors, "grey");
 
 $input-height: 44px;
 $text-input-padding: 10px 16px;
@@ -40,8 +42,6 @@ $select-line-height: $input-height - 2 * list.nth($select-padding, 1);
 $select-option-padding: 8px 16px;
 $select-option-height: 40px;
 $select-option-line-height: $select-option-height - 2 * list.nth($select-option-padding, 1);
-
-$menu-shadow: 2px 4px 4px rgb(66 66 66 / 5%);
 
 /* ========================================== Exports =========================================== */
 :export {

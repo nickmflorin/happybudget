@@ -58,7 +58,7 @@
     @include partials.border(partials.$input-border-color);
 
     border-radius: partials.$input-border-radius;
-    box-shadow: partials.$menu-shadow;
+    box-shadow: none;
     box-sizing: border-box;
     left: 0px;
     margin-top: 4px;
@@ -72,7 +72,7 @@
 
   &__option {
     align-items: center;
-    background-color: #ffffff;
+    background-color: partials.$white;
     box-sizing: border-box;
     cursor: default;
     display: flex;
@@ -80,20 +80,25 @@
     height: partials.$select-option-height;
     line-height: partials.$select-option-line-height;
     padding: partials.$select-option-padding;
-    -webkit-tap-highlight-color: rgb(0 0 0 / 0%);
+    -webkit-tap-highlight-color: partials.$transparent;
     user-select: none;
     width: 100%;
 
+    &:current {
+      background-color: partials.$standard-active-hover-bg-color;
+    }
+
     &:hover {
-      background-color: partials.$highlight-blue;
+      background-color: partials.$standard-hover-bg-color;
     }
 
     &:active {
-      background-color: partials.$highlight-blue;
-    }
+      // TODO: Make this different from hovered color.
+      background-color: partials.$standard-hover-bg-color;
 
-    &:current {
-      background-color: partials.$highlight-blue;
+      &:hover {
+        background-color: partials.$standard-active-hover-bg-color;
+      }
     }
 
     &--multi-checkbox {

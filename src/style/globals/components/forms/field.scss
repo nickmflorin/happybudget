@@ -19,7 +19,7 @@ $field-part-separation: 4px;
   }
 
   > .field__help-text {
-    @include partials.typography-style("body", $level: 4, $override: (line-height: 16px));
+    @include partials.font("body", $level: 4, $override: (line-height: 16px));
 
     margin-top: $field-part-separation;
   }

@@ -71,7 +71,7 @@
 }
 
 .field-feedback {
-  @include partials.typography-style("body", $level: 4);
+  @include partials.font("body", $level: 4);
 
   @include partials.with-feedback-types using ($feedback, $data) {
     &--#{$feedback} {

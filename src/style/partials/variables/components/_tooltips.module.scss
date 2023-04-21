@@ -6,14 +6,14 @@
 @use "./typography.module" as typography;
 
 $tooltip-font-size: typography.$standard-body-font-size;
-$tooltip-font-family: typography.$avenir;
+$tooltip-font-family: typography.$font-family-avenir;
 $tooltip-border-radius: 8px;
 $tooltip-font-weight: 500;
 
 $tooltip-default-color: colors.$text-secondary;
 $tooltip-default-border-color: colors.$standard-border-color;
 $tooltip-default-bg-color: colors.$white;
-$tooltip-default-disabled-bg-color: colors.$input-disabled-bg-color;
+$tooltip-default-disabled-bg-color: colors.$standard-disabled-bg-color;
 $tooltip-default-disabled-color: colors.$standard-disabled-color;
 $tooltip-disabled-border-color: colors.$standard-disabled-border-color;
 
@@ -108,14 +108,14 @@ $tooltip-style-properties: (
       $default: $tooltip-default-disabled-border-color,
       $args...
     );
-    $disabled-color: fn.get-optional-kwarg(
+    $standard-disabled-color: fn.get-optional-kwarg(
       "disabled-color",
       $default: $tooltip-default-disabled-color,
       $args...
     );
 
     @include tooltip-style(
-      $color: $disabled-color,
+      $color: $standard-disabled-color,
       $border-color: $disabled-border-color,
       $bg-color: $disabled-bg-color
     );

@@ -121,14 +121,16 @@
   }
 
   &.icon--row-drag {
-    color: partials.get-icon-color("grey");
+    $ic: partials.get-icon-color("grey");
+
+    color: $ic;
 
     &:hover {
-      color: color.lighten($icon-color, 20%);
+      color: color.adjust($ic, $lightness: 20%);
     }
 
     &:active {
-      color: color.lighten($icon-color, 20%);
+      color: color.adjust($ic, $lightness: 20%);
     }
   }
 }

@@ -21,13 +21,13 @@ $table-row-border-color: colors.$standard-border-color;
 $table-cell-horizontal-padding: 4px;
 
 $table-body-typography: map.set(
-  typography.get-typography("body", $font-weight-name: "regular", $level: 1),
+  typography.get-font("body", $font-weight-name: "regular", $level: 1),
   line-height,
   24px
 );
 
 $table-header-typography: map.merge(
-  typography.get-typography("body", $font-weight-name: "bold", $level: 2),
+  typography.get-font("body", $font-weight-name: "bold", $level: 2),
   (
     line-height: 24px,
     text-transform: uppercase,
@@ -57,7 +57,7 @@ $table-brand-theme-vars: (
   header-background-color: $table-bg-color,
   // This needs to be transparent such that it does not cover up the 2px green border underneath
   // the header row.
-  header-cell-hover-background-color: transparent,
+  header-cell-hover-background-color: colors.$transparent,
   header-cell-moving-background-color: $table-bg-color,
 
   // We might need to show this when we're doing column resizing.
@@ -71,7 +71,7 @@ $table-brand-theme-vars: (
   border-color: $table-border-color,
   selected-row-background-color: $table-bg-color,
   row-border-width: 1px,
-  row-hover-color: colors.$highlight-blue,
+  row-hover-color: colors.$transparent,
   odd-row-background-color: $table-bg-color,
 );
 
