@@ -1,4 +1,7 @@
-import { enumeratedLiterals, EnumeratedLiteralType } from "lib";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { enumeratedLiterals } from "lib/util/literals";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { EnumeratedLiteralType } from "lib/util/types/literals";
 
 import { HttpMethod } from ".";
 

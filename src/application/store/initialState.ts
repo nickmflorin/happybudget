@@ -1,5 +1,3 @@
-import { model, tabling } from "lib";
-
 import * as api from "../api";
 
 import * as types from "./types";
@@ -17,13 +15,13 @@ export const initialListResponseState = <
 });
 
 export const initialApiModelListResponseState = <
-  M extends model.ApiModel,
+  M extends import("lib/model/types").ApiModel,
 >(): types.ApiModelListStore<M> => ({
   ...initialListResponseState<M>(),
 });
 
 export const initialAuthenticatedApiModelListResponseState = <
-  M extends model.ApiModel,
+  M extends import("lib/model/types").ApiModel,
 >(): types.AuthenticatedApiModelListStore<M> => ({
   ...initialApiModelListResponseState<M>(),
   search: "",
@@ -36,7 +34,9 @@ export const initialAuthenticatedApiModelListResponseState = <
   error: null,
 });
 
-export const initialTableState = <R extends tabling.Row>(): types.TableStore<R> => ({
+export const initialTableState = <
+  R extends import("lib/tabling/rows/types").Row,
+>(): types.TableStore<R> => ({
   data: [],
   loading: false,
   search: "",
@@ -48,7 +48,7 @@ export const initialTableState = <R extends tabling.Row>(): types.TableStore<R> 
 });
 
 export const initialDetailResponseState = <
-  M extends model.ApiModel,
+  M extends import("lib/model/types").ApiModel,
 >(): types.ApiModelDetailStore<M> => ({
   loading: false,
   data: null,
@@ -63,11 +63,14 @@ export const createApplicationInitialState = (
   user: storeConfig.user,
   loading: false,
   drawerOpen: false,
-  contacts: initialAuthenticatedApiModelListResponseState<model.Contact>(),
-  filteredContacts: initialAuthenticatedApiModelListResponseState<model.Contact>(),
+  contacts:
+    initialAuthenticatedApiModelListResponseState<import("lib/model/contact/types").Contact>(),
+  filteredContacts:
+    initialAuthenticatedApiModelListResponseState<import("lib/model/contact/types").Contact>(),
   fringeColors: initialListResponseState<string>(),
-  subaccountUnits: initialApiModelListResponseState<model.SubAccountUnit>(),
-  actualTypes: initialApiModelListResponseState<model.ActualType>(),
+  subaccountUnits:
+    initialApiModelListResponseState<import("lib/model/budgeting/types").SubAccountUnit>(),
+  actualTypes: initialApiModelListResponseState<import("lib/model/budgeting/types").ActualType>(),
   productPermissionModalOpen: false,
   public: {
     // ...config.PUBLIC_MODULE_INITIAL_STATE,

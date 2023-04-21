@@ -1,5 +1,6 @@
 import { logger } from "internal";
-import { validators } from "lib";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { validateAny } from "lib/util/validators";
 
 import * as types from "./types";
 
@@ -58,7 +59,7 @@ export const sidebarItemControlIsActive = <P extends string = string>(
         return control.test(path);
     }
   }
-  return validators.validateAny(control, (a: types.SidebarItemActiveStateControl<P>) =>
+  return validateAny(control, (a: types.SidebarItemActiveStateControl<P>) =>
     sidebarItemControlIsActive<P>(a, path),
   );
 };
@@ -118,7 +119,7 @@ export const sidebarItemIsActive = <T extends types.SidebarId, P extends string 
   }
   const subMenu = (sidebarItem as types.DashboardSidebarItemConfig<P>).subMenu;
   if (subMenu !== undefined) {
-    return validators.validateAny(subMenu, (a: types.DashboardSidebarSubItemConfig) =>
+    return validateAny(subMenu, (a: types.DashboardSidebarSubItemConfig) =>
       sidebarItemIsActive(a, path),
     );
   }

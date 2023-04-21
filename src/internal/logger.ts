@@ -8,18 +8,17 @@ import {
 } from "roarr";
 import { ulid } from "ulid";
 
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
-import { ProductionEnvironments } from "application/config/types";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
-import { ApplicationError } from "application/errors/errors/base";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
-import { JsonLiteral } from "lib/schemas";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
-import { generateRandomNumericId } from "lib/util";
+export enum ProductionEnvironments {
+  APP = "app",
+  DEV = "dev",
+  LOCAL = "local",
+}
+
+type ProductionEnvironment = typeof ProductionEnvironments[keyof typeof ProductionEnvironments];
 
 type LogContextValue =
-  | Exclude<JsonLiteral, ArrayBuffer>
-  | import("application/errors/errors").ApplicationError;
+  | Exclude<import("lib/schemas").JsonLiteral, ArrayBuffer>
+  | typeof import("application/errors/errors").ApplicationError;
 
 export type LogMessageContext = Record<string, LogContextValue>;
 
@@ -43,12 +42,17 @@ if (process.env.NEXT_PUBLIC_ROARR_BROWSER_LOG === "true" && typeof window !== "u
 }
 
 const productionEnv = process.env.NEXT_PUBLIC_PRODUCTION_ENV;
-if (productionEnv === undefined || !ProductionEnvironments.contains(productionEnv)) {
+if (
+  productionEnv === undefined ||
+  ![ProductionEnvironments.APP, ProductionEnvironments.DEV, ProductionEnvironments.LOCAL].includes(
+    productionEnv as ProductionEnvironment,
+  )
+) {
   throw new TypeError(`Detected invalid value '${productionEnv}' for NEXT_PUBLIC_PRODUCTION_ENV.`);
 }
 
 const application = process.env.npm_package_name;
-if (application === undefined) {
+if (application === undefined && typeof window === "undefined") {
   throw new TypeError(`Detected invalid value '${application}' for npm_package_name.`);
 }
 
@@ -61,18 +65,25 @@ const messageContextErrorProcessor: TransformMessageFunction<LogMessageContext> 
 ): Message<RoarrMessageContext> => {
   let jsonContext: RoarrMessageContext = {};
 
+  /* eslint-disable-next-line @typescript-eslint/no-var-requires */
+  const { ApplicationError } = require("application/errors/errors/base");
+
   /* Separate the log context keys that are not associated with instances of errors.ApplicationError
      from those that are. */
   const errors = Object.keys(message.context).reduce(
-    (prev: import("application/errors/errors").ApplicationError[], key: string) => {
+    (prev: typeof ApplicationError[], key: string): typeof ApplicationError[] => {
       const value: LogContextValue = message.context[key];
+
       if (value instanceof ApplicationError) {
         return [...prev, value];
       }
-      jsonContext = { ...jsonContext, [key]: value };
+      jsonContext = {
+        ...jsonContext,
+        [key]: value as Exclude<LogContextValue, typeof ApplicationError>,
+      };
       return prev;
     },
-    [] as import("application/errors/errors").ApplicationError[],
+    [] as typeof ApplicationError[],
   );
 
   // If the message that was provided is an empty string, use the message from the error.
@@ -97,9 +108,7 @@ const messageContextErrorProcessor: TransformMessageFunction<LogMessageContext> 
                context keys for errors with randomly generated IDs in the case that the key is
                already in the context. */
             const errorKeyPrefix =
-              errors.length > 1
-                ? `error-${index + 1}-${generateRandomNumericId()}_${key}`
-                : `error-${generateRandomNumericId()}_${key}`;
+              errors.length > 1 ? `error-${index + 1}-${ulid()}_${key}` : `error-${ulid()}_${key}`;
             if (Object.keys(logContext).includes(key)) {
               return { ...prev, [errorKeyPrefix]: logContext[key] };
             }
@@ -122,7 +131,7 @@ const _LOGGER = Logger.child<LogMessageContext>(messageContextErrorProcessor).ch
     ...message,
     context: {
       ...message.context,
-      application,
+      application: application || "application-name-not-available",
       instanceId,
       productionEnv,
     },

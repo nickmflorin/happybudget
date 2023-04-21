@@ -1,4 +1,5 @@
-import { ui, model } from "lib";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { IconCodes, IconNames } from "lib/ui/icons/types";
 
 import { parseEnvVar } from "../util";
 
@@ -40,23 +41,23 @@ export const Pages: types.Pages = {
     sidebars: {
       dashboard: {
         label: "Templates",
-        icon: { type: ui.IconCodes.REGULAR, name: ui.IconNames.FOLDER_OPEN },
-        activeIcon: { type: ui.IconCodes.SOLID, name: ui.IconNames.FOLDER_OPEN },
+        icon: { type: IconCodes.REGULAR, name: IconNames.FOLDER_OPEN },
+        activeIcon: { type: IconCodes.SOLID, name: IconNames.FOLDER_OPEN },
         subMenu: [
           {
             label: "Discover",
-            icon: { type: ui.IconCodes.REGULAR, name: ui.IconNames.CAMERA_ALT },
-            activeIcon: { type: ui.IconCodes.SOLID, name: ui.IconNames.CAMERA_ALT },
+            icon: { type: IconCodes.REGULAR, name: IconNames.CAMERA_ALT },
+            activeIcon: { type: IconCodes.SOLID, name: IconNames.CAMERA_ALT },
             active: new RegExp(`^/discover${paths.PATH_END_REGEX_STRING}`),
             page: types.PageIds.DISCOVER,
           },
           {
             label: "My Templates",
             active: new RegExp(`^/templates${paths.PATH_END_REGEX_STRING}`),
-            icon: { type: ui.IconCodes.REGULAR, name: ui.IconNames.COPY },
-            activeIcon: { type: ui.IconCodes.SOLID, name: ui.IconNames.COPY },
+            icon: { type: IconCodes.REGULAR, name: IconNames.COPY },
+            activeIcon: { type: IconCodes.SOLID, name: IconNames.COPY },
             page: types.PageIds.TEMPLATES,
-            tagText: (user: model.User) => `${user.metrics.num_templates}`,
+            tagText: (user: import("lib/model").User) => `${user.metrics.num_templates}`,
           },
         ],
       },
@@ -72,32 +73,34 @@ export const Pages: types.Pages = {
     sidebars: {
       dashboard: {
         label: "Budgets",
-        icon: { type: ui.IconCodes.REGULAR, name: ui.IconNames.FOLDER_OPEN },
-        activeIcon: { type: ui.IconCodes.SOLID, name: ui.IconNames.FOLDER_OPEN },
+        icon: { type: IconCodes.REGULAR, name: IconNames.FOLDER_OPEN },
+        activeIcon: { type: IconCodes.SOLID, name: IconNames.FOLDER_OPEN },
         subMenu: [
           {
             label: "Active",
-            icon: { type: ui.IconCodes.REGULAR, name: ui.IconNames.CAMERA_ALT },
-            activeIcon: { type: ui.IconCodes.SOLID, name: ui.IconNames.CAMERA_ALT },
+            icon: { type: IconCodes.REGULAR, name: IconNames.CAMERA_ALT },
+            activeIcon: { type: IconCodes.SOLID, name: IconNames.CAMERA_ALT },
             active: new RegExp(`^/budgets${paths.PATH_END_REGEX_STRING}`),
             page: types.PageIds.BUDGETS,
-            tagText: (user: model.User) => `${user.metrics.num_budgets}`,
+            tagText: (user: import("lib/model").User) => `${user.metrics.num_budgets}`,
           },
           {
             label: "Collaborating",
             active: new RegExp(`^/collaborating${paths.PATH_END_REGEX_STRING}`),
-            icon: { type: ui.IconCodes.REGULAR, name: ui.IconNames.USERS },
-            activeIcon: { type: ui.IconCodes.SOLID, name: ui.IconNames.USERS },
+            icon: { type: IconCodes.REGULAR, name: IconNames.USERS },
+            activeIcon: { type: IconCodes.SOLID, name: IconNames.USERS },
             page: types.PageIds.COLLABORATING_BUDGETS,
-            tagText: (user: model.User) => `${user.metrics.num_collaborating_budgets}`,
+            tagText: (user: import("lib/model").User) =>
+              `${user.metrics.num_collaborating_budgets}`,
           },
           {
             label: "Archive",
             active: new RegExp(`^/archive${paths.PATH_END_REGEX_STRING}`),
-            icon: { type: ui.IconCodes.REGULAR, name: ui.IconNames.BOOK },
-            activeIcon: { type: ui.IconCodes.SOLID, name: ui.IconNames.BOOK },
+            icon: { type: IconCodes.SOLID, name: IconNames.BOOK },
+            /* icon: { type: IconCodes.REGULAR, name: IconNames.BOOK },
+               activeIcon: { type: IconCodes.SOLID, name: IconNames.BOOK }, */
             page: types.PageIds.COLLABORATING_BUDGETS,
-            tagText: (user: model.User) => `${user.metrics.num_archived_budgets}`,
+            tagText: (user: import("lib/model").User) => `${user.metrics.num_archived_budgets}`,
           },
         ],
       },

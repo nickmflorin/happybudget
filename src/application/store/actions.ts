@@ -1,5 +1,3 @@
-import { model } from "lib";
-
 import * as api from "../api";
 
 import * as types from "./types";
@@ -47,14 +45,18 @@ export const requestContactsAction = createAction<types.RequestActionPayload>()(
 export const loadingContactsAction = createAction<boolean>()("contacts.Loading");
 
 export const responseContactsAction =
-  createAction<api.ClientResponse<api.ApiListResponse<model.Contact>>>()("contacts.Response");
+  createAction<
+    api.ClientResponse<api.ApiListResponse<import("lib/model/contact/types").Contact>>
+  >()("contacts.Response");
 
 export const removeContactFromStateAction = createAction<number>()("user.contacts.RemoveFromState");
 
-export const updateContactInStateAction = createAction<types.UpdateModelPayload<model.Contact>>()(
-  "user.contacts.UpdateInState",
+export const updateContactInStateAction = createAction<
+  types.UpdateModelPayload<import("lib/model/contact/types").Contact>
+>()("user.contacts.UpdateInState");
+export const addContactToStateAction = createAction<import("lib/model/contact/types").Contact>()(
+  "user.contacts.AddToState",
 );
-export const addContactToStateAction = createAction<model.Contact>()("user.contacts.AddToState");
 
 export const setContactsSearchAction = createAction<string>()("user.contacts.SetSearch");
 
@@ -66,11 +68,11 @@ export const loadingFilteredContactsAction = createAction<boolean>()(
 );
 
 export const responseFilteredContactsAction = createAction<
-  api.ClientResponse<api.ApiListResponse<model.Contact>>
+  api.ClientResponse<api.ApiListResponse<import("lib/model/contact/types").Contact>>
 >()("user.contacts.ResponseFiltered");
 
 export const responseSubAccountUnitsAction = createAction<
-  api.ClientResponse<api.ApiListResponse<model.SubAccountUnit>>
+  api.ClientResponse<api.ApiListResponse<import("lib/model/budgeting/types").SubAccountUnit>>
 >()("budget.subaccountunits.Response");
 
 export const responseFringeColorsAction = createAction<
@@ -78,27 +80,27 @@ export const responseFringeColorsAction = createAction<
 >()("budget.fringecolors.Response");
 
 export const responseActualTypesAction = createAction<
-  api.ClientResponse<api.ApiListResponse<model.ActualType>>
+  api.ClientResponse<api.ApiListResponse<import("lib/model/budgeting/types").ActualType>>
 >()("budget.actualstypes.Response");
 
 export type UserMetricsIncrementByPayload = {
   readonly incrementBy: number;
-  readonly metric: keyof model.User["metrics"];
+  readonly metric: keyof import("lib/model/user/types").User["metrics"];
 };
 
 export type UserMetricsDecrementByPayload = {
   readonly decrementBy: number;
-  readonly metric: keyof model.User["metrics"];
+  readonly metric: keyof import("lib/model/user/types").User["metrics"];
 };
 
 export type UserMetricsChangePayload = {
   readonly change: "increment" | "decrement";
-  readonly metric: keyof model.User["metrics"];
+  readonly metric: keyof import("lib/model/user/types").User["metrics"];
 };
 
 export type UserMetricsValuePayload = {
   readonly value: number;
-  readonly metric: keyof model.User["metrics"];
+  readonly metric: keyof import("lib/model/user/types").User["metrics"];
 };
 
 export type UserMetricsActionPayload =
@@ -113,14 +115,15 @@ export type UserMetricsAction =
   | types.Action<UserMetricsChangePayload>
   | types.Action<UserMetricsValuePayload>;
 
-export type UpdateUserAction = types.Action<model.User>;
+export type UpdateUserAction = types.Action<import("lib/model/user/types").User>;
 export type ClearUserAction = types.Action<null>;
 export type UserAction = UpdateUserAction | UserMetricsAction | ClearUserAction;
 
 export const updateLoggedInUserMetricsAction =
   createAction<UserMetricsActionPayload>()("user.UpdateMetrics");
 
-export const updateLoggedInUserAction = createAction<model.User>()("user.UpdateInState");
+export const updateLoggedInUserAction =
+  createAction<import("lib/model/user/types").User>()("user.UpdateInState");
 
 export const clearLoggedInUserAction = createAction<null>()("user.Clear");
 

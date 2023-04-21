@@ -90,7 +90,6 @@ export const IconCodeMap = {
 export const IconNames = enumeratedLiterals([
   "arrow-down",
   "arrow-up",
-  "ellipsis",
   "database",
   "circle-question",
   "circle-exclamation",
@@ -106,20 +105,19 @@ export const IconNames = enumeratedLiterals([
   "file-image",
   "file-audio",
   "file-video",
-  "file-archive",
+  "file-zipper",
   "file",
-  "bank",
+  "building-columns",
   "file-import",
   "circle-notch",
   "server",
   "caret-down",
   "caret-up",
-  "times-circle",
-  "plus-circle",
-  "trash-alt",
+  "circle-xmark",
+  "circle-plus",
+  "trash-can",
   "filter",
-  "sort-amount-down",
-  "camera-alt",
+  "camera",
   "folder-open",
   "copy",
   "users",
@@ -129,40 +127,12 @@ export const IconNames = enumeratedLiterals([
   "triangle-exclamation",
 ] as const);
 
-export const IconLicenses = enumeratedLiterals(["free", "pro", "both"] as const);
-export type IconLicense = EnumeratedLiteralType<typeof IconLicenses>;
-
-export type LicensedIcon<
-  N extends string = string,
-  LICENSE extends IconLicense = IconLicense,
-> = LICENSE extends IconLicense
-  ? {
-      readonly name: N;
-      readonly license: LICENSE;
-    }
-  : never;
-
-export function licensedIcon<N extends string>(name: N): LicensedIcon<N, "both">;
-export function licensedIcon<N extends string, LICENSE extends IconLicense = "both">(
-  name: N,
-  license: LICENSE,
-): LicensedIcon<N, LICENSE>;
-export function licensedIcon<N extends string, LICENSE extends IconLicense = "both">(
-  name: N,
-  license?: LICENSE,
-): LicensedIcon<N, LICENSE> {
-  if (license === undefined) {
-    return { name, license: IconLicenses.BOTH } as LicensedIcon<N, LICENSE>;
-  }
-  return { name, license } as LicensedIcon<N, LICENSE>;
-}
-
 /* When an Icon is added to the registry, the name must be added to the appropriate IconCode key
    in this object type. */
 export const Icons = {
   [IconCodes.REGULAR]: [
     IconNames.CIRCLE_QUESTION,
-    IconNames.FILE_ARCHIVE,
+    IconNames.FILE_ZIPPER,
     IconNames.FILE_AUDIO,
     IconNames.FILE_EXCEL,
     IconNames.FILE_IMAGE,
@@ -172,39 +142,35 @@ export const Icons = {
     IconNames.FILE_WORD,
     IconNames.FILE,
     IconNames.COPY,
-    IconNames.TRASH_ALT,
+    IconNames.TRASH_CAN,
     IconNames.FOLDER_OPEN,
-    IconNames.CAMERA_ALT,
     IconNames.USERS,
-    licensedIcon(IconNames.BOOK_OPEN, IconLicenses.PRO),
-    licensedIcon(IconNames.BOOK, IconLicenses.PRO),
   ] as const,
   [IconCodes.SOLID]: [
     IconNames.DATABASE,
+    IconNames.ARROW_UP,
     IconNames.ARROW_DOWN,
-    IconNames.ELLIPSIS,
     IconNames.CIRCLE_CHECK,
     IconNames.CIRCLE_EXCLAMATION,
     IconNames.XMARK,
     IconNames.CIRCLE_USER,
     IconNames.CHEVRON_DOWN,
     IconNames.FILE_CSV,
-    IconNames.BANK,
+    IconNames.BUILDING_COLUMNS,
     IconNames.FILE_IMPORT,
     IconNames.CIRCLE_NOTCH,
     IconNames.SERVER,
     IconNames.CARET_UP,
     IconNames.CARET_DOWN,
-    IconNames.TIMES_CIRCLE,
-    IconNames.PLUS_CIRCLE,
+    IconNames.CIRCLE_XMARK,
+    IconNames.CIRCLE_PLUS,
     IconNames.FILTER,
-    IconNames.SORT_AMOUNT_DOWN,
     IconNames.BOOK_OPEN,
     IconNames.ADDRESS_BOOK,
     IconNames.USERS,
     IconNames.COPY,
     IconNames.FOLDER_OPEN,
-    IconNames.CAMERA_ALT,
+    IconNames.CAMERA,
     IconNames.BOOK,
     IconNames.TRIANGLE_EXCLAMATION,
   ] as const,

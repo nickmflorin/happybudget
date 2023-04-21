@@ -1,5 +1,9 @@
-import { errors } from "application";
-import { enumeratedLiterals, EnumeratedLiteralType } from "lib";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { enumeratedLiterals } from "lib/util/literals";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { EnumeratedLiteralType } from "lib/util/types/literals";
+
+import * as errors from "../../errors";
 
 import { ApiSuccessResponse } from "./response";
 

@@ -68,10 +68,10 @@ See https://github.com/FortAwesome/Font-Awesome/issues/19348
 import { getIconCode } from "lib/ui/icons/util";
 /* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { findDuplicates } from "lib/util/arrays";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { stringifyEnumerated } from "lib/util/formatters/attributes";
 
-import { parseEnvVar } from "../../util";
-
-import { Icons, IconNames, IconPrefixes, LicensedIcon } from "./constants";
+import { Icons, IconNames, IconPrefixes } from "./constants";
 import { NaiveFAIconDefinition, NaiveFAConfig } from "./types";
 
 /**
@@ -144,15 +144,8 @@ export const configure = (__options__?: ConfigurationOptions) => {
 
   const iconsMapCodes = (name: string): string[] =>
     Object.keys(Icons).reduce((curr: string[], k: string) => {
-      const namesForCode: (LicensedIcon<string> | string)[] = Icons[
-        k as keyof typeof Icons
-      ].slice() as (LicensedIcon<string> | string)[];
-      const names = namesForCode.reduce((prev: string[], i: LicensedIcon<string> | string) => {
-        if (typeof i === "string") {
-          return [...prev, i];
-        }
-        return [...prev, i.name];
-      }, []);
+      const namesForCode: string[] = Icons[k as keyof typeof Icons].slice() as string[];
+      const names = namesForCode.reduce((prev: string[], i: string) => [...prev, i], []);
       if (names.includes(name)) {
         return [...curr, k];
       }
@@ -161,18 +154,29 @@ export const configure = (__options__?: ConfigurationOptions) => {
 
   const iconsMapHasName = (name: string): boolean => iconsMapCodes(name).length !== 0;
 
+  const availableNames = registry.map((i: NaiveFAIconDefinition) => i.iconName);
+  const availableNamesAndPrefixes = registry.map(
+    (i: NaiveFAIconDefinition) => `${i.iconName} (prefix = ${i.prefix})`,
+  );
+  const availableNamesString = stringifyEnumerated(availableNamesAndPrefixes.sort(), {
+    delimiter: "\n",
+    indent: 4,
+  });
+
   /* First, verify that there are no IconName values in the `IconNames` array that are no longer in
      the registry and thus no longer included in the library of FontAwesome icons we support.  If
      we do not check this, TypeScript will treat an IconName associated with an Icon that will not
      render as being valid. */
   let errors: IconValidationError[] = IconNames.__ALL__.reduce(
     (prev: IconValidationError[], name: IconName) => {
-      if (!registry.map((i: NaiveFAIconDefinition) => i.iconName).includes(name)) {
+      if (!availableNames.includes(name)) {
         return [
           ...prev,
           {
             iconName: name,
-            error: `The icon name '${name}' is no longer associated with a registered icon.`,
+            error:
+              `The icon name '${name}' is no longer associated with a registered icon. ` +
+              `Available names are:\n${availableNamesString}`,
           },
         ];
       }
@@ -207,11 +211,13 @@ export const configure = (__options__?: ConfigurationOptions) => {
     if (!IconPrefixes.contains(icon.prefix)) {
       error = `The icon '${icon.prefix}' is not included in the 'IconPrefixes' array.`;
     } else if (!IconNames.contains(icon.iconName)) {
-      error = `The icon '${icon.iconName}' is not included in the 'IconNames' array.`;
+      error = `The icon '${icon.iconName}' (prefix = '${icon.prefix}') is not included in the 'IconNames' array.`;
     } else if (!iconsMapHasName(icon.iconName)) {
-      error = `The icon, '${icon.iconName}', is not included in the 'Icons' object.`;
+      error = `The icon, '${icon.iconName}' (prefix = '${icon.prefix}'), is not included in the 'Icons' object.`;
     } else if (!iconsMapCodes(icon.iconName).includes(getIconCode(icon.prefix as IconPrefix))) {
-      error = `The icon, '${icon.iconName}', is registered, but not with the code '${getIconCode(
+      error = `The icon, '${icon.iconName}' (prefix = '${
+        icon.prefix
+      }'), is registered, but not with the code '${getIconCode(
         icon.prefix as IconPrefix,
       )}', but with code(s) '${iconsMapCodes(icon.iconName)}'.`;
     }
@@ -277,25 +283,7 @@ export const configure = (__options__?: ConfigurationOptions) => {
  * reduce the bundle size sent to the browser on the initial page load.
  */
 export const configureAsync = async (): Promise<void> => {
-  const { importRegistry } = await import("./registry");
+  const { ICON_REGISTRY } = await import("./registry");
   const { library, config } = await import("@fortawesome/fontawesome-svg-core");
-
-  const PRO_FONT_AWESOME = parseEnvVar(
-    process.env.NEXT_PUBLIC_PRO_FONT_AWESOME,
-    "NEXT_PUBLIC_PRO_FONT_AWESOME",
-    { type: "boolean", required: true },
-  );
-
-  let licenseType: "pro" | "free";
-  if (PRO_FONT_AWESOME === true) {
-    if (process.env.FONTAWESOME_NPM_AUTH_TOKEN === undefined) {
-      throw new TypeError("'FONTAWESOME_NPM_AUTH_TOKEN' is not present in the environment.");
-    }
-    licenseType = "pro";
-  } else {
-    licenseType = "free";
-  }
-
-  const registry = await importRegistry(licenseType);
-  return configure({ registry, library, config });
+  return configure({ registry: ICON_REGISTRY.slice() as NaiveFAIconDefinition[], library, config });
 };

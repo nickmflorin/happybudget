@@ -1,7 +1,5 @@
 import { Required, Optional } from "utility-types";
 
-import { feedback } from "lib";
-
 import { ApiDetail, HttpMethod } from "../../api";
 import * as codes from "../codes";
 import * as errorTypes from "../errorTypes";
@@ -93,9 +91,9 @@ export class NetworkError extends AbstractHttpError<typeof errorTypes.HttpErrorT
     return { message: this.message, url: this.url, method: this.method };
   }
 
-  public toFeedback = (): feedback.GlobalFeedback<typeof feedback.FeedbackTypes.ERROR> => ({
+  public toFeedback = (): import("lib/feedback/types").GlobalFeedback<"error"> => ({
     message: this.userMessage,
-    feedbackType: feedback.FeedbackTypes.ERROR,
+    feedbackType: "error",
   });
 }
 
@@ -196,8 +194,8 @@ export class ApiFieldError extends AbstractApiError<typeof errorTypes.HttpErrorT
     this.errors = standardizedDetails;
   }
 
-  public toFeedback = <N extends string = string>(): feedback.FieldFeedback<
-    typeof feedback.FeedbackTypes.ERROR,
+  public toFeedback = <N extends string = string>(): import("lib/feedback/types").FieldFeedback<
+    "error",
     N
   >[] =>
     this.errors.map(
@@ -206,7 +204,7 @@ export class ApiFieldError extends AbstractApiError<typeof errorTypes.HttpErrorT
       ) => ({
         field: e.field as N,
         message: e.userMessage,
-        feedbackType: feedback.FeedbackTypes.ERROR,
+        feedbackType: "error",
       }),
     );
 }
@@ -260,9 +258,9 @@ export class ApiGlobalError extends AbstractApiError<
     this.code = config.code;
   }
 
-  public toFeedback = (): feedback.GlobalFeedback<typeof feedback.FeedbackTypes.ERROR> => ({
+  public toFeedback = (): import("lib/feedback/types").GlobalFeedback<"error"> => ({
     message: this.userMessage,
-    feedbackType: feedback.FeedbackTypes.ERROR,
+    feedbackType: "error",
   });
 }
 

@@ -1,7 +1,5 @@
 import { Optional, OptionalKeys } from "utility-types";
 
-import { model, ui } from "lib";
-
 import * as api from "../../api";
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -42,7 +40,7 @@ export type Action<
   ? {
       readonly payload: P;
       readonly context: C;
-      readonly user?: model.User | null;
+      readonly user?: import("lib/model").User | null;
       readonly type: T;
     }
   : never;
@@ -125,16 +123,17 @@ export type RequestActionCreator<C extends ActionContext = ActionContext> = Acti
   C
 >;
 
-export type ApiModelListActionPayloadMap<M extends model.ApiModel> = ListActionPayloadMap<M>;
+export type ApiModelListActionPayloadMap<M extends import("lib/model").ApiModel> =
+  ListActionPayloadMap<M>;
 
 export type ModelListActionCreatorMap<
-  M extends model.ApiModel,
+  M extends import("lib/model").ApiModel,
   C extends ActionContext = ActionContext,
 > = Omit<ActionCreatorMap<ApiModelListActionPayloadMap<M>, C>, "request"> & {
   readonly request: RequestActionCreator<C>;
 };
 
-export type AuthenticatedApiModelListActionPayloadMap<M extends model.ApiModel> =
+export type AuthenticatedApiModelListActionPayloadMap<M extends import("lib/model").ApiModel> =
   ApiModelListActionPayloadMap<M> & {
     readonly updating: ModelListActionAction;
     readonly creating: boolean;
@@ -143,43 +142,46 @@ export type AuthenticatedApiModelListActionPayloadMap<M extends model.ApiModel> 
     readonly addToState: M;
     readonly updateInState: UpdateModelPayload<M>;
     readonly setSearch: string;
-    readonly setPagination: ui.Pagination;
+    readonly setPagination: import("lib/ui").Pagination;
     readonly updateOrdering: UpdateOrderingPayload<string>;
   };
 
 export type AuthenticatedApiModelListActionCreatorMap<
-  M extends model.ApiModel,
+  M extends import("lib/model").ApiModel,
   C extends ActionContext = ActionContext,
 > = Omit<ActionCreatorMap<AuthenticatedApiModelListActionPayloadMap<M>, C>, "request"> & {
   readonly request: RequestActionCreator<C>;
 };
 
-export type ModelDetailActionPayloadMap<M extends model.ApiModel> = {
+export type ModelDetailActionPayloadMap<M extends import("lib/model").ApiModel> = {
   readonly loading: boolean;
   readonly response: api.ClientResponse<api.ApiSuccessResponse<M>>;
   readonly updateInState: UpdateModelPayload<M>;
   readonly invalidate: null;
 };
 
-export type UpdateModelPayload<T extends model.Model> = {
+export type UpdateModelPayload<T extends import("lib/model").Model> = {
   id: T["id"];
   data: Partial<T>;
 };
 
-export type ModelListActionCompleteAction<M extends model.Model = model.Model> = {
+export type ModelListActionCompleteAction<
+  M extends import("lib/model").Model = import("lib/model").Model,
+> = {
   readonly id: M["id"];
   readonly value: false;
   readonly success?: boolean;
 };
 
-export type ModelListActionStartAction<M extends model.Model = model.Model> = {
+export type ModelListActionStartAction<
+  M extends import("lib/model").Model = import("lib/model").Model,
+> = {
   readonly id: M["id"];
   readonly value: true;
 };
 
-export type ModelListActionAction<M extends model.Model = model.Model> =
-  | ModelListActionStartAction<M>
-  | ModelListActionCompleteAction<M>;
+export type ModelListActionAction<M extends import("lib/model").Model = import("lib/model").Model> =
+  ModelListActionStartAction<M> | ModelListActionCompleteAction<M>;
 
 export type ListActionPayloadMap<T extends api.ListResponseIteree> = {
   readonly request: RequestActionPayload;
@@ -195,7 +197,7 @@ export type ListActionCreatorMap<
   readonly request: RequestActionCreator<C>;
 };
 
-export type HttpUpdateModelPayload<T extends model.Model, P> = {
+export type HttpUpdateModelPayload<T extends import("lib/model").Model, P> = {
   id: T["id"];
   data: Partial<P>;
 };

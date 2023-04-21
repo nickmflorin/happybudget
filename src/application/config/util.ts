@@ -1,4 +1,5 @@
-import { parsers } from "lib";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { parseInteger, parseBoolean } from "lib/util/parsers";
 
 type EnvVarTypeName = "string" | "number" | "boolean";
 
@@ -44,13 +45,13 @@ export const parseEnvVar = <O extends SafeEnvVarOptions>(
     case "string":
       return nullableValue as SafeEnvVarRT<O>;
     case "number":
-      const parsedInt = parsers.parseInteger(nullableValue);
+      const parsedInt = parseInteger(nullableValue);
       if (parsedInt === null && required) {
         throw new TypeError(`Value for environment variable '${name}' is not a valid integer!"`);
       }
       return parsedInt as SafeEnvVarRT<O>;
     case "boolean":
-      const parsedBool = parsers.parseBoolean(nullableValue);
+      const parsedBool = parseBoolean(nullableValue);
       if (parsedBool === null && required) {
         throw new TypeError(`Value for environment variable '${name}' is not a valid boolean!"`);
       }

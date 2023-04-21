@@ -8,8 +8,6 @@ import {
   IconNames,
   IconPrefixMap,
   Icons,
-  LicensedIcon,
-  IconLicense,
   IconCode,
   IconPrefix,
 } from "application/config/configuration/fontAwesome/constants";
@@ -22,22 +20,10 @@ export * from "application/config/configuration/fontAwesome/constants";
 
 export type IconLibrary = typeof Icons;
 
-export type IconLibraryNameTransform<
-  T extends Readonly<(LicensedIcon<string, IconLicense> | string)[]>,
-> = {
-  [I in keyof T]: T[I] extends { name: infer N }
-    ? N
-    : T[I] extends infer N extends string
-    ? N
-    : never;
-};
-
-type IconNameMap = { [key in keyof IconLibrary]: IconLibraryNameTransform<IconLibrary[key]> };
-
 type IconNameReverseMap<N extends IconName> = keyof {
-  [key in keyof IconNameMap as N extends IconNameMap[key][number]
+  [key in keyof IconLibrary as N extends IconLibrary[key][number]
     ? key
-    : never]: IconNameMap[key][number];
+    : never]: IconLibrary[key][number];
 };
 
 export type GetIconPrefix<C extends IconCode> = C extends IconCode
@@ -76,7 +62,7 @@ export type IconType = IconPrefix | IconCode;
  * @see IconCode
  */
 export type IconName = EnumeratedLiteralType<typeof IconNames>;
-export type GetIconName<C extends IconCode> = C extends IconCode ? IconNameMap[C][number] : never;
+export type GetIconName<C extends IconCode> = C extends IconCode ? IconLibrary[C][number] : never;
 
 export type IconForName<
   N extends IconName = IconName,
@@ -259,7 +245,6 @@ type _BaseIconProps = types.ComponentProps<
       types.Style,
       types.CSSSizeProperties | types.CSSDirectionalProperties<"padding"> | "color"
     >;
-    readonly fallbackLicenseIcon?: BasicIconProp;
   },
   { external: Pick<FontAwesomeIconProps, "spin"> }
 >;

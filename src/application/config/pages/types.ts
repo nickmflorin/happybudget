@@ -1,5 +1,9 @@
-import { api } from "application";
-import { model, ui, enumeratedLiterals, EnumeratedLiteralType } from "lib";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { enumeratedLiterals } from "lib/util/literals";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { EnumeratedLiteralType } from "lib/util/types/literals";
+
+import * as api from "../../api";
 
 export type MetaOptionName = "description";
 
@@ -82,14 +86,14 @@ export type BaseSidebarItemConfig<P extends string = string> = {
    * is merely just removing the clickable link from their view.
    */
   readonly hidden?: boolean | SidebarPagePathCallback;
-  readonly icon: ui.IconProp;
+  readonly icon: import("lib/ui").IconProp;
   /**
-   * The icon, {@link ui.IconProp}, that should be displayed in the sidebar item when the sidebar
+   * The icon, {@link ui.IconProp}, that should be displayed in the sidebar item whenthe sidebar
    * item is in the "active" state.  If not defined, the icon defined by the 'icon' property will
    * be used for both the "active" and the "inactive" states.
    */
-  readonly activeIcon?: ui.IconProp;
-  readonly tooltip?: ui.Tooltip;
+  readonly activeIcon?: import("lib/ui").IconProp;
+  readonly tooltip?: import("lib/ui").Tooltip;
 };
 
 export type DashboardSidebarSubItemConfig<
@@ -98,7 +102,7 @@ export type DashboardSidebarSubItemConfig<
 > = BaseSidebarItemConfig<P> & {
   readonly label: string;
   readonly page: I;
-  readonly tagText?: (user: model.User) => string;
+  readonly tagText?: (user: import("lib/model").User) => string;
 };
 
 export type DashboardSidebarItemConfig<P extends string = string> = BaseSidebarItemConfig<P> & {
@@ -117,7 +121,10 @@ export type AnySidebarItemConfig<P extends string = string> =
   | DashboardSidebarItemConfig<P>
   | BudgetingSidebarItemConfig<P>;
 
-export type Page<I extends PageId = PageId, P extends string = string> = model.Model<I> & {
+export type Page<
+  I extends PageId = PageId,
+  P extends string = string,
+> = import("lib/model").Model<I> & {
   readonly head?: PageCallbackParam<HeadOptions, I>;
   readonly title?: PageCallbackParam<string, I>;
   // TODO: Figure out how to dynamically force pages to render a 404 if they are hidden.

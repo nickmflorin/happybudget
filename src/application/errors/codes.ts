@@ -1,8 +1,11 @@
 import { type FieldError as RootFieldError } from "react-hook-form";
 
-import { enumeratedLiterals, EnumeratedLiteralType } from "lib";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { enumeratedLiterals } from "lib/util/literals";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { EnumeratedLiteralType } from "lib/util/types/literals";
 
-import { STATUS_CODES, StatusCode } from "../api";
+import { STATUS_CODES, StatusCode } from "../api/types";
 
 import { CodedErrorType, CodedErrorTypes } from "./errorTypes";
 

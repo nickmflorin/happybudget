@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { errors } from "application";
+import * as errors from "../../errors";
 
 import * as payload from "./payload";
 import * as query from "./query";

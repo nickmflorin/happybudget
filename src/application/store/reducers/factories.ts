@@ -1,7 +1,18 @@
 import { find, uniq } from "lodash";
 
 import { logger } from "internal";
-import { model, replaceInArray, SingleOrArray, ui } from "lib";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { getModelInState } from "lib/model/lookup";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { orderModelsBy } from "lib/model/ordering";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { Model, ApiModel } from "lib/model/types";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { ModelSelectionMode } from "lib/ui/types";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { replaceInArray } from "lib/util/arrays";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { SingleOrArray } from "lib/util/types/arrays";
 
 import * as api from "../../api";
 import * as types from "../types";
@@ -74,7 +85,7 @@ export const createSimpleBooleanToggleReducer =
  * A reducer factory that creates a generic reducer, {@link types.Reducer}, capable of handling and
  * maintaining the state of a model's detail - where a detail is considered the information related
  * to a specific instance of a model,
- * {@link model.ApiModel}.
+ * {@link ApiModel}.
  *
  * @param {types.ReducerConfig} config
  *   Configuration for the created reducer, {@link types.Reducer}, that includes the map of action
@@ -82,7 +93,7 @@ export const createSimpleBooleanToggleReducer =
  */
 export const createDetailReducer =
   <
-    M extends model.ApiModel,
+    M extends ApiModel,
     C extends types.ActionContext = types.ActionContext,
     S extends types.ApiModelDetailStore<M> = types.ApiModelDetailStore<M>,
     MP extends Partial<types.ModelDetailActionPayloadMap<M>> = Partial<
@@ -160,14 +171,14 @@ export const createListReducer =
 /**
  * A reducer factory that creates a generic reducer, {@link types.Reducer}, capable of handling and
  * maintaining the state of a series of model details - where a detail is considered the information
- * related to a specific instance of a model, {@link model.ApiModel}.
+ * related to a specific instance of a model, {@link ApiModel}.
  *
  * @param {types.ReducerConfig} config
  *   Configuration for the created reducer, {@link types.Reducer}, that includes the map of action
  *   types to their associated action creators, {@link types.ActionCreator}.
  */
 export const createModelListReducer = <
-  M extends model.ApiModel,
+  M extends ApiModel,
   C extends types.ActionContext = types.ActionContext,
   S extends types.ApiModelListStore<M> = types.ApiModelListStore<M>,
   MP extends types.ApiModelListActionPayloadMap<M> = types.ApiModelListActionPayloadMap<M>,
@@ -178,14 +189,14 @@ export const createModelListReducer = <
 /**
  * A reducer factory that creates a generic reducer, {@link types.Reducer}, capable of handling and
  * maintaining the state of a series of model details for an authenticated user - where a detail is
- * considered the information related to a specific instance of a model, {@link model.ApiModel}.
+ * considered the information related to a specific instance of a model, {@link ApiModel}.
  *
  * @param {types.ReducerConfig} config
  *   Configuration for the created reducer, {@link types.Reducer}, that includes the map of action
  *   types to their associated action creators, {@link types.ActionCreator}.
  */
 export const createAuthenticatedModelListReducer = <
-  M extends model.ApiModel,
+  M extends ApiModel,
   C extends types.ActionContext = types.ActionContext,
   S extends types.AuthenticatedApiModelListStore<M> = types.AuthenticatedApiModelListStore<M>,
   /* eslint-disable-next-line max-len */
@@ -209,7 +220,7 @@ export const createAuthenticatedModelListReducer = <
       s.ordering.length !== 0
         ? {
             ...s,
-            data: model.orderModelsBy(s.data, s.ordering, action.user || null),
+            data: orderModelsBy(s.data, s.ordering, action.user || null),
           }
         : s;
 
@@ -218,7 +229,7 @@ export const createAuthenticatedModelListReducer = <
     } else if (types.actionQualifiesMap(actions, "request", action)) {
       return { ...state, data: [], count: 0 };
     } else if (types.actionQualifiesMap(actions, "removeFromState", action)) {
-      const existing = model.getModelInState(state.data, action.payload, { action });
+      const existing = getModelInState(state.data, action.payload, { action });
       if (existing === null) {
         return state;
       }
@@ -230,7 +241,7 @@ export const createAuthenticatedModelListReducer = <
     } else if (types.actionQualifiesMap(actions, "updateInState", action)) {
       /* Note: Eventually we will want to apply `reorderIfApplicable` here but we need to make sure
          it is fully properly functioning before we do so. */
-      const existing = model.getModelInState(state.data, action.payload.id, { action });
+      const existing = getModelInState(state.data, action.payload.id, { action });
       if (existing === null) {
         return state;
       }
@@ -244,7 +255,7 @@ export const createAuthenticatedModelListReducer = <
         }),
       };
     } else if (types.actionQualifiesMap(actions, "addToState", action)) {
-      const existing = model.getModelInState(state.data, action.payload.id, {
+      const existing = getModelInState(state.data, action.payload.id, {
         warnOnMissing: false,
       });
       if (existing !== undefined) {
@@ -335,33 +346,24 @@ export const createModelIndexedReducer =
     return state;
   };
 
-export type SelectAction<M extends model.Model> = types.BasicAction<
-  SingleOrArray<M["id"]>,
-  "SELECT"
->;
-export type DeselectAction<M extends model.Model> = types.BasicAction<
-  SingleOrArray<M["id"]>,
-  "DESELECT"
->;
-export type ToggleAction<M extends model.Model> = types.BasicAction<
-  SingleOrArray<M["id"]>,
-  "TOGGLE"
->;
-export type SelectionAction<M extends model.Model> =
+export type SelectAction<M extends Model> = types.BasicAction<SingleOrArray<M["id"]>, "SELECT">;
+export type DeselectAction<M extends Model> = types.BasicAction<SingleOrArray<M["id"]>, "DESELECT">;
+export type ToggleAction<M extends Model> = types.BasicAction<SingleOrArray<M["id"]>, "TOGGLE">;
+export type SelectionAction<M extends Model> =
   | SelectAction<M>
   | DeselectAction<M>
   | ToggleAction<M>;
 
-export type SelectionState<M extends model.Model> = M["id"][];
+export type SelectionState<M extends Model> = M["id"][];
 
-export type SelectionHandlers<M extends model.Model> = {
+export type SelectionHandlers<M extends Model> = {
   readonly select: (s: SelectionState<M>, id: SingleOrArray<M["id"]>) => SelectionState<M>;
   readonly deselect: (s: SelectionState<M>, id: SingleOrArray<M["id"]>) => SelectionState<M>;
   readonly toggle: (s: SelectionState<M>, id: SingleOrArray<M["id"]>) => SelectionState<M>;
 };
 
-export const createSelectionHandlers = <M extends model.Model>(
-  mode: ui.ModelSelectionMode,
+export const createSelectionHandlers = <M extends Model>(
+  mode: ModelSelectionMode,
 ): SelectionHandlers<M> => {
   type S = SelectionState<M>;
 
@@ -404,8 +406,8 @@ export const createSelectionHandlers = <M extends model.Model>(
   return { select, deselect, toggle };
 };
 
-export const createSelectionReducer = <M extends model.Model>(
-  mode: ui.ModelSelectionMode,
+export const createSelectionReducer = <M extends Model>(
+  mode: ModelSelectionMode,
   initialState: SelectionState<M>,
 ): types.BasicReducer<M["id"][], SelectionAction<M>> => {
   const handlers = createSelectionHandlers<M>(mode);

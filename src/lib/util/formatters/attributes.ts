@@ -10,6 +10,15 @@ type StringifyEnumeratedOptions<T extends string | number | boolean | Record<str
   readonly numbered: false;
   readonly delimiter: string;
   readonly stringifyElement: (v: T) => string;
+  readonly indent?: number;
+};
+
+const emptySpace = (count: number) => {
+  let space = "";
+  for (let i = 0; i < count; i++) {
+    space += " ";
+  }
+  return space;
 };
 
 /**
@@ -25,10 +34,13 @@ export const stringifyEnumerated = <T extends string | number | boolean | Record
   data: T[],
   options?: Partial<StringifyEnumeratedOptions<T>>,
 ): string => {
+  const indent = options?.indent || 0;
   const delimiter = options?.delimiter === undefined ? " " : options.delimiter;
   const stringifyElement =
     options?.stringifyElement === undefined ? (v: T) => String(v) : options?.stringifyElement;
-  return data.map((d: T, index: number) => `${index + 1}. ${stringifyElement(d)}`).join(delimiter);
+  return data
+    .map((d: T, index: number) => `${emptySpace(indent)}${index + 1}. ${stringifyElement(d)}`)
+    .join(delimiter);
 };
 
 type StringifyAttributeOptions<T extends Record<string, unknown>> = {

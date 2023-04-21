@@ -1,11 +1,14 @@
 import { Optional } from "utility-types";
 import { z } from "zod";
 
-import { schemas, formatters } from "lib";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { stringifyZodIssues } from "lib/util/formatters/attributes";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { manageSuffixPunctuation } from "lib/util/formatters/formal";
 
 import * as errorTypes from "../errorTypes";
 
-type CustomLogContext = Record<string, Exclude<schemas.JsonLiteral, ArrayBuffer>>;
+type CustomLogContext = Record<string, Exclude<import("lib/schemas").JsonLiteral, ArrayBuffer>>;
 
 export type ApplicationErrorLogContext<T extends CustomLogContext = CustomLogContext> = T & {
   message: string;
@@ -13,7 +16,7 @@ export type ApplicationErrorLogContext<T extends CustomLogContext = CustomLogCon
 
 export type ApplicationErrorConfig<
   E extends errorTypes.ErrorType,
-  C extends schemas.JsonObject = schemas.JsonObject,
+  C extends import("lib/schemas").JsonObject = import("lib/schemas").JsonObject,
 > = Readonly<{
   readonly errorType: E;
   readonly message?: string;
@@ -60,9 +63,9 @@ export class ApplicationError<
 
   public get prefix(): string | undefined {
     return this._prefix !== undefined
-      ? formatters.manageSuffixPunctuation(this._prefix, { add: ":", remove: true })
+      ? manageSuffixPunctuation(this._prefix, { add: ":", remove: true })
       : this.defaultPrefix !== undefined
-      ? formatters.manageSuffixPunctuation(this.defaultPrefix, { add: ":", remove: true })
+      ? manageSuffixPunctuation(this.defaultPrefix, { add: ":", remove: true })
       : undefined;
   }
 
@@ -194,6 +197,6 @@ export class MalformedDataSchemaError extends MalformedDataError {
     if (this.error.issues.length === 1) {
       return this.error.issues[0].message;
     }
-    return formatters.stringifyZodIssues(this.error.issues);
+    return stringifyZodIssues(this.error.issues);
   }
 }

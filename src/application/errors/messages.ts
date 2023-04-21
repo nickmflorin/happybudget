@@ -1,5 +1,14 @@
 import { logger } from "internal";
-import { EnumeratedLiteralType, formatters, enumeratedLiterals, messages } from "lib";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { stringifyAttributes } from "lib/util/formatters/attributes";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { capitalizeFirstAlphaChar, toSentence } from "lib/util/formatters/formal";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { enumeratedLiterals } from "lib/util/literals";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { Message, IMessage } from "lib/util/messages/message";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { EnumeratedLiteralType } from "lib/util/types/literals";
 
 import { ApiFieldDetailContext, ApiFieldDetail, HttpMethod } from "../api";
 
@@ -29,15 +38,15 @@ export type ErrorMessageContext = ApiFieldDetailContext & {
 };
 
 type ErrorMessageDefaults = {
-  readonly userMessage: messages.IMessage<ErrorMessageContext>;
-  readonly message?: messages.IMessage<ErrorMessageContext>;
+  readonly userMessage: IMessage<ErrorMessageContext>;
+  readonly message?: IMessage<ErrorMessageContext>;
 };
 
-export const HTTP_USER_MESSAGE = messages.Message<ErrorMessageContext>([
+export const HTTP_USER_MESSAGE = Message<ErrorMessageContext>([
   "There was an error with the request.",
 ]);
 
-export const HTTP_MESSAGE = messages.Message<ErrorMessageContext>(
+export const HTTP_MESSAGE = Message<ErrorMessageContext>(
   [
     ":status :method | :code There was an error making a request to :url.",
     ":status :method | :code There was an error making a request to :url: :reason",
@@ -52,10 +61,10 @@ export const HTTP_MESSAGE = messages.Message<ErrorMessageContext>(
       status: (v: number | string | codes.UNKNOWN) => `[${v}]`,
       code: (v: string) => `(code = ${v})`,
       method: (v: string) => v.toUpperCase(),
-      reason: (v: string) => formatters.capitalizeFirstAlphaChar(v),
+      reason: (v: string) => capitalizeFirstAlphaChar(v),
       details: (v: ApiFieldDetail[]) =>
         `${v.length} Details(s): ` +
-        formatters.stringifyAttributes(v, {
+        stringifyAttributes(v, {
           messageKey: "message",
           ignore: ["userMessage"],
         }),
@@ -70,19 +79,19 @@ export const HTTP_MESSAGES: ErrorMessageDefaults = {
 
 const ErrorTypeMessages: { [key in errorTypes.CodedErrorType]: ErrorMessageDefaults } = {
   [errorTypes.ErrorTypes.NETWORK]: {
-    userMessage: messages.Message("There was an error with the request."),
-    message: messages.Message("There was a network error."),
+    userMessage: Message("There was an error with the request."),
+    message: Message("There was a network error."),
   },
   [errorTypes.ErrorTypes.FIELD]: {
-    userMessage: messages.Message("There was an error with the request."),
-    message: messages.Message("There was an unknown error."),
+    userMessage: Message("There was an error with the request."),
+    message: Message("There was an unknown error."),
   },
   [errorTypes.ErrorTypes.GLOBAL]: {
-    userMessage: messages.Message("There was an error with the request."),
-    message: messages.Message("There was an unknown error."),
+    userMessage: Message("There was an error with the request."),
+    message: Message("There was an unknown error."),
   },
   [errorTypes.ErrorTypes.CLIENT_VALIDATION]: {
-    userMessage: messages.Message("There was an error."),
+    userMessage: Message("There was an error."),
   },
 };
 
@@ -90,49 +99,49 @@ type ErrorMessages = Partial<{ [key in codes.ErrorCode]: ErrorMessageDefaults }>
 
 const DefaultMessages: ErrorMessages = {
   [codes.ErrorCodes.UNKNOWN]: {
-    userMessage: messages.Message("There was an error with the request."),
-    message: messages.Message("There was an unknown error."),
+    userMessage: Message("There was an error with the request."),
+    message: Message("There was an unknown error."),
   },
   [codes.ErrorCodes.METHOD_NOT_ALLOWED]: {
-    userMessage: messages.Message("There was an error with the request."),
-    message: messages.Message("The method is not allowed."),
+    userMessage: Message("There was an error with the request."),
+    message: Message("The method is not allowed."),
   },
   [codes.ErrorCodes.INTERNAL_SERVER_ERROR]: {
-    userMessage: messages.Message("There was an error with the request."),
-    message: messages.Message("There was an internal server error."),
+    userMessage: Message("There was an error with the request."),
+    message: Message("There was an internal server error."),
   },
   [codes.ErrorCodes.SERVICE_UNAVAILABLE]: {
-    userMessage: messages.Message("There was an error with the request."),
-    message: messages.Message("The service is unavailable."),
+    userMessage: Message("There was an error with the request."),
+    message: Message("The service is unavailable."),
   },
   [codes.ErrorCodes.BODY_NOT_SERIALIZABLE]: {
-    userMessage: messages.Message("There was an error with the request."),
-    message: messages.Message("The response body was not serializable."),
+    userMessage: Message("There was an error with the request."),
+    message: Message("The response body was not serializable."),
   },
   [codes.ErrorCodes.BODY_NOT_PRESENT]: {
-    userMessage: messages.Message("There was an error with the request."),
-    message: messages.Message("The response body was not present."),
+    userMessage: Message("There was an error with the request."),
+    message: Message("The response body was not present."),
   },
   [codes.ErrorCodes.NOT_FOUND]: {
-    userMessage: messages.Message("There was an error with the request."),
-    message: messages.Message("The requested resource could not be found."),
+    userMessage: Message("There was an error with the request."),
+    message: Message("The requested resource could not be found."),
   },
   [codes.ErrorCodes.REQUIRED]: {
-    userMessage: messages.Message("The value is required."),
-    message: messages.Message(["The field is required.", "The field :field is required."], {
+    userMessage: Message("The value is required."),
+    message: Message(["The field is required.", "The field :field is required."], {
       doNotInject: [undefined],
     }),
   },
   [codes.ErrorCodes.VALUE]: {
-    userMessage: messages.Message(
+    userMessage: Message(
       [
         "The provided value is invalid.",
         "The provided value :value is invalid.",
         "The provided value :value is invalid: :reason.",
       ],
-      { formatters: { reason: (v: string) => formatters.toSentence(v) } },
+      { formatters: { reason: (v: string) => toSentence(v) } },
     ),
-    message: messages.Message(
+    message: Message(
       [
         "The value is invalid.",
         "The value :value is invalid.",
@@ -143,21 +152,21 @@ const DefaultMessages: ErrorMessages = {
     ),
   },
   [codes.ErrorCodes.UNIQUE]: {
-    message: messages.Message([
+    message: Message([
       "The field must be unique.",
       "The field :field must be unique.",
       "The provided value for field :field must be unique",
       "The provided value :value is not unique.",
       "The provided value :value for the field :field is not unique.",
     ]),
-    userMessage: messages.Message([
+    userMessage: Message([
       "The provided value must be unique",
       "The provided value :value is not unique.",
     ]),
   },
   [codes.ErrorCodes.INVALID]: {
-    userMessage: messages.Message("The value is invalid."),
-    message: messages.Message(
+    userMessage: Message("The value is invalid."),
+    message: Message(
       [
         "The value is invalid.",
         "The value :value is invalid.",
@@ -168,11 +177,11 @@ const DefaultMessages: ErrorMessages = {
     ),
   },
   [codes.ErrorCodes.MINLENGTH]: {
-    userMessage: messages.Message([
+    userMessage: Message([
       "The value does not meet the minimum length.",
       "The value does not meet the minimum length :minimum.",
     ]),
-    message: messages.Message(
+    message: Message(
       [
         "The value does not meet the minimum length.",
         "The value :value does not meet the minimum length.",
@@ -182,11 +191,11 @@ const DefaultMessages: ErrorMessages = {
     ),
   },
   [codes.ErrorCodes.MAXLENGTH]: {
-    userMessage: messages.Message(
+    userMessage: Message(
       ["The value exceeds the maximum length.", "The value exceeds the maximum length :maximum."],
       { doNotInject: [undefined] },
     ),
-    message: messages.Message(
+    message: Message(
       [
         "The value exceeds the maximum length.",
         "The value :value exceeds the maximum length.",
@@ -200,7 +209,7 @@ const DefaultMessages: ErrorMessages = {
 const _getMessageForScope = (
   defaults: ErrorMessageDefaults,
   scope: ErrorMessageScope = ErrorMessageScopes.USER,
-): messages.IMessage<ErrorMessageContext> => {
+): IMessage<ErrorMessageContext> => {
   if (scope === ErrorMessageScopes.USER) {
     return defaults.userMessage;
   }

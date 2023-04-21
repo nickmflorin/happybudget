@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { model, schemas } from "lib";
+import { schemas } from "lib";
 
 export type Order = 1 | -1 | 0;
 
@@ -13,11 +13,14 @@ export type FieldOrder<F extends string = string> = {
 
 export type Ordering<F extends string = string> = FieldOrder<F>[];
 
-export type ModelOrderableField<M extends model.ApiModel> = Exclude<keyof M, "id"> & string;
+export type ModelOrderableField<M extends import("lib/model").ApiModel> = Exclude<keyof M, "id"> &
+  string;
 
-export type ModelFieldOrder<M extends model.ApiModel> = FieldOrder<ModelOrderableField<M>>;
+export type ModelFieldOrder<M extends import("lib/model").ApiModel> = FieldOrder<
+  ModelOrderableField<M>
+>;
 
-export type ModelOrdering<M extends model.ApiModel> = ModelFieldOrder<M>[];
+export type ModelOrdering<M extends import("lib/model").ApiModel> = ModelFieldOrder<M>[];
 
 const FieldOrderSchema = z
   .object({
@@ -42,7 +45,9 @@ export type ListQuery = {
   readonly search?: string;
 };
 
-export type ApiModelListQuery<M extends model.ApiModel = model.ApiModel> = ListQuery & {
+export type ApiModelListQuery<
+  M extends import("lib/model").ApiModel = import("lib/model").ApiModel,
+> = ListQuery & {
   readonly ordering?: ModelOrdering<M>;
   readonly ids?: number[];
   readonly exclude?: number[];

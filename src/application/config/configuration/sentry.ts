@@ -4,7 +4,8 @@ import SentryRRWeb from "@sentry/rrweb";
 import { Integrations } from "@sentry/tracing";
 
 import { logger } from "internal";
-import { parsers } from "lib";
+
+import { parseEnvVar } from "../util";
 
 export const configure = () => {
   const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
@@ -16,26 +17,16 @@ export const configure = () => {
   if (SENTRY_ENV === undefined) {
     throw new TypeError("No SENTRY_ENV found in the environment.");
   }
-  const SENTRY_ERROR_DATA_DEPTH_STRING = process.env.NEXT_PUBLIC_SENTRY_ERROR_DATA_DEPTH;
-  const SENTRY_ERROR_DATA_DEPTH: number | null =
-    SENTRY_ERROR_DATA_DEPTH_STRING === undefined
-      ? null
-      : parsers.parseInteger(SENTRY_ERROR_DATA_DEPTH_STRING);
-  if (SENTRY_ERROR_DATA_DEPTH === null) {
-    throw new TypeError(
-      `Invalid value ${SENTRY_ERROR_DATA_DEPTH_STRING} detected for 'NEXT_PUBLIC_SENTRY_ERROR_DATA_DEPTH' in environment.`,
-    );
-  }
-  const SENTRY_NORMALIZE_DEPTH_STRING = process.env.NEXT_PUBLIC_SENTRY_NORMALIZE_DEPTH;
-  const SENTRY_NORMALIZE_DEPTH: number | null =
-    SENTRY_NORMALIZE_DEPTH_STRING === undefined
-      ? null
-      : parsers.parseInteger(SENTRY_NORMALIZE_DEPTH_STRING);
-  if (SENTRY_NORMALIZE_DEPTH === null) {
-    throw new TypeError(
-      `Invalid value ${SENTRY_NORMALIZE_DEPTH_STRING} detected for 'NEXT_PUBLIC_SENTRY_NORMALIZE_DEPTH' in environment.`,
-    );
-  }
+  const SENTRY_ERROR_DATA_DEPTH = parseEnvVar(
+    process.env.NEXT_PUBLIC_SENTRY_ERROR_DATA_DEPTH,
+    "NEXT_PUBLIC_SENTRY_ERROR_DATA_DEPTH",
+    { type: "number", required: true },
+  );
+  const SENTRY_NORMALIZE_DEPTH = parseEnvVar(
+    process.env.NEXT_PUBLIC_SENTRY_NORMALIZE_DEPTH,
+    "NEXT_PUBLIC_SENTRY_NORMALIZE_DEPTH",
+    { type: "number", required: true },
+  );
 
   Sentry.configureScope((scope: Sentry.Scope) => {
     scope.setTag("userAgent", window.navigator.userAgent);

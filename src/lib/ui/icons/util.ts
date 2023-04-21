@@ -31,47 +31,6 @@ export const getIconPrefix = (i: types.Icon | types.IconType): types.IconPrefix 
   return getIconPrefix(i.type);
 };
 
-export const getIconLicense = (i: types.Icon | types.IconName): types.IconLicense => {
-  // This will throw an error if an IconName is associated with multiple weights.
-  const ic = typeguards.isIconName(i) ? getIcon(i) : i;
-
-  let found: types.IconLicense[] = [];
-
-  const isIconName = (
-    v: types.LicensedIcon<types.IconName> | types.IconName,
-  ): v is types.IconName => typeof v === "string" && v === ic.name;
-
-  const isLicensedIcon = (
-    v: types.LicensedIcon<types.IconName> | types.IconName,
-  ): v is types.LicensedIcon<types.IconName> => typeof v !== "string" && v.name === ic.name;
-
-  const arr: (types.LicensedIcon<types.IconName> | types.IconName)[] = types.Icons[
-    ic.type
-  ].slice() as (types.LicensedIcon<types.IconName> | types.IconName)[];
-  for (let i = 0; i < arr.length; i++) {
-    const iteree: types.LicensedIcon<types.IconName> | types.IconName = arr[i];
-    if (isIconName(iteree)) {
-      found = [...found, types.IconLicenses.BOTH];
-    } else if (isLicensedIcon(iteree)) {
-      found = [...found, iteree.license];
-    }
-  }
-  if (found.length === 0) {
-    throw new Error(
-      "Error Finding Icon License: Could not find any references to an Icon with name " +
-        `'${ic.name}', type '${ic.type}'.  The original provided icon was specified as ` +
-        `'${JSON.stringify(i)}.'`,
-    );
-  } else if (found.length !== 1) {
-    throw new Error(
-      "Error Finding Icon License: Found multiple references to an Icon with name " +
-        `'${ic.name}', type '${ic.type}'.  The original provided icon was specified as ` +
-        `'${JSON.stringify(i)}.'`,
-    );
-  }
-  return found[0];
-};
-
 /**
  * This is the default FontAwesome prefix that will be *favored* when a prefix is not supplied and
  * just the {@link ui.types.IconName} is provided.
@@ -114,15 +73,9 @@ export const getIconCodes = <N extends types.IconName = types.IconName>(
 export function getIcons(name?: types.IconName): types.Icon[] {
   const icons = Object.keys(types.Icons).reduce((curr: types.Icon[], k: string): types.Icon[] => {
     const names: types.IconName[] = (
-      types.Icons[k as types.IconCode].slice() as (
-        | types.IconName
-        | types.LicensedIcon<types.IconName>
-      )[]
+      types.Icons[k as types.IconCode].slice() as types.IconName[]
     ).reduce(
-      (
-        prev: types.IconName[],
-        curr: types.IconName | types.LicensedIcon<types.IconName>,
-      ): types.IconName[] => (typeof curr === "string" ? [...prev, curr] : [...prev, curr.name]),
+      (prev: types.IconName[], curr: types.IconName): types.IconName[] => [...prev, curr],
       [] as types.IconName[],
     );
     return [...curr, ...names.map((n: types.IconName) => ({ type: k, name: n } as types.Icon))];

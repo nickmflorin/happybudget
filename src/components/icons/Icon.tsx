@@ -2,8 +2,6 @@ import React, { useMemo, forwardRef, ForwardedRef } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { config } from "application";
-import { logger } from "internal";
 import { ui } from "lib";
 
 import { useIcon } from "./hooks";
@@ -17,34 +15,10 @@ function _IconComponent(
     contain,
     color = ui.IconColors.GREY,
     ref,
-    fallbackLicenseIcon,
     ...props
   }: ui.IconComponentProps & { readonly ref?: ForwardedRef<SVGSVGElement> },
 ) {
   const iconProps = useIcon({ ...props, axis, size, contain, color });
-
-  const _icon = useMemo(() => {
-    const licensedIcon = ui.getNativeIcon(icon);
-    const license = ui.getIconLicense(icon);
-
-    const PRO_FONT_AWESOME = config.parseEnvVar(
-      process.env.NEXT_PUBLIC_PRO_FONT_AWESOME,
-      "NEXT_PUBLIC_PRO_FONT_AWESOME",
-      { type: "boolean", required: true },
-    );
-    /* If the Icon is licensed as a PRO icon, but the PRO license is not available, FA will not
-       render the SVG, but no hard error will occur. */
-    if (PRO_FONT_AWESOME === false && license === "pro") {
-      logger.error(
-        { prefix: licensedIcon[0], name: licensedIcon[1] },
-        "The provided icon is only compatible with the pro license.",
-      );
-      return fallbackLicenseIcon !== undefined
-        ? ui.getNativeIcon(fallbackLicenseIcon)
-        : licensedIcon;
-    }
-    return licensedIcon;
-  }, [icon, fallbackLicenseIcon]);
 
   /*
   If the size is provided as a number or a valid CSS value, we cannot dynamically use SASS classes
@@ -60,7 +34,15 @@ function _IconComponent(
     [props.style, axis, size],
   );
 
-  return <FontAwesomeIcon {...props} {...iconProps} style={style} ref={ref} icon={_icon} />;
+  return (
+    <FontAwesomeIcon
+      {...props}
+      {...iconProps}
+      style={style}
+      ref={ref}
+      icon={ui.getNativeIcon(icon)}
+    />
+  );
 }
 
 const ForwardedIconComponent = forwardRef(

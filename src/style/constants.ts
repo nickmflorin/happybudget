@@ -1,31 +1,39 @@
-import { ui, enumeratedLiterals, EnumeratedLiteralType } from "lib";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { HexColorSchema } from "lib/ui/types/schemas";
+/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { parseSize } from "lib/ui/util";
 
 import scssBreakpoints from "./partials/variables/_breakpoints.module.scss";
 import scssColors from "./partials/variables/_colors.module.scss";
 
-export const BreakpointIds = enumeratedLiterals([
-  "small",
-  "medium",
-  "large",
-  "xLarge",
-  "xxLarge",
-  "xxxLarge",
-] as const);
-export type BreakpointId = EnumeratedLiteralType<typeof BreakpointIds>;
+export enum BreakpointIds {
+  SMALL = "small",
+  MEDIUM = "medium",
+  LARGE = "large",
+  XLARGE = "xlarge",
+  XXLARGE = "xxlarge",
+  XXXLARGE = "xxxlarge",
+}
 
-const BreakpointIdToSCSSName = {
+export type BreakpointId = typeof BreakpointIds[keyof typeof BreakpointIds];
+
+const AllBreakpointIds = Object.keys(BreakpointIds).map(
+  (value: string) => BreakpointIds[value as keyof typeof BreakpointIds],
+) as BreakpointId[];
+
+const BreakpointIdToSCSSName: { [key in BreakpointId]: string } = {
   small: "smallBreakpoint",
   medium: "mediumBreakpoint",
   large: "largeBreakpoint",
-  xLarge: "xLargeBreakpoint",
-  xxLarge: "xxLargeBreakpoint",
-  xxxLarge: "xxxLargeBreakpoint",
+  xlarge: "xLargeBreakpoint",
+  xxlarge: "xxLargeBreakpoint",
+  xxxlarge: "xxxLargeBreakpoint",
 };
 
 export type Breakpoints = Record<BreakpointId, number>;
 
 const formBreakpoints = (): Breakpoints =>
-  BreakpointIds.__ALL__.reduce((prev: Breakpoints, k: string) => {
+  AllBreakpointIds.reduce((prev: Breakpoints, k: string) => {
     const breakpointId = k as BreakpointId;
     const breakpointValue = scssBreakpoints[BreakpointIdToSCSSName[breakpointId]];
     if (breakpointValue === undefined) {
@@ -33,7 +41,7 @@ const formBreakpoints = (): Breakpoints =>
         `Breakpoint '${breakpointId}' cannot be established: No SCSS variable found for '${BreakpointIdToSCSSName[breakpointId]}'`,
       );
     }
-    const parsed = ui.parseSize(breakpointValue, { strict: false });
+    const parsed = parseSize(breakpointValue, { strict: false });
     if (typeof parsed === "number") {
       throw new Error(
         `Breakpoint '${breakpointId}' cannot be established: SCSS variable for ` +
@@ -56,28 +64,32 @@ const formBreakpoints = (): Breakpoints =>
 
 export const breakpoints = formBreakpoints();
 
-export const ColorNames = enumeratedLiterals(["lightGrey"] as const);
-export type ColorName = EnumeratedLiteralType<typeof ColorNames>;
+export enum ColorNames {
+  lightGrey = "lightGrey",
+}
 
-export type Colors = { [key in ColorName]: ui.HexColor };
+export type ColorName = typeof ColorNames[keyof typeof ColorNames];
+
+const AllColorNames = Object.keys(ColorNames).map(
+  (value: string) => ColorNames[value as keyof typeof ColorNames],
+) as ColorName[];
+
+export type Colors = { [key in ColorName]: import("lib/ui/types/style").HexColor };
 
 const formColors = (): Colors =>
-  ColorNames.__ALL__.reduce((prev: Colors, k: string) => {
-    const colorName = k as ColorName;
-    const hexColor = scssColors[colorName];
+  AllColorNames.reduce((prev: Colors, k: ColorName) => {
+    const hexColor = scssColors[k];
 
     if (hexColor === undefined) {
-      throw new Error(
-        `Color '${colorName}' cannot be established: No SCSS variable found for '${colorName}'`,
-      );
+      throw new Error(`Color '${k}' cannot be established: No SCSS variable found for '${k}'`);
     }
-    const parsed = ui.HexColorSchema.safeParse(hexColor);
+    const parsed = HexColorSchema.safeParse(hexColor);
     if (parsed.success) {
-      return { ...prev, [colorName]: parsed.data };
+      return { ...prev, [k]: parsed.data };
     }
     throw new Error(
-      `Color '${colorName}' cannot be established: SCSS variable for ` +
-        `'${colorName} has value '${hexColor} that is invalid'`,
+      `Color '${k}' cannot be established: SCSS variable for ` +
+        `'${k} has value '${hexColor} that is invalid'`,
     );
   }, {} as Colors);
 

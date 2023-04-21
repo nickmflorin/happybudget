@@ -1,6 +1,6 @@
 import { errors } from "application";
 import { logger } from "internal";
-import { model, assertNull, assertNotNullOrUndefined, parsers } from "lib";
+import { assertNull, assertNotNullOrUndefined, parsers } from "lib";
 
 import * as schemas from "./schemas";
 import * as types from "./types";
@@ -566,7 +566,10 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
    *
    *   @see types.ClientResponse
    */
-  public retrieve = async <M extends model.Model, Q extends types.RawQuery = types.RawQuery>(
+  public retrieve = async <
+    M extends import("lib/model").Model,
+    Q extends types.RawQuery = types.RawQuery,
+  >(
     path: types.RequestPath<string, "GET">,
     options?: types.ClientRequestOptions<M, { query: Q }>,
   ): Promise<types.ClientResponse<M, { query: Q }>> =>
@@ -575,7 +578,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
   public createParameterizedRetrieveService =
     <
       U extends types.RequestPath<string, "GET">,
-      M extends model.Model,
+      M extends import("lib/model").Model,
       Q extends types.RawQuery = types.RawQuery,
     >(
       urlPattern: U,
@@ -666,7 +669,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
    *   @see types.ClientResponse
    */
   public listModels = async <
-    M extends model.ApiModel,
+    M extends import("lib/model").ApiModel,
     Q extends types.ApiModelListQuery<M> = types.ApiModelListQuery<M>,
   >(
     path: types.RequestPath<string, "GET">,
@@ -683,7 +686,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
   public createParameterizedListModelsService =
     <
       U extends types.RequestPath<string, "GET">,
-      M extends model.ApiModel,
+      M extends import("lib/model").ApiModel,
       Q extends types.ApiModelListQuery<M> = types.ApiModelListQuery<M>,
     >(
       urlPattern: U,
@@ -696,7 +699,10 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
       );
 
   public createListModelsService =
-    <M extends model.ApiModel, Q extends types.ApiModelListQuery<M> = types.ApiModelListQuery<M>>(
+    <
+      M extends import("lib/model").ApiModel,
+      Q extends types.ApiModelListQuery<M> = types.ApiModelListQuery<M>,
+    >(
       url: types.RequestPath<string, "GET">,
       opts?: types.ServiceOptions<M, { query: Q }>,
     ): types.Service<types.ApiListResponse<M>, { query: Q }, M> =>

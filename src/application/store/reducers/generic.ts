@@ -1,5 +1,4 @@
 import { logger } from "internal";
-import { model } from "lib";
 
 import * as types from "../types";
 
@@ -10,7 +9,9 @@ export const identityReducer =
 
 export const identityReducerWithDefinedState = <S>(st: S) => st;
 
-export const modelListActionReducer = <M extends model.Model = model.Model>(
+export const modelListActionReducer = <
+  M extends import("lib/model").Model = import("lib/model").Model,
+>(
   st: types.ModelListActionStore<M> = { current: [], completed: [], failed: [] },
   action: types.ModelListActionAction<M>,
 ): types.ModelListActionStore<M> => {

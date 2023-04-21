@@ -1,5 +1,3 @@
-import { model } from "lib";
-
 import * as api from "../../api";
 import * as errors from "../../errors";
 
@@ -37,19 +35,20 @@ export type ListStore<T extends api.ListResponseIteree> = {
   readonly error: errors.HttpError | null;
 };
 
-export type ApiModelListStore<T extends model.ApiModel> = ListStore<T>;
+export type ApiModelListStore<T extends import("lib/model").ApiModel> = ListStore<T>;
 
-export type AuthenticatedApiModelListStore<M extends model.ApiModel> = ListStore<M> & {
-  readonly search: string;
-  readonly page: number;
-  readonly pageSize: number;
-  readonly deleting: ModelListActionStore;
-  readonly updating: ModelListActionStore;
-  readonly creating: boolean;
-  readonly ordering: api.ModelOrdering<M>;
-};
+export type AuthenticatedApiModelListStore<M extends import("lib/model").ApiModel> =
+  ListStore<M> & {
+    readonly search: string;
+    readonly page: number;
+    readonly pageSize: number;
+    readonly deleting: ModelListActionStore;
+    readonly updating: ModelListActionStore;
+    readonly creating: boolean;
+    readonly ordering: api.ModelOrdering<M>;
+  };
 
-export type ApiModelDetailStore<T extends model.ApiModel> = {
+export type ApiModelDetailStore<T extends import("lib/model").ApiModel> = {
   /**
    * The data object received from the API that conforms to the generically provided ApiModel
    * type.  This will be null in the case that the request resulted in an error or the response
@@ -72,8 +71,9 @@ export type ApiModelDetailStore<T extends model.ApiModel> = {
 
 export type ModelIndexedStore<S> = { [key: number]: S };
 
-export type ModelListActionStore<M extends model.Model = model.Model> = {
-  readonly current: M["id"][];
-  readonly completed: M["id"][];
-  readonly failed: M["id"][];
-};
+export type ModelListActionStore<M extends import("lib/model").Model = import("lib/model").Model> =
+  {
+    readonly current: M["id"][];
+    readonly completed: M["id"][];
+    readonly failed: M["id"][];
+  };
