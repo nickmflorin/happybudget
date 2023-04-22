@@ -6,7 +6,7 @@ import { store } from "application";
 
 import { AppLoading } from "./AppLoading";
 
-export const ConnectedApplicationSpinner = (): JSX.Element => {
+export const ConnectedAppLoading = (): JSX.Element => {
   const applicationLoading = useSelector(store.selectors.selectApplicationLoading);
   return <AppLoading visible={applicationLoading} />;
 };

@@ -1,7 +1,7 @@
 import { model } from "lib";
 
-import * as types from "../../../../application/store/types";
-import * as tabling from "../tabling";
+import * as tabling from "../../../../deprecated/store/reducers/tabling";
+import * as types from "../../types";
 
 type R = model.AccountRow;
 type M = model.Account;

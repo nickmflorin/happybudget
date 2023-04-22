@@ -4,17 +4,21 @@ import { type Middleware, type StoreEnhancer } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
 import createSagaMiddleware, { SagaMiddlewareOptions } from "redux-saga";
 
-import { createApplicationReducer } from "./reducer";
-import { createApplicationSaga, createSagaManager } from "./sagas";
+import { createApplicationSaga, createSagaManager } from "../../deprecated/store/sagas";
 
-import { createApplicationInitialState } from "../../application/store/initialState";
-import * as types from "../../application/store/types";
+import { createApplicationInitialState } from "./initialState";
+import { createApplicationReducer } from "./reducer";
+import * as types from "./types";
 
 type MD = Middleware<Record<string, unknown>, types.ApplicationStore>;
 
+/* eslint-disable-next-line @typescript-eslint/no-unused-vars -- Temporary */
 const publicActionMiddleware: MD = api => next => (action: types.Action) => {
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars -- Temporary */
   const state = api.getState();
-  return next({ ...action, context: { ...action.context, publicTokenId: state.public.tokenId } });
+  /* return next({
+     ...action, context: { ...action.context, publicTokenId: state.public.tokenId } }); */
+  return next({ ...action, context: { ...action.context, publicTokenId: "TEMPORARY_HACK" } });
 };
 
 const userActionMiddleware: MD = api => next => (action: types.Action) => {
@@ -22,7 +26,7 @@ const userActionMiddleware: MD = api => next => (action: types.Action) => {
   return next({ ...action, user: state.user });
 };
 
-const configureStore = (c: types.StoreConfig): types.Store<types.ApplicationStore> => {
+export const configureStore = (c: types.StoreConfig): types.Store<types.ApplicationStore> => {
   const initialState = createApplicationInitialState(c);
   const applicationReducer = createApplicationReducer(c);
   const applicationSaga = createApplicationSaga();
@@ -74,5 +78,3 @@ const configureStore = (c: types.StoreConfig): types.Store<types.ApplicationStor
   );
   return { ...store, injectSaga, ejectSaga, hasSaga };
 };
-
-export default configureStore;

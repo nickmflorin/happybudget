@@ -99,13 +99,13 @@ export type PublicStore = {
 export type ApplicationStore = {
   readonly loading: boolean;
   readonly user: import("lib/model").User | null;
-  readonly contacts: store.AuthenticatedApiModelListStore<import("lib/model").Contact>;
-  readonly filteredContacts: store.AuthenticatedApiModelListStore<import("lib/model").Contact>;
-  readonly actualTypes: store.ApiModelListStore<import("lib/model").ActualType>;
-  readonly fringeColors: store.ListStore<string>;
-  readonly subaccountUnits: store.ApiModelListStore<import("lib/model").SubAccountUnit>;
-  readonly productPermissionModalOpen: boolean;
-  readonly public: PublicStore;
+  /* readonly contacts: store.AuthenticatedApiModelListStore<import("lib/model").Contact>;
+     readonly filteredContacts: store.AuthenticatedApiModelListStore<import("lib/model").Contact>;
+     readonly actualTypes: store.ApiModelListStore<import("lib/model").ActualType>;
+     readonly fringeColors: store.ListStore<string>;
+     readonly subaccountUnits: store.ApiModelListStore<import("lib/model").SubAccountUnit>;
+     readonly productPermissionModalOpen: boolean;
+     readonly public: PublicStore; */
   readonly drawerOpen: boolean;
 };
 

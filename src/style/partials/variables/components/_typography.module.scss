@@ -511,7 +511,7 @@ $typography-weight-names: (
 }
 
 @function font-src($family, $style, $font-style: normal) {
-  $src: null;
+  $src: ();
   $font-style: fn.validate-value($font-style, $font-family-font-styles);
   $family: fn.validate-value($family, $font-families);
   $style: fn.validate-value($style, fn.map-get($font-family-style-folder-names, $family));

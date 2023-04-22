@@ -28,36 +28,36 @@ export const selectLoggedInUser = (s: types.ApplicationStore) => {
   return s.user;
 };
 
-export const selectContacts = simpleDeepEqualSelector(
-  (state: types.ApplicationStore) => state.contacts.data,
-);
-export const selectContactsLoaded = simpleDeepEqualSelector(
-  (state: types.ApplicationStore) => state.contacts.responseWasReceived,
-);
-export const selectContactsLoading = simpleShallowEqualSelector(
-  (state: types.ApplicationStore) => state.contacts.loading,
-);
-export const selectFilteredContacts = simpleDeepEqualSelector(
-  (state: types.ApplicationStore) => state.filteredContacts.data,
-);
-export const selectFilteredContactsLoading = simpleShallowEqualSelector(
-  (state: types.ApplicationStore) => state.filteredContacts.loading,
-);
-export const selectSubAccountUnitStore = simpleDeepEqualSelector(
-  (state: types.ApplicationStore) => state.subaccountUnits,
-);
-export const selectSubAccountUnits = simpleDeepEqualSelector(
-  (state: types.ApplicationStore) => state.subaccountUnits.data,
-);
-export const selectFringeColorStore = simpleDeepEqualSelector(
-  (state: types.ApplicationStore) => state.fringeColors,
-);
-export const selectFringeColors = simpleDeepEqualSelector(
-  (state: types.ApplicationStore) => state.fringeColors.data,
-);
-export const selectActualTypeStore = simpleDeepEqualSelector(
-  (state: types.ApplicationStore) => state.actualTypes,
-);
-export const selectActualTypes = simpleDeepEqualSelector(
-  (state: types.ApplicationStore) => state.actualTypes.data,
-);
+/* export const selectContacts = simpleDeepEqualSelector(
+     (state: types.ApplicationStore) => state.contacts.data,
+   );
+   export const selectContactsLoaded = simpleDeepEqualSelector(
+     (state: types.ApplicationStore) => state.contacts.responseWasReceived,
+   );
+   export const selectContactsLoading = simpleShallowEqualSelector(
+     (state: types.ApplicationStore) => state.contacts.loading,
+   );
+   export const selectFilteredContacts = simpleDeepEqualSelector(
+     (state: types.ApplicationStore) => state.filteredContacts.data,
+   );
+   export const selectFilteredContactsLoading = simpleShallowEqualSelector(
+     (state: types.ApplicationStore) => state.filteredContacts.loading,
+   );
+   export const selectSubAccountUnitStore = simpleDeepEqualSelector(
+     (state: types.ApplicationStore) => state.subaccountUnits,
+   );
+   export const selectSubAccountUnits = simpleDeepEqualSelector(
+     (state: types.ApplicationStore) => state.subaccountUnits.data,
+   );
+   export const selectFringeColorStore = simpleDeepEqualSelector(
+     (state: types.ApplicationStore) => state.fringeColors,
+   );
+   export const selectFringeColors = simpleDeepEqualSelector(
+     (state: types.ApplicationStore) => state.fringeColors.data,
+   );
+   export const selectActualTypeStore = simpleDeepEqualSelector(
+     (state: types.ApplicationStore) => state.actualTypes,
+   );
+   export const selectActualTypes = simpleDeepEqualSelector(
+     (state: types.ApplicationStore) => state.actualTypes.data,
+   ); */

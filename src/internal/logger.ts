@@ -147,6 +147,14 @@ type InconsistentReduxStateErrorParams<
 };
 
 export type Logger = typeof _LOGGER & {
+  readonly requestError: (
+    error: import("application/errors/errors/http").HttpError,
+    message?: string,
+  ) => void;
+  readonly applicationError: (
+    error: import("application/errors/errors/base").ApplicationError,
+    message?: string,
+  ) => void;
   readonly inconsistentReduxStateError: <
     A extends import("application/store/types/actions").BasicAction<P> | string,
     P,
@@ -159,6 +167,21 @@ export type Logger = typeof _LOGGER & {
 
 const LOGGER: Logger = {
   ..._LOGGER,
+  applicationError(
+    this: Logger,
+    error: import("application/errors/errors/base").ApplicationError,
+    message?: string,
+  ) {
+    // The error message will be in the context regardless.
+    this.error({ ...error.logContext }, message || error.message);
+  },
+  requestError(
+    this: Logger,
+    error: import("application/errors/errors/http").HttpError,
+    message?: string,
+  ) {
+    this.applicationError(error, message);
+  },
   inconsistentReduxStateError<
     A extends import("application/store/types/actions").BasicAction<P> | string,
     P,

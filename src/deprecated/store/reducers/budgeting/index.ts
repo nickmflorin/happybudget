@@ -2,9 +2,9 @@ import { Optional } from "utility-types";
 
 import { model, tabling } from "lib";
 
-import * as initialState from "../../../../application/store/initialState";
-import * as types from "../../../../application/store/types";
-import * as factories from "../../../../application/store/reducers/factories";
+import * as initialState from "../../initialState";
+import * as types from "../../types";
+import * as factories from "../factories";
 
 import {
   createAuthenticatedSubAccountsTableReducer,

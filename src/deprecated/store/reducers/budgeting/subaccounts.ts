@@ -1,7 +1,7 @@
 import { model, tabling } from "lib";
 
-import * as types from "../../../../application/store/types";
 import * as reducers from "../tabling";
+import * as types from "../../../../application/store/types";
 
 type R = model.SubAccountRow;
 type M = model.SubAccount;

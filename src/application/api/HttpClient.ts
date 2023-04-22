@@ -404,6 +404,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
     let error: errors.HttpError | null = null;
 
     const request = new Request(this.constructUrl(path, options), {
+      method,
       body:
         options?.body !== undefined && !types.payloadIsFormData(options.body)
           ? JSON.stringify(this.filterPayload(options.body))
@@ -768,7 +769,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
     path: types.RequestPath<string, "POST">,
     options?: types.ClientRequestOptions<S, { body: P }>,
   ): Promise<types.ClientStrictResponse<S, { body: P }>> =>
-    this.request<"POST", S, { body: P }, true>(path, types.HttpMethods.GET, true, options);
+    this.request<"POST", S, { body: P }, true>(path, types.HttpMethods.POST, true, options);
 
   public createPostService =
     <S extends types.ApiResponseBody | null, P extends types.Payload = types.Payload>(

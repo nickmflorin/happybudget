@@ -7,10 +7,20 @@ import { logger } from "internal";
 
 import { parseEnvVar } from "../util";
 
-export const configure = () => {
+export const sentryDSN = (): string | null => {
   const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
   if (SENTRY_DSN === undefined || SENTRY_DSN.toLowerCase() === "none") {
     logger.warn("No SENTRY_DSN found in the environment, skipping Sentry configuration.");
+    return null;
+  }
+  return SENTRY_DSN;
+};
+
+export const sentryIsConfigured = (): boolean => sentryDSN() !== null;
+
+export const configure = () => {
+  const SENTRY_DSN = sentryDSN();
+  if (SENTRY_DSN === null) {
     return;
   }
   const SENTRY_ENV = process.env.NEXT_PUBLIC_SENTRY_ENV;

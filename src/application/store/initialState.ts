@@ -63,17 +63,17 @@ export const createApplicationInitialState = (
   user: storeConfig.user,
   loading: false,
   drawerOpen: false,
-  contacts:
-    initialAuthenticatedApiModelListResponseState<import("lib/model/contact/types").Contact>(),
-  filteredContacts:
-    initialAuthenticatedApiModelListResponseState<import("lib/model/contact/types").Contact>(),
-  fringeColors: initialListResponseState<string>(),
-  subaccountUnits:
-    initialApiModelListResponseState<import("lib/model/budgeting/types").SubAccountUnit>(),
-  actualTypes: initialApiModelListResponseState<import("lib/model/budgeting/types").ActualType>(),
-  productPermissionModalOpen: false,
-  public: {
-    // ...config.PUBLIC_MODULE_INITIAL_STATE,
-    tokenId: storeConfig.tokenId,
-  } as types.PublicStore,
+  /* contacts:
+       initialAuthenticatedApiModelListResponseState<import("lib/model/contact/types").Contact>(),
+     filteredContacts:
+       initialAuthenticatedApiModelListResponseState<import("lib/model/contact/types").Contact>(),
+     fringeColors: initialListResponseState<string>(),
+     subaccountUnits:
+       initialApiModelListResponseState<import("lib/model/budgeting/types").SubAccountUnit>(),
+     actualTypes: initialApiModelListResponseState<import("lib/model/budgeting/types").ActualType>(),
+     productPermissionModalOpen: false, */
+  /* public: {
+       // ...config.PUBLIC_MODULE_INITIAL_STATE,
+       tokenId: storeConfig.tokenId,
+     } as types.PublicStore, */
 });

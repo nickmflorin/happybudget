@@ -1,7 +1,7 @@
 import { model } from "lib";
 
-import * as types from "../../../../application/store/types";
 import * as tabling from "../tabling";
+import * as types from "../../../../application/store/types";
 
 type M = model.Actual;
 type R = model.ActualRow;
