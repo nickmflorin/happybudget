@@ -9,7 +9,7 @@ const CorshaConsole = ({ Component, pageProps }: AppProps) => {
     return <Component {...pageProps} />;
   }
   return (
-    <AppConfig>
+    <AppConfig authenticated={true}>
       <Layout>
         <Component {...pageProps} />
       </Layout>

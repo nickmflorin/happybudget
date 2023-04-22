@@ -1,18 +1,47 @@
 import { useRouter } from "next/router";
-import React, { ReactNode, useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 import * as Sentry from "@sentry/browser";
-import { Provider } from "react-redux";
 import { Store } from "redux";
 
 import { api, store, plugins, errors } from "application";
 import { logger } from "internal";
 import { model, parsers } from "lib";
-import { ScreenLoading, ConnectedAppLoading } from "components/loading";
+
+const TEMPORARY_HACK = true;
 
 const validateAuthToken = async (
   forceReloadFromStripe: boolean,
 ): Promise<model.User | null | errors.HttpError> => {
+  if (TEMPORARY_HACK) {
+    return {
+      first_name: "Nick",
+      last_name: "Florin",
+      id: 1,
+      full_name: "Nick Florin",
+      email: "nickmflorin@gmail.com",
+      profile_image: null,
+      is_first_time: false,
+      last_login: "2020-01-01",
+      date_joined: "2020-01-01",
+      is_active: true,
+      is_superuser: true,
+      timezone: "",
+      address: "",
+      position: "",
+      company: "",
+      phone_number: 1924,
+      product_id: "standard",
+      billing_status: "active",
+      is_staff: true,
+      metrics: {
+        num_archived_budgets: 1,
+        num_budgets: 1,
+        num_collaborating_budgets: 1,
+        num_templates: 1,
+      },
+    };
+  }
   const response = await api.validateAuthToken({ force_reload_from_stripe: forceReloadFromStripe });
   if (response.error) {
     /* If the token authentication fails because the user is not authenticated, return null so a
@@ -36,7 +65,7 @@ const validatePublicToken = async (
   const response = await api.validatePublicToken({ token, instance: { id, type } });
   if (response.error) {
     /* If the token authentication fails because the user is not authenticated, return null so a
-         redirect can occur. */
+       redirect can occur. */
     if (
       errors.isApiGlobalError(response.error) &&
       response.error.code === errors.ApiErrorCodes.ACCOUNT_NOT_AUTHENTICATED
@@ -66,9 +95,6 @@ export type PublicStoreConfigProps = {
 
 export type StoreConfigProps = AuthenticatedStoreConfigProps | PublicStoreConfigProps;
 
-const propsArePublic = (props: StoreConfigProps): props is PublicStoreConfigProps =>
-  (props as PublicStoreConfigProps).isPublic === true;
-
 const handleUser = (user: model.User) => {
   Sentry.setUser({ email: user.email, id: String(user.id) });
   plugins.identify(user);
@@ -76,16 +102,18 @@ const handleUser = (user: model.User) => {
 
 type RedirectPath = "/login" | "/404";
 
-const _StoreConfig = (props: StoreConfigProps & { readonly children: ReactNode }): JSX.Element => {
-  const [reduxStore, setReduxStore] = useState<
-    Store<store.ApplicationStore, store.Action> | undefined
-  >(undefined);
+export const useStore = (
+  props: StoreConfigProps,
+): Store<store.ApplicationStore, store.Action> | null => {
+  const [reduxStore, setReduxStore] = useState<Store<store.ApplicationStore, store.Action> | null>(
+    null,
+  );
   const router = useRouter();
 
-  const instanceId = (props as PublicStoreConfigProps).instanceId;
-  const instanceIdParam = (props as PublicStoreConfigProps).instanceIdParam;
-  const instanceType = (props as PublicStoreConfigProps).instanceType;
-  const publicTokenId = (props as PublicStoreConfigProps).publicTokenId;
+  const propsInstanceId = (props as PublicStoreConfigProps).instanceId;
+  const propsInstanceIdParam = (props as PublicStoreConfigProps).instanceIdParam;
+  const propsInstanceType = (props as PublicStoreConfigProps).instanceType;
+  const propsPublicTokenId = (props as PublicStoreConfigProps).publicTokenId;
 
   const handleAuthenticationError = useMemo(
     () => (e: errors.HttpError) => {
@@ -133,26 +161,32 @@ const _StoreConfig = (props: StoreConfigProps & { readonly children: ReactNode }
     [handleAuthenticationError, router],
   );
 
+  const tokenId = useMemo<string | null>(
+    () =>
+      propsPublicTokenId ||
+      (typeof router.query.tokenId === "string" ? router.query.tokenId : null),
+    [propsPublicTokenId, router],
+  );
+
+  const instanceId = useMemo<number | null>(() => {
+    const instanceId: number | null = propsInstanceId === undefined ? null : propsInstanceId;
+    if (instanceId === null && typeof router.query.instanceId === "string") {
+      return parsers.parseInteger(router.query.instanceId);
+    }
+    return instanceId;
+  }, [propsInstanceId, router]);
+
   useEffect(() => {
-    if (!propsArePublic(props)) {
+    if (!props.isPublic) {
       setupUserStore(true);
     }
-    /* eslint-disable-next-line react-hooks/exhaustive-deps -- The typeguard only needs the 'isPublic' property. */
   }, [props.isPublic, setupUserStore]);
 
   useEffect(() => {
-    if (propsArePublic(props)) {
-      if (props.instanceIdParam === undefined && props.instanceId === undefined) {
+    if (props.isPublic) {
+      if (propsInstanceId === undefined && propsInstanceIdParam === undefined) {
         throw new Error("Either the 'instanceId' or 'instanceIdParam' props must be provied.");
-      }
-      const tokenId =
-        props.publicTokenId ||
-        (typeof router.query.tokenId === "string" ? router.query.tokenId : undefined);
-      let instanceId: number | null = props.instanceId === undefined ? null : props.instanceId;
-      if (instanceId === null && typeof router.query.instanceId === "string") {
-        instanceId = parsers.parseInteger(router.query.instanceId);
-      }
-      if (tokenId === undefined || instanceId === null) {
+      } else if (tokenId === null || instanceId === null) {
         /* In the case that the user has an active session but visited an invalid public route, we
            want to redirect them to the 404 page, not the home page. */
         setupUserStore(false, "/404");
@@ -166,7 +200,7 @@ const _StoreConfig = (props: StoreConfigProps & { readonly children: ReactNode }
         const promises: [
           Promise<string | null | errors.HttpError>,
           Promise<model.User | null | errors.HttpError>,
-        ] = [validatePublicToken(tokenId, instanceId, props.instanceType), validateAuthToken(true)];
+        ] = [validatePublicToken(tokenId, instanceId, propsInstanceType), validateAuthToken(true)];
         Promise.all(promises).then(
           ([privateToken, user]: [
             string | null | errors.HttpError,
@@ -177,7 +211,7 @@ const _StoreConfig = (props: StoreConfigProps & { readonly children: ReactNode }
             ): value is T => value !== null && !(value instanceof Error);
             if (privateToken === null) {
               /* If the public token validation failed, but the user is logged in, we should treat
-                 that as a 404 instead of redirecting them back to the home page. */
+                   that as a 404 instead of redirecting them back to the home page. */
               if (isDefinedValue(user)) {
                 router.push("/404");
               } else {
@@ -209,32 +243,18 @@ const _StoreConfig = (props: StoreConfigProps & { readonly children: ReactNode }
         );
       }
     }
-    /* eslint-disable-next-line react-hooks/exhaustive-deps -- The typeguard only needs the 'isPublic' property. */
   }, [
     handleAuthenticationError,
     handlePublicTokenError,
+    setupUserStore,
     router,
     props.isPublic,
-    setupUserStore,
-    props.isPublic,
     instanceId,
-    instanceIdParam,
-    instanceType,
-    publicTokenId,
+    tokenId,
+    propsInstanceIdParam,
+    propsInstanceType,
+    propsInstanceId,
   ]);
 
-  if (reduxStore === undefined) {
-    return <ScreenLoading />;
-  } else {
-    return (
-      <Provider store={reduxStore}>
-        <React.Fragment>
-          <ConnectedAppLoading />
-          {props.children}
-        </React.Fragment>
-      </Provider>
-    );
-  }
+  return reduxStore;
 };
-
-export const StoreConfig = React.memo(_StoreConfig);

@@ -2,9 +2,6 @@ import { configureStore as configureRootStore, applyMiddleware } from "@reduxjs/
 import * as Sentry from "@sentry/react";
 import { type Middleware, type StoreEnhancer } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
-import createSagaMiddleware, { SagaMiddlewareOptions } from "redux-saga";
-
-import { createApplicationSaga, createSagaManager } from "../../deprecated/store/sagas";
 
 import { createApplicationInitialState } from "./initialState";
 import { createApplicationReducer } from "./reducer";
@@ -29,22 +26,23 @@ const userActionMiddleware: MD = api => next => (action: types.Action) => {
 export const configureStore = (c: types.StoreConfig): types.Store<types.ApplicationStore> => {
   const initialState = createApplicationInitialState(c);
   const applicationReducer = createApplicationReducer(c);
-  const applicationSaga = createApplicationSaga();
+  // const applicationSaga = createApplicationSaga();
 
   /* If in a production environment, instruct the redux-sagas middleware to funnel errors through to
      Sentry. */
-  let sagaMiddlewareOptions: SagaMiddlewareOptions = {};
-  if (process.env.NODE_ENV === "production") {
-    sagaMiddlewareOptions = {
-      ...sagaMiddlewareOptions,
-      onError: (error: Error) => Sentry.captureException(error),
-    };
-  }
-  /* Create the redux-saga middleware that allows the sagas to run as side-effects in the
-     application. */
-  const sagaMiddleware = createSagaMiddleware(sagaMiddlewareOptions);
+  // let sagaMiddlewareOptions: SagaMiddlewareOptions = {};
+  // if (process.env.NODE_ENV === "production") {
+  //   sagaMiddlewareOptions = {
+  //     ...sagaMiddlewareOptions,
+  //     onError: (error: Error) => Sentry.captureException(error),
+  //   };
+  // }
+  // /* Create the redux-saga middleware that allows the sagas to run as side-effects in the
+  //    application. */
+  // const sagaMiddleware = createSagaMiddleware(sagaMiddlewareOptions);
 
-  let baseMiddleware: MD[] = [publicActionMiddleware, userActionMiddleware, sagaMiddleware];
+  // let baseMiddleware: MD[] = [publicActionMiddleware, userActionMiddleware, sagaMiddleware];
+  let baseMiddleware: MD[] = [publicActionMiddleware, userActionMiddleware];
   if (process.env.NODE_ENV === "development") {
     /* eslint-disable-next-line @typescript-eslint/no-var-requires */
     baseMiddleware = [require("redux-immutable-state-invariant").default(), ...baseMiddleware];
@@ -71,10 +69,11 @@ export const configureStore = (c: types.StoreConfig): types.Store<types.Applicat
 
   /* Start the application saga and establish the saga injector.  This must be done after the store
      is configured, because the SagaMiddleware must be mounted to run the root saga. */
-  const [injectSaga, ejectSaga, hasSaga] = createSagaManager(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (saga: any, ...args: Parameters<any>) => sagaMiddleware.run(saga, ...args),
-    applicationSaga,
-  );
-  return { ...store, injectSaga, ejectSaga, hasSaga };
+  /* const [injectSaga, ejectSaga, hasSaga] = createSagaManager(
+       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       (saga: any, ...args: Parameters<any>) => sagaMiddleware.run(saga, ...args),
+       applicationSaga,
+     );
+     return { ...store, injectSaga, ejectSaga, hasSaga }; */
+  return store;
 };

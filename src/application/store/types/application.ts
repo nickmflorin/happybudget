@@ -1,5 +1,4 @@
 import { type Store as RootStore } from "redux";
-import { type Saga } from "redux-saga";
 
 import { Action } from "./actions";
 import * as store from "./store";
@@ -116,8 +115,10 @@ export type StoreConfig = {
   readonly user: import("lib/model").User | null;
 };
 
-export type Store<S extends ApplicationStore> = RootStore<S, Action> & {
-  readonly injectSaga: (key: string, saga: Saga) => boolean;
-  readonly ejectSaga: (key: string) => boolean;
-  readonly hasSaga: (key: string) => boolean;
-};
+/* export type Store<S extends ApplicationStore> = RootStore<S, Action> & {
+     readonly injectSaga: (key: string, saga: Saga) => boolean;
+     readonly ejectSaga: (key: string) => boolean;
+     readonly hasSaga: (key: string) => boolean;
+   }; */
+
+export type Store<S extends ApplicationStore> = RootStore<S, Action>;
