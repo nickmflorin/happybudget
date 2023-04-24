@@ -1,0 +1,8 @@
+@use "../../partials" as partials;
+
+@include describe("first()") {
+  @include it("should return the first element of the list") {
+    $result: partials.first(("a", "b", null, "c"));
+    @include assert-equal($result, "a");
+  }
+}

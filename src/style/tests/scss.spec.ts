@@ -16,9 +16,10 @@ import { runSass } from "sass-true";
 /* The SASS Jest "project" scopes the `rootDir` of the project's configuration to this directory
    in `src/styles/__tests__/jest.config.ts` - so the glob pattern will only look at files in this
    directory. */
-const testPath = "**/*test.scss";
+const testPath = "**/*.test.scss";
 
 describe("SASS", () => {
+  console.error(path.resolve(process.cwd(), testPath));
   const sassTestFiles = glob.sync(path.resolve(process.cwd(), testPath));
   sassTestFiles.forEach((file: string) =>
     runSass(

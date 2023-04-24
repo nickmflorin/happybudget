@@ -26,7 +26,7 @@
     "start": "next start",
     "lint": "next lint && stylelint \"./src/**/*.{scss,css}\" && prettier -c .",
     "eslint-fix": "npx eslint . --fix",
-    "test": "jest --watchAll",
+    "test": "jest --watchAll --silent=false",
     "test:ci": "jest --ci",
     "tsc": "tsc --project ./tsconfig.json",
     "tsc:watch": "tsc -w"

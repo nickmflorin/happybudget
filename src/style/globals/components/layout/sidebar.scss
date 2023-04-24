@@ -16,7 +16,7 @@ Note: This only works properly if the "corsha-logo" svg is used with a "fit" con
       it will deviate very slightly.
 */
 $sidebar-padding-top: partials.$sidebar-naive-padding-top - 0.5 *
-  (partials.$sidebar-anchor-size - partials.get-svg-height(partials.$corsha-logo-svg-name));
+  (partials.$sidebar-anchor-size - partials.get-svg-height(partials.$leaf-logo-svg-name));
 
 /*
 Based on the design comps, the support icon needs to be 42px from the bottom of the sidebar, where
@@ -58,7 +58,7 @@ $sidebar-horizontal-padding: 0.5 * (partials.$sidebar-width - partials.$sidebar-
     align-self: flex-start;
 
     .svg {
-      @include partials.svg-contain-fit(partials.$corsha-logo-svg-name);
+      @include partials.svg-contain-fit(partials.$leaf-logo-svg-name);
       @include partials.hovered {
         cursor: pointer;
       }
