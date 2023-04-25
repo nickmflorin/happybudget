@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 import { SWRConfig as RootSWRConfig } from "swr";
 import { PublicConfiguration } from "swr/_internal";
 import { z } from "zod";
@@ -47,7 +49,7 @@ export const getSwrConfig = (): Configuration => {
   throw new Error("Invalid SWR configuration!");
 };
 
-type SWRConfigProps = { readonly children: JSX.Element };
+type SWRConfigProps = { readonly children: ReactNode };
 
 export const shouldRetryOnError = (
   e: Error | errors.ApiGlobalError | errors.NetworkError | unknown,

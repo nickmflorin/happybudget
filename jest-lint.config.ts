@@ -14,7 +14,6 @@ export const withLintConfig = (__dirname: string, config: Config) =>
        tests.  This means that we have to explicitly tell Jest to look at all files in the project,
        and let the `.eslint.js` file control everything after.
 
-       https://jestjs.io/docs/configuration#testmatch-arraystring
-     */
+       https://jestjs.io/docs/configuration#testmatch-arraystring */
     testMatch: ["<rootDir>/**/*", "!**/__snapshots__/**", ...(config.testMatch || [])],
   });

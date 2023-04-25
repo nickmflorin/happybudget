@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 
 import { Provider } from "react-redux";
 /* FontAwesome's stylesheet must be imported, before any internal components or stylesheets are
@@ -14,7 +14,7 @@ import { useSegment } from "./useSegment";
 import { useStore } from "./useStore";
 
 export type AppConfigProps = {
-  readonly children: JSX.Element;
+  readonly children: ReactNode;
   readonly authenticated: boolean;
 };
 

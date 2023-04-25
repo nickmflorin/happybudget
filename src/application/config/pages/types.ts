@@ -15,40 +15,89 @@ export type HeadOptions = MetaOptions & {
 
 export type ClientPath<P extends string = string> = api.RequestPath<P, "GET">;
 
-export const SidebarIds = enumeratedLiterals(["dashboard", "budgeting"] as const);
-export type SidebarId = EnumeratedLiteralType<typeof SidebarIds>;
+export const NavIds = enumeratedLiterals(["dashboard", "budgeting"] as const);
+export type NavId = EnumeratedLiteralType<typeof NavIds>;
+
+export type BaseNav<I extends NavId> = {
+  readonly navId: I;
+};
+
+export type DashboardNav = BaseNav<"dashboard"> & {
+  readonly tabIndex?: number;
+};
+
+export type BudgetingNav = BaseNav<"budgeting"> & {
+  readonly sidebarIndex?: number;
+};
+
+export type Nav<I extends NavId> = {
+  dashboard: DashboardNav;
+  budgeting: BudgetingNav;
+}[I];
+
+export type Navs = (BudgetingNav | DashboardNav)[];
 
 export const PageIds = enumeratedLiterals([
   "templates",
-  "discover",
-  "budgets",
-  "collaborating-budgets",
-  "archived-budgets",
+  "projects",
+  "contacts",
+  "integrations",
+  "sources",
+  "settings",
 ] as const);
 
 export type PageId = EnumeratedLiteralType<typeof PageIds>;
 
-export type SidebarPagePathCallback = (v: string) => boolean;
+export type PageCallbackParams = {
+  readonly path: string;
+};
 
-export type SidebarPageActivePathSelector<P extends string = string> =
+export type AuthenticatedPageCallbackParams = PageCallbackParams & {
+  readonly user: import("lib/model").User;
+};
+
+export type PageCallback<
+  V extends string | number | Record<string, unknown> | boolean,
+  P extends PageCallbackParams = PageCallbackParams,
+> = (p: P) => V;
+
+export type PageParam<
+  V extends string | number | Record<string, unknown> | boolean,
+  P extends PageCallbackParams = PageCallbackParams,
+> = V | PageCallback<V, P>;
+
+export type PageActivePathSelector<P extends string = string> =
   | ClientPath<P>
   | RegExp
-  | SidebarPagePathCallback;
+  | PageCallback<boolean>;
 
-export type SidebarItemActiveStateControl<P extends string = string> =
-  | SidebarPageActivePathSelector<P>
-  | SidebarPageActivePathSelector<P>[];
+export type ActiveStateControl<P extends string = string> =
+  | PageActivePathSelector<P>
+  | PageActivePathSelector<P>[];
 
-/**
- * Defines the types of parameters that can be provided to callbacks for a given page, {@link Page}.
- */
-export type PageCallbackParams = Record<never, string>;
+type BasePage<
+  I extends PageId,
+  P extends string,
+  PARAMS extends PageCallbackParams = PageCallbackParams,
+> = import("lib/model").Model<I> & {
+  readonly head?: PageParam<HeadOptions, PARAMS>;
+  readonly title?: PageParam<string, PARAMS>;
+  /**
+   * The path that the router will push to the browser history in the event that the page is being
+   * navigated to via a link.  For any sidebar items that are associated with this page,
+   * {@link Page}, the determination of whether or not the sidebar item is active will be made based
+   * on this 'pathname' property if the 'pathRegex' is not specified on either the page itself and
+   * the sidebar item does not specify an 'active' property.
+   */
+  readonly pathname: ClientPath<P>;
+};
 
-export type PageCallbackParam<T, I extends PageId> = I extends keyof PageCallbackParams
-  ? T | ((params: PageCallbackParams[I]) => T)
-  : T;
-
-export type BaseSidebarItemConfig<P extends string = string> = {
+export type AuthenticatedPage<I extends PageId, P extends string> = BasePage<
+  I,
+  P,
+  AuthenticatedPageCallbackParams
+> & {
+  readonly isAuthenticated?: true;
   /**
    * Whether or not the sidebar item should be treated as being in the "active" state.
    *
@@ -64,20 +113,21 @@ export type BaseSidebarItemConfig<P extends string = string> = {
    *    In this case, the sidebar item, {@link types.SidebarItemConfig}, will be treated as active
    *    if the regular expression matches the current pathname as seen in the browser.
    *
-   * 3. A callback function {@link SidebarPagePathCallback}
+   * 3. A callback function {@link PagePathCallback}
    *    In this case, the sidebar item, {@link types.SidebarItemConfig}, will be treated as active
    *    if the callback function returns 'true' when called with the current path as seen in the
    *    browser as its first and only argument.
    *
    * 4. An array of regular expressions, string pathnames and/or callback functions,
-   *    {@link (string | RegExp | SidebarPagePathCallback)[]}.  In this case, the sidebar item,
+   *    {@link (string | RegExp | PagePathCallback)[]}.  In this case, the sidebar item,
    *    {@link types.SidebarItemConfig}, will be treated as active if any of the regular expressions
    *    in the array match the current pathname as seen in the browser, if any of the string values
    *    in the array equal the current pathname as seen in the browser, or if any of the callback
-   *    functions, {@link SidebarPagePathCallback}, in the array evaluate to 'true' when called with
+   *    functions, {@link PagePathCallback}, in the array evaluate to 'true' when called with
    *    the current path as seen in the browser as its first and only argument.
    */
-  readonly active?: SidebarItemActiveStateControl<P>;
+  readonly active?: ActiveStateControl<P>;
+  readonly label: string;
   /**
    * Whether or not the page should be hidden from the sidebar based on dynamic conditions, such
    * as permissions that the user has.
@@ -85,8 +135,8 @@ export type BaseSidebarItemConfig<P extends string = string> = {
    * Note: This alone is obviously not enough to guarantee that they cannot access the page - this
    * is merely just removing the clickable link from their view.
    */
-  readonly hidden?: boolean | SidebarPagePathCallback;
-  readonly icon: import("lib/ui").IconProp;
+  readonly hidden?: PageParam<boolean>;
+  readonly icon?: import("lib/ui").IconProp;
   /**
    * The icon, {@link ui.IconProp}, that should be displayed in the sidebar item whenthe sidebar
    * item is in the "active" state.  If not defined, the icon defined by the 'icon' property will
@@ -94,50 +144,34 @@ export type BaseSidebarItemConfig<P extends string = string> = {
    */
   readonly activeIcon?: import("lib/ui").IconProp;
   readonly tooltip?: import("lib/ui").Tooltip;
+  readonly navs?: Navs;
 };
 
-export type DashboardSidebarSubItemConfig<
-  I extends PageId = PageId,
-  P extends string = string,
-> = BaseSidebarItemConfig<P> & {
-  readonly label: string;
-  readonly page: I;
-  readonly tagText?: (user: import("lib/model").User) => string;
+export type PublicPage<I extends PageId, P extends string> = BasePage<I, P> & {
+  readonly isAuthenticated: false;
 };
 
-export type DashboardSidebarItemConfig<P extends string = string> = BaseSidebarItemConfig<P> & {
-  readonly label: string;
-  readonly subMenu?: DashboardSidebarSubItemConfig[];
-};
-
-export type BudgetingSidebarItemConfig<P extends string = string> = BaseSidebarItemConfig<P>;
-
-export type SidebarItemConfig<SI extends SidebarId = SidebarId, P extends string = string> = {
-  readonly dashboard: DashboardSidebarItemConfig<P>;
-  readonly budgeting: BudgetingSidebarItemConfig<P>;
-}[SI];
-
-export type AnySidebarItemConfig<P extends string = string> =
-  | DashboardSidebarItemConfig<P>
-  | BudgetingSidebarItemConfig<P>;
-
-export type Page<
-  I extends PageId = PageId,
-  P extends string = string,
-> = import("lib/model").Model<I> & {
-  readonly head?: PageCallbackParam<HeadOptions, I>;
-  readonly title?: PageCallbackParam<string, I>;
-  // TODO: Figure out how to dynamically force pages to render a 404 if they are hidden.
-  readonly hidden?: boolean;
-  /**
-   * The path that the router will push to the browser history in the event that the page is being
-   * navigated to via a link.  For any sidebar items that are associated with this page,
-   * {@link Page}, the determination of whether or not the sidebar item is active will be made based
-   * on this 'pathname' property if the 'pathRegex' is not specified on either the page itself and
-   * the sidebar item does not specify an 'active' property.
-   */
-  readonly pathname: ClientPath<P>;
-  readonly sidebars?: Partial<{ [key in SidebarId]: Omit<SidebarItemConfig<key, P>, "page"> }>;
-};
+export type Page<I extends PageId, P extends string> = AuthenticatedPage<I, P> | PublicPage<I, P>;
 
 export type Pages<P extends string = string> = { [key in PageId]: Page<key, P> };
+
+export const insertUserNameInTitle = (user: import("lib/model").User, value: string) =>
+  user.full_name !== "" ? `${user.full_name} | ${value}` : value;
+
+export const createPage = <I extends PageId, P extends string, PG extends Page<I, P>>(
+  page: PG,
+): PG => {
+  if (page.isAuthenticated) {
+    const defaultTitle = (params: AuthenticatedPageCallbackParams) =>
+      insertUserNameInTitle(params.user, page.label);
+    return {
+      title: defaultTitle,
+      ...page,
+      head: (params: AuthenticatedPageCallbackParams) => ({
+        title: defaultTitle,
+        ...(typeof page.head === "function" ? page.head(params) : page.head),
+      }),
+    };
+  }
+  return page;
+};

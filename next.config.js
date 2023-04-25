@@ -7,6 +7,9 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   output: "standalone",
+  experimental: {
+    appDir: true,
+  },
   webpack: config => {
     /* The StylelintPlugin requires the addition to the package.json: "postcss": "^8.4.18". */
     config.plugins.push(new StylelintPlugin());

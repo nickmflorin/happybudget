@@ -1,6 +1,9 @@
 {
   "editor.tabSize": 2,
-  "editor.rulers": [100, 120],
+  "editor.rulers": [
+    100,
+    120
+  ],
   "editor.trimAutoWhitespace": true,
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -17,7 +20,11 @@
   "typescript.updateImportsOnFileMove.enabled": "always",
   "typescript.validate.enable": true,
   "eslint.options": {},
-  "eslint.validate": ["typescript", "typescriptreact", "javascript"],
+  "eslint.validate": [
+    "typescript",
+    "typescriptreact",
+    "javascript"
+  ],
   "eslint.alwaysShowStatus": true,
   "eslint.packageManager": "npm",
   "eslint.run": "onSave",
@@ -31,8 +38,12 @@
   "css.validate": false,
   "less.validate": false,
   "scss.validate": false,
-  "stylelint.validate": ["css", "scss"],
+  "stylelint.validate": [
+    "css",
+    "scss"
+  ],
   "[markdown]": {
     "editor.defaultFormatter": "darkriszty.markdown-table-prettify"
-  }
+  },
+  "typescript.enablePromptUseWorkspaceTsdk": true
 }
