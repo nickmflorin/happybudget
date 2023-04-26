@@ -9,8 +9,6 @@
     "@ag-grid-enterprise/clipboard": "~26.1.0",
     "@ag-grid-enterprise/menu": "~26.1.0",
     "@ag-grid-enterprise/range-selection": "~26.1.0",
-    "@ckeditor/ckeditor5-adapter-ckfinder": "^37.1.0",
-    "@ckeditor/ckeditor5-build-balloon": "^30.0.0",
     "@ckeditor/ckeditor5-build-classic": "^37.1.0",
     "@ckeditor/ckeditor5-react": "^6.0.0",
     "@fancyapps/ui": "~4.0.9",

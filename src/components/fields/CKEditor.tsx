@@ -2,7 +2,7 @@ import React, { ReactNode, useEffect, useRef, forwardRef, useImperativeHandle, F
 import { isNil } from "lodash";
 import classNames from "classnames";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
-import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
+import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
 
 interface EditorProps {
   readonly className?: string;
@@ -115,7 +115,7 @@ export default Editor;
 //           const html = e.getData();
 //           onBlur?.(html);
 //         }}
-// 				onFocus={() => console.log("FOCUSED")}
+// onFocus={() => console.log("FOCUSED")}
 //         onChange={(event, e) => {
 //           if (isInitialChange.current === false) {
 //             const html = e.getData();
