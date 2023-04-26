@@ -27,12 +27,12 @@ const HelpDropdownMenu = (
             );
           }
         },
-        icon: <Icon icon={"bullhorn"} weight={"light"} />
+        icon: <Icon icon={"bullhorn"} weight={"solid"} />
       },
       {
         id: "intercom-chat",
         label: "Chat with Support",
-        icon: <Icon icon={"comment-dots"} weight={"light"} />
+        icon: <Icon icon={"comment-dots"} weight={"solid"} />
       },
       {
         id: "faq",
@@ -47,7 +47,7 @@ const HelpDropdownMenu = (
             );
           }
         },
-        icon: <Icon icon={"question-circle"} weight={"light"} />
+        icon: <Icon icon={"question-circle"} weight={"solid"} />
       }
     ]}
   >

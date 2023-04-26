@@ -36,7 +36,7 @@ const ModelSelectOption = <
     ) {
       return (
         <IconButton
-          icon={<Icon icon={"trash"} weight={"regular"} />}
+          icon={<Icon icon={"trash"} weight={"solid"} />}
           iconSize={"xsmall"}
           loading={deleting}
           onClick={(event: React.MouseEvent<HTMLButtonElement>) => {

@@ -57,7 +57,7 @@ const UploaderContent = (props: UploaderContentProps): JSX.Element => {
       props.renderError(params)
     ) : (
       <div className={classNames("upload-indicator", props.className)} style={props.style}>
-        <Icon icon={"exclamation-circle"} weight={"light"} />
+        <Icon icon={"exclamation-circle"} weight={"solid"} />
       </div>
     );
   } else if (!isNil(props.renderContentNoError)) {
@@ -77,7 +77,7 @@ const UploaderContent = (props: UploaderContentProps): JSX.Element => {
     } else {
       return (
         <div className={classNames("upload-indicator", props.className)} style={props.style}>
-          <Icon icon={"upload"} weight={"light"} />
+          <Icon icon={"upload"} weight={"solid"} />
         </div>
       );
     }

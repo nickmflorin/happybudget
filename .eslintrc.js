@@ -13,7 +13,7 @@ module.exports = {
   settings: {
     react: {
       /* Tells eslint-plugin-react to automatically detect the version of React
-				 to use. */
+         to use. */
       version: "detect"
     }
   },
@@ -62,14 +62,14 @@ module.exports = {
     "react/no-children-prop": ["off"],
     "react/jsx-curly-brace-presence": ["error", "always"],
     /* Note:  These non-typescript base rules have to be disabled as of TS
-			 4.0.0 in order to prevent false positives.  The no-undef lint rule does
-			 not use TypeScript to determine the global variables that exist -
-			 instead, it relies upon ESLint's configuration - so it is strongly
-			 recommended that it be turned off since TS will handle it anyways.
-			 https://github.com/typescript-eslint/typescript-eslint/blob/master/
-			 docs/getting-started/linting/FAQ.md#i-get-errors-from-the-no-undef-
-			 rule-about-global-variables-not-being-defined-even-though-there-are-no-
-			 typescript-errors */
+       4.0.0 in order to prevent false positives.  The no-undef lint rule does
+       not use TypeScript to determine the global variables that exist -
+       instead, it relies upon ESLint's configuration - so it is strongly
+       recommended that it be turned off since TS will handle it anyways.
+       https://github.com/typescript-eslint/typescript-eslint/blob/master/
+       docs/getting-started/linting/FAQ.md#i-get-errors-from-the-no-undef-
+       rule-about-global-variables-not-being-defined-even-though-there-are-no-
+       typescript-errors */
     "no-use-before-define": "off",
     "no-undef": "off"
   },
@@ -97,8 +97,9 @@ module.exports = {
         "@typescript-eslint/explicit-module-boundary-types": ["off"],
         "@typescript-eslint/explicit-function-return-type": ["off"],
         /* It would be nice for this to be an error, but unfortunately AG Grid's
-			 type bindings are so terrible that it makes it difficult. */
-        "@typescript-eslint/no-unsafe-member-access": ["off"]
+       type bindings are so terrible that it makes it difficult. */
+        "@typescript-eslint/no-unsafe-member-access": ["off"],
+        "@typescript-eslint/no-unsafe-call": ["off"]
       }
     }
   ]

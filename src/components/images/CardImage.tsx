@@ -11,7 +11,7 @@ type CardImagePlaceholderProps = {
 
 const CardImagePlaceholder: React.FC<CardImagePlaceholderProps> = React.memo(({ titleOnly, onClick }) => (
   <div className={classNames("card-image-placeholder", { "title-only": titleOnly })} onClick={onClick}>
-    <Icon icon={"image-polaroid"} weight={"light"} />
+    <Icon icon={"image-polaroid"} weight={"solid"} />
   </div>
 ));
 

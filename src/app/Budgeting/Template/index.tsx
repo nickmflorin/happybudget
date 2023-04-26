@@ -37,7 +37,7 @@ const Template = (props: TemplateProps): JSX.Element => {
       budgetLoading={budgetLoading}
       sidebar={[
         {
-          icon: <Icon icon={"copy"} weight={"light"} />,
+          icon: <Icon icon={"copy"} weight={"solid"} />,
           activeIcon: <Icon icon={"copy"} weight={"solid"} />,
           onClick: () => history.push("/templates"),
           tooltip: {
@@ -46,8 +46,8 @@ const Template = (props: TemplateProps): JSX.Element => {
           }
         },
         {
-          icon: <Icon icon={"file-spreadsheet"} weight={"light"} />,
-          activeIcon: <Icon icon={"file-spreadsheet"} weight={"solid"} />,
+          icon: <Icon icon={"file-excel"} weight={"solid"} />,
+          activeIcon: <Icon icon={"file-excel"} weight={"solid"} />,
           onClick: () => {
             if (!isNaN(props.budgetId)) {
               const templateLastVisited = budgeting.urls.getLastVisited("template", props.budgetId);

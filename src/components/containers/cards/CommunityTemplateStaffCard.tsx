@@ -79,7 +79,7 @@ const CommunityTemplateStaffCard = ({
         {
           id: "hide_show",
           label: props.budget.hidden === true ? "Show" : "Hide",
-          icon: <Icon weight={"light"} icon={props.budget.hidden === true ? "eye" : "eye-slash"} />,
+          icon: <Icon weight={"solid"} icon={props.budget.hidden === true ? "eye" : "eye-slash"} />,
           onClick: (e: MenuItemModelClickEvent) => toggleVisibility(e),
           loading: togglingVisibility,
           disabled: togglingVisibility

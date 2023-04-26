@@ -27,7 +27,7 @@ const ImportActualsDropdownMenu = (props: ImportActualsDropdownMenuProps): JSX.E
     models={map(model.budgeting.ActualImportSources.choices, (source: Model.ActualImportSource) => ({
       ...source,
       label: source.name,
-      icon: <ActualImportSourceIcon weight={"light"} source={source} />
+      icon: <ActualImportSourceIcon weight={"solid"} source={source} />
     }))}
   />
 );

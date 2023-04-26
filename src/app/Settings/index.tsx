@@ -19,21 +19,21 @@ const Settings = (): JSX.Element => {
       sidebar={[
         {
           label: "Profile",
-          icon: <Icon icon={"address-card"} weight={"light"} />,
+          icon: <Icon icon={"address-card"} weight={"solid"} />,
           activeIcon: <Icon icon={"address-card"} weight={"solid"} />,
           onClick: () => history.push("/profile"),
           active: location.pathname.startsWith("/profile")
         },
         {
           label: "Security",
-          icon: <Icon icon={"shield-check"} weight={"light"} />,
+          icon: <Icon icon={"shield-check"} weight={"solid"} />,
           activeIcon: <Icon icon={"shield-check"} weight={"solid"} />,
           onClick: () => history.push("/security"),
           active: location.pathname.startsWith("/security")
         },
         {
           label: "Billing",
-          icon: <Icon icon={"wallet"} weight={"light"} />,
+          icon: <Icon icon={"wallet"} weight={"solid"} />,
           activeIcon: <Icon icon={"wallet"} weight={"solid"} />,
           onClick: () => history.push("/billing"),
           active: location.pathname.startsWith("/billing")

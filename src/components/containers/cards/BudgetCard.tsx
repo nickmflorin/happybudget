@@ -84,7 +84,7 @@ const BudgetCard = ({ onArchived, onDuplicated, ...props }: BudgetCardProps): JS
         {
           id: "duplicate",
           label: "Duplicate",
-          icon: <Icon icon={"clone"} weight={"light"} />,
+          icon: <Icon icon={"clone"} weight={"solid"} />,
           onClick: (e: MenuItemModelClickEvent) => duplicate(e),
           keepDropdownOpenOnClick: true,
           loading: duplicating,
@@ -93,7 +93,7 @@ const BudgetCard = ({ onArchived, onDuplicated, ...props }: BudgetCardProps): JS
         {
           id: "archive",
           label: "Archive",
-          icon: <Icon icon={"books"} weight={"light"} />,
+          icon: <Icon icon={"books"} weight={"solid"} />,
           onClick: (e: MenuItemModelClickEvent) => archive(e),
           keepDropdownOpenOnClick: true,
           loading: archiving,

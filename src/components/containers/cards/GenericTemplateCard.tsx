@@ -57,19 +57,19 @@ const GenericTemplateCard = ({
         {
           id: "edit",
           label: "Edit",
-          icon: <Icon icon={"edit"} weight={"light"} />,
+          icon: <Icon icon={"edit"} weight={"solid"} />,
           onClick: () => onEdit()
         },
         {
           id: "edit_name_image",
           label: "Edit Name/Image",
-          icon: <Icon icon={"image"} weight={"light"} />,
+          icon: <Icon icon={"image"} weight={"solid"} />,
           onClick: () => onEditNameImage()
         },
         {
           id: "duplicate",
           label: "Duplicate",
-          icon: <Icon icon={"clone"} weight={"light"} />,
+          icon: <Icon icon={"clone"} weight={"solid"} />,
           onClick: (e: MenuItemModelClickEvent) => duplicate(e),
           keepDropdownOpenOnClick: true,
           loading: duplicating,
@@ -78,7 +78,7 @@ const GenericTemplateCard = ({
         {
           id: "delete",
           label: "Delete",
-          icon: <Icon icon={"trash"} weight={"light"} />,
+          icon: <Icon icon={"trash"} weight={"solid"} />,
           onClick: (e: MenuItemModelClickEvent) => onDelete(e),
           keepDropdownOpenOnClick: true,
           loading: deleting,

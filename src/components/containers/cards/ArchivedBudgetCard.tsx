@@ -41,7 +41,7 @@ const ArchivedBudgetCard = ({ onActivated, ...props }: ArchivedBudgetCardProps):
         {
           id: "activate",
           label: "Activate",
-          icon: <Icon icon={"books"} weight={"light"} />,
+          icon: <Icon icon={"books"} weight={"solid"} />,
           onClick: (e: MenuItemModelClickEvent) => activate(e),
           keepDropdownOpenOnClick: true,
           loading: activating,

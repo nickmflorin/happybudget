@@ -24,7 +24,7 @@ const FILE_ICON_EXTENSION_MAPPING: FileIconExtensionMap[] = [
   },
   {
     extensions: ["csv"],
-    icon: "file-csv"
+    icon: ["fas", "file-csv"]
   },
   {
     extensions: ["zip"],

@@ -45,7 +45,7 @@ const AttachmentListItem = ({ attachment, deleting, onClick, onDownloadError, ..
                 .catch((e: Error) => onDownloadError(e))
                 .finally(() => setDownloading(false));
             }}
-            icon={<Icon icon={"arrow-circle-down"} weight={"regular"} />}
+            icon={<Icon icon={"arrow-circle-down"} weight={"solid"} />}
           />
         </div>
         <div className={"button-action-wrapper"}>

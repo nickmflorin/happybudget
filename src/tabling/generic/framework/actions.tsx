@@ -18,7 +18,7 @@ export const ExportCSVAction = <R extends Table.RowData, M extends Model.RowHttp
   exportFileName: string
 ): Table.MenuActionObj => ({
   label: "Export CSV",
-  icon: "file-csv",
+  icon: ["fas", "file-csv"],
   wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => (
     <ExportCSVDropdownMenu<R, M>
       columns={params.columns}
@@ -40,7 +40,7 @@ export const ToggleColumnAction = <R extends Table.RowData, M extends Model.RowH
   params: Table.PublicMenuActionParams<R, M>
 ): Table.MenuActionObj => ({
   label: "Columns",
-  icon: "line-columns",
+  icon: ["fas", "columns"],
   wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => (
     <ToggleColumnsDropdownMenu
       hiddenColumns={params.hiddenColumns}
@@ -61,7 +61,7 @@ export const CollaboratorsAction = (action: Omit<Partial<Table.MenuActionObj>, "
   ...action,
   render: () => {
     return (
-      <DefaultButton medium icon={"user-group"} onClick={action.onClick}>
+      <DefaultButton medium icon={["fas", "users"]} onClick={action.onClick}>
         {"Collaborators"}
       </DefaultButton>
     );
@@ -90,7 +90,7 @@ export const ShareAction = <B extends Model.PublicHttpModel, R extends Table.Row
   }
   return {
     label: "Share",
-    icon: "cloud",
+    icon: ["fas", "cloud"],
     active: !isNil(publicToken) && !publicToken.is_expired,
     wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => (
       <ShareDropdownMenu {...props}>{children}</ShareDropdownMenu>

@@ -157,7 +157,7 @@ const AuthenticatedTable = <B extends Model.BaseBudget, P extends Model.Account 
           }
         },
         {
-          icon: "badge-percent",
+          icon: "percent",
           label: "Mark Up",
           isWriteOnly: true,
           onClick: () => {

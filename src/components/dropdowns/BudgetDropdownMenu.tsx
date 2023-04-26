@@ -18,13 +18,13 @@ const BudgetDropdownMenu: React.FC<BudgetDropdownMenuProps> = ({ children, onNew
         {
           id: "new-blank-budget",
           label: "New Blank Budget",
-          icon: <Icon icon={"pencil"} weight={"light"} />,
+          icon: <Icon icon={"pencil"} weight={"solid"} />,
           onClick: () => onNewBudget()
         },
         {
           id: "start-from-template",
           label: "Start from Template ",
-          icon: <Icon icon={"image"} weight={"light"} />,
+          icon: <Icon icon={"image"} weight={"solid"} />,
           onClick: () => history.push("/discover")
         }
       ]}

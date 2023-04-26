@@ -43,7 +43,7 @@ const Columns: Table.Column<R, M>[] = [
          the Icon at the right end of the cell. */
       innerCellStyle: (row: Table.BodyRow<R>) => (tabling.rows.isMarkupRow(row) ? { display: "block" } : {}),
       icon: (row: Table.BodyRow<R>) =>
-        tabling.rows.isMarkupRow(row) ? <Icon icon={"percentage"} weight={"light"} /> : undefined
+        tabling.rows.isMarkupRow(row) ? <Icon icon={"percentage"} weight={"solid"} /> : undefined
     },
     colSpan: (params: Table.ColSpanParams<R, M>) => {
       const row: Table.BodyRow<R> = params.data;

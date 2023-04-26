@@ -95,7 +95,7 @@ const SearchInput = <B extends Model.SimpleBudget | Model.SimpleCollaboratingBud
     placeholder={props.searchPlaceholder || "Search Projects..."}
     value={props.search}
     allowClear={true}
-    prefix={<Icon icon={"search"} weight={"light"} />}
+    prefix={<Icon icon={"search"} weight={"solid"} />}
     onChange={(event: React.ChangeEvent<HTMLInputElement>) => props.onSearch(event.target.value)}
   />
 );
@@ -132,7 +132,7 @@ const DashboardPage = <B extends Model.SimpleBudget | Model.SimpleCollaboratingB
       subMenu={subMenu}
     >
       {budgets.length === 0 && responseWasReceived && !isNil(props.noDataProps) ? (
-        <NoData {...props.noDataProps} icon={<Icon icon={"plus"} weight={"light"} />}>
+        <NoData {...props.noDataProps} icon={<Icon icon={"plus"} weight={"solid"} />}>
           {props.noDataProps.child}
         </NoData>
       ) : (

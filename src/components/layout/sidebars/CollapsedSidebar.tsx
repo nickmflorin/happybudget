@@ -29,9 +29,9 @@ const CollapsedSidebar = ({ toggle, ...props }: CollapsedSidebarProps): JSX.Elem
         className={"btn--sidebar-toggle"}
         icon={(params: ClickableIconCallbackParams) => {
           if (params.isHovered === true) {
-            return <Icon icon={"arrow-alt-to-left"} green={true} weight={"light"} />;
+            return <Icon icon={"arrow-alt-to-left"} green={true} weight={"solid"} />;
           } else {
-            return <Icon icon={"bars"} weight={"light"} />;
+            return <Icon icon={"bars"} weight={"solid"} />;
           }
         }}
         onClick={() => toggle()}

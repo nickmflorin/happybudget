@@ -24,7 +24,7 @@ const GenericOwnedTemplate = (props: GenericOwnedTemplateProps): JSX.Element => 
     createMenuElement={
       <PrimaryButtonIconToggle
         key={2}
-        icon={<Icon icon={"plus"} weight={"regular"} />}
+        icon={<Icon icon={"plus"} weight={"solid"} />}
         onClick={() => props.onCreate()}
         text={"New Blank Budget"}
         breakpoint={"medium"}

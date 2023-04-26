@@ -42,8 +42,8 @@ const Budget = (props: BudgetProps): JSX.Element => {
       budgetLoading={budgetLoading}
       sidebar={[
         {
-          icon: <Icon weight={"light"} icon={"file-plus"} />,
-          activeIcon: <Icon weight={"solid"} icon={"file-plus"} />,
+          icon: <Icon weight={"solid"} icon={"file"} />,
+          activeIcon: <Icon weight={"solid"} icon={"file"} />,
           onClick: () => history.push("/discover"),
           tooltip: {
             title: "Templates",
@@ -51,7 +51,7 @@ const Budget = (props: BudgetProps): JSX.Element => {
           }
         },
         {
-          icon: <Icon weight={"light"} icon={"copy"} />,
+          icon: <Icon weight={"solid"} icon={"copy"} />,
           activeIcon: <Icon weight={"solid"} icon={"copy"} />,
           onClick: () => history.push("/budgets"),
           tooltip: {
@@ -60,7 +60,7 @@ const Budget = (props: BudgetProps): JSX.Element => {
           }
         },
         {
-          icon: <Icon weight={"light"} icon={"address-book"} flip={"horizontal"} />,
+          icon: <Icon weight={"solid"} icon={"address-book"} flip={"horizontal"} />,
           activeIcon: <Icon weight={"solid"} icon={"address-book"} flip={"horizontal"} />,
           onClick: () => history.push("/contacts"),
           separatorAfter: true,
@@ -70,8 +70,8 @@ const Budget = (props: BudgetProps): JSX.Element => {
           }
         },
         {
-          icon: <Icon weight={"light"} icon={"file-chart-line"} />,
-          activeIcon: <Icon weight={"solid"} icon={"file-chart-line"} />,
+          icon: <Icon weight={"solid"} icon={"chart-line"} />,
+          activeIcon: <Icon weight={"solid"} icon={"chart-line"} />,
           onClick: () => history.push(`/budgets/${props.budgetId}/analysis`),
           active: location.pathname.startsWith(`/budgets/${props.budgetId}/analysis`),
           tooltip: {
@@ -80,8 +80,8 @@ const Budget = (props: BudgetProps): JSX.Element => {
           }
         },
         {
-          icon: <Icon weight={"light"} icon={"file-spreadsheet"} />,
-          activeIcon: <Icon weight={"solid"} icon={"file-spreadsheet"} />,
+          icon: <Icon weight={"solid"} icon={"file-excel"} />,
+          activeIcon: <Icon weight={"solid"} icon={"file-excel"} />,
           onClick: () => {
             if (!budgeting.urls.isBudgetRelatedUrl(location.pathname, props.budgetId)) {
               const budgetLastVisited = budgeting.urls.getLastVisited("budget", props.budgetId);
@@ -99,7 +99,7 @@ const Budget = (props: BudgetProps): JSX.Element => {
           }
         },
         {
-          icon: <Icon weight={"light"} icon={"file-invoice"} />,
+          icon: <Icon weight={"solid"} icon={"file-invoice"} />,
           activeIcon: <Icon weight={"solid"} icon={"file-invoice"} />,
           onClick: () => history.push(`/budgets/${props.budgetId}/actuals`),
           active: location.pathname.startsWith(`/budgets/${props.budgetId}/actuals`),

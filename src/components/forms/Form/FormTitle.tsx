@@ -11,7 +11,7 @@ interface FormTitleProps extends StandardComponentProps {
 
 const FormTitle = ({ icon, title, ...props }: FormTitleProps): JSX.Element => (
   <div {...props} className={classNames("form-title", props.className)}>
-    {ui.iconIsJSX(icon) ? icon : <Icon icon={icon} weight={"regular"} />}
+    {ui.iconIsJSX(icon) ? icon : <Icon icon={icon} weight={"solid"} />}
     {title}
   </div>
 );

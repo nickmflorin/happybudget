@@ -35,7 +35,7 @@ const CreateMarkupModal = <
   <CreateModelModal<Model.Markup, Http.MarkupPayload, MarkupFormValues, RSP>
     {...props}
     title={"Markup"}
-    titleIcon={"badge-percent"}
+    titleIcon={"percent"}
     createSync={(payload: Http.MarkupPayload, callbacks: CreateModelCallbacks<RSP>) =>
       table.dispatchEvent({ type: "markupAdd", payload, ...callbacks })
     }

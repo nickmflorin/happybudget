@@ -18,7 +18,7 @@ const FormLabelContent = ({ dataType, ...props }: FormLabelContentProps): JSX.El
     <React.Fragment>
       {!isNil(cType) && !isNil(cType.icon) && (
         <div className={"icon-wrapper"}>
-          {ui.iconIsJSX(cType.icon) ? cType?.icon : <Icon icon={cType.icon} weight={"regular"} />}
+          {ui.iconIsJSX(cType.icon) ? cType?.icon : <Icon icon={cType.icon} weight={"solid"} />}
         </div>
       )}
       {props.children}

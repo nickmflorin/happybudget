@@ -48,13 +48,13 @@ const GenericOwnedBudgetCard = ({ deleting, onEdit, onDelete, ...props }: Generi
       {
         id: "edit",
         label: "Edit Name/Image",
-        icon: <Icon icon={"image"} weight={"light"} />,
+        icon: <Icon icon={"image"} weight={"solid"} />,
         onClick: () => onEdit()
       },
       {
         id: "delete",
         label: "Delete",
-        icon: <Icon icon={"trash"} weight={"light"} />,
+        icon: <Icon icon={"trash"} weight={"solid"} />,
         onClick: (e: MenuItemModelClickEvent) => onDelete(e),
         keepDropdownOpenOnClick: false,
         loading: deleting

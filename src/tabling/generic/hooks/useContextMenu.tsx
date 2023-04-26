@@ -243,7 +243,7 @@ const useContextMenu = <R extends Table.RowData, M extends Model.RowHttpModel = 
             ...contextMenuItems,
             {
               name: "Insert Markup",
-              icon: '<i class="far fa-badge-percent context-icon"></i>',
+              icon: '<i class="far fa-percent context-icon"></i>',
               action: () => onMarkupRows(markupableRowsAbove)
             }
           ];

@@ -46,7 +46,7 @@ const TemplateCard = ({ onMoved, ...props }: TemplateCardProps): JSX.Element => 
         {
           id: "move",
           label: "Move to Community",
-          icon: <Icon icon={"user-friends"} weight={"light"} />,
+          icon: <Icon icon={"user-friends"} weight={"solid"} />,
           onClick: (e: MenuItemModelClickEvent) => move(e),
           keepDropdownOpenOnClick: true,
           visible: user.is_staff === true,

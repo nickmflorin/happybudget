@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconPrefix } from "@fortawesome/fontawesome-svg-core";
 
-const PrefixMap: { [key in IconWeight]: IconPrefix } = { light: "fal", regular: "far", solid: "fas" };
+const PrefixMap: { [key in IconWeight]: IconPrefix } = { light: "far", regular: "far", solid: "fas" };
 
 const Icon = forwardRef(
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -16,11 +16,11 @@ const Icon = forwardRef(
       } else if (!isNil(weight)) {
         return PrefixMap[weight];
       } else if (light === true) {
-        return "fal";
+        return "far";
       } else if (solid === true) {
         return "fas";
       }
-      return "far";
+      return "fas";
     }, [weight, light, regular, solid]);
 
     if (!isNil(icon)) {

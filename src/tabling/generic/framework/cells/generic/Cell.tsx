@@ -50,7 +50,7 @@ const Cell = <
     >
       {props.children}
       {!isNil(icon) ? (
-        <div className={"icon-wrapper"}>{ui.iconIsJSX(icon) ? icon : <Icon icon={icon} weight={"light"} />}</div>
+        <div className={"icon-wrapper"}>{ui.iconIsJSX(icon) ? icon : <Icon icon={icon} weight={"solid"} />}</div>
       ) : (
         <></>
       )}

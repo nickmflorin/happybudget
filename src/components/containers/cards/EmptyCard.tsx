@@ -12,7 +12,7 @@ interface EmptyCardProps extends StandardComponentProps {
 const EmptyCard = ({ icon, onClick, className, style = {} }: EmptyCardProps): JSX.Element => (
   <div className={"empty-card-wrapper"}>
     <div className={classNames("empty-card", className)} style={style} onClick={onClick}>
-      <Icon icon={icon} weight={"light"} />
+      <Icon icon={icon} weight={"solid"} />
     </div>
   </div>
 );

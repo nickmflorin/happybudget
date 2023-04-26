@@ -24,7 +24,7 @@ const Landing = (): JSX.Element => (
       </Switch>
       <div className={"copyright"}>
         <div className={"icon-wrapper"}>
-          <Icon icon={"copyright"} weight={"regular"} />
+          <Icon icon={"copyright"} weight={"solid"} />
         </div>
         <div className={"copyright-text"}>{"Nick Florin, 2022"}</div>
       </div>

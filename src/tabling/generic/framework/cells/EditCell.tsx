@@ -62,7 +62,7 @@ const Action = <
       })}
       iconSize={"xsmall"}
       size={"xsmall"}
-      icon={<Icon icon={icon} weight={"regular"} style={props.iconStyle} />}
+      icon={<Icon icon={icon} weight={"solid"} style={props.iconStyle} />}
       onClick={() => props.config.action(props.row, props.hovered)}
       tooltip={{ title: tooltip, placement: "bottom", overlayClassName: "tooltip-lower" }}
     />

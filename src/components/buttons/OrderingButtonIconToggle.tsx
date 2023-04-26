@@ -21,7 +21,7 @@ const OrderingButtonIconToggle = ({ ordering, labelMap, ...props }: OrderingButt
     if (order !== undefined) {
       return <OrderingArrowIcon style={{ width: "10px" }} order={order.order} />;
     }
-    return <Icon icon={"bars-filter"} weight={"light"} />;
+    return <Icon icon={"bars-filter"} weight={"solid"} />;
   }, [ordering]);
 
   return (
@@ -30,7 +30,7 @@ const OrderingButtonIconToggle = ({ ordering, labelMap, ...props }: OrderingButt
       style={{ ...props.style, width: "auto" }}
       breakpointStyle={props.style}
       icon={sortIcon}
-      breakpointIcon={<Icon icon={"sort-amount-down"} weight={"regular"} />}
+      breakpointIcon={<Icon icon={"sort-amount-down"} weight={"solid"} />}
     >
       {label}
     </DefaultButtonIconToggle>

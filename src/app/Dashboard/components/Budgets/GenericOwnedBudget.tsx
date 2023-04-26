@@ -55,7 +55,7 @@ const GenericOwnedBudget = (props: GenericOwnedBudgetProps): JSX.Element => {
         >
           <PrimaryButtonIconToggle
             breakpoint={"medium"}
-            icon={<Icon icon={"plus"} weight={"regular"} />}
+            icon={<Icon icon={"plus"} weight={"solid"} />}
             text={"Create Budget"}
           />
         </BudgetDropdownMenu>

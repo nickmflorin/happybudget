@@ -83,7 +83,7 @@ const AuthenticatedTable = <B extends Model.BaseBudget>(props: AuthenticatedTabl
           }
         },
         {
-          icon: "badge-percent",
+          icon: "percent",
           label: "Mark Up",
           isWriteOnly: true,
           onClick: () => {

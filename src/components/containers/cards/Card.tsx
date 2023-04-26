@@ -86,7 +86,7 @@ const Card = ({
               <DropdownMenu models={dropdown} placement={"bottomRight"}>
                 <IconButton
                   className={classNames("dropdown-ellipsis", iconClassName)}
-                  icon={<Icon icon={"ellipsis-v"} weight={"light"} dimension={{ height: 26 }} />}
+                  icon={<Icon icon={"ellipsis-v"} weight={"solid"} dimension={{ height: 26 }} />}
                 />
               </DropdownMenu>
             )}

@@ -24,7 +24,7 @@ const MultiValue = <O extends SelectOption, G extends GroupBase<O> = GroupBase<O
   <components.MultiValue className={classNames("select-multi-value", props.className)} {...props}>
     {!isNil(props.data.icon) && (
       <div className={"icon-wrapper"}>
-        {ui.iconIsJSX(props.data.icon) ? props.data.icon : <Icon icon={props.data.icon} weight={"light"} />}
+        {ui.iconIsJSX(props.data.icon) ? props.data.icon : <Icon icon={props.data.icon} weight={"solid"} />}
       </div>
     )}
     <div className={"select-multi-value-content"}>

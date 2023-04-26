@@ -129,7 +129,7 @@ const AttachmentsCell = <
       if (dragState.drag) {
         return (
           <div className={"drag"}>
-            <Icon weight={"regular"} icon={"arrow-circle-down"} />
+            <Icon weight={"solid"} icon={"arrow-circle-down"} />
             {"Drop files here"}
           </div>
         );
@@ -138,7 +138,7 @@ const AttachmentsCell = <
       } else {
         return (
           <div className={"selected"}>
-            <Icon weight={"regular"} icon={"arrow-circle-down"} />
+            <Icon weight={"solid"} icon={"arrow-circle-down"} />
             {"Double click or drop files here"}
           </div>
         );

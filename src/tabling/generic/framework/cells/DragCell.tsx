@@ -25,7 +25,7 @@ const DragCell = <
   if (tabling.rows.isModelRow(row)) {
     return (
       <Cell {...props}>
-        <Icon ref={iconRef} className={"icon--row-drag"} weight={"solid"} icon={"grip-dots-vertical"} />
+        <Icon ref={iconRef} className={"icon--row-drag"} weight={"solid"} icon={"ellipsis-v"} />
       </Cell>
     );
   }

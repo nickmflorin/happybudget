@@ -45,11 +45,11 @@ const Header = ({
               size={"large"}
               icon={(params: ClickableIconCallbackParams) => {
                 if (sidebarVisible === true && params.isHovered === true) {
-                  return <Icon icon={"arrow-alt-to-left"} weight={"light"} green={true} />;
+                  return <Icon icon={"arrow-alt-to-left"} weight={"solid"} green={true} />;
                 } else if (params.isHovered === true) {
-                  return <Icon icon={"arrow-alt-to-right"} weight={"light"} green={true} />;
+                  return <Icon icon={"arrow-alt-to-right"} weight={"solid"} green={true} />;
                 } else {
-                  return <Icon icon={"bars"} weight={"light"} />;
+                  return <Icon icon={"bars"} weight={"solid"} />;
                 }
               }}
               onClick={() => toggleSidebar()}

@@ -20,7 +20,7 @@ const UserDropdownMenu = (props: Omit<DropdownMenuProps, "models" | "menuClassNa
           id: "profile",
           label: "Profile",
           onClick: () => history.push("/profile"),
-          icon: <Icon icon={"address-card"} weight={"light"} />
+          icon: <Icon icon={"address-card"} weight={"solid"} />
         },
         {
           id: "admin",
@@ -28,14 +28,14 @@ const UserDropdownMenu = (props: Omit<DropdownMenuProps, "models" | "menuClassNa
           onClick: () => {
             window.location.href = `${process.env.REACT_APP_API_DOMAIN}/admin`;
           },
-          icon: <Icon icon={"lock"} weight={"light"} />,
+          icon: <Icon icon={"lock"} weight={"solid"} />,
           visible: user.is_staff === true
         },
         {
           id: "logout",
           label: "Logout",
           onClick: () => history.push("/logout"),
-          icon: <Icon icon={"sign-out"} weight={"light"} />
+          icon: <Icon icon={"sign-out"} weight={"solid"} />
         }
       ]}
     >

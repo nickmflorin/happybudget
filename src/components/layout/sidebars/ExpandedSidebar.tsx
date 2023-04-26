@@ -30,7 +30,7 @@ const ExpandedSidebar = ({ toggle, ...props }: ExpandedSidebarProps): JSX.Elemen
       <ShowHide show={isMobile}>
         <IconButton
           className={"btn--sidebar-close"}
-          icon={<Icon icon={"times"} weight={"light"} />}
+          icon={<Icon icon={"times"} weight={"solid"} />}
           onClick={() => toggle()}
         />
       </ShowHide>

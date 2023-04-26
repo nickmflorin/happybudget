@@ -27,7 +27,7 @@ const Option = <O extends SelectOption, IsMulti extends boolean = false, G exten
   <components.Option className={classNames("select-option", props.className)} {...props}>
     {!isNil(props.data.icon) && (
       <div className={"icon-wrapper"}>
-        {ui.iconIsJSX(props.data.icon) ? props.data.icon : <Icon icon={props.data.icon} weight={"light"} />}
+        {ui.iconIsJSX(props.data.icon) ? props.data.icon : <Icon icon={props.data.icon} weight={"solid"} />}
       </div>
     )}
     <div className={"select-option-content"}>
