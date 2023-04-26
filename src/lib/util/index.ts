@@ -1,16 +1,10 @@
 import { sumChars } from "./string";
 
-export * as colors from "./colors";
 export * as clipboard from "./clipboard";
 export * as events from "./events";
-export * as formatters from "./formatters";
 export * as html from "./html";
-export * as messages from "./messages";
-export * as parsers from "./parsers";
 export * as validators from "./validators";
 
-export * from "./arrays";
-export * from "./literals";
 export * from "./string";
 export * from "./types";
 export * from "./typeguards";

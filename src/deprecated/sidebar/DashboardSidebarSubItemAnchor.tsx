@@ -5,7 +5,7 @@ import classNames from "classnames";
 import { config as app } from "application";
 import { ShowHide } from "components/util";
 
-import { ContentAnchorProps, ContentButtonSubContent } from "../abstract";
+import { ContentAnchorProps, ContentButtonSubContent } from "../../components/buttons/abstract";
 
 import { useSidebarItemAnchorProps } from "./useSidebarItemAnchorProps";
 

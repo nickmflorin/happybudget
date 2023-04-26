@@ -1,4 +1,7 @@
-import { ui, removeObjAttributes } from "lib";
+import * as buttons from "lib/ui/buttons/types";
+import { useLessThanBreakpoint } from "lib/ui/hooks";
+import * as icons from "lib/ui/icons";
+import { removeObjAttributes } from "lib/util";
 import { constants } from "style";
 
 import { SecondaryActionButton } from "./SecondaryActionButton";
@@ -6,16 +9,16 @@ import { SecondaryButtonProps, SecondaryButton } from "./SecondaryButton";
 
 type BaseProps = Omit<SecondaryButtonProps, "icon"> & {
   readonly breakpoint: constants.BreakpointId;
-  readonly breakpointStyle?: ui.Style;
+  readonly breakpointStyle?: buttons.Style;
 };
 
 type SecondaryButtonIconToggleBreakpointIconProps = BaseProps & {
-  readonly breakpointIcon: ui.IconProp;
-  readonly icon?: ui.IconProp;
+  readonly breakpointIcon: icons.IconProp;
+  readonly icon?: icons.IconProp;
 };
 
 type SecondaryButtonIconToggleSameIconProps = BaseProps & {
-  readonly icon: ui.IconProp;
+  readonly icon: icons.IconProp;
 };
 
 export type SecondaryButtonIconToggleProps =
@@ -28,7 +31,7 @@ const isPropsWithBreakpointIcon = (
   (props as SecondaryButtonIconToggleBreakpointIconProps).breakpointIcon !== undefined;
 
 export const SecondaryButtonIconToggle = (props: SecondaryButtonIconToggleProps): JSX.Element => {
-  const isLessThan = ui.useLessThanBreakpoint(props.breakpoint);
+  const isLessThan = useLessThanBreakpoint(props.breakpoint);
   if (isLessThan) {
     return (
       <SecondaryActionButton

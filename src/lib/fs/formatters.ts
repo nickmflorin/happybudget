@@ -1,6 +1,6 @@
 import { isNil } from "lodash";
 
-import { errors } from "application";
+import * as errors from "application/errors";
 
 import { getFileType } from "./util";
 

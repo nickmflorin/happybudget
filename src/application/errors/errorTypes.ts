@@ -3,10 +3,8 @@
  * error type, {@link ErrorType}, is defined as a certain categorization of {@link ErrorCode}(s)
  * that are supported in the application.
  */
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+
 import { enumeratedLiterals } from "lib/util/literals";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
-import { EnumeratedLiteralType } from "lib/util/types/literals";
 
 export type CLIENT_FIELD_VALIDATION = "client-validation";
 export type API_FIELD = "field";
@@ -18,7 +16,7 @@ export type HTTP_NETWORK = "network";
  * error in the JSON body of the response.
  */
 export const ApiErrorTypes = enumeratedLiterals(["field", "global"] as const);
-export type ApiErrorType = EnumeratedLiteralType<typeof ApiErrorTypes>;
+export type ApiErrorType = import("lib/util/types").EnumeratedLiteralType<typeof ApiErrorTypes>;
 
 /**
  * The {@link ErrorType} categorization for errors that are either embedded in the JSON response
@@ -26,14 +24,14 @@ export type ApiErrorType = EnumeratedLiteralType<typeof ApiErrorTypes>;
  * connection to the server cannot be made or the server does not respond with a response.
  */
 export const HttpErrorTypes = enumeratedLiterals([...ApiErrorTypes.__ALL__, "network"] as const);
-export type HttpErrorType = EnumeratedLiteralType<typeof HttpErrorTypes>;
+export type HttpErrorType = import("lib/util/types").EnumeratedLiteralType<typeof HttpErrorTypes>;
 
 export const CodedErrorTypes = enumeratedLiterals([
   "client-validation",
   ...HttpErrorTypes.__ALL__,
 ] as const);
 
-export type CodedErrorType = EnumeratedLiteralType<typeof CodedErrorTypes>;
+export type CodedErrorType = import("lib/util/types").EnumeratedLiteralType<typeof CodedErrorTypes>;
 
 export const ErrorTypes = enumeratedLiterals([
   ...CodedErrorTypes.__ALL__,
@@ -42,4 +40,4 @@ export const ErrorTypes = enumeratedLiterals([
   "filename",
 ] as const);
 
-export type ErrorType = EnumeratedLiteralType<typeof ErrorTypes>;
+export type ErrorType = import("lib/util/types").EnumeratedLiteralType<typeof ErrorTypes>;

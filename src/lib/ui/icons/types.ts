@@ -2,7 +2,6 @@ import React, { ReactElement } from "react";
 
 import { FontAwesomeIconProps } from "@fortawesome/react-fontawesome";
 
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import {
   IconCodeMap,
   IconNames,
@@ -12,10 +11,10 @@ import {
   IconPrefix,
 } from "application/config/configuration/fontAwesome/constants";
 
-import { enumeratedLiterals, EnumeratedLiteralType } from "../../util";
+import { enumeratedLiterals } from "../../util/literals";
+import { EnumeratedLiteralType } from "../../util/types/literals";
 import * as types from "../types";
 
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 export * from "application/config/configuration/fontAwesome/constants";
 
 export type IconLibrary = typeof Icons;
@@ -232,7 +231,7 @@ type _BaseIconProps = types.ComponentProps<
      *
      * Default: "medium" (Defaulted in SASS)
      */
-    readonly size?: types.CSSSize<number | "px"> | IconSize;
+    readonly size?: IconSize;
     /**
      * The axis {@link Exclude<SizeAxis, "both">} that the Icon should be sized in based on the
      * provided `size` prop.  An Icon must maintain its aspect-ratio, so it cannot size in both

@@ -1,9 +1,6 @@
 import { type FieldError as RootFieldError } from "react-hook-form";
 
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { enumeratedLiterals } from "lib/util/literals";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
-import { EnumeratedLiteralType } from "lib/util/types/literals";
 
 import { STATUS_CODES, StatusCode } from "../api/types";
 
@@ -42,7 +39,9 @@ export const ClientValidationErrorCodes = enumeratedLiterals([
   "valueAsNumber",
 ] as const);
 
-export type ClientValidationErrorCode = EnumeratedLiteralType<typeof ClientValidationErrorCodes>;
+export type ClientValidationErrorCode = import("lib/util/types").EnumeratedLiteralType<
+  typeof ClientValidationErrorCodes
+>;
 
 export type ClientValidationError<T extends ClientValidationErrorCode = ClientValidationErrorCode> =
   // We don't need to worry about multiple types now, and probably ever.
@@ -61,20 +60,24 @@ export const AuthErrorCodes = enumeratedLiterals([
   "account_not_on_waitlist",
   "account_not_authenticated",
 ] as const);
-export type AuthErrorCode = EnumeratedLiteralType<typeof AuthErrorCodes>;
+export type AuthErrorCode = import("lib/util/types").EnumeratedLiteralType<typeof AuthErrorCodes>;
 
 export const PermissionErrorCodes = enumeratedLiterals([
   "permission_error",
   "product_permission_error",
 ] as const);
-export type PermissionErrorCode = EnumeratedLiteralType<typeof PermissionErrorCodes>;
+export type PermissionErrorCode = import("lib/util/types").EnumeratedLiteralType<
+  typeof PermissionErrorCodes
+>;
 
 export const BillingErrorCodes = enumeratedLiterals([
   "stripe_request_error",
   "checkout_error",
   "checkout_session_inactive",
 ] as const);
-export type BillingErrorCode = EnumeratedLiteralType<typeof BillingErrorCodes>;
+export type BillingErrorCode = import("lib/util/types").EnumeratedLiteralType<
+  typeof BillingErrorCodes
+>;
 
 export const ApiFieldErrorCodes = enumeratedLiterals([
   "required",
@@ -87,7 +90,9 @@ export const ApiFieldErrorCodes = enumeratedLiterals([
   UNKNOWN,
 ] as const);
 
-export type ApiFieldErrorCode = EnumeratedLiteralType<typeof ApiFieldErrorCodes>;
+export type ApiFieldErrorCode = import("lib/util/types").EnumeratedLiteralType<
+  typeof ApiFieldErrorCodes
+>;
 
 export const ApiGlobalErrorCodes = enumeratedLiterals([
   ...PermissionErrorCodes.__ALL__,
@@ -105,16 +110,20 @@ export const ApiGlobalErrorCodes = enumeratedLiterals([
   "body_not_present",
 ] as const);
 
-export type ApiGlobalErrorCode = EnumeratedLiteralType<typeof ApiGlobalErrorCodes>;
+export type ApiGlobalErrorCode = import("lib/util/types").EnumeratedLiteralType<
+  typeof ApiGlobalErrorCodes
+>;
 
 export const ApiErrorCodes = enumeratedLiterals([
   ...ApiGlobalErrorCodes.__ALL__,
   ...ApiFieldErrorCodes.__ALL__,
 ] as const);
-export type ApiErrorCode = EnumeratedLiteralType<typeof ApiErrorCodes>;
+export type ApiErrorCode = import("lib/util/types").EnumeratedLiteralType<typeof ApiErrorCodes>;
 
 export const NetworkErrorCodes = enumeratedLiterals(["network"] as const);
-export type NetworkErrorCode = EnumeratedLiteralType<typeof NetworkErrorCodes>;
+export type NetworkErrorCode = import("lib/util/types").EnumeratedLiteralType<
+  typeof NetworkErrorCodes
+>;
 
 export const DEFAULT_STATUS_CODES: Partial<{ [key in ApiGlobalErrorCode]: StatusCode }> = {
   [ApiErrorCodes.BAD_REQUEST]: STATUS_CODES.HTTP_400_BAD_REQUEST,
@@ -161,8 +170,8 @@ export const ErrorTypeCodes: ErrorTypeCodes = {
 };
 
 export type ErrorCode<T extends CodedErrorType | undefined = undefined> = T extends undefined
-  ? EnumeratedLiteralType<typeof ErrorCodes>
-  : EnumeratedLiteralType<ErrorTypeCodes[T & keyof ErrorTypeCodes]>;
+  ? import("lib/util/types").EnumeratedLiteralType<typeof ErrorCodes>
+  : import("lib/util/types").EnumeratedLiteralType<ErrorTypeCodes[T & keyof ErrorTypeCodes]>;
 
 export const isErrorCode = <T extends CodedErrorType = CodedErrorType>(
   code: string,

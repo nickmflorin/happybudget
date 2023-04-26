@@ -6,9 +6,10 @@ import {
   type UseFormRegisterReturn,
 } from "react-hook-form";
 
-import { errors } from "application";
+import * as errors from "application/errors";
 
-import { createFeedbackHook, isFieldFeedback, type FeedbackManagerFeedback } from "../../feedback";
+import { isFieldFeedback, type FeedbackManagerFeedback } from "../../feedback";
+import { createFeedbackHook } from "../../feedback/hooks";
 import { removeObjAttributes, Noop } from "../../util";
 
 import * as types from "./types";

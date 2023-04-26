@@ -1,4 +1,4 @@
-import { errors } from "application";
+import * as errors from "application/errors";
 
 import * as formatters from "./formatters";
 import * as types from "./types";

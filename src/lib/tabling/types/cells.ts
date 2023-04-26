@@ -8,10 +8,11 @@ import {
   RowNode,
 } from "ag-grid-community";
 
-import { store } from "application";
+import * as store from "application/store/types";
 
 import * as model from "../../model";
 import * as ui from "../../ui";
+import * as icons from "../../ui/icons";
 import * as columns from "../columns";
 import * as events from "../events";
 import * as rows from "../rows";
@@ -70,8 +71,8 @@ export interface CellProps<
   readonly prefixChildren?: JSX.Element;
   readonly suffixChildren?: JSX.Element;
   readonly icon?:
-    | ui.IconProp
-    | ((row: rows.RowSubType<R, rows.BodyRowType>) => ui.IconProp | undefined | null);
+    | icons.IconProp
+    | ((row: rows.RowSubType<R, rows.BodyRowType>) => icons.IconProp | undefined | null);
   readonly innerCellClassName?: string | undefined | ((r: R) => string | undefined);
   readonly innerCellStyle?: ui.Style | undefined | ((r: R) => ui.Style | undefined);
   readonly table: table.TableInstance<R, M>;

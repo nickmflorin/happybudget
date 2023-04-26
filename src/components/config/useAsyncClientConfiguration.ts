@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 
 type ConfigureModule = {
-  configureApplicationAsync: () => Promise<void>;
+  configureClientApplicationAsync: () => Promise<void>;
 };
 
-export const useFontAwesome = (): [boolean] => {
+export const useAsyncClientConfiguration = (): [boolean] => {
   const [configured, setConfigured] = useState(false);
 
   useEffect(() => {
@@ -12,16 +12,16 @@ export const useFontAwesome = (): [boolean] => {
        of the initial bundle sent to the browser to be very large.  To avoid this, we instead
        dynamically import and perform the Font Awesome configuration to avoid a very large initial
        bundle. */
-    import("application/config/configuration").then((m: ConfigureModule) => {
-      m.configureApplicationAsync()
+    import("application/config/configuration/client").then((m: ConfigureModule) => {
+      m.configureClientApplicationAsync()
         .then(() => {
           setConfigured(true);
         })
         .catch((e: unknown) => {
           if (e instanceof Error) {
-            throw new Error(`Font Awesome Configuration Error: ${e}`);
+            throw new Error(`Client Configuration Error: ${e}`);
           } else {
-            throw new Error("Unknown Font Awesome Configuration Error");
+            throw new Error("Unknown Client Configuration Error");
           }
         });
     });

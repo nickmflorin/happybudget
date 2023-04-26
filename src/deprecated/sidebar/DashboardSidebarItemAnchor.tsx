@@ -5,7 +5,7 @@ import { config as app } from "application";
 import { ConditionalTooltip } from "components/tooltips";
 import { ShowHide } from "components/util";
 
-import { ContentAnchor, ContentAnchorProps, ContentButtonSubContent } from "../abstract";
+import { ContentAnchor, ContentAnchorProps, ContentButtonSubContent } from "../../components/buttons/abstract";
 
 import { DashboardSidebarSubItemAnchor } from "./DashboardSidebarSubItemAnchor";
 import { useSidebarItemAnchorProps } from "./useSidebarItemAnchorProps";

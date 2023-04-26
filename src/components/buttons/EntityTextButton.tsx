@@ -2,7 +2,7 @@ import React from "react";
 
 import classNames from "classnames";
 
-import { ui } from "lib";
+import * as ui from "lib/ui/types";
 import { EntityText, EntityTextProps } from "components/typography";
 
 import { BareButton, BareButtonProps } from "./BareButton";

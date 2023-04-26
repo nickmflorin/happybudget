@@ -1,8 +1,9 @@
-import React, { useMemo, forwardRef, ForwardedRef } from "react";
+import React, { forwardRef, ForwardedRef } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { ui } from "lib";
+import * as icons from "lib/ui/icons";
+import * as ui from "lib/ui/types";
 
 import { useIcon } from "./hooks";
 
@@ -13,40 +14,18 @@ function _IconComponent(
     size,
     axis = ui.SizeAxes.VERTICAL,
     contain,
-    color = ui.IconColors.GREY,
+    color = icons.IconColors.GREY,
     ref,
     ...props
-  }: ui.IconComponentProps & { readonly ref?: ForwardedRef<SVGSVGElement> },
+  }: icons.IconComponentProps & { readonly ref?: ForwardedRef<SVGSVGElement> },
 ) {
   const iconProps = useIcon({ ...props, axis, size, contain, color });
 
-  /*
-  If the size is provided as a number or a valid CSS value, we cannot dynamically use SASS classes
-  to define the size because there is no way to inform SASS what the provided value is.  However, if
-  the size is provided as a standardized size string - we can just affix the element with the class
-  name - so we do not need to mutate the style.
-  */
-  const style = useMemo(
-    () =>
-      size !== undefined && ui.isCSSSize(size)
-        ? ui.sizeOnAxis(props.style, axis, size)
-        : props.style,
-    [props.style, axis, size],
-  );
-
-  return (
-    <FontAwesomeIcon
-      {...props}
-      {...iconProps}
-      style={style}
-      ref={ref}
-      icon={ui.getNativeIcon(icon)}
-    />
-  );
+  return <FontAwesomeIcon {...props} {...iconProps} ref={ref} icon={icons.getNativeIcon(icon)} />;
 }
 
 const ForwardedIconComponent = forwardRef(
-  (props: ui.IconComponentProps, ref: ForwardedRef<SVGSVGElement>) => (
+  (props: icons.IconComponentProps, ref: ForwardedRef<SVGSVGElement>) => (
     <_IconComponent {...props} ref={ref} />
   ),
 ) as typeof _IconComponent;
@@ -60,10 +39,10 @@ export const IconComponent = React.memo(ForwardedIconComponent);
  * <IconComponent /> should not be used outside of this file.
  *
  * This <Icon /> component allows the `icon` prop to be provided as either an element,
- * {@link ui.IconElement}, or a name/prefix definition, {@link ui.BasicIconProp}
+ * {@link icons.IconElement}, or a name/prefix definition, {@link icons.BasicIconProp}
  * (e.g. ["far", "slack"]).  This allows components that accept an `icon` prop to accept it either
- * as an `<Icon />` rendered element, {@link ui.IconElement}, or a prefix/name combination,
- * {@link ui.BasicIconProp}, while still rendering the provided prop inside of an `<Icon />`
+ * as an `<Icon />` rendered element, {@link icons.IconElement}, or a prefix/name combination,
+ * {@link icons.BasicIconProp}, while still rendering the provided prop inside of an `<Icon />`
  * element it defines:
  *
  * type ButtonProps = { ..., icon: IconProp };
@@ -90,11 +69,11 @@ export const IconComponent = React.memo(ForwardedIconComponent);
  * "<svg class="icon--previous icon--button">...</svg>"
  */
 const _Icon = forwardRef(function Icon(
-  { icon, ...props }: ui.IconProps,
+  { icon, ...props }: icons.IconProps,
   ref: ForwardedRef<SVGSVGElement>,
 ) {
-  if (ui.isIconElement(icon)) {
-    return ui.mergeIconElementWithProps(icon, props);
+  if (icons.isIconElement(icon)) {
+    return icons.mergeIconElementWithProps(icon, props);
   }
   return <IconComponent {...props} ref={ref} icon={icon} />;
 });

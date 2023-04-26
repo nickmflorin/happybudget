@@ -1,6 +1,6 @@
-import { ui } from "lib";
+import * as tooltip from "lib/ui/tooltip/types";
 
-export const ItemizedTooltipItem = (props: ui.ItemizedTooltipItem): JSX.Element => (
+export const ItemizedTooltipItem = (props: tooltip.ItemizedTooltipItem): JSX.Element => (
   <div className="itemized-tooltip-item">
     <div className="itemized-tooltip-item__label">{props.label}</div>
     <div className="itemized-tooltip-item__value">

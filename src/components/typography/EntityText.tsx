@@ -2,11 +2,17 @@ import { useMemo } from "react";
 
 import classNames from "classnames";
 
-import { model as models, ui } from "lib";
+import {
+  isModelWithIdentifier,
+  isModelWithName,
+  isModelWithDescription,
+  ApiModel,
+} from "lib/model";
+import * as ui from "lib/ui/types";
 
 export type EntityTextProps = ui.ComponentProps<{
   readonly fillEmpty?: boolean | string;
-  readonly model?: models.ApiModel;
+  readonly model?: ApiModel;
   readonly description?: string;
   readonly identifier?: string;
 }>;
@@ -57,9 +63,9 @@ export const EntityText = ({
     if (identifier !== undefined || model === undefined) {
       return identifier;
     }
-    return models.isModelWithIdentifier(model)
+    return isModelWithIdentifier(model)
       ? model.identifier
-      : models.isModelWithName(model)
+      : isModelWithName(model)
       ? model.name
       : undefined;
   }, [model, identifier]);
@@ -68,7 +74,7 @@ export const EntityText = ({
     () =>
       description !== undefined
         ? description
-        : model !== undefined && models.isModelWithDescription(model)
+        : model !== undefined && isModelWithDescription(model)
         ? model.description
         : undefined,
     [model, description],

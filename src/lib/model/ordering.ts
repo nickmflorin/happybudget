@@ -1,6 +1,6 @@
 import { orderBy as rootOrderBy, sortBy, findIndex } from "lodash";
 
-import { api } from "application";
+import * as api from "application/api";
 import { logger } from "internal";
 
 import { ApiModel } from "./types";

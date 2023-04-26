@@ -3,8 +3,9 @@ import { type MouseEvent } from "react";
 import classNames from "classnames";
 import { Optional } from "utility-types";
 
-import { errors } from "application";
+import * as errors from "application/errors";
 import { feedback, ui } from "lib";
+import * as icons from "lib/ui/icons";
 import { BareActionButton } from "components/buttons";
 import { FeedbackIcon } from "components/icons";
 
@@ -81,7 +82,7 @@ export const GlobalFeedback = <P extends feedback.FeedbackType = feedback.Feedba
       {!propsHasError(props) && props.onClose !== undefined && (
         <BareActionButton
           className="button--global-feedback-close"
-          icon={ui.IconNames.XMARK}
+          icon={icons.IconNames.XMARK}
           size={ui.ButtonSizes.MEDIUM}
           onClick={(e: MouseEvent<HTMLButtonElement>) => props.onClose?.(e)}
         />

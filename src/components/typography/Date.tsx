@@ -1,7 +1,8 @@
 import classNames from "classnames";
 
-import { config } from "application";
-import { ui, formatters } from "lib";
+import * as localization from "application/config/localization";
+import * as ui from "lib/ui/types";
+import * as formatters from "lib/util/formatters";
 
 /*
 Props for the component that instruct the component to plug the value directly into the element
@@ -14,7 +15,7 @@ type DateRawProps = {
 
 type DateConvProps = {
   readonly value: formatters.DatePrimitive | null | undefined;
-  readonly localization?: config.localization.DateLocalizationCode;
+  readonly localization?: localization.DateLocalizationCode;
   readonly raw?: false;
 };
 
@@ -38,8 +39,8 @@ export const Date = (props: DateProps): JSX.Element => {
   const dateString =
     props.value === null || props.value === undefined
       ? null
-      : formatters.dateFormatter(
-          props.localization || config.localization.DateLocalizationCodes.DISPLAY,
-        )({ value: props.value });
+      : formatters.dateFormatter(props.localization || localization.DateLocalizationCodes.DISPLAY)({
+          value: props.value,
+        });
   return dateString !== null ? <Date raw={true}>{dateString}</Date> : <></>;
 };

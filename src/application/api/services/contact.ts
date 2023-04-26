@@ -1,15 +1,16 @@
-import { model } from "lib";
+import { attachment, contact, budgeting } from "lib/model";
 
 import { client } from "../client";
 import * as types from "../types";
 
-export const getContacts = client.createListModelsService<model.Contact>("/contacts");
-export const getContact = client.createParameterizedRetrieveService<"/contacts/:id", model.Contact>(
+export const getContacts = client.createListModelsService<contact.Contact>("/contacts");
+export const getContact = client.createParameterizedRetrieveService<
   "/contacts/:id",
-);
+  contact.Contact
+>("/contacts/:id");
 export const updateContact = client.createParameterizedPatchService<
   "/contacts/:id/",
-  model.Contact,
+  contact.Contact,
   types.ContactPayload
 >("/contacts/:id/");
 
@@ -18,13 +19,13 @@ export const deleteContact =
 
 export const createContact = client.createParameterizedPostService<
   "/contacts/",
-  model.Contact,
+  contact.Contact,
   types.ContactPayload
 >("/contacts/");
 
 export const getContactAttachments = client.createParameterizedListModelsService<
   "/contacts/:id/attachments",
-  model.Attachment
+  attachment.Attachment
 >("/contacts/:id/attachments");
 
 export const deleteContactAttachment =
@@ -34,22 +35,22 @@ export const deleteContactAttachment =
 
 export const uploadContactAttachment = client.createParameterizedUploadService<
   "/contacts/:id/attachments/",
-  { data: model.Attachment[] }
+  { data: attachment.Attachment[] }
 >("/contacts/:id/attachments/");
 
 export const getContactTaggedActuals = client.createParameterizedListModelsService<
   "/contacts/:id/tagged-actuals/",
-  model.TaggedActual
+  budgeting.TaggedActual
 >("/contacts/:id/tagged-actuals/");
 
 export const bulkUpdateContacts = client.createPatchService<
-  types.ChildListResponse<model.Contact>,
-  types.BulkUpdatePayload<types.ModelPayload<model.Contact>>
+  types.ChildListResponse<contact.Contact>,
+  types.BulkUpdatePayload<types.ModelPayload<contact.Contact>>
 >("/contacts/bulk-update/");
 
 export const bulkCreateContacts = client.createPatchService<
-  types.ChildListResponse<model.Contact>,
-  types.BulkCreatePayload<types.ModelPayload<model.Contact>>
+  types.ChildListResponse<contact.Contact>,
+  types.BulkCreatePayload<types.ModelPayload<contact.Contact>>
 >("/contacts/bulk-create/");
 
 export const bulkDeleteContacts = client.createPatchService<null, types.BulkDeletePayload>(

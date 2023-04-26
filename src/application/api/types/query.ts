@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { schemas } from "lib";
+import * as schemas from "lib/schemas";
 
 export type Order = 1 | -1 | 0;
 

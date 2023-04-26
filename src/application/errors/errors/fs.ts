@@ -53,3 +53,5 @@ export class InvalidFileNameError extends ApplicationError<
     this.filename = filename;
   }
 }
+
+export type FileErrorType = InvalidFileExtensionError | InvalidFileExtensionError;

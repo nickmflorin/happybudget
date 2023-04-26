@@ -1,6 +1,7 @@
-import { errors } from "application";
+import * as errors from "application/errors";
 import { logger } from "internal";
-import { assertNull, assertNotNullOrUndefined, parsers } from "lib";
+import { assertNull, assertNotNullOrUndefined } from "lib/util";
+import * as parsers from "lib/util/parsers";
 
 import * as schemas from "./schemas";
 import * as types from "./types";

@@ -2,12 +2,12 @@ import { useMemo } from "react";
 
 import classNames from "classnames";
 
-import { ui } from "lib";
+import * as icons from "lib/ui/icons";
 
 /**
  * A hook that provides the props that are common for both the Icon and SVG components.
  */
-export const useIconOrSvg = <P extends ui.BaseSVGProps & { readonly className?: string }>(
+export const useIconOrSvg = <P extends icons.BaseSVGProps & { readonly className?: string }>(
   form: "icon" | "svg",
   props: P,
 ): Pick<P, "className"> =>
@@ -29,7 +29,7 @@ export const useIconOrSvg = <P extends ui.BaseSVGProps & { readonly className?: 
 /**
  * A hook that provides the props that are common for the Icon component.
  */
-export const useIcon = <P extends ui.IconProps>({
+export const useIcon = <P extends icons.IconProps>({
   className,
   ...props
 }: Omit<P, "icon">): Pick<P, "className"> => {
@@ -40,7 +40,7 @@ export const useIcon = <P extends ui.IconProps>({
       className: classNames(
         baseProps.className,
         `icon--axis-${props.axis}`,
-        props.size !== undefined && !ui.isCSSSize(props.size) && `icon--size-${props.size}`,
+        props.size !== undefined && `icon--size-${props.size}`,
         className,
       ),
     }),
@@ -51,7 +51,7 @@ export const useIcon = <P extends ui.IconProps>({
 /**
  * A hook that provides the props that are common for the SVG component.
  */
-export const useSVG = <P extends Omit<ui.SVGProps, "children">>(
+export const useSVG = <P extends Omit<icons.SVGProps, "children">>(
   name: string,
   { className, ...props }: P,
 ): Pick<P, "className"> => {

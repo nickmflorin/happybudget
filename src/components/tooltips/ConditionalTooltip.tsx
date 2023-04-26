@@ -1,19 +1,19 @@
 import { ReactNode } from "react";
 
-import { ui } from "lib";
+import * as tooltip from "lib/ui/tooltip/types";
 
 import { TooltipOrContent } from "./TooltipOrContent";
 
 interface ConditionalTooltipProps<
-  T extends typeof ui.TooltipTypes.BRAND | typeof ui.TooltipTypes.INFO,
+  T extends typeof tooltip.TooltipTypes.BRAND | typeof tooltip.TooltipTypes.INFO,
 > {
   readonly children: ReactNode;
-  readonly tooltip?: ui.Tooltip | null;
+  readonly tooltip?: tooltip.Tooltip | null;
   readonly type?: T;
 }
 
 export const ConditionalTooltip = <
-  T extends typeof ui.TooltipTypes.BRAND | typeof ui.TooltipTypes.INFO,
+  T extends typeof tooltip.TooltipTypes.BRAND | typeof tooltip.TooltipTypes.INFO,
 >({
   children,
   tooltip,

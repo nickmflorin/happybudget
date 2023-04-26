@@ -2,11 +2,11 @@ import React from "react";
 
 import { useSelector } from "react-redux";
 
-import { store } from "application";
+import { selectApplicationLoading } from "application/store/selectors";
 
 import { AppLoading } from "./AppLoading";
 
 export const ConnectedAppLoading = (): JSX.Element => {
-  const applicationLoading = useSelector(store.selectors.selectApplicationLoading);
+  const applicationLoading = useSelector(selectApplicationLoading);
   return <AppLoading visible={applicationLoading} />;
 };

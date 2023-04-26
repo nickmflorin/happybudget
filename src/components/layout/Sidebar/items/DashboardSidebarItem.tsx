@@ -1,5 +1,5 @@
 /* import { config } from "application";
-   import { ui } from "lib"; */
+   import * as ui from "lib/ui/types";; */
 
 /* import GenericSidebarItem from "./GenericSidebarItem";
    import ParentSidebarItem from "./ParentSidebarItem"; */

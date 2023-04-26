@@ -1,4 +1,5 @@
-import { enumeratedLiterals, EnumeratedLiteralType } from "../../util";
+import { enumeratedLiterals } from "../../util/literals";
+import { EnumeratedLiteralType } from "../../util/types/literals";
 import * as icons from "../icons";
 import * as tooltip from "../tooltip";
 import { ComponentProps } from "../types";

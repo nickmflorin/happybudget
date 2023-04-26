@@ -1,6 +1,6 @@
 import { type Reducer } from "react";
 
-import { errors } from "application";
+import * as errors from "application/errors";
 
 import * as constants from "../constants";
 import * as typeguards from "../typeguards";

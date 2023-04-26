@@ -4,7 +4,8 @@ import React from "react";
 import classNames from "classnames";
 import * as config from "config";
 
-import { ui } from "lib";
+import * as ui from "lib/ui/types";
+
 import { CorshaLogo } from "components/icons";
 import { Separator } from "components/structural";
 

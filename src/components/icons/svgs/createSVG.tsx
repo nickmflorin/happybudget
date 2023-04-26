@@ -2,7 +2,7 @@ import React from "react";
 
 import { Subtract } from "utility-types";
 
-import { ui } from "lib";
+import * as icons from "lib/ui/icons";
 
 import { useSVG } from "../hooks";
 
@@ -11,11 +11,11 @@ const XMLNS = "http://www.w3.org/2000/svg";
 type InternalSVGProps = {
   readonly __defaults__: {
     readonly name: string;
-    readonly color: ui.IconColor;
+    readonly color: icons.IconColor;
   };
 };
 
-type SVGProps<P extends ui.SVGProps = ui.SVGProps> = P & InternalSVGProps;
+type SVGProps<P extends icons.SVGProps = icons.SVGProps> = P & InternalSVGProps;
 
 export type SVG<P extends SVGProps = SVGProps> = React.FunctionComponent<
   Omit<Subtract<P, InternalSVGProps>, "children">
@@ -50,12 +50,12 @@ const _MemoizedSVG = React.memo(_SVG);
  * @example
  * export const MyCustomSVG = createSVG(
  *   <path>{...}</path>,
- *   { defaultColor: ui.IconColors.WHITE, name: "my-custom-svg"}
+ *   { defaultColor: icons.IconColors.WHITE, name: "my-custom-svg"}
  * );
  */
 export const createSVG = <P extends SVGProps = SVGProps>(
   children: React.ReactElement<JSX.IntrinsicElements["svg"]["path"]>,
-  options: { readonly name: string; readonly defaultColor: ui.IconColor },
+  options: { readonly name: string; readonly defaultColor: icons.IconColor },
 ): SVG<P> => {
   const SVGComponent = (props: Omit<Subtract<P, InternalSVGProps>, "children">) => (
     <_MemoizedSVG {...props} __defaults__={{ ...options, color: options.defaultColor }}>

@@ -1,4 +1,4 @@
-import { errors } from "application";
+import * as errors from "application/errors";
 
 type LoadFileReturnType<S extends true | undefined> = true extends S ? string : string | null;
 

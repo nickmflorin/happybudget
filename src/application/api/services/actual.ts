@@ -1,17 +1,19 @@
-import { model } from "lib";
+import { attachment, budgeting } from "lib/model";
 
 import { client } from "../client";
 import * as types from "../types";
 
-export const getActual = client.createParameterizedRetrieveService<"/actuals/:id", model.Account>(
+export const getActual = client.createParameterizedRetrieveService<
   "/actuals/:id",
-);
+  budgeting.Actual
+>("/actuals/:id");
 
-export const getActualTypes = client.createListModelsService<model.Attachment>("/actuals/types/");
+export const getActualTypes =
+  client.createListModelsService<attachment.Attachment>("/actuals/types/");
 
 export const getActualAttachments = client.createParameterizedListModelsService<
   "/actuals/:id/attachments",
-  model.Attachment
+  attachment.Attachment
 >("/actuals/:id/attachments");
 
 export const deleteActualAttachment = client.createParameterizedDeleteService<
@@ -21,7 +23,7 @@ export const deleteActualAttachment = client.createParameterizedDeleteService<
 
 export const uploadActualAttachment = client.createParameterizedUploadService<
   "/actuals/:id/attachments/",
-  { data: model.Attachment[] }
+  { data: attachment.Attachment[] }
 >("/actuals/:id/attachments/");
 
 export const deleteActual = client.createParameterizedDeleteService<"/actuals/:id/", never>(
@@ -30,6 +32,6 @@ export const deleteActual = client.createParameterizedDeleteService<"/actuals/:i
 
 export const updateActual = client.createParameterizedPatchService<
   "/actuals/:id/",
-  model.Actual,
+  budgeting.Actual,
   Partial<types.ActualPayload>
 >("/actuals/:id/");

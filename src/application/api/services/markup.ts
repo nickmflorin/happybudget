@@ -1,11 +1,12 @@
-import { model } from "lib";
+import { budgeting } from "lib/model";
 
 import { client } from "../client";
 import * as types from "../types";
 
-export const getMarkup = client.createParameterizedRetrieveService<"/markups/:id", model.Markup>(
+export const getMarkup = client.createParameterizedRetrieveService<
   "/markups/:id",
-);
+  budgeting.Markup
+>("/markups/:id");
 
 export const deleteMarkup =
   client.createParameterizedDeleteService<"/markups/:id/">("/markups/:id/");

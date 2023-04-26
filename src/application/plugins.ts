@@ -4,7 +4,9 @@ import moment from "moment-timezone";
 import Cookies from "universal-cookie";
 
 import { logger } from "internal";
-import { model, formatters, parsers } from "lib";
+import { model } from "lib";
+import * as formatters from "lib/util/formatters";
+import * as parsers from "lib/util/parsers";
 
 const cookies = new Cookies();
 

@@ -1,4 +1,5 @@
-import { IsUnion } from ".";
+import { IsUnion } from "./composites";
+
 /**
  * A type that results in a string type corresponding to the original string type defined by the
  * first generic type argument {@link T} with the substring defined by the second generic type
@@ -82,9 +83,6 @@ export type StringHasLength<S extends string, L extends number> = LengthOfString
 export type LengthString<S extends string, L extends number> = StringHasLength<S, L> extends true
   ? S
   : never;
-
-export type StringNumber<T extends number = number> = `${T}`;
-export type StringOrNumber<T extends number = number> = T | StringNumber<T>;
 
 export type HyphensToUnderscores<T extends string> =
   T extends `${infer V extends string}-${infer L extends string}`

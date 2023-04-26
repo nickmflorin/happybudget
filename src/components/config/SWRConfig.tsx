@@ -4,7 +4,7 @@ import { SWRConfig as RootSWRConfig } from "swr";
 import { PublicConfiguration } from "swr/_internal";
 import { z } from "zod";
 
-import { errors } from "application";
+import * as errors from "application/errors";
 import { logger } from "internal";
 
 const SWR_CONFIG_SCHEMA = z

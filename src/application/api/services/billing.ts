@@ -1,11 +1,11 @@
-import { model } from "lib";
+import { billing, user } from "lib/model";
 
 import { client } from "../client";
 import * as types from "../types";
 
-export const getProducts = client.createListService<model.Product>("/billing/products");
+export const getProducts = client.createListService<billing.Product>("/billing/products");
 
-export const getSubscription = client.createGetService<{ subscription: model.Subscription }>(
+export const getSubscription = client.createGetService<{ subscription: billing.Subscription }>(
   "/billing/subscription",
 );
 
@@ -15,7 +15,7 @@ export const createCheckoutSession = client.createPostService<
 >("/billing/checkout-session/");
 
 export const syncCheckoutSession = client.createPostService<
-  model.User,
+  user.User,
   types.SyncCheckoutSessionPayload
 >("/billing/sync-checkout-session/");
 

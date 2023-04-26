@@ -1,10 +1,11 @@
 import classNames from "classnames";
 
-import { ui } from "lib";
+import * as icons from "lib/ui/icons";
+import * as ui from "lib/ui/types";
 
 import { Icon } from "./Icon";
 
-type CaretIconProps = Omit<ui.IconComponentProps, "icon"> & {
+type CaretIconProps = Omit<icons.IconComponentProps, "icon"> & {
   readonly direction?: Exclude<
     ui.CSSDirection,
     typeof ui.CSSDirections.LEFT | typeof ui.CSSDirections.RIGHT
@@ -15,6 +16,8 @@ export const CaretIcon = ({ direction = ui.CSSDirections.DOWN, ...props }: Caret
   <Icon
     className={classNames("icon--caret", props.className)}
     {...props}
-    icon={direction === ui.CSSDirections.DOWN ? ui.IconNames.CARET_DOWN : ui.IconNames.CARET_UP}
+    icon={
+      direction === ui.CSSDirections.DOWN ? icons.IconNames.CARET_DOWN : icons.IconNames.CARET_UP
+    }
   />
 );

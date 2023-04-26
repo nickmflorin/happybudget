@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 
 import classNames from "classnames";
 
-import { ui } from "lib";
+import * as ui from "lib/ui/types";
 
 export type SeparatorProps = ui.ComponentProps<{
   readonly margin?: string | number;

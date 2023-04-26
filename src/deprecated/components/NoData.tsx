@@ -3,13 +3,14 @@ import { ReactNode } from "react";
 import classNames from "classnames";
 
 import { ui } from "lib";
+import * as icons from "lib/ui/icons"
 import { PrimaryButton } from "components/buttonsOld";
 
 export type NoDataProps = ui.ComponentProps<{
   readonly title?: string;
   readonly subTitle?: string;
   readonly button?: { readonly onClick?: () => void; readonly text: string };
-  readonly icon?: ui.IconProp;
+  readonly icon?: icons.IconProp;
 }>
 
 type PrivateNoDataProps = NoDataProps & {

@@ -1,7 +1,4 @@
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { enumeratedLiterals } from "lib/util/literals";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
-import { EnumeratedLiteralType } from "lib/util/types/literals";
 
 import { HttpMethod } from ".";
 
@@ -65,7 +62,7 @@ export type UrlWithPathParams<
   : U;
 
 export const HttpSchemes = enumeratedLiterals(["http", "https"] as const);
-export type HttpScheme = EnumeratedLiteralType<typeof HttpSchemes>;
+export type HttpScheme = import("lib/util/types").EnumeratedLiteralType<typeof HttpSchemes>;
 
 type InvalidHostChars = "/" | "?" | ":" | "@" | "&" | "=" | "+" | "$" | ",";
 

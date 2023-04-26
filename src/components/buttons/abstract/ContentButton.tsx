@@ -3,14 +3,17 @@ import React, { useMemo } from "react";
 import classNames from "classnames";
 
 import { logger } from "internal";
-import { ui } from "lib";
+import * as buttons from "lib/ui/buttons/types";
+import * as icons from "lib/ui/icons";
+import * as loading from "lib/ui/loading";
+import * as ui from "lib/ui/types";
 import { CaretIcon } from "components/icons";
 import { Spinner } from "components/loading";
 import { ShowHide } from "components/util";
 
 import { Button, ButtonProps, Anchor, AnchorProps } from "./Button";
 
-export type TextVariant = Exclude<ui.ButtonVariant, typeof ui.ButtonVariants.ACTION>;
+export type TextVariant = Exclude<buttons.ButtonVariant, typeof buttons.ButtonVariants.ACTION>;
 
 type Loc = Exclude<ui.CSSDirection, typeof ui.CSSDirections.UP | typeof ui.CSSDirections.DOWN>;
 
@@ -20,7 +23,7 @@ const CARET_DEFAULT_LOCATION: Loc = ui.CSSDirections.RIGHT;
 type ContentButtonSubContentProps = {
   readonly children: string | JSX.Element;
   readonly loading?: boolean;
-  readonly icon?: ui.IconProp;
+  readonly icon?: icons.IconProp;
   /**
    * Defines the direction that the caret should be pointed in, whether it be "up" or "down".
    */
@@ -64,7 +67,7 @@ const _Affix = (
         className="icon-spinner--button"
         fallbackIcon={props.icon}
         loading={props.loading}
-        size={ui.SpinnerSizes.FILL}
+        size={loading.SpinnerSizes.FILL}
       />
     ),
     [props.icon, props.loading],

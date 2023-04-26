@@ -1,6 +1,6 @@
 import hoistNonReactStatics from "hoist-non-react-statics";
 
-import { ui } from "lib";
+import * as ui from "lib/ui/types";
 
 import { Loading, LoadingProps } from "./Loading";
 

@@ -1,14 +1,14 @@
-import { model } from "lib";
+import { budgeting } from "lib/model";
 
 import { client } from "../client";
 import * as types from "../types";
 
-export const getGroup = client.createParameterizedRetrieveService<"/groups/:id", model.Group>(
+export const getGroup = client.createParameterizedRetrieveService<"/groups/:id", budgeting.Group>(
   "/groups/:id",
 );
 export const updateGroup = client.createParameterizedPatchService<
   "/groups/:id/",
-  model.Group,
+  budgeting.Group,
   Partial<types.GroupPayload>
 >("/groups/:id/");
 

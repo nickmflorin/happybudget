@@ -1,7 +1,6 @@
-import { isNil } from "lodash";
 import mime from "mime";
 
-import { errors } from "application";
+import * as errors from "application/errors";
 
 import * as parsers from "./parsers";
 import * as types from "./types";
@@ -13,14 +12,14 @@ export const downloadData = (data: string, name: string) => {
   link.style.visibility = "hidden";
   document.body.appendChild(link);
   link.click();
-  if (!isNil(link.parentNode)) {
+  if (link.parentNode !== null) {
     link.parentNode.removeChild(link);
   }
 };
 
 export const downloadBlob = (blob: Blob, name: string) => {
   const blobUrl = URL.createObjectURL(blob);
-  if (!isNil(blobUrl)) {
+  if (blobUrl !== null) {
     downloadData(blobUrl, name);
   } else {
     throw new Error("Error downloading file.");
@@ -35,7 +34,7 @@ export const download = (
   const parsed = parsers.parseFileName(nm, options);
 
   const mimeType = mime.getType(parsed.extension);
-  if (isNil(mimeType)) {
+  if (mimeType === null) {
     throw new errors.InvalidFileExtensionError(parsed.extension);
   }
   let blob: Blob;
@@ -53,7 +52,7 @@ export const downloadAsCsvFile = (filename: string, data: types.CSVData) => {
   const processRow = (row: types.CSVRow): string => {
     let finalVal = "";
     for (let j = 0; j < row.length; j++) {
-      const innerValue = !isNil(row[j]) ? String(row[j]) : "";
+      const innerValue = row[j] !== null && row[j] !== undefined ? String(row[j]) : "";
       /* eslint-disable quotes */
       let result = innerValue.replace(/"/g, '""');
       if (result.search(/("|,|\n)/g) >= 0) {

@@ -1,4 +1,5 @@
-import { enumeratedLiterals, EnumeratedLiteralType } from "../../util";
+import { enumeratedLiterals } from "../../util/literals";
+import { EnumeratedLiteralType } from "../../util/types/literals";
 
 export const TypographyTypes = enumeratedLiterals(["heading", "body", "label"] as const);
 export type TypographyType = EnumeratedLiteralType<typeof TypographyTypes>;

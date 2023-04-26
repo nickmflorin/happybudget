@@ -1,21 +1,21 @@
-import { model } from "lib";
+import { attachment, budgeting } from "lib/model";
 
 import { client } from "../client";
 import * as types from "../types";
 
 export const getSubAccount = client.createParameterizedRetrieveService<
   "/subaccounts/:id",
-  model.Account
+  budgeting.Account
 >("/subaccounts/:id");
 
 export const getSubAccountMarkups = client.createParameterizedListModelsService<
   "/subaccounts/:id/markups",
-  model.Markup
+  budgeting.Markup
 >("/subaccounts/:id/markups");
 
 export const getSubAccountGroups = client.createParameterizedListModelsService<
   "/subaccounts/:id/groups",
-  model.Group
+  budgeting.Group
 >("/subaccounts/:id/groups");
 
 export const deleteSubAccount = client.createParameterizedDeleteService<"/subaccounts/:id/", never>(
@@ -24,45 +24,49 @@ export const deleteSubAccount = client.createParameterizedDeleteService<"/subacc
 
 export const updateSubAccount = client.createParameterizedPatchService<
   "/subaccounts/:id/",
-  model.SubAccount,
+  budgeting.SubAccount,
   Partial<types.SubAccountPayload>
 >("/subaccounts/:id/");
 
 export const createSubAccountChild = client.createParameterizedPostService<
   "/subaccounts/:id/children/",
-  model.SubAccount,
+  budgeting.SubAccount,
   Partial<types.SubAccountPayload>
 >("/subaccounts/:id/children/");
 
 export const createSubAccountMarkup = client.createParameterizedPostService<
   "/subaccounts/:id/markups/",
-  types.AncestryResponse<model.UserBudget | model.Template, model.SubAccount, model.Markup>,
+  types.AncestryResponse<
+    budgeting.UserBudget | budgeting.Template,
+    budgeting.SubAccount,
+    budgeting.Markup
+  >,
   Partial<types.MarkupPayload>
 >("/subaccounts/:id/markups/");
 
 export const createSubAccountGroup = client.createParameterizedPostService<
   "/subaccounts/:id/groups/",
-  model.Group,
+  budgeting.Group,
   types.GroupPayload
 >("/subaccounts/:id/groups/");
 
 export const getSubAccountChildren = client.createParameterizedListModelsService<
   "/subaccounts/:id/children/",
-  model.SubAccount
+  budgeting.SubAccount
 >("/subaccounts/:id/children/");
 
 export const getSubAccountSimpleChildren = client.createParameterizedListModelsService<
   "/subaccounts/:id/children/",
-  model.SubAccount
+  budgeting.SubAccount
 >("/subaccounts/:id/children/", { query: { simple: true } });
 
 export const bulkUpdateSubAccountChildren = client.createParameterizedPatchService<
   "/subaccounts/:id/bulk-update-children/",
   types.ApiSuccessResponse<
     types.AncestryListResponse<
-      model.UserBudget | model.Template,
-      model.SubAccount,
-      model.SubAccount
+      budgeting.UserBudget | budgeting.Template,
+      budgeting.SubAccount,
+      budgeting.SubAccount
     >
   >,
   types.BulkUpdatePayload<types.SubAccountPayload>
@@ -72,9 +76,9 @@ export const bulkDeleteSubAccountChildren = client.createParameterizedPatchServi
   "/subaccounts/:id/bulk-delete-children/",
   types.ApiSuccessResponse<
     types.AncestryListResponse<
-      model.UserBudget | model.Template,
-      model.SubAccount,
-      model.SubAccount
+      budgeting.UserBudget | budgeting.Template,
+      budgeting.SubAccount,
+      budgeting.SubAccount
     >
   >,
   types.BulkDeletePayload
@@ -84,9 +88,9 @@ export const bulkCreateSubAccountChildren = client.createParameterizedPatchServi
   "/subaccounts/:id/bulk-create-children/",
   types.ApiSuccessResponse<
     types.AncestryListResponse<
-      model.UserBudget | model.Template,
-      model.SubAccount,
-      model.SubAccount
+      budgeting.UserBudget | budgeting.Template,
+      budgeting.SubAccount,
+      budgeting.SubAccount
     >
   >,
   types.BulkCreatePayload<types.SubAccountPayload>
@@ -94,16 +98,18 @@ export const bulkCreateSubAccountChildren = client.createParameterizedPatchServi
 
 export const bulkDeleteSubAccountMarkups = client.createParameterizedPatchService<
   "/subaccounts/:id/bulk-delete-markups/",
-  types.ApiSuccessResponse<types.ParentsResponse<model.UserBudget | model.Template, model.Account>>,
+  types.ApiSuccessResponse<
+    types.ParentsResponse<budgeting.UserBudget | budgeting.Template, budgeting.Account>
+  >,
   types.BulkDeletePayload
 >("/subaccounts/:id/bulk-delete-markups/");
 
 export const getSubAccountUnits =
-  client.createListModelsService<model.SubAccountUnit>("/subaccounts/units");
+  client.createListModelsService<budgeting.SubAccountUnit>("/subaccounts/units");
 
 export const getSubAccountAttachments = client.createParameterizedListModelsService<
   "/subaccounts/:id/attachments",
-  model.Attachment
+  attachment.Attachment
 >("/subaccounts/:id/attachments");
 
 export const deleteSubAccountAttachment = client.createParameterizedDeleteService<
@@ -113,5 +119,5 @@ export const deleteSubAccountAttachment = client.createParameterizedDeleteServic
 
 export const uploadSubAccountAttachment = client.createParameterizedUploadService<
   "/subaccounts/:id/attachments/",
-  { data: model.Attachment[] }
+  { data: attachment.Attachment[] }
 >("/subaccounts/:id/attachments/");

@@ -1,7 +1,8 @@
 import { Subtract } from "utility-types";
 
 import * as ui from "../ui";
-import { enumeratedLiterals, EnumeratedLiteralType } from "../util";
+import { enumeratedLiterals } from "../util/literals";
+import { EnumeratedLiteralType } from "../util/types/literals";
 
 export type ID = string | number;
 

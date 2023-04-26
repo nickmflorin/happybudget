@@ -1,4 +1,5 @@
-import { enumeratedLiterals, EnumeratedLiteralType } from "../../util";
+import { enumeratedLiterals } from "../../util/literals";
+import { EnumeratedLiteralType } from "../../util/types/literals";
 import * as types from "../types";
 
 export const BilingStatuses = enumeratedLiterals(["active", "expired", "cancelled"] as const);

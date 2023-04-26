@@ -5,8 +5,9 @@ import classNames from "classnames";
 
 import { config as app } from "application";
 import { ui } from "lib";
+import * as icons from "lib/ui/icons";
 
-import { AnchorProps } from "../abstract";
+import { AnchorProps } from "../../components/buttons/abstract";
 
 export type UseSidebarItemAnchorProps<
   T extends app.SidebarId,
@@ -29,7 +30,7 @@ export const useSidebarItemAnchorProps = <
   ...props
 }: UseSidebarItemAnchorProps<T, I, P>): {
   readonly tooltip: ui.Tooltip | undefined;
-  readonly icon: ui.IconProp | undefined;
+  readonly icon: icons.IconProp | undefined;
   readonly className: string;
   readonly to: AnchorProps["to"];
   readonly id: string;

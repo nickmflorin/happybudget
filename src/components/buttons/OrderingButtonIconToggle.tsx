@@ -2,8 +2,8 @@ import { useMemo } from "react";
 
 import { find } from "lodash";
 
-import { api } from "application";
-import { ui } from "lib";
+import * as api from "application/api";
+import * as icons from "lib/ui/icons";
 import { Icon, OrderingArrowIcon } from "components/icons";
 
 import {
@@ -33,7 +33,7 @@ export const OrderingButtonIconToggle = <F extends string = string>({
     if (order !== undefined) {
       return <OrderingArrowIcon order={order.order} />;
     }
-    return <Icon icon={ui.IconNames.FILTER} />;
+    return <Icon icon={icons.IconNames.FILTER} />;
   }, [order]);
 
   return (
@@ -42,7 +42,7 @@ export const OrderingButtonIconToggle = <F extends string = string>({
       style={{ ...props.style, width: "auto" }}
       breakpointStyle={props.style}
       icon={sortIcon}
-      breakpointIcon={<Icon icon={ui.IconNames.SORT_AMOUNT_DOWN} />}
+      breakpointIcon={<Icon icon={icons.IconNames.ARROW_DOWN} />}
     >
       {label}
     </SecondaryButtonIconToggle>

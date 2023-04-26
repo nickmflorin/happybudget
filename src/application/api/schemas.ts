@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { formatters } from "lib";
+import * as formatters from "lib/util/formatters";
 
 import * as errors from "../errors";
 

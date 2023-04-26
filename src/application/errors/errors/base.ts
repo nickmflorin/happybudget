@@ -1,9 +1,7 @@
 import { Optional } from "utility-types";
 import { z } from "zod";
 
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { stringifyZodIssues } from "lib/util/formatters/attributes";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { manageSuffixPunctuation } from "lib/util/formatters/formal";
 
 import * as errorTypes from "../errorTypes";
@@ -126,7 +124,7 @@ export interface IApplicationUserError<C extends CustomLogContext = CustomLogCon
  *   contextually applicable, communicating the error to a user.
  */
 export class ApplicationUserError<
-    E extends errorTypes.ErrorType,
+    E extends errorTypes.ErrorType = errorTypes.ErrorType,
     C extends CustomLogContext = CustomLogContext,
   >
   extends ApplicationError<E, C>

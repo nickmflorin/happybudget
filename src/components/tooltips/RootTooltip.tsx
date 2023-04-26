@@ -4,7 +4,8 @@ import classNames from "classnames";
 import { Tooltip as AntdTooltip } from "antd";
 
 import { logger } from "internal";
-import { ui } from "lib";
+import * as tooltip from "lib/ui/tooltip/types";
+
 // import { TextWithIncludedLink } from "components/typography";
 
 import { ItemizedTooltipContent } from "./ItemizedTooltipContent";
@@ -12,7 +13,7 @@ import { ItemizedTooltipContent } from "./ItemizedTooltipContent";
 export const RootTooltip = ({
   children,
   ...props
-}: ui.TooltipProps & { readonly children: ReactNode }): JSX.Element => {
+}: tooltip.TooltipProps & { readonly children: ReactNode }): JSX.Element => {
   const title = useMemo(() => {
     if (props.includeLink !== undefined && typeof props.content !== "string") {
       logger.warn("Cannot include link in tooltip when the title is not a string.");

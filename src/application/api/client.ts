@@ -1,6 +1,6 @@
 import Cookies from "universal-cookie";
 
-import { parseEnvVar } from "../config";
+import { parseEnvVar } from "../config/util";
 
 import { HttpClient } from "./HttpClient";
 import * as types from "./types";

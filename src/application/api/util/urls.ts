@@ -1,3 +1,5 @@
+import urlModule from "url";
+
 import { logger } from "internal";
 
 import * as types from "../types";
@@ -5,22 +7,18 @@ import * as types from "../types";
 /**
  * Parses the query parameters from the provided URL and returns the query parameters as an object.
  *
- * @param {string} url The URL for which we want to get the query parameters from.
+ * @param {string} url The URL that the query parameters should be parsed from.
+ *
+ * @returns {Record<string, string>}
+ * 	 An object that represents the parameter names and values that are in the URL.
  */
-export const getQueryParams = (url: string): Record<string, string> => {
-  const anchor = document.createElement("a");
-  anchor.href = url;
-
-  const queryParams: Record<string, string> = {};
-  const queryStrings = anchor.search.substring(1);
-  if (queryStrings !== "") {
-    const params = queryStrings.split("&");
-    for (let i = 0; i < params.length; i++) {
-      const pair = params[i].split("=");
-      queryParams[pair[0]] = decodeURIComponent(pair[1]);
-    }
+export const getQueryParams = (url: string): Map<string, types.QueryParamValue> => {
+  const queryString = urlModule.parse(url).query;
+  const params = new Map<string, types.QueryParamValue>();
+  if (queryString) {
+    new URLSearchParams(queryString).forEach((v: string, k: string) => params.set(k, v));
   }
-  return queryParams;
+  return params;
 };
 
 export const getUrlPathParams = <U extends string>(value: U): types.UrlPathParams<U> => {
@@ -67,28 +65,36 @@ export const processRawQueryParams = (query: types.RawQuery = {}): types.Process
   }, {});
 
 /**
- * Adds the provided query parameters to the provided URL, accounting for query parameters that may
- * already exist on the provided URL.  The provided query parameters will be merged with existing
- * query parameters on the URL (if they exist).
+ * Adds the provided query parameters to the provided URL or path, overwriting existing query
+ * parameters that may already exist on the provided URL or path.
  *
- * @param {string} url
- *   The URL for which we want to add the provided query parameters to.  The URL can already contain
- *   query parameters, and the provided query parameters will be merged with the existing ones.
+ * @template U The type of the URL or path.
  *
- * @param {types.RawQuery} query  The query parameters to add to the URL as an object.
+ * @param {U} url
+ *   The URL or path that the query parameters should be added to.
+ *
+ * @param {RawQuery} query The query parameters that should be added to the URL or path.
+ *
+ * @returns {U} The URL or path with the query parameters added.
  */
-export const addQueryParamsToUrl = (url: string, query: types.RawQuery = {}): string => {
-  const existingQuery = getQueryParams(url);
-  const newQuery = query || {};
-  const mergedQuery: types.RawQuery = { ...existingQuery, ...newQuery };
-  const processed = processRawQueryParams(mergedQuery);
-
+export const addQueryParamsToUrl = <
+  Q extends types.RawQuery = types.RawQuery,
+  U extends string = string,
+>(
+  url: U,
+  query: Partial<Q> | undefined = {},
+): U => {
   const urlParams = new URLSearchParams();
-  Object.keys(processed).forEach((key: string) => {
-    urlParams.append(key, encodeURIComponent(processed[key]));
+  const q: types.ProcessedQuery = processRawQueryParams(query);
+
+  Object.keys(q).forEach((k: string) => {
+    const v = q[k];
+    if (v !== null && v !== undefined && (typeof v !== "string" || v.trim() !== "")) {
+      urlParams.append(k, encodeURIComponent(v));
+    }
   });
   if (urlParams.toString() !== "") {
-    return url.split("?")[0] + "?" + urlParams.toString();
+    return (url.split("?")[0] + "?" + urlParams.toString()) as U;
   }
   return url;
 };

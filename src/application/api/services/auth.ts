@@ -1,4 +1,4 @@
-import { model } from "lib";
+import { user, auth } from "lib/model";
 
 import { client } from "../client";
 import * as types from "../types";
@@ -7,8 +7,8 @@ export const login = async (
   email: string,
   password: string,
   options?: Omit<types.ExposedClientRequestOptions, "credentials" | "body">,
-): Promise<types.ClientResponse<model.User>> =>
-  client.post<model.User, { readonly email: string; readonly password: string }>("/auth/login/", {
+): Promise<types.ClientResponse<user.User>> =>
+  client.post<user.User, { readonly email: string; readonly password: string }>("/auth/login/", {
     ...options,
     credentials: types.RequestCredentials.OMIT,
     body: { email, password },
@@ -17,8 +17,8 @@ export const login = async (
 export const socialLogin = async (
   body: types.SocialPayload,
   options?: Omit<types.ExposedClientRequestOptions, "credentials" | "body">,
-): Promise<types.ClientResponse<model.User>> =>
-  client.post<model.User, types.SocialPayload>("/auth/social-login/", {
+): Promise<types.ClientResponse<user.User>> =>
+  client.post<user.User, types.SocialPayload>("/auth/social-login/", {
     ...options,
     credentials: types.RequestCredentials.OMIT,
     body,
@@ -31,8 +31,8 @@ export const logout = async (
 export const validateAuthToken = async (
   payload?: types.AuthTokenValidationPayload,
   options?: Omit<types.ExposedClientRequestOptions, "credentials" | "body">,
-): Promise<types.ClientResponse<model.User>> =>
-  client.post<model.User>("/auth/validate/", { ...options, body: payload });
+): Promise<types.ClientResponse<user.User>> =>
+  client.post<user.User>("/auth/validate/", { ...options, body: payload });
 
 export const validatePublicToken = async (
   payload?: types.PublicTokenValidationPayload,
@@ -46,8 +46,8 @@ export const validatePublicToken = async (
 export const validateEmailConfirmationToken = async (
   token: string,
   options?: Omit<types.ExposedClientRequestOptions, "credentials" | "body">,
-): Promise<types.ClientResponse<model.User>> =>
-  client.post<model.User>("/auth/validate-email-verification-token/", {
+): Promise<types.ClientResponse<user.User>> =>
+  client.post<user.User>("/auth/validate-email-verification-token/", {
     ...options,
     credentials: types.RequestCredentials.OMIT,
     body: { token },
@@ -56,8 +56,8 @@ export const validateEmailConfirmationToken = async (
 export const validatePasswordRecoveryToken = async (
   token: string,
   options?: Omit<types.ExposedClientRequestOptions, "credentials" | "body">,
-): Promise<types.ClientResponse<model.User>> =>
-  client.post<model.User>("/auth/validate-password-recovery-token/", {
+): Promise<types.ClientResponse<user.User>> =>
+  client.post<user.User>("/auth/validate-password-recovery-token/", {
     ...options,
     credentials: types.RequestCredentials.OMIT,
     body: { token },
@@ -86,8 +86,8 @@ export const recoverPassword = async (
 export const resetPassword = async (
   payload: types.ResetPasswordPayload,
   options?: Omit<types.ExposedClientRequestOptions, "credentials" | "body">,
-): Promise<types.ClientResponse<model.User>> =>
-  client.post<model.User>("/auth/reset-password/", {
+): Promise<types.ClientResponse<user.User>> =>
+  client.post<user.User>("/auth/reset-password/", {
     ...options,
     credentials: types.RequestCredentials.OMIT,
     body: payload,
@@ -95,7 +95,7 @@ export const resetPassword = async (
 
 export const updatePublicToken = client.createParameterizedPatchService<
   "/auth/public-tokens/:id/",
-  model.PublicToken,
+  auth.PublicToken,
   types.PublicTokenPayload
 >("/auth/public-tokens/:id/");
 
@@ -104,5 +104,5 @@ export const deletePublicToken =
 
 export const getPublicToken = client.createParameterizedRetrieveService<
   "/auth/public-tokens/:id/",
-  model.PublicToken
+  auth.PublicToken
 >("/auth/public-tokens/:id/");

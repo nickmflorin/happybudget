@@ -2,7 +2,8 @@ import React, { ReactNode, useEffect } from "react";
 
 import { useDispatch } from "react-redux";
 
-import { store } from "application";
+import { actions } from "application/store";
+import { type Dispatch } from "application/store/types";
 
 export type LoadWithApplicationProps = {
   readonly loading?: boolean;
@@ -15,13 +16,13 @@ export const LoadWithApplication: React.FC<LoadWithApplicationProps> = ({
   children,
   hideWhileLoading = false,
 }) => {
-  const dispatch: store.Dispatch = useDispatch();
+  const dispatch: Dispatch = useDispatch();
 
   useEffect(() => {
     if (loading === true) {
-      dispatch(store.actions.setApplicationLoadingAction(true, {}));
+      dispatch(actions.setApplicationLoadingAction(true, {}));
     } else {
-      dispatch(store.actions.setApplicationLoadingAction(false, {}));
+      dispatch(actions.setApplicationLoadingAction(false, {}));
     }
   }, [loading, dispatch]);
 

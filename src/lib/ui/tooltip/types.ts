@@ -2,7 +2,9 @@ import { ReactNode } from "react";
 
 import { TooltipPropsWithTitle } from "antd/es/tooltip";
 
-import { formatters, EnumeratedLiteralType, enumeratedLiterals } from "../../util";
+import * as formatters from "../../util/formatters";
+import { enumeratedLiterals } from "../../util/literals";
+import { EnumeratedLiteralType } from "../../util/types/literals";
 import * as buttons from "../buttons";
 
 export const TooltipTypes = enumeratedLiterals(["info", "brand", "entity"] as const);

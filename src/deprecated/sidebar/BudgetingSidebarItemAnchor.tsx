@@ -3,9 +3,9 @@ import { useMemo } from "react";
 
 import classNames from "classnames";
 
-import { config as app } from "application";
+import * as app from "application/config";
 
-import { BareActionAnchor, BareActionAnchorProps } from "../BareActionButton";
+import { BareActionAnchor, BareActionAnchorProps } from "../../components/buttons/BareActionButton";
 
 export type BudgetingSidebarItemAnchorProps<I extends app.PageId, P extends string = string> = Pick<
   BareActionAnchorProps,

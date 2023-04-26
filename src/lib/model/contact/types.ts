@@ -1,6 +1,7 @@
 import * as fs from "../../fs";
 import { isObjectOfType } from "../../schemas";
-import { enumeratedLiterals, EnumeratedLiteralType } from "../../util";
+import { enumeratedLiterals } from "../../util/literals";
+import { EnumeratedLiteralType } from "../../util/types/literals";
 import * as attachment from "../attachment";
 import * as choice from "../choice";
 import * as types from "../types";

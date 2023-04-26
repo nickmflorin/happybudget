@@ -4,6 +4,7 @@ import classNames from "classnames";
 import { isFragment } from "react-is";
 
 import { ui, core, OneOrMany } from "lib";
+import * as icons from "lib/ui/icons";
 import { Icon } from "components/icons";
 
 // Iterates over the child elements, removing fragments (<></>) recursively.
@@ -14,7 +15,7 @@ const _getAffixes = (props: Pick<AffixGroupProps, "children" | "affixes">): ui.A
       /* If there are multiple children, we have to concatenate the results of recursive calls such
          that each child element will have Fragment(s) flattened out. */
       return child.reduce(
-        (prev: ui.Affix[], curr: JSX.Element | ui.IconName) => [
+        (prev: ui.Affix[], curr: JSX.Element | icons.IconName) => [
           ...prev,
           ..._getAffixes({ children: curr }),
         ],
@@ -39,7 +40,7 @@ const _getAffixes = (props: Pick<AffixGroupProps, "children" | "affixes">): ui.A
 };
 
 const AffixIcon = (props: {
-  icon: ui.IconName | ui.IconElement | ui.Icon;
+  icon: icons.IconName | icons.IconElement | icons.Icon;
   spacing?: number;
   index?: number;
 }) => (
@@ -52,12 +53,12 @@ const AffixIcon = (props: {
 
 type AffixProps = {
   /*
-  The ui.IconBasicProp cannot be a child because it includes ui.Icon which is an object of form
-  { type: ..., name: ... }, and objects are not valid React children.  However, the ui.Icon type can
+  The icons.IconBasicProp cannot be a child because it includes icons.Icon which is an object of form
+  { type: ..., name: ... }, and objects are not valid React children.  However, the icons.Icon type can
   still be provided as an element in the `affixes` prop - and in that case it will be converted to
   an `Icon` without using the `Affix` component here.
   */
-  readonly children: JSX.Element | ui.IconName | ui.IconElement;
+  readonly children: JSX.Element | icons.IconName | icons.IconElement;
   readonly spacing?: number;
   readonly index?: number;
 };
@@ -81,7 +82,7 @@ const Affix = (props: AffixProps): JSX.Element => {
 
 export type AffixGroupProps = ui.ComponentProps<{
   readonly affixes?: ui.Affixes;
-  readonly children?: OneOrMany<JSX.Element | ui.IconName>;
+  readonly children?: OneOrMany<JSX.Element | icons.IconName>;
   /**
    * Defines the separation between the individual "affixes" in the `AffixGroup`.
    *

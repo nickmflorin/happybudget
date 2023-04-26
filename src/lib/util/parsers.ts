@@ -1,9 +1,14 @@
+import { z } from "zod";
+
 import { logger } from "internal";
 
 import * as formatters from "./formatters";
-import { stringIsInteger } from "./typeguards";
 
 export const isInteger = (n: number) => Number(n) === n && n % 1 === 0;
+
+export const isStringInteger = (n: string | number) => z.coerce.number().int().safeParse(n).success;
+
+export const isStringNumber = (n: string | number) => z.coerce.number().safeParse(n).success;
 
 type StringParserOptions<D = unknown> = {
   readonly strict?: true;
@@ -28,14 +33,37 @@ export const parseInteger = <O extends StringParserOptions = StringParserOptions
   options?: O,
 ): StringParserReturn<number, O> => {
   const defaultValue = options?.defaultValue ?? null;
-  if (typeof v === "string" && stringIsInteger(v)) {
-    return parseInteger(parseInt(v), options);
-  } else if (typeof v === "number" && isInteger(v)) {
-    return v as StringParserReturn<number, O>;
-  } else if (typeof v === "number" && options?.strict !== true) {
-    return Math.floor(v) as StringParserReturn<number, O>;
+
+  const result = z.coerce.number().int().safeParse(v);
+  if (result.success) {
+    return result.data as StringParserReturn<number, O>;
   }
   let message = `Value ${v} cannot be converted to an integer.`;
+  if (options?.errorMessage) {
+    message =
+      formatters.manageSuffixPunctuation(options.errorMessage, { remove: true, add: ":" }) +
+      " " +
+      message;
+  }
+  if (options?.strict) {
+    throw new Error(message);
+  } else if (options?.logInvalid !== false) {
+    logger.warn({ value: v }, message);
+  }
+  return defaultValue as StringParserReturn<number, O>;
+};
+
+export const parseNumber = <O extends StringParserOptions = StringParserOptions>(
+  v: string | number,
+  options?: O,
+): StringParserReturn<number, O> => {
+  const defaultValue = options?.defaultValue ?? null;
+
+  const result = z.coerce.number().safeParse(v);
+  if (result.success) {
+    return result.data as StringParserReturn<number, O>;
+  }
+  let message = `Value ${v} cannot be converted to a number.`;
   if (options?.errorMessage) {
     message =
       formatters.manageSuffixPunctuation(options.errorMessage, { remove: true, add: ":" }) +

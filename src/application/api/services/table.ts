@@ -1,4 +1,4 @@
-import { model } from "lib";
+import { budgeting } from "lib/model";
 
 import * as types from "../types";
 
@@ -7,8 +7,8 @@ import * as budget from "./budget";
 import * as subaccount from "./subaccount";
 
 export const getTableChildren = <
-  M extends model.Account | model.SubAccount,
-  P extends model.ParentType<M>,
+  M extends budgeting.Account | budgeting.SubAccount,
+  P extends budgeting.ParentType<M>,
   Q extends types.ApiModelListQuery<M> = types.ApiModelListQuery<M>,
 >(
   parentId: number,
@@ -19,20 +19,22 @@ export const getTableChildren = <
     budget: async (id: number, o?: types.ExposedClientRequestOptions<{ query: Q }>) =>
       budget.getBudgetChildren(
         { id },
-        o as types.ExposedClientRequestOptions<{ query: types.ApiModelListQuery<model.Account> }>,
+        o as types.ExposedClientRequestOptions<{
+          query: types.ApiModelListQuery<budgeting.Account>;
+        }>,
       ),
     account: async (id: number, o?: types.ExposedClientRequestOptions<{ query: Q }>) =>
       account.getAccountChildren(
         { id },
         o as types.ExposedClientRequestOptions<{
-          query: types.ApiModelListQuery<model.SubAccount>;
+          query: types.ApiModelListQuery<budgeting.SubAccount>;
         }>,
       ),
     subaccount: async (id: number, o?: types.ExposedClientRequestOptions<{ query: Q }>) =>
       subaccount.getSubAccountChildren(
         { id },
         o as types.ExposedClientRequestOptions<{
-          query: types.ApiModelListQuery<model.SubAccount>;
+          query: types.ApiModelListQuery<budgeting.SubAccount>;
         }>,
       ),
   };
@@ -42,8 +44,8 @@ export const getTableChildren = <
 };
 
 export const getTableSimpleChildren = <
-  M extends model.SimpleAccount | model.SimpleSubAccount,
-  P extends model.ParentType<M>,
+  M extends budgeting.SimpleAccount | budgeting.SimpleSubAccount,
+  P extends budgeting.ParentType<M>,
   Q extends types.ApiModelListQuery<M> = types.ApiModelListQuery<M>,
 >(
   parentId: number,
@@ -55,21 +57,21 @@ export const getTableSimpleChildren = <
       budget.getBudgetSimpleChildren(
         { id },
         o as types.ExposedClientRequestOptions<{
-          query: types.ApiModelListQuery<model.SimpleAccount>;
+          query: types.ApiModelListQuery<budgeting.SimpleAccount>;
         }>,
       ),
     account: async (id: number, o?: types.ExposedClientRequestOptions<{ query: Q }>) =>
       account.getAccountSimpleChildren(
         { id },
         o as types.ExposedClientRequestOptions<{
-          query: types.ApiModelListQuery<model.SimpleSubAccount>;
+          query: types.ApiModelListQuery<budgeting.SimpleSubAccount>;
         }>,
       ),
     subaccount: async (id: number, o?: types.ExposedClientRequestOptions<{ query: Q }>) =>
       subaccount.getSubAccountSimpleChildren(
         { id },
         o as types.ExposedClientRequestOptions<{
-          query: types.ApiModelListQuery<model.SimpleSubAccount>;
+          query: types.ApiModelListQuery<budgeting.SimpleSubAccount>;
         }>,
       ),
   };
@@ -79,9 +81,9 @@ export const getTableSimpleChildren = <
 };
 
 export const createTableMarkup = <
-  B extends model.Budget | model.Template,
-  A extends model.Account | model.SubAccount,
-  P extends model.ParentType<A>,
+  B extends budgeting.Budget | budgeting.Template,
+  A extends budgeting.Account | budgeting.SubAccount,
+  P extends budgeting.ParentType<A>,
   R extends types.MarkupResponseType<B, A> = types.MarkupResponseType<B, A>,
 >(
   parentId: number,
@@ -121,42 +123,42 @@ export const createTableMarkup = <
 };
 
 export const getTableGroups = <
-  P extends model.ParentType,
-  Q extends types.ApiModelListQuery<model.Group> = types.ApiModelListQuery<model.Group>,
+  P extends budgeting.ParentType,
+  Q extends types.ApiModelListQuery<budgeting.Group> = types.ApiModelListQuery<budgeting.Group>,
 >(
   parentId: number,
   parentType: P,
   options?: types.ExposedClientRequestOptions<{ query: Q }>,
-): Promise<types.ClientResponse<types.ApiListResponse<model.Group>, { query: Q }>> => {
+): Promise<types.ClientResponse<types.ApiListResponse<budgeting.Group>, { query: Q }>> => {
   const serviceMap = {
     budget: async (id: number, o?: types.ExposedClientRequestOptions<{ query: Q }>) =>
       budget.getBudgetGroups(
         { id },
-        o as types.ExposedClientRequestOptions<{ query: types.ApiModelListQuery<model.Group> }>,
+        o as types.ExposedClientRequestOptions<{ query: types.ApiModelListQuery<budgeting.Group> }>,
       ),
     account: async (id: number, o?: types.ExposedClientRequestOptions<{ query: Q }>) =>
       account.getAccountGroups(
         { id },
-        o as types.ExposedClientRequestOptions<{ query: types.ApiModelListQuery<model.Group> }>,
+        o as types.ExposedClientRequestOptions<{ query: types.ApiModelListQuery<budgeting.Group> }>,
       ),
     subaccount: async (id: number, o?: types.ExposedClientRequestOptions<{ query: Q }>) =>
       subaccount.getSubAccountGroups(
         { id },
-        o as types.ExposedClientRequestOptions<{ query: types.ApiModelListQuery<model.Group> }>,
+        o as types.ExposedClientRequestOptions<{ query: types.ApiModelListQuery<budgeting.Group> }>,
       ),
   };
   return serviceMap[parentType](parentId, options) as Promise<
-    types.ClientResponse<types.ApiListResponse<model.Group>, { query: Q }>
+    types.ClientResponse<types.ApiListResponse<budgeting.Group>, { query: Q }>
   >;
 };
 
 export const createTableGroup = (
   parentId: number,
-  parentType: model.ParentType,
+  parentType: budgeting.ParentType,
   body: types.GroupPayload,
   options?: Omit<types.ExposedClientRequestOptions<{ body: types.GroupPayload }>, "body">,
 ): Promise<
-  types.ClientResponse<types.ApiSuccessResponse<model.Group>, { body: types.GroupPayload }>
+  types.ClientResponse<types.ApiSuccessResponse<budgeting.Group>, { body: types.GroupPayload }>
 > => {
   const serviceMap = {
     budget: async (
@@ -182,6 +184,6 @@ export const createTableGroup = (
       }>),
   };
   return serviceMap[parentType](parentId, options) as Promise<
-    types.ClientResponse<types.ApiSuccessResponse<model.Group>, { body: types.GroupPayload }>
+    types.ClientResponse<types.ApiSuccessResponse<budgeting.Group>, { body: types.GroupPayload }>
   >;
 };

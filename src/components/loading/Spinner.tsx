@@ -1,12 +1,14 @@
-import React, { useMemo, useEffect } from "react";
+import React, { useMemo } from "react";
 
 import classNames from "classnames";
 
 import { logger } from "internal";
-import { ui } from "lib";
+import * as ui from "lib/ui/types";
+
+import * as icons from "lib/ui/icons";
 import { Icon } from "components/icons";
 
-export type SpinnerProps = Omit<ui.IconProps, "axis" | "contain" | "icon" | "size" | "spin"> & {
+export type SpinnerProps = Omit<icons.IconProps, "axis" | "contain" | "icon" | "size" | "spin"> & {
   readonly size?: ui.CSSSize<number | "px"> | ui.SpinnerSize;
   readonly loading?: boolean | undefined;
   /**
@@ -32,7 +34,7 @@ export type SpinnerProps = Omit<ui.IconProps, "axis" | "contain" | "icon" | "siz
    * toggling between the Icon and the Spinner in the view, depending on the loading state, does
    * not cause HTML elements near the component to shift around.
    */
-  readonly fallbackIcon?: ui.IconProp;
+  readonly fallbackIcon?: icons.IconProp;
   /**
    * A custom render function that can be used to render an independent indicator when in a loading
    * state.
@@ -58,14 +60,14 @@ export const _Spinner = ({
     return !(destroyAfter === false);
   }, [destroyAfter, fallbackIcon]);
 
-  useEffect(() => {
-    if ((fallbackIcon !== undefined || destroyAfter !== undefined) && render !== undefined) {
-      logger.warn(
-        "The 'destroyAfter' prop and/or the `fallbackIcon` prop cannot be used with a custom " +
-          "render prop.",
-      );
-    }
-  }, [destroyAfter, fallbackIcon, render]);
+  /* useEffect(() => {
+       if ((fallbackIcon !== undefined || destroyAfter !== undefined) && render !== undefined) {
+         logger.warn(
+           "The 'destroyAfter' prop and/or the `fallbackIcon` prop cannot be used with a custom " +
+             "render prop.",
+         );
+       }
+     }, [destroyAfter, fallbackIcon, render]); */
 
   const style = useMemo(
     () =>
@@ -80,7 +82,7 @@ export const _Spinner = ({
     () =>
       classNames(
         "icon--spinner",
-        size !== undefined && !ui.isCSSSize(size) && `icon--spinner--size-${size}`,
+        size !== undefined && `icon--spinner--size-${size}`,
         props.className,
       ),
     [props.className, size],
@@ -94,11 +96,11 @@ export const _Spinner = ({
   } else if (loading || !_destroyAfter) {
     return (
       <Icon
-        color={ui.IconColors.BRAND}
+        color={icons.IconColors.BRAND}
         {...props}
         style={style}
         spin={loading}
-        icon={ui.IconNames.CIRCLE_NOTCH}
+        icon={icons.IconNames.CIRCLE_NOTCH}
         contain={ui.SizeContains.SQUARE}
         className={className}
       />
@@ -106,7 +108,7 @@ export const _Spinner = ({
   } else if (!loading && fallbackIcon !== undefined) {
     return (
       <Icon
-        color={ui.IconColors.BRAND}
+        color={icons.IconColors.BRAND}
         {...props}
         contain={ui.SizeContains.SQUARE}
         className={className}

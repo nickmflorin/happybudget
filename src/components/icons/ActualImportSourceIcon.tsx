@@ -3,23 +3,24 @@ import { useMemo } from "react";
 import { find } from "lodash";
 
 import { logger } from "internal";
-import { model, ui } from "lib";
+import { budgeting } from "lib/model";
+import * as icons from "lib/ui/icons";
 
 import { Icon } from "./Icon";
 
 type ImportSourceIconMap = {
-  readonly sourceId: model.ActualImportSource["id"];
-  readonly icon: ui.IconName;
+  readonly sourceId: budgeting.ActualImportSource["id"];
+  readonly icon: icons.IconName;
 };
 
 const IMPORT_SOURCE_MAPPING: ImportSourceIconMap[] = [
   {
-    icon: ui.IconNames.BANK,
-    sourceId: model.ActualImportSources.BANK_ACCOUNT.id,
+    icon: icons.IconNames.BUILDING_COLUMNS,
+    sourceId: budgeting.ActualImportSources.BANK_ACCOUNT.id,
   },
 ];
 
-const getImportSourceIcon = (id: model.ActualImportSource["id"]): ui.IconName => {
+const getImportSourceIcon = (id: budgeting.ActualImportSource["id"]): icons.IconName => {
   const mapping: ImportSourceIconMap | undefined = find(
     IMPORT_SOURCE_MAPPING,
     (mp: ImportSourceIconMap) => mp.sourceId === id,
@@ -27,11 +28,11 @@ const getImportSourceIcon = (id: model.ActualImportSource["id"]): ui.IconName =>
   if (mapping === undefined) {
     logger.warn(`No icon is configured for import source ${id}.`);
   }
-  return mapping?.icon || ui.IconNames.FILE_IMPORT;
+  return mapping?.icon || icons.IconNames.FILE_IMPORT;
 };
 
-type ActualImportSourceIconProps = Omit<ui.IconComponentProps, "icon"> & {
-  readonly source: model.ActualImportSource | model.ActualImportSource["id"];
+type ActualImportSourceIconProps = Omit<icons.IconComponentProps, "icon"> & {
+  readonly source: budgeting.ActualImportSource | budgeting.ActualImportSource["id"];
 };
 
 export const ActualImportSourceIcon = ({ source, ...props }: ActualImportSourceIconProps) => {

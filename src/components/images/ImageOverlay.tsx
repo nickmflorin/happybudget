@@ -1,6 +1,7 @@
 import classNames from "classnames";
 
-import { ui } from "lib";
+import * as ui from "lib/ui/types";
+
 import { ShowHide } from "components/util";
 
 export type ImageOverlayProps = ui.ComponentProps<{

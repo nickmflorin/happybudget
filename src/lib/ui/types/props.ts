@@ -2,8 +2,12 @@ import { ComponentProps as ReactComponentProps, ComponentType } from "react";
 
 import { RequiredKeys, OptionalKeys } from "utility-types";
 
+import { logger } from "internal";
+
 import { HTMLElementName, HTMLElementTag } from "../../core";
-import { IntersectionIfPopulated, enumeratedLiterals, EnumeratedLiteralType } from "../../util";
+import { enumeratedLiterals } from "../../util/literals";
+import { IntersectionIfPopulated } from "../../util/types";
+import { EnumeratedLiteralType } from "../../util/types/literals";
 
 import { HexColor } from "./style";
 
@@ -261,6 +265,56 @@ export type Style = Omit<
   DisallowedCSSStyleProperties | keyof OverriddenCSSStyleProperties
 > &
   Partial<OverriddenCSSStyleProperties>;
+
+type SafelyMergeProvidedStyleReturnType<
+  P extends Style | undefined,
+  A extends Style | undefined,
+> = P extends undefined ? (A extends undefined ? undefined : A) : P;
+
+/**
+ * Merges the additional styles {@link Style} into the provided styles {@link Style} in the case
+ * that a component is updating the object defined by the `style` property of the
+ * {@link ComponentProps} that are provided to the component, logging cases where the properties
+ * are being altered/overwritten.
+ *
+ * @param {Style | undefined} provided
+ *   The value of the `style` prop provided to the component externally.
+ *
+ * @param {Style | undefined}  additional
+ *   Additional attributes of the {@link Style} object that will be merged into the {@link Style}
+ *   object that was provided to the component externally.
+ *
+ * @returns {Style | undefined}
+ *   The merged {@link Style} object, with the style attributes defined by the `additional`
+ *   parameter overwriting those defined by the `provided` parameter.
+ */
+export const safelyMergeIntoProvidedStyle = <
+  P extends Style | undefined,
+  A extends Style | undefined,
+>(
+  provided: P,
+  additional: A,
+): SafelyMergeProvidedStyleReturnType<P, A> => {
+  if (additional === undefined) {
+    return provided as SafelyMergeProvidedStyleReturnType<P, A>;
+  } else if (provided === undefined) {
+    return additional as SafelyMergeProvidedStyleReturnType<P, A>;
+  }
+  return Object.keys(additional).reduce((prev: Style, name: string) => {
+    const styleName = name as keyof Style;
+    if (additional[styleName] !== undefined) {
+      if (provided[styleName] !== undefined) {
+        logger.warn(
+          { name, previous: provided[styleName], new: additional[styleName] },
+          `The style property '${styleName}' was explicitly provided as '${provided[styleName]} ' +
+      'but is being overwritten as '${additional[styleName]}'.`,
+        );
+      }
+      return { ...prev, [name]: additional[styleName] };
+    }
+    return prev;
+  }, provided) as SafelyMergeProvidedStyleReturnType<P, A>;
+};
 
 /**
  * The properties that all components in the application should be capable of accepting and passing

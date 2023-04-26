@@ -1,7 +1,4 @@
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { enumeratedLiterals } from "lib/util/literals";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
-import { EnumeratedLiteralType } from "lib/util/types/literals";
 
 import * as errors from "../../errors";
 
@@ -16,10 +13,12 @@ export * from "./schemas";
 export * from "./urls";
 
 export const HttpMethods = enumeratedLiterals(["GET", "POST", "PATCH", "DELETE"] as const);
-export type HttpMethod = EnumeratedLiteralType<typeof HttpMethods>;
+export type HttpMethod = import("lib/util/types").EnumeratedLiteralType<typeof HttpMethods>;
 
 export const RequestCredentials = enumeratedLiterals(["same-origin", "include", "omit"] as const);
-export type RequestCredential = EnumeratedLiteralType<typeof RequestCredentials>;
+export type RequestCredential = import("lib/util/types").EnumeratedLiteralType<
+  typeof RequestCredentials
+>;
 
 export enum STATUS_CODES {
   HTTP_200_OK = 200,

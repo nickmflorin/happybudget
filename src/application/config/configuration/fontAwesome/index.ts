@@ -64,11 +64,8 @@ To fix this, we can either:
 
 See https://github.com/FortAwesome/Font-Awesome/issues/19348
 */
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { getIconCode } from "lib/ui/icons/util";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { findDuplicates } from "lib/util/arrays";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { stringifyEnumerated } from "lib/util/formatters/attributes";
 
 import { Icons, IconNames, IconPrefixes } from "./constants";

@@ -1,6 +1,5 @@
 import { orderBy } from "lodash";
 
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { IconCodes, IconNames } from "lib/ui/icons/types";
 
 import { parseEnvVar } from "../util";

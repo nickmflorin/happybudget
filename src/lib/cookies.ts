@@ -1,6 +1,6 @@
 import Cookies from "universal-cookie";
 
-import { parsers } from "./util";
+import * as parsers from "./util/parsers";
 
 export const setConfirmationSuppressed = (key: string, value: boolean) => {
   const cookiesObj = new Cookies();

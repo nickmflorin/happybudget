@@ -1,23 +1,23 @@
-import { ui } from "lib";
+import * as buttons from "lib/ui/buttons/types";
 
 import { SolidButton, SolidButtonProps, SolidAnchor, SolidAnchorProps } from "./abstract";
 
 type BareProps<
   P extends
-    | SolidButtonProps<typeof ui.ButtonSolidVariants.BARE>
-    | SolidAnchorProps<typeof ui.ButtonSolidVariants.BARE> =
-    | SolidButtonProps<typeof ui.ButtonSolidVariants.BARE>
-    | SolidAnchorProps<typeof ui.ButtonSolidVariants.BARE>,
+    | SolidButtonProps<typeof buttons.ButtonSolidVariants.BARE>
+    | SolidAnchorProps<typeof buttons.ButtonSolidVariants.BARE> =
+    | SolidButtonProps<typeof buttons.ButtonSolidVariants.BARE>
+    | SolidAnchorProps<typeof buttons.ButtonSolidVariants.BARE>,
 > = Omit<P, "variant">;
 
-export type BareButtonProps = BareProps<SolidButtonProps<typeof ui.ButtonSolidVariants.BARE>>;
+export type BareButtonProps = BareProps<SolidButtonProps<typeof buttons.ButtonSolidVariants.BARE>>;
 
 export const BareButton = (props: BareButtonProps) => (
-  <SolidButton {...props} variant={ui.ButtonSolidVariants.BARE} />
+  <SolidButton {...props} variant={buttons.ButtonSolidVariants.BARE} />
 );
 
-export type BareAnchorProps = BareProps<SolidAnchorProps<typeof ui.ButtonSolidVariants.BARE>>;
+export type BareAnchorProps = BareProps<SolidAnchorProps<typeof buttons.ButtonSolidVariants.BARE>>;
 
 export const BareAnchor = (props: BareAnchorProps) => (
-  <SolidAnchor {...props} variant={ui.ButtonSolidVariants.BARE} />
+  <SolidAnchor {...props} variant={buttons.ButtonSolidVariants.BARE} />
 );

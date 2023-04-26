@@ -1,10 +1,10 @@
 import { ValueSetterParams } from "ag-grid-community";
 import { z } from "zod";
 
-import { config } from "application";
+import * as localization from "application/config/localization";
 import { logger } from "internal";
 
-import { formatters } from "../../util";
+import * as formatters from "../../util/formatters";
 import * as rows from "../rows";
 import { CellValue } from "../types";
 
@@ -95,7 +95,7 @@ export const dateValueSetter =
   ) =>
   (params: ValueSetterParams<R>): boolean =>
     _valueSetter<R, D, N>(field, "date", (row: rows.ModelRow<D>) => {
-      const parsed = formatters.dateFormatter(config.localization.DateLocalizationCodes.API)({
+      const parsed = formatters.dateFormatter(localization.DateLocalizationCodes.API)({
         value: params.newValue,
         logError: false,
         strict: false,
@@ -120,9 +120,7 @@ export const dateTimeValueSetter =
   ) =>
   (params: ValueSetterParams<R>): boolean =>
     _valueSetter<R, D, N>(field, "datetime", (row: rows.ModelRow<D>) => {
-      const parsed = formatters.dateTimeFormatter(
-        config.localization.DateTimeLocalizationCodes.API,
-      )({
+      const parsed = formatters.dateTimeFormatter(localization.DateTimeLocalizationCodes.API)({
         value: params.newValue,
         logError: false,
         strict: false,

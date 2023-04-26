@@ -1,6 +1,6 @@
 import { UploadFile as RootUploadFile } from "antd/lib/upload/interface";
 
-import { api } from "application";
+import * as api from "application/api";
 
 export type FileWithExtension<N extends string = string, E extends string = string> = `${N}.${E}`;
 

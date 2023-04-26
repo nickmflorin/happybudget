@@ -1,7 +1,7 @@
 import { Optional } from "utility-types";
 import { z } from "zod";
 
-import { errors } from "application";
+import * as errors from "application/errors";
 import { logger } from "internal";
 
 import * as tabling from "../../tabling";

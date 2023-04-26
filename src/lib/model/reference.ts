@@ -2,7 +2,8 @@ import { uniq } from "lodash";
 
 import { logger } from "internal";
 
-import { formatters, removeObjAttributes } from "../util";
+import { removeObjAttributes } from "../util";
+import * as formatters from "../util/formatters";
 
 import * as typeguards from "./typeguards";
 import * as types from "./types";

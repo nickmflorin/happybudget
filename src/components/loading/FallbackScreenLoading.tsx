@@ -4,7 +4,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 import classNames from "classnames";
 import { Spin } from "antd";
 
-import { ui } from "lib";
+import * as ui from "lib/ui/types";
 
 import { Spinner, RenderProps } from "./Spinner";
 

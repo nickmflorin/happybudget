@@ -4,15 +4,21 @@ import { useEffect, useState, useMemo } from "react";
 import * as Sentry from "@sentry/browser";
 import { Store } from "redux";
 
-import { api, store, plugins, errors } from "application";
+import * as api from "application/api";
+import * as errors from "application/errors";
+import * as plugins from "application/plugins";
+import { configureStore } from "application/store/configureStore";
+import * as store from "application/store/types";
 import { logger } from "internal";
-import { model, parsers } from "lib";
+import { type ApiModelType } from "lib/model/types";
+import { type User } from "lib/model/user";
+import * as parsers from "lib/util/parsers";
 
 const TEMPORARY_HACK = true;
 
 const validateAuthToken = async (
   forceReloadFromStripe: boolean,
-): Promise<model.User | null | errors.HttpError> => {
+): Promise<User | null | errors.HttpError> => {
   if (TEMPORARY_HACK) {
     return {
       first_name: "Nick",
@@ -60,7 +66,7 @@ const validateAuthToken = async (
 const validatePublicToken = async (
   token: string,
   id: number,
-  type: model.ApiModelType,
+  type: ApiModelType,
 ): Promise<string | null | errors.HttpError> => {
   const response = await api.validatePublicToken({ token, instance: { id, type } });
   if (response.error) {
@@ -82,7 +88,7 @@ export type AuthenticatedStoreConfigProps = {
 };
 
 export type PublicStoreConfigProps = {
-  readonly instanceType: model.ApiModelType;
+  readonly instanceType: ApiModelType;
   /* The instance ID associated with the public token can either be determined via the
      `instanceIdParam` that it is associated with in the URL PATH params or directly, via passing it
      in via the `instanceId` prop. */
@@ -95,7 +101,7 @@ export type PublicStoreConfigProps = {
 
 export type StoreConfigProps = AuthenticatedStoreConfigProps | PublicStoreConfigProps;
 
-const handleUser = (user: model.User) => {
+const handleUser = (user: User) => {
   Sentry.setUser({ email: user.email, id: String(user.id) });
   plugins.identify(user);
 };
@@ -153,7 +159,7 @@ export const useStore = (
       } else if (redirectOnSuccess !== undefined) {
         router.push(redirectOnSuccess);
       } else {
-        const configuredStore = store.configureStore({ user, tokenId: null });
+        const configuredStore = configureStore({ user, tokenId: null });
         handleUser(user);
         setReduxStore(configuredStore);
       }
@@ -199,14 +205,14 @@ export const useStore = (
            user. */
         const promises: [
           Promise<string | null | errors.HttpError>,
-          Promise<model.User | null | errors.HttpError>,
+          Promise<User | null | errors.HttpError>,
         ] = [validatePublicToken(tokenId, instanceId, propsInstanceType), validateAuthToken(true)];
         Promise.all(promises).then(
           ([privateToken, user]: [
             string | null | errors.HttpError,
-            model.User | null | errors.HttpError,
+            User | null | errors.HttpError,
           ]) => {
-            const isDefinedValue = <T extends string | model.User>(
+            const isDefinedValue = <T extends string | User>(
               value: T | null | errors.HttpError,
             ): value is T => value !== null && !(value instanceof Error);
             if (privateToken === null) {
@@ -222,14 +228,14 @@ export const useStore = (
               }
             } else if (isDefinedValue(privateToken)) {
               if (isDefinedValue(user)) {
-                const configuredStore = store.configureStore({ tokenId: privateToken, user });
+                const configuredStore = configureStore({ tokenId: privateToken, user });
                 handleUser(user);
                 setReduxStore(configuredStore);
               } else {
                 if (user instanceof Error) {
                   handleAuthenticationError(user);
                 }
-                const configuredStore = store.configureStore({ tokenId: privateToken, user: null });
+                const configuredStore = configureStore({ tokenId: privateToken, user: null });
                 setReduxStore(configuredStore);
               }
             } else {

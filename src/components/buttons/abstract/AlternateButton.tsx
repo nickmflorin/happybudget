@@ -1,6 +1,6 @@
 import classNames from "classnames";
 
-import { ui } from "lib";
+import * as buttons from "lib/ui/buttons/types";
 
 import {
   ContentAnchorProps,
@@ -10,44 +10,44 @@ import {
 } from "./ContentButton";
 
 type AlternateProps<
-  V extends ui.ButtonAlternateVariant,
+  V extends buttons.ButtonAlternateVariant,
   P extends
-    | ContentButtonProps<typeof ui.ButtonVariants.ALTERNATE>
-    | ContentAnchorProps<typeof ui.ButtonVariants.ALTERNATE> =
-    | ContentButtonProps<typeof ui.ButtonVariants.ALTERNATE>
-    | ContentAnchorProps<typeof ui.ButtonVariants.ALTERNATE>,
+    | ContentButtonProps<typeof buttons.ButtonVariants.ALTERNATE>
+    | ContentAnchorProps<typeof buttons.ButtonVariants.ALTERNATE> =
+    | ContentButtonProps<typeof buttons.ButtonVariants.ALTERNATE>
+    | ContentAnchorProps<typeof buttons.ButtonVariants.ALTERNATE>,
 > = Omit<P, "variant"> & {
   readonly variant: V;
 };
 
-export type AlternateButtonProps<V extends ui.ButtonAlternateVariant> = AlternateProps<
+export type AlternateButtonProps<V extends buttons.ButtonAlternateVariant> = AlternateProps<
   V,
-  ContentButtonProps<typeof ui.ButtonVariants.ALTERNATE>
+  ContentButtonProps<typeof buttons.ButtonVariants.ALTERNATE>
 >;
 
-export const AlternateButton = <V extends ui.ButtonAlternateVariant>({
+export const AlternateButton = <V extends buttons.ButtonAlternateVariant>({
   variant,
   ...props
 }: AlternateButtonProps<V>) => (
   <ContentButton
     {...props}
-    variant={ui.ButtonVariants.ALTERNATE}
+    variant={buttons.ButtonVariants.ALTERNATE}
     className={classNames(`button--alternate--${variant}`, props.className)}
   />
 );
 
-export type AlternateAnchorProps<V extends ui.ButtonAlternateVariant> = AlternateProps<
+export type AlternateAnchorProps<V extends buttons.ButtonAlternateVariant> = AlternateProps<
   V,
-  ContentAnchorProps<typeof ui.ButtonVariants.ALTERNATE>
+  ContentAnchorProps<typeof buttons.ButtonVariants.ALTERNATE>
 >;
 
-export const AlternateAnchor = <V extends ui.ButtonAlternateVariant>({
+export const AlternateAnchor = <V extends buttons.ButtonAlternateVariant>({
   variant,
   ...props
 }: AlternateAnchorProps<V>) => (
   <ContentAnchor
     {...props}
-    variant={ui.ButtonVariants.ALTERNATE}
+    variant={buttons.ButtonVariants.ALTERNATE}
     className={classNames(`button--alternate--${variant}`, props.className)}
   />
 );

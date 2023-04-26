@@ -1,10 +1,11 @@
 import classNames from "classnames";
 
-import { ui, feedback } from "lib";
+import * as feedback from "lib/feedback";
+import * as icons from "lib/ui/icons";
 
 import { Icon } from "./Icon";
 
-export type FeedbackIconProps = Omit<ui.IconProps, "color" | "icon" | "spin"> & {
+export type FeedbackIconProps = Omit<icons.IconProps, "color" | "icon" | "spin"> & {
   readonly feedbackType: feedback.FeedbackType;
 };
 

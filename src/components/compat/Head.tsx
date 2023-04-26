@@ -1,23 +1,23 @@
 import NextHead from "next/head";
 
-import { config } from "application";
+import * as pages from "application/config/pages";
 
-export type HeadProps = config.MetaOptions & {
+export type HeadProps = pages.MetaOptions & {
   readonly title?: string;
 };
 
 export const Head = ({ title, ...props }: HeadProps): JSX.Element => (
   <NextHead>
     <>
-      <title>{title || config.DEFAULT_PAGE_TITLE}</title>
-      {Object.keys(config.DefaultMetaOptions).map((k: string, index: number) => (
+      <title>{title || pages.DEFAULT_PAGE_TITLE}</title>
+      {Object.keys(pages.DefaultMetaOptions).map((k: string, index: number) => (
         <meta
           key={index}
           name={k}
           content={
-            props[k as keyof config.MetaOptions] === undefined
-              ? config.DefaultMetaOptions[k as keyof config.MetaOptions]
-              : props[k as keyof config.MetaOptions]
+            props[k as keyof pages.MetaOptions] === undefined
+              ? pages.DefaultMetaOptions[k as keyof pages.MetaOptions]
+              : props[k as keyof pages.MetaOptions]
           }
         />
       ))}

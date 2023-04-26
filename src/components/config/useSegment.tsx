@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect, useRef } from "react";
 
-import { parseEnvVar } from "application/config";
+import { parseEnvVar } from "application/config/util";
 import { logger } from "internal";
 
 const SEGMENT_ENABLED = parseEnvVar(

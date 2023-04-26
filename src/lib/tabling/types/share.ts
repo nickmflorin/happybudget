@@ -1,4 +1,4 @@
-import { api } from "application";
+import * as api from "application/api";
 
 import * as model from "../../model";
 import * as rows from "../rows";

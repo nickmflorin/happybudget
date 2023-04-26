@@ -1,6 +1,7 @@
 import classNames from "classnames";
 
-import { errors } from "application";
+import * as errors from "application/errors";
+import * as messages from "application/errors/messages";
 import { ui, feedback as Feedback } from "lib";
 
 export type FieldFeedbackProps<
@@ -24,6 +25,6 @@ export const FieldFeedback = <D extends ui.FormData, N extends ui.FieldName<D> =
       props.className,
     )}
   >
-    {ui.isFormFieldFeedback(feedback) ? feedback.message : errors.getErrorMessage(feedback.type)}
+    {ui.isFormFieldFeedback(feedback) ? feedback.message : messages.getErrorMessage(feedback.type)}
   </div>
 );

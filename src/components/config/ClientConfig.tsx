@@ -1,3 +1,4 @@
+"use client";
 import React, { ReactNode } from "react";
 
 import { Provider } from "react-redux";
@@ -5,28 +6,29 @@ import { Provider } from "react-redux";
    imported. */
 import "@fortawesome/fontawesome-svg-core/styles.css";
 
-import { FallbackScreenLoading, ConnectedAppLoading } from "components/loading";
+import { ConnectedAppLoading } from "components/loading/ConnectedAppLoading";
+import { FallbackScreenLoading } from "components/loading/FallbackScreenLoading";
 
 import { AntDConfig } from "./AntDConfig";
 import { SWRConfig } from "./SWRConfig";
-import { useFontAwesome } from "./useFontAwesome";
+import { useAsyncClientConfiguration } from "./useAsyncClientConfiguration";
 import { useSegment } from "./useSegment";
 import { useStore } from "./useStore";
 
-export type AppConfigProps = {
+export type ClientConfigProps = {
   readonly children: ReactNode;
   readonly authenticated: boolean;
 };
 
-export const AppConfig = (props: AppConfigProps) => {
-  const [fontAwesomeConfigured] = useFontAwesome();
+export const ClientConfig = (props: ClientConfigProps) => {
+  const [configured] = useAsyncClientConfiguration();
   useSegment();
   // When we hook up the public store, the authenticated prop will control the isPublic parameter.
   const store = useStore({ isPublic: false });
 
   return (
     <AntDConfig>
-      {fontAwesomeConfigured === true && store !== null ? (
+      {configured === true && store !== null ? (
         <Provider store={store}>
           <React.Fragment>
             <ConnectedAppLoading />

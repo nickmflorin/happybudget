@@ -1,14 +1,8 @@
 import { logger } from "internal";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { stringifyAttributes } from "lib/util/formatters/attributes";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { capitalizeFirstAlphaChar, toSentence } from "lib/util/formatters/formal";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { enumeratedLiterals } from "lib/util/literals";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { Message, IMessage } from "lib/util/messages/message";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
-import { EnumeratedLiteralType } from "lib/util/types/literals";
 
 import { ApiFieldDetailContext, ApiFieldDetail, HttpMethod } from "../api";
 
@@ -25,7 +19,9 @@ import * as errorTypes from "./errorTypes";
  * not defined.
  */
 export const ErrorMessageScopes = enumeratedLiterals(["user", "internal"] as const);
-export type ErrorMessageScope = EnumeratedLiteralType<typeof ErrorMessageScopes>;
+export type ErrorMessageScope = import("lib/util/types").EnumeratedLiteralType<
+  typeof ErrorMessageScopes
+>;
 
 export type ErrorMessageContext = ApiFieldDetailContext & {
   readonly code: codes.ErrorCode;

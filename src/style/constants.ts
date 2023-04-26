@@ -1,7 +1,5 @@
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+import { parseSize } from "lib/ui/types";
 import { HexColorSchema } from "lib/ui/types/schemas";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
-import { parseSize } from "lib/ui/util";
 
 import scssBreakpoints from "./partials/variables/_breakpoints.module.scss";
 import scssColors from "./partials/variables/_colors.module.scss";

@@ -1,17 +1,11 @@
 import { find, uniq } from "lodash";
 
 import { logger } from "internal";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { getModelInState } from "lib/model/lookup";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { orderModelsBy } from "lib/model/ordering";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { Model, ApiModel } from "lib/model/types";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { ModelSelectionMode } from "lib/ui/types";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { replaceInArray } from "lib/util/arrays";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { SingleOrArray } from "lib/util/types/arrays";
 
 import * as api from "../../api";

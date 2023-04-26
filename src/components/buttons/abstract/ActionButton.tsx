@@ -2,30 +2,31 @@ import { useMemo } from "react";
 
 import classNames from "classnames";
 
-import { ui } from "lib";
+import * as buttons from "lib/ui/buttons/types";
+import * as icons from "lib/ui/icons";
 import { Spinner } from "components/loading";
 
 import { Button, ButtonProps, Anchor, AnchorProps } from "./Button";
 
 type ActionProps<
-  V extends ui.ButtonActionVariant = ui.ButtonActionVariant,
+  V extends buttons.ButtonActionVariant = buttons.ButtonActionVariant,
   P extends
-    | ButtonProps<typeof ui.ButtonVariants.ACTION>
-    | AnchorProps<typeof ui.ButtonVariants.ACTION> =
-    | ButtonProps<typeof ui.ButtonVariants.ACTION>
-    | AnchorProps<typeof ui.ButtonVariants.ACTION>,
+    | ButtonProps<typeof buttons.ButtonVariants.ACTION>
+    | AnchorProps<typeof buttons.ButtonVariants.ACTION> =
+    | ButtonProps<typeof buttons.ButtonVariants.ACTION>
+    | AnchorProps<typeof buttons.ButtonVariants.ACTION>,
 > = Omit<P, "children" | "variant"> & {
-  readonly icon: ui.IconProp;
+  readonly icon: icons.IconProp;
   readonly variant?: V;
 };
 
 // Provides the common props that are used for both the Button and the Anchor cases.
-const useActionProps = <V extends ui.ButtonActionVariant = ui.ButtonActionVariant>(
+const useActionProps = <V extends buttons.ButtonActionVariant = buttons.ButtonActionVariant>(
   props: Pick<ActionProps<V>, "loading" | "icon" | "variant" | "className">,
 ) =>
   useMemo(
     () => ({
-      variant: ui.ButtonVariants.ACTION,
+      variant: buttons.ButtonVariants.ACTION,
       className: classNames(
         props.variant !== undefined && `button--action--${props.variant}`,
         props.className,
@@ -42,10 +43,10 @@ const useActionProps = <V extends ui.ButtonActionVariant = ui.ButtonActionVarian
     [props.className, props.icon, props.variant, props.loading],
   );
 
-export type ActionButtonProps<V extends ui.ButtonActionVariant = ui.ButtonActionVariant> =
-  ActionProps<V, ButtonProps<typeof ui.ButtonVariants.ACTION>>;
+export type ActionButtonProps<V extends buttons.ButtonActionVariant = buttons.ButtonActionVariant> =
+  ActionProps<V, ButtonProps<typeof buttons.ButtonVariants.ACTION>>;
 
-export const ActionButton = <V extends ui.ButtonActionVariant = ui.ButtonActionVariant>({
+export const ActionButton = <V extends buttons.ButtonActionVariant = buttons.ButtonActionVariant>({
   icon,
   ...props
 }: ActionButtonProps<V>) => {
@@ -53,10 +54,10 @@ export const ActionButton = <V extends ui.ButtonActionVariant = ui.ButtonActionV
   return <Button {...props} {...ps} />;
 };
 
-export type ActionAnchorProps<V extends ui.ButtonActionVariant = ui.ButtonActionVariant> =
-  ActionProps<V, AnchorProps<typeof ui.ButtonVariants.ACTION>>;
+export type ActionAnchorProps<V extends buttons.ButtonActionVariant = buttons.ButtonActionVariant> =
+  ActionProps<V, AnchorProps<typeof buttons.ButtonVariants.ACTION>>;
 
-export const ActionAnchor = <V extends ui.ButtonActionVariant = ui.ButtonActionVariant>({
+export const ActionAnchor = <V extends buttons.ButtonActionVariant = buttons.ButtonActionVariant>({
   icon,
   ...props
 }: ActionAnchorProps<V>) => {

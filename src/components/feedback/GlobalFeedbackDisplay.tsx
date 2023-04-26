@@ -3,7 +3,7 @@ import React, { useMemo } from "react";
 import classNames from "classnames";
 import { Optional } from "utility-types";
 
-import { errors } from "application";
+import * as errors from "application/errors";
 import { feedback, ui } from "lib";
 
 import { GlobalFeedback } from "./GlobalFeedback";

@@ -1,5 +1,4 @@
 import { logger } from "internal";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { validateAny } from "lib/util/validators";
 
 import * as types from "./types";

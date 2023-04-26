@@ -1,10 +1,11 @@
 import classNames from "classnames";
 
-import { model, ui } from "lib";
+import { attachment } from "lib/model";
+import * as ui from "lib/ui/types";
 import { FileIcon } from "components/icons";
 
 export type AttachmentTextProps = ui.ComponentProps<{
-  readonly model: model.Attachment | model.SimpleAttachment;
+  readonly model: attachment.Attachment | attachment.SimpleAttachment;
   readonly additionalCount?: number;
 }>;
 

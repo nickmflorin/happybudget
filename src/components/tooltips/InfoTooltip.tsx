@@ -2,11 +2,11 @@ import { ReactNode } from "react";
 
 import classNames from "classnames";
 
-import { ui } from "lib";
+import * as tooltip from "lib/ui/tooltip/types";
 
 import { RootTooltip } from "./RootTooltip";
 
-export type InfoTooltipProps = ui.TooltipProps & {
+export type InfoTooltipProps = tooltip.TooltipProps & {
   readonly children: ReactNode;
 };
 

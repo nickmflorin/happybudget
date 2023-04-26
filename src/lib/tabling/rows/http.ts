@@ -1,4 +1,4 @@
-import { api } from "application";
+import * as api from "application/api";
 import { logger } from "internal";
 import { tabling, model } from "lib";
 

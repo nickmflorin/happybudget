@@ -1,6 +1,7 @@
 import classNames from "classnames";
 
-import { ui } from "lib";
+import * as ui from "lib/ui/types";
+
 import { HeadingText, HeadingTextProps } from "components/typography";
 
 import { AffixGroup, AffixGroupProps } from "./AffixGroup";

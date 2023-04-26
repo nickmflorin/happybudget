@@ -1,7 +1,6 @@
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
-import { parseInteger, parseBoolean } from "lib/util/parsers";
+import { parseInteger, parseBoolean, parseNumber } from "lib/util/parsers";
 
-type EnvVarTypeName = "string" | "number" | "boolean";
+type EnvVarTypeName = "string" | "integer" | "boolean" | "number";
 
 type SafeEnvVarOptions = {
   readonly required?: true;
@@ -13,6 +12,7 @@ type SafeEnvVarType<O> = O extends { readonly type: infer T extends EnvVarTypeNa
       boolean: boolean;
       string: string;
       number: number;
+      integer: number;
     }[T]
   : string;
 
@@ -44,6 +44,12 @@ export const parseEnvVar = <O extends SafeEnvVarOptions>(
   switch (options?.type) {
     case "string":
       return nullableValue as SafeEnvVarRT<O>;
+    case "integer":
+      const parsedNum = parseNumber(nullableValue);
+      if (parsedNum === null && required) {
+        throw new TypeError(`Value for environment variable '${name}' is not a valid number!"`);
+      }
+      return parsedNum as SafeEnvVarRT<O>;
     case "number":
       const parsedInt = parseInteger(nullableValue);
       if (parsedInt === null && required) {
@@ -60,3 +66,7 @@ export const parseEnvVar = <O extends SafeEnvVarOptions>(
       return nullableValue as SafeEnvVarRT<O>;
   }
 };
+
+export type NextLoc = "server" | "client";
+
+export const getNextLoc = (): NextLoc => (typeof window === "undefined" ? "server" : "client");

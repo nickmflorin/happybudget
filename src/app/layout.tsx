@@ -1,11 +1,11 @@
-import { AppConfig } from "components/config";
+import { configureServerApplication } from "application/config/configuration/server";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <body>
-        <AppConfig authenticated={true}>{children}</AppConfig>
-      </body>
-    </html>
-  );
-}
+configureServerApplication();
+
+const RootLayout = async ({ children }: { children: React.ReactNode }) => (
+  <html lang="en">
+    <body>{children}</body>
+  </html>
+);
+
+export default RootLayout;

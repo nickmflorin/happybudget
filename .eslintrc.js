@@ -68,21 +68,13 @@ const IMPORT_ORDER_CONFIG = {
 
 const RESTRICTED_IMPORT_PATTERNS = [
   {
-    group: ["lib/*", "!lib/compat"],
-    message: "Imports from lib must use namespaces.",
-  },
-  {
     group: ["internal/*"],
     message: "Imports from internal must use namespaces.",
   },
-  {
-    group: ["components/*/*"],
-    message: "Components must be imported from modules.",
-  },
-  {
-    group: ["application/*/*"],
-    message: "Imports from application must be imported as modules.",
-  },
+  // {
+  //   group: ["components/*/*"],
+  //   message: "Components must be imported from modules.",
+  // },
   {
     /* Importing from root level modules with relative imports (i.e. "../components" or "../lib")
        is not allowed as it can lead to circular imports. */

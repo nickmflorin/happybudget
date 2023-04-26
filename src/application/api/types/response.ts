@@ -1,4 +1,4 @@
-import { schemas } from "lib";
+import * as schemas from "lib/schemas";
 
 export type FileUploadResponse = {
   readonly fileUrl: string;
@@ -19,28 +19,28 @@ export type ApiListResponse<M extends ListResponseIteree> = {
 };
 
 export type MarkupResponseType<
-  B extends import("lib/model").Budget | import("lib/model").Template =
-    | import("lib/model").Budget
-    | import("lib/model").Template,
-  A extends import("lib/model").Account | import("lib/model").SubAccount =
-    | import("lib/model").Account
-    | import("lib/model").SubAccount,
+  B extends import("lib/model/budgeting").Budget | import("lib/model/budgeting").Template =
+    | import("lib/model/budgeting").Budget
+    | import("lib/model/budgeting").Template,
+  A extends import("lib/model/budgeting").Account | import("lib/model/budgeting").SubAccount =
+    | import("lib/model/budgeting").Account
+    | import("lib/model/budgeting").SubAccount,
 > =
-  | ParentChildResponse<B, import("lib/model").Markup>
-  | AncestryResponse<B, A, import("lib/model").Markup>;
+  | ParentChildResponse<B, import("lib/model/budgeting").Markup>
+  | AncestryResponse<B, A, import("lib/model/budgeting").Markup>;
 
 export const markupResponseTypeIsAncestry = <
-  B extends import("lib/model").Budget | import("lib/model").Template =
-    | import("lib/model").Budget
-    | import("lib/model").Template,
-  A extends import("lib/model").Account | import("lib/model").SubAccount =
-    | import("lib/model").Account
-    | import("lib/model").SubAccount,
+  B extends import("lib/model/budgeting").Budget | import("lib/model/budgeting").Template =
+    | import("lib/model/budgeting").Budget
+    | import("lib/model/budgeting").Template,
+  A extends import("lib/model/budgeting").Account | import("lib/model/budgeting").SubAccount =
+    | import("lib/model/budgeting").Account
+    | import("lib/model/budgeting").SubAccount,
 >(
   response: MarkupResponseType<B, A>,
-): response is AncestryResponse<B, A, import("lib/model").Markup> =>
-  (response as AncestryResponse<B, A, import("lib/model").Markup>).parent !== undefined &&
-  (response as AncestryResponse<B, A, import("lib/model").Markup>).budget !== undefined;
+): response is AncestryResponse<B, A, import("lib/model/budgeting").Markup> =>
+  (response as AncestryResponse<B, A, import("lib/model/budgeting").Markup>).parent !== undefined &&
+  (response as AncestryResponse<B, A, import("lib/model/budgeting").Markup>).budget !== undefined;
 
 export type ReorderResponse = { data: number[] };
 

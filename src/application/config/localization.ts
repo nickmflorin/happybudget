@@ -1,20 +1,23 @@
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { enumeratedLiterals } from "lib/util/literals";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
-import { EnumeratedLiteralType } from "lib/util/types";
 
 export const DateLocalizationCodes = enumeratedLiterals(["DISPLAY", "API"] as const);
-export type DateLocalizationCode = EnumeratedLiteralType<typeof DateLocalizationCodes>;
+export type DateLocalizationCode = import("lib/util/types").EnumeratedLiteralType<
+  typeof DateLocalizationCodes
+>;
 
 export const TimeLocalizationCodes = enumeratedLiterals(["DISPLAY"] as const);
-export type TimeLocalizationCode = EnumeratedLiteralType<typeof TimeLocalizationCodes>;
+export type TimeLocalizationCode = import("lib/util/types").EnumeratedLiteralType<
+  typeof TimeLocalizationCodes
+>;
 
 export const DateTimeLocalizationCodes = enumeratedLiterals([
   "ABBREVIATED",
   "DISPLAY",
   "API",
 ] as const);
-export type DateTimeLocalizationCode = EnumeratedLiteralType<typeof DateTimeLocalizationCodes>;
+export type DateTimeLocalizationCode = import("lib/util/types").EnumeratedLiteralType<
+  typeof DateTimeLocalizationCodes
+>;
 
 export const DateLocalizations = {
   [DateLocalizationCodes.DISPLAY]: "MM/DD/YYYY" as const,
@@ -38,7 +41,9 @@ export const DateTimeLocalizations = {
 export type DateTimeLocalization = typeof DateTimeLocalizations[keyof typeof DateTimeLocalizations];
 
 export const LocalizationTypes = enumeratedLiterals(["time", "date", "datetime"] as const);
-export type LocalizationType = EnumeratedLiteralType<typeof LocalizationTypes>;
+export type LocalizationType = import("lib/util/types").EnumeratedLiteralType<
+  typeof LocalizationTypes
+>;
 
 export type Localizations = {
   date: typeof DateLocalizations & Record<DateLocalizationCode, string>;

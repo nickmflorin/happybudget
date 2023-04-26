@@ -2,7 +2,7 @@ import React from "react";
 
 import classNames from "classnames";
 
-import { Portal } from "components/layout";
+import { Portal } from "components/layout/Portal";
 
 import { Loading, LoadingProps } from "./Loading";
 

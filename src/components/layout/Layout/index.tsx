@@ -1,19 +1,20 @@
+import { ReactNode } from "react";
+
 import classNames from "classnames";
 
-import { ui } from "lib";
-
-// import { Sidebar } from "../Sidebar";
+import * as ui from "lib/ui/types";
 
 import { Main } from "./Main";
 
-export type LayoutProps = ui.ComponentProps & { readonly children: JSX.Element };
+export type LayoutProps = ui.ComponentProps & {
+  readonly children: ReactNode;
+  readonly sidebar?: JSX.Element;
+  readonly header: JSX.Element;
+};
 
-/**
- * A component that represents the overall application layout.
- */
-export const Layout = (props: LayoutProps): JSX.Element => (
+export const Layout = ({ header, sidebar, children, ...props }: LayoutProps): JSX.Element => (
   <div {...props} className={classNames("layout", props.className)}>
-    {/* <Sidebar /> */}
-    <Main>{props.children}</Main>
+    {sidebar !== undefined && <div className="sidebar-container">{sidebar}</div>}
+    <Main header={header}>{children}</Main>
   </div>
 );

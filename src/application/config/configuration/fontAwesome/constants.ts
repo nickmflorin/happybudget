@@ -44,10 +44,8 @@ validation logic will throw an Error during the icon registration process.
    ii. Remove the icon name from the `Icons` object under the appropriate code that is associated
        with the icon being removed.
 */
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
+
 import { enumeratedLiterals } from "lib/util/literals";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
-import { EnumeratedLiteralType } from "lib/util/types/literals";
 
 export const IconPrefixes = enumeratedLiterals(["far", "fas"] as const);
 
@@ -57,7 +55,7 @@ export const IconPrefixes = enumeratedLiterals(["far", "fas"] as const);
  *
  * This type will typically take on values such as "far", "fab" or "fas".
  */
-export type IconPrefix = EnumeratedLiteralType<typeof IconPrefixes>;
+export type IconPrefix = import("lib/util/types").EnumeratedLiteralType<typeof IconPrefixes>;
 
 /**
  * An {@link IconCode} represents a more intuitive, human readable form of the FontAwesome prefix
@@ -72,7 +70,7 @@ export const IconCodes = enumeratedLiterals(["solid", "regular"] as const);
  *
  * @see IconPrefix
  */
-export type IconCode = EnumeratedLiteralType<typeof IconCodes>;
+export type IconCode = import("lib/util/types").EnumeratedLiteralType<typeof IconCodes>;
 
 export const IconPrefixMap = {
   [IconCodes.REGULAR]: IconPrefixes.FAR,

@@ -1,7 +1,8 @@
 import classNames from "classnames";
 
-import { config } from "application";
-import { ui, formatters } from "lib";
+import * as localization from "application/config/localization";
+import * as ui from "lib/ui/types";
+import * as formatters from "lib/util/formatters";
 
 /*
 Props for the component that instruct the component to plug the value directly into the element
@@ -14,7 +15,7 @@ type TimeRawProps = {
 
 type TimeConvProps = {
   readonly value: formatters.DatePrimitive | null | undefined;
-  readonly localization?: config.localization.TimeLocalizationCode;
+  readonly localization?: localization.TimeLocalizationCode;
   readonly raw?: false;
 };
 
@@ -38,8 +39,8 @@ export const Time = (props: TimeProps): JSX.Element => {
   const timeString =
     props.value === null || props.value === undefined
       ? null
-      : formatters.timeFormatter(
-          props.localization || config.localization.TimeLocalizationCodes.DISPLAY,
-        )({ value: props.value });
+      : formatters.timeFormatter(props.localization || localization.TimeLocalizationCodes.DISPLAY)({
+          value: props.value,
+        });
   return timeString !== null ? <Time raw={true}>{timeString}</Time> : <></>;
 };

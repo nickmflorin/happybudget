@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { Checkbox as RootCheckbox, CheckboxProps as RootCheckboxProps } from "antd";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
 
-import { ui } from "lib";
+import * as ui from "lib/ui/types";
 
 export type CheckboxProps<
   D extends ui.FormData = ui.FormData,

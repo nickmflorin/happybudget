@@ -1,6 +1,6 @@
 import { Required } from "utility-types";
 
-import { PopulatedOrNever, Immutable } from ".";
+import { PopulatedOrNever, Immutable } from "./misc";
 
 /**
  * Results in the intersection of {@link A} and {@link B} if both are not {@link never}, otherwise

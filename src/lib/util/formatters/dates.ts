@@ -2,7 +2,7 @@ import { Moment } from "moment";
 import moment from "moment-timezone";
 import { z } from "zod";
 
-import { config } from "application";
+import * as localization from "application/config/localization";
 
 import * as formatter from "./formatter";
 
@@ -31,33 +31,29 @@ export const LocalizedMomentSchema = (timezone?: string | null): typeof MomentSc
   );
 
 export const createLocalizationSchema = <
-  T extends config.localization.LocalizationType,
-  C extends config.localization.LocalizationCodes[T],
+  T extends localization.LocalizationType,
+  C extends localization.LocalizationCodes[T],
 >(
   type: T,
   localizationCode: C,
 ) => {
-  const localizationFormat = config.localization.getLocalization<T, C>(type, localizationCode);
+  const localizationFormat = localization.getLocalization<T, C>(type, localizationCode);
   return DateSchema.transform<DatePrimitive>((value): string =>
     moment(value).format(localizationFormat),
   );
 };
 
-export const createDateLocalizationSchema = <
-  C extends config.localization.LocalizationCodes["date"],
->(
+export const createDateLocalizationSchema = <C extends localization.LocalizationCodes["date"]>(
   localizationCode: C,
 ) => createLocalizationSchema("date", localizationCode);
 
 export const createDateTimeLocalizationSchema = <
-  C extends config.localization.LocalizationCodes["datetime"],
+  C extends localization.LocalizationCodes["datetime"],
 >(
   localizationCode: C,
 ) => createLocalizationSchema("datetime", localizationCode);
 
-export const createTimeLocalizationSchema = <
-  C extends config.localization.LocalizationCodes["time"],
->(
+export const createTimeLocalizationSchema = <C extends localization.LocalizationCodes["time"]>(
   localizationCode: C,
 ) => createLocalizationSchema("time", localizationCode);
 
@@ -99,8 +95,8 @@ export const DateTimeDifferenceSchema = DateSchema.transform<string>(value => {
 });
 
 export const createLocalizationFormatter = <
-  T extends config.localization.LocalizationType,
-  C extends config.localization.LocalizationCodes[T] = config.localization.LocalizationCodes[T],
+  T extends localization.LocalizationType,
+  C extends localization.LocalizationCodes[T] = localization.LocalizationCodes[T],
 >(
   type: T,
   code: C,
@@ -109,13 +105,13 @@ export const createLocalizationFormatter = <
   return formatter.createFormatter<DatePrimitive>(schema);
 };
 
-export const dateFormatter = (code: config.localization.LocalizationCodes["date"]) =>
+export const dateFormatter = (code: localization.LocalizationCodes["date"]) =>
   createLocalizationFormatter<"date">("date", code);
 
-export const timeFormatter = (code: config.localization.LocalizationCodes["time"]) =>
+export const timeFormatter = (code: localization.LocalizationCodes["time"]) =>
   createLocalizationFormatter<"time">("time", code);
 
-export const dateTimeFormatter = (code: config.localization.LocalizationCodes["datetime"]) =>
+export const dateTimeFormatter = (code: localization.LocalizationCodes["datetime"]) =>
   createLocalizationFormatter<"datetime">("datetime", code);
 
 export const localizedMomentFormatter = (timezone?: string | null) =>

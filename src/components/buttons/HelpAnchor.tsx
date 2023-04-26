@@ -1,6 +1,6 @@
 import classNames from "classnames";
 
-import { ui } from "lib";
+import * as icons from "lib/ui/icons";
 
 import { BareButton, BareButtonProps } from "./BareButton";
 
@@ -13,7 +13,7 @@ export const HelpAnchor = (props: HelpAnchorProps): JSX.Element => (
   <BareButton
     {...props}
     className={classNames("button--help", props.className)}
-    icon={ui.IconNames.CIRCLE_QUESTION}
+    icon={icons.IconNames.CIRCLE_QUESTION}
   >
     Help
   </BareButton>

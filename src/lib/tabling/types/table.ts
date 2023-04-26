@@ -1,7 +1,10 @@
 import * as fs from "../../fs";
 import * as model from "../../model";
 import * as ui from "../../ui";
-import { enumeratedLiterals, EnumeratedLiteralType, SingleOrArray } from "../../util";
+import * as icons from "../../ui/icons";
+import { enumeratedLiterals } from "../../util/literals";
+import { SingleOrArray } from "../../util/types/arrays";
+import { EnumeratedLiteralType } from "../../util/types/literals";
 import * as columns from "../columns";
 import * as events from "../events";
 import * as rows from "../rows";
@@ -66,7 +69,7 @@ export type MenuActionRenderFunc = (props: MenuActionRenderProps) => JSX.Element
 
 export type MenuActionObj = {
   readonly index?: number;
-  readonly icon?: ui.IconProp;
+  readonly icon?: icons.IconProp;
   readonly tooltip?: ui.DeterministicTooltip;
   readonly disabled?: boolean;
   readonly hidden?: boolean;

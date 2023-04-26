@@ -1,7 +1,6 @@
 import classNames from "classnames";
 
-import { config } from "application";
-import { ui } from "lib";
+import * as ui from "lib/ui/types";
 
 export type TabBarProps = ui.ComponentProps;
 

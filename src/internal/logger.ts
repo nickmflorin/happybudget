@@ -18,7 +18,7 @@ type ProductionEnvironment = typeof ProductionEnvironments[keyof typeof Producti
 
 type LogContextValue =
   | Exclude<import("lib/schemas").JsonLiteral, ArrayBuffer>
-  | typeof import("application/errors/errors").ApplicationError;
+  | import("application/errors/errors").ApplicationErrorType;
 
 export type LogMessageContext = Record<string, LogContextValue>;
 
@@ -90,7 +90,6 @@ const messageContextErrorProcessor: TransformMessageFunction<LogMessageContext> 
   if (errors.length !== 0 && message.message.trim() === "") {
     message = { ...message, message: errors[0].message };
   }
-
   return {
     ...message,
     // Add in the log context for each individual error instance in the original context.

@@ -1,4 +1,7 @@
-import { enumeratedLiterals, EnumeratedLiteralType, StringHasLength } from "../../util";
+import { enumeratedLiterals } from "../../util/literals";
+import * as parsers from "../../util/parsers";
+import { EnumeratedLiteralType } from "../../util/types/literals";
+import { StringHasLength } from "../../util/types/strings";
 
 export type FontFamily = "AvenirNext" | "Roboto";
 
@@ -14,12 +17,15 @@ export type FontFace = { family: FontFamily; variants: FontVariant[] };
 export const CSSSizeUnits = ["px", "%", "rem", "em", "vh", "vw"] as const;
 export type CSSSizeUnit = typeof CSSSizeUnits[number];
 
+export const isCSSSizeUnit = (value: string): value is CSSSizeUnit =>
+  CSSSizeUnits.includes(value as CSSSizeUnit);
+
 /**
  * Represents a valid CSS size specification that may be provided to a given component's props.
  *
  * This type is not meant to be used to represent all CSS size specifications that can exist
- * in a component's style, {@link ui.types.Style}.  Instead, it is meant to be used as a specific
- * prop that a component may expose, such as `size`.
+ * in a component's style, {@link Style}.  Instead, it is meant to be used as a specific prop that
+ * a component may expose, such as `size`.
  *
  * Accounting for all possible valid CSS values that can be used to specify dimension is not
  * feasible - but this type represents the types that we will most likely see and should allow.
@@ -34,9 +40,56 @@ export const SizeDimensions = enumeratedLiterals(["width", "height", "both"] as 
 
 /**
  * Represents the various dimensions that the props for a component can dictate the component's
- * size, when provided as prop that is separate from style, {@link ui.types.Style}.
+ * size, when provided as prop that is separate from style, {@link Style}.
  */
 export type SizeDimension = EnumeratedLiteralType<typeof SizeDimensions>;
+
+type ParseSizeOptions = {
+  readonly strict?: false;
+};
+
+type ParseSizeReturn<U extends CSSSizeUnit | number, O extends ParseSizeOptions> = O extends {
+  readonly strict: false;
+}
+  ? [number, U] | number | null
+  : [number, U] | number;
+
+// TODO: Convert to a Zod Schema
+export const parseSize = <U extends CSSSizeUnit | number, O extends ParseSizeOptions>(
+  size: string | number,
+  options?: O,
+): ParseSizeReturn<U, O> => {
+  if (typeof size === "number") {
+    return size as ParseSizeReturn<U, O>;
+  } else if (parsers.isStringInteger(size)) {
+    return parsers.parseInteger(size) as ParseSizeReturn<U, O>;
+  } else {
+    for (const key of CSSSizeUnits) {
+      if (size.endsWith(key)) {
+        const stringNumber = size.slice(0, size.length - key.length);
+        const unit = size.slice(size.length - key.length);
+        /* We only want to throw an error for an invalid unit if the first portion of the string is
+           in fact a number - this avoids errors that would arise from a unit that is a substring of
+           another unit. */
+        if (parsers.isStringInteger(stringNumber)) {
+          if (!isCSSSizeUnit(unit)) {
+            if (options?.strict === false) {
+              return null as ParseSizeReturn<U, O>;
+            }
+            throw new Error(
+              `The provided size '${size}' does not have a valid CSS unit, '${unit}'.`,
+            );
+          }
+          return [parsers.parseInteger(stringNumber) as number, unit as U] as ParseSizeReturn<U, O>;
+        }
+      }
+    }
+    if (options?.strict === false) {
+      return null as ParseSizeReturn<U, O>;
+    }
+    throw new Error(`The provided size '${size}' is not valid.`);
+  }
+};
 
 type _CSSFontPrefixedProperties = "weight" | "size" | "style" | "family";
 
@@ -73,6 +126,14 @@ export type OppositeCSSDirection<T extends CSSDirection> = {
   right: "left";
 }[T];
 
+export const getOppositeDirection = <T extends CSSDirection>(v: T): OppositeCSSDirection<T> =>
+  ({
+    [CSSDirections.UP]: CSSDirections.DOWN,
+    [CSSDirections.DOWN]: CSSDirections.UP,
+    [CSSDirections.LEFT]: CSSDirections.RIGHT,
+    [CSSDirections.RIGHT]: CSSDirections.LEFT,
+  }[v]);
+
 /**
  * A generic type that results in the {@link SizeDimension} that is associated with axis,
  * {@link SizeAxis}, specified via the generic type argument {@link D}.
@@ -100,8 +161,8 @@ export type CSSDirectionalProperties<S extends string> =
  * Otherwise, it represents the size related CSS properties for the specified dimension, {@link D}.
  *
  * This type, {@link CSSSizeProperties}, is meant to be used when the sizing of a component is being
- * controlled by other props or other means, and the component's `style` prop {@link ui.types.Style}
- * needs to exclude the related properties such that they do not conflict.
+ * controlled by other props or other means, and the component's `style` prop {@link Style} needs to
+ * exclude the related properties such that they do not conflict.
  *
  * @example
  * CSSSizeNames<"height">; // "minHeight" | "maxHeight" | "height";

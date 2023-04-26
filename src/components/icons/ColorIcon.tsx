@@ -1,6 +1,6 @@
 import classNames from "classnames";
 
-import { ui } from "lib";
+import * as ui from "lib/ui/types";
 import { constants } from "style";
 
 export type ColorIconProps = ui.ComponentProps<{

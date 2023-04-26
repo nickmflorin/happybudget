@@ -1,21 +1,21 @@
-import { ui } from "lib";
+import * as buttons from "lib/ui/buttons/types";
 
 import { SolidAnchor, SolidAnchorProps, SolidButton, SolidButtonProps } from "./abstract";
 
 export type PrimaryButtonProps = Omit<
-  SolidButtonProps<typeof ui.ButtonSolidVariants.PRIMARY>,
+  SolidButtonProps<typeof buttons.ButtonSolidVariants.PRIMARY>,
   "variant"
 >;
 
 export const PrimaryButton = (props: PrimaryButtonProps) => (
-  <SolidButton {...props} variant={ui.ButtonSolidVariants.PRIMARY} />
+  <SolidButton {...props} variant={buttons.ButtonSolidVariants.PRIMARY} />
 );
 
 export type PrimaryAnchorProps = Omit<
-  SolidAnchorProps<typeof ui.ButtonSolidVariants.PRIMARY>,
+  SolidAnchorProps<typeof buttons.ButtonSolidVariants.PRIMARY>,
   "variant"
 >;
 
 export const PrimaryAnchor = (props: PrimaryAnchorProps) => (
-  <SolidAnchor {...props} variant={ui.ButtonSolidVariants.PRIMARY} />
+  <SolidAnchor {...props} variant={buttons.ButtonSolidVariants.PRIMARY} />
 );

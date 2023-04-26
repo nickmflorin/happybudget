@@ -1,10 +1,10 @@
-import { model } from "lib";
+import { budgeting } from "lib/model";
 
 import { client } from "../client";
 import * as types from "../types";
 
 export const getHeaderTemplates =
-  client.createListModelsService<model.SimpleHeaderTemplate>("/pdf/header-templates");
+  client.createListModelsService<budgeting.SimpleHeaderTemplate>("/pdf/header-templates");
 
 export const deleteHeaderTemplate =
   client.createParameterizedDeleteService<"/pdf/header-templates/:id/">(
@@ -12,16 +12,16 @@ export const deleteHeaderTemplate =
   );
 export const updateHeaderTemplate = client.createParameterizedPatchService<
   "/pdf/header-templates/:id/",
-  model.HeaderTemplate,
+  budgeting.HeaderTemplate,
   types.HeaderTemplatePayload
 >("/pdf/header-templates/:id/");
 
 export const getHeaderTemplate = client.createParameterizedRetrieveService<
   "/pdf/header-templates/:id/",
-  model.HeaderTemplate
+  budgeting.HeaderTemplate
 >("/pdf/header-templates/:id/");
 
 export const createHeaderTemplate = client.createPostService<
-  model.SimpleHeaderTemplate,
+  budgeting.SimpleHeaderTemplate,
   types.HeaderTemplatePayload
 >("/pdf/header-templates/");

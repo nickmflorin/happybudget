@@ -2,17 +2,18 @@ import React, { useMemo } from "react";
 
 import classNames from "classnames";
 
-import { ui } from "lib";
+import * as ui from "lib/ui/types";
+import * as typography from "lib/ui/typography/types";
 
 export type BodyTextRenderProps = ui.ComponentProps;
 
 export type BodyTextProps = ui.ComponentProps<{
   readonly style?: Omit<ui.Style, ui.CSSFontProperties>;
   readonly children: string | ((props: BodyTextRenderProps) => JSX.Element);
-  readonly level?: ui.TypographyTypeLevel<"body">;
+  readonly level?: typography.TypographyTypeLevel<"body">;
   // Will be set based on the level if the weight is not provided.
-  readonly weight?: ui.TypographyWeightName;
-  readonly transform?: ui.TextTransform;
+  readonly weight?: typography.TypographyWeightName;
+  readonly transform?: typography.TextTransform;
 }>;
 
 export const BodyText = ({ children, ...props }: BodyTextProps) => {
@@ -20,7 +21,7 @@ export const BodyText = ({ children, ...props }: BodyTextProps) => {
     () =>
       classNames(
         "body",
-        `body--${props.level || ui.DEFAULT_BODY_LEVEL}`,
+        `body--${props.level || typography.DEFAULT_BODY_LEVEL}`,
         props.weight !== undefined && `body--weight-type-${props.weight}`,
         props.transform !== undefined && `body--transform-${props.transform}`,
         props.className,

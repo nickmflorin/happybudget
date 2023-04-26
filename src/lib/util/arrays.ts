@@ -1,7 +1,5 @@
 import { keys, pickBy, isEqual, findIndex } from "lodash";
 
-import * as model from "../model";
-
 // A type that is meant to represent a valid element of an array that is not an Array itself.
 export type ArrayPrimitive = null | boolean | number | string | Record<string, unknown>;
 
@@ -66,16 +64,16 @@ type ArrayLookupOptions = {
 };
 
 type _FindInArrayRT<
-  T extends Record<string, unknown> | model.Model,
+  T extends Record<string, unknown> | import("lib/model/types").Model,
   O extends ArrayLookupOptions | undefined = undefined,
 > = O extends { readonly strict: true } ? [T, number] : [T, number] | null;
 
 type Predicate<T extends Record<string, unknown>> =
   | ((obj: T) => boolean)
-  | (T extends model.Model ? { id: T["id"] } : never);
+  | (T extends import("lib/model/types").Model ? { id: T["id"] } : never);
 
 const _findInArray = <
-  T extends Record<string, unknown> | model.Model,
+  T extends Record<string, unknown> | import("lib/model/types").Model,
   O extends ArrayLookupOptions | undefined = undefined,
 >(
   data: T[],
@@ -85,7 +83,7 @@ const _findInArray = <
   const index = findIndex<T>(data, (obj: T) => {
     if (typeof predicate === "function") {
       return predicate(obj);
-    } else if ((obj as model.Model).id === undefined) {
+    } else if ((obj as import("lib/model/types").Model).id === undefined) {
       throw new Error(
         `The object ${JSON.stringify(obj)} does not represent a valid model with an ID.`,
       );
@@ -102,7 +100,7 @@ const _findInArray = <
 };
 
 export const replaceInArray = <
-  T extends Record<string, unknown> | model.Model,
+  T extends Record<string, unknown> | import("lib/model/types").Model,
   O extends ArrayLookupOptions | undefined = undefined,
 >(
   data: T[],
@@ -120,7 +118,7 @@ export const replaceInArray = <
 };
 
 export const updateInArray = <
-  T extends Record<string, unknown> | model.Model,
+  T extends Record<string, unknown> | import("lib/model/types").Model,
   O extends ArrayLookupOptions | undefined = undefined,
 >(
   data: T[],

@@ -1,14 +1,15 @@
-import { model } from "lib";
+import { budgeting } from "lib/model";
 
 import { client } from "../client";
 import * as types from "../types";
 
-export const getFringe = client.createParameterizedRetrieveService<"/fringes/:id", model.Fringe>(
+export const getFringe = client.createParameterizedRetrieveService<
   "/fringes/:id",
-);
+  budgeting.Fringe
+>("/fringes/:id");
 export const updateFringe = client.createParameterizedPatchService<
   "/fringes/:id/",
-  model.Fringe,
+  budgeting.Fringe,
   types.FringePayload
 >("/fringes/:id/");
 

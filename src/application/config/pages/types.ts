@@ -1,7 +1,4 @@
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
 import { enumeratedLiterals } from "lib/util/literals";
-/* eslint-disable-next-line no-restricted-imports -- This is a special case to avoid circular imports. */
-import { EnumeratedLiteralType } from "lib/util/types/literals";
 
 import * as api from "../../api";
 
@@ -16,7 +13,7 @@ export type HeadOptions = MetaOptions & {
 export type ClientPath<P extends string = string> = api.RequestPath<P, "GET">;
 
 export const NavIds = enumeratedLiterals(["dashboard", "budgeting"] as const);
-export type NavId = EnumeratedLiteralType<typeof NavIds>;
+export type NavId = import("lib/util/types").EnumeratedLiteralType<typeof NavIds>;
 
 export type BaseNav<I extends NavId> = {
   readonly navId: I;
@@ -46,7 +43,7 @@ export const PageIds = enumeratedLiterals([
   "settings",
 ] as const);
 
-export type PageId = EnumeratedLiteralType<typeof PageIds>;
+export type PageId = import("lib/util/types").EnumeratedLiteralType<typeof PageIds>;
 
 export type PageCallbackParams = {
   readonly path: string;
@@ -136,13 +133,13 @@ export type AuthenticatedPage<I extends PageId, P extends string> = BasePage<
    * is merely just removing the clickable link from their view.
    */
   readonly hidden?: PageParam<boolean>;
-  readonly icon?: import("lib/ui").IconProp;
+  readonly icon?: import("lib/ui/icons").IconProp;
   /**
-   * The icon, {@link ui.IconProp}, that should be displayed in the sidebar item whenthe sidebar
+   * The icon, {@link icons.IconProp}, that should be displayed in the sidebar item whenthe sidebar
    * item is in the "active" state.  If not defined, the icon defined by the 'icon' property will
    * be used for both the "active" and the "inactive" states.
    */
-  readonly activeIcon?: import("lib/ui").IconProp;
+  readonly activeIcon?: import("lib/ui/icons").IconProp;
   readonly tooltip?: import("lib/ui").Tooltip;
   readonly navs?: Navs;
 };

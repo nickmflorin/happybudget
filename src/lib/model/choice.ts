@@ -1,6 +1,7 @@
 import { find } from "lodash";
 
-import { toLiteralAccessor, type LiteralsAccessor, ExtractValues } from "../util";
+import { toLiteralAccessor } from "../util/literals";
+import { type LiteralsAccessor, ExtractValues } from "../util/types";
 
 import { inferModelFromName, InferModelFromNameOptions } from "./lookup";
 

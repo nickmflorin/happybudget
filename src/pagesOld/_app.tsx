@@ -1,7 +1,6 @@
-import { api } from "application";
+import * as api from "application/api";
 import { AppProps } from "lib/compat";
-import { AppConfig } from "components/config";
-import { Layout } from "components/layout";
+import { ClientConfig } from "components/config/ClientConfig";
 import "style/globals/index.scss";
 
 const CorshaConsole = ({ Component, pageProps }: AppProps) => {
@@ -9,11 +8,9 @@ const CorshaConsole = ({ Component, pageProps }: AppProps) => {
     return <Component {...pageProps} />;
   }
   return (
-    <AppConfig authenticated={true}>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
-    </AppConfig>
+    <ClientConfig authenticated={true}>
+      <Component {...pageProps} />
+    </ClientConfig>
   );
 };
 

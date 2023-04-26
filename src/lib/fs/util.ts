@@ -1,7 +1,6 @@
-import { isNil } from "lodash";
 import mime from "mime";
 
-import { errors } from "application";
+import * as errors from "application/errors";
 
 export const fileSizeInMB = (file: File | number) =>
   (typeof file === "number" ? file : file.size) / 1024 / 1024;
@@ -17,7 +16,7 @@ export const getFileType = (filename: string, strict = false): string | null => 
   };
   if (filename.indexOf(".") !== -1) {
     const ext = filename.split(".").pop();
-    if (isNil(ext)) {
+    if (ext === undefined) {
       return returnNull();
     } else if (ext.trim() === "") {
       throw new errors.InvalidFileNameError(filename);
@@ -53,7 +52,7 @@ export const getDataFromURL = (url: string): Promise<string | ArrayBuffer> =>
 
 export const extensionIsImage = (ext: string) => {
   const mimeType = mime.getType(ext);
-  if (isNil(mimeType)) {
+  if (mimeType === null) {
     throw new errors.InvalidFileExtensionError(ext);
   }
   return mimeType.split("/")[0] === "image";

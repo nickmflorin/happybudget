@@ -2,13 +2,14 @@ import { ReactNode } from "react";
 
 import classNames from "classnames";
 
-import { ui, model } from "lib";
+import { ApiModel } from "lib/model";
+import * as tooltip from "lib/ui/tooltip/types";
 import { EntityText, EntityTextProps } from "components/typography";
 
 import { RootTooltip } from "./RootTooltip";
 
-export type EntityTooltipProps = Omit<ui.TooltipProps, "content"> & {
-  readonly model: model.ApiModel;
+export type EntityTooltipProps = Omit<tooltip.TooltipProps, "content"> & {
+  readonly model: ApiModel;
   readonly children: ReactNode;
 } & Pick<EntityTextProps, "fillEmpty">;
 

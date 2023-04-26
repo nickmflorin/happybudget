@@ -1,6 +1,6 @@
 import { ICellEditorParams } from "ag-grid-community";
 
-import { store } from "application";
+import * as store from "application/store/types";
 
 import * as model from "../../model";
 import * as columns from "../columns";

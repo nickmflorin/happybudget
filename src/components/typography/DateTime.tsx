@@ -1,8 +1,9 @@
 import classNames from "classnames";
 import { Moment } from "moment";
 
-import { config } from "application";
-import { ui, formatters } from "lib";
+import * as localization from "application/config/localization";
+import * as ui from "lib/ui/types";
+import * as formatters from "lib/util/formatters";
 
 import { Date } from "./Date";
 import { Time } from "./Time";
@@ -37,8 +38,8 @@ type DateTimeConvProps = ui.ComponentProps<{
    * explicitly.
    */
   readonly value: DateTimeValueType | [PrimitiveValueType, PrimitiveValueType];
-  readonly timeLocalization?: config.localization.TimeLocalizationCode;
-  readonly dateLocalization?: config.localization.DateLocalizationCode;
+  readonly timeLocalization?: localization.TimeLocalizationCode;
+  readonly dateLocalization?: localization.DateLocalizationCode;
   /**
    * Whether or not the date and time parts should be stacked on top of each other or displayed side
    * by side.
@@ -61,7 +62,7 @@ const getDateString = (
   const dateValue: DateTimeValueType = Array.isArray(props.value) ? props.value[0] : props.value;
   return dateValue !== null && dateValue !== undefined && dateValue !== false
     ? formatters.dateFormatter(
-        props.dateLocalization || config.localization.DateLocalizationCodes.DISPLAY,
+        props.dateLocalization || localization.DateLocalizationCodes.DISPLAY,
       )({ value: dateValue })
     : null;
 };
@@ -75,7 +76,7 @@ const getTimeString = (
   const timeValue: DateTimeValueType = Array.isArray(props.value) ? props.value[1] : props.value;
   return timeValue !== null && timeValue !== undefined && timeValue !== false
     ? formatters.timeFormatter(
-        props.timeLocalization || config.localization.TimeLocalizationCodes.DISPLAY,
+        props.timeLocalization || localization.TimeLocalizationCodes.DISPLAY,
       )({ value: timeValue })
     : null;
 };

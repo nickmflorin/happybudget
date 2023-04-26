@@ -3,11 +3,13 @@ import React, { useEffect, useState } from "react";
 
 import classNames from "classnames";
 
-import { ui } from "lib";
+import * as ui from "lib/ui/types";
+
+import * as icons from "lib/ui/icons";
 import { Icon } from "components/icons";
 import { ShowHide } from "components/util";
 
-export type ImageProps = ui.ComponentProps<{
+export type ImageProps = icons.ComponentProps<{
   readonly src?: string | null;
   readonly alt?: string;
   readonly circle?: true;
@@ -16,7 +18,7 @@ export type ImageProps = ui.ComponentProps<{
   readonly wrapperClassName?: string;
   readonly fallbackSrc?: string;
   readonly fallbackComponent?: JSX.Element;
-  readonly fallbackIcon?: ui.IconProp;
+  readonly fallbackIcon?: icons.IconProp;
   readonly onLoad?: () => void;
   readonly onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
   readonly onError?: (e: React.SyntheticEvent<HTMLImageElement>) => void;

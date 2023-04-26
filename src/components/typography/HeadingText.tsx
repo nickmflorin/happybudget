@@ -1,16 +1,17 @@
 import classNames from "classnames";
 
-import { ui } from "lib";
+import * as ui from "lib/ui/types";
+import * as typography from "lib/ui/typography/types";
 
 export type HeadingTextProps = ui.ComponentProps<{
-  readonly level?: ui.TypographyTypeLevel<"heading">;
+  readonly level?: typography.TypographyTypeLevel<"heading">;
   readonly style?: Omit<ui.Style, ui.CSSFontProperties>;
-  readonly weight?: ui.TypographyWeightName;
+  readonly weight?: typography.TypographyWeightName;
   readonly children: string;
 }>;
 
 type Factories = {
-  [key in ui.TypographyTypeLevel<"heading">]: (
+  [key in typography.TypographyTypeLevel<"heading">]: (
     props: Omit<HeadingTextProps, "level">,
   ) => JSX.Element;
 };
@@ -23,11 +24,11 @@ const factories: Factories = {
 };
 
 export const HeadingText = ({ level, weight, ...props }: HeadingTextProps) =>
-  factories[level || ui.DEFAULT_HEADING_LEVEL]({
+  factories[level || typography.DEFAULT_HEADING_LEVEL]({
     ...props,
     className: classNames(
       "heading",
-      `heading--${level || ui.DEFAULT_HEADING_LEVEL}`,
+      `heading--${level || typography.DEFAULT_HEADING_LEVEL}`,
       weight !== undefined && `body--weight-type-${weight}`,
       props.className,
     ),

@@ -1,9 +1,12 @@
 import { SyntheticEvent } from "react";
 
-import { store, api } from "application";
+import * as api from "application/api";
+import * as store from "application/store/types";
 
 import * as model from "../../model";
-import { enumeratedLiterals, EnumeratedLiteralType, SingleOrArray } from "../../util";
+import { enumeratedLiterals } from "../../util/literals";
+import { SingleOrArray } from "../../util/types/arrays";
+import { EnumeratedLiteralType } from "../../util/types/literals";
 import * as columns from "../columns";
 import * as rows from "../rows";
 import * as types from "../types";

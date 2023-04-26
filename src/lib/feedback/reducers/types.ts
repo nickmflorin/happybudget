@@ -1,8 +1,10 @@
 import { type Dispatch } from "react";
 
-import { store, errors } from "application";
+import * as errors from "application/errors";
+import * as store from "application/store/types";
 
-import { enumeratedLiterals, OneOrMany } from "../../util";
+import { enumeratedLiterals } from "../../util/literals";
+import { OneOrMany } from "../../util/types/arrays";
 import * as types from "../types";
 
 export const FeedbackActionTypes = enumeratedLiterals(["clear", "add", "set"] as const);

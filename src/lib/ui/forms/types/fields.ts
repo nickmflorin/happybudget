@@ -8,7 +8,7 @@ import {
   type FieldPathValue,
 } from "react-hook-form";
 
-import { errors } from "application";
+import * as errors from "application/errors";
 
 import * as feedback from "../../../feedback";
 import { Noop } from "../../../util";

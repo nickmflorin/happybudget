@@ -3,8 +3,11 @@ import { ColSpanParams as RootColSpanParams, ColDef } from "ag-grid-community";
 
 import * as model from "../../model";
 import * as schemas from "../../schemas";
-import * as ui from "../../ui";
-import { formatters, ExtractValues, enumeratedLiterals, EnumeratedLiteralType } from "../../util";
+import * as icons from "../../ui/icons";
+import * as formatters from "../../util/formatters";
+import { enumeratedLiterals } from "../../util/literals";
+import { ExtractValues } from "../../util/types";
+import { EnumeratedLiteralType } from "../../util/types/literals";
 import * as events from "../events";
 import * as rows from "../rows";
 import * as types from "../types";
@@ -35,7 +38,7 @@ export type ColumnTypeId = EnumeratedLiteralType<typeof ColumnTypeIds>;
 export interface ColumnDataType {
   readonly id: ColumnDataTypeId;
   readonly style?: React.CSSProperties;
-  readonly icon?: ui.IconProp;
+  readonly icon?: icons.IconProp;
   readonly pdfOverrides?: Omit<Partial<ColumnDataType>, "id">;
   readonly headerOverrides?: Omit<Partial<ColumnDataType>, "id" | "icon" | "pdfOverrides">;
 }

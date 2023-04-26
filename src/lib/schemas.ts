@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { errors } from "application";
+import * as errors from "application/errors";
 
 const JsonLiteralSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
 export type JsonLiteral = z.infer<typeof JsonLiteralSchema> | ArrayBuffer;
