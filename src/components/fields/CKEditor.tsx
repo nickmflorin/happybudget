@@ -2,7 +2,7 @@ import React, { ReactNode, useEffect, useRef, forwardRef, useImperativeHandle, F
 import { isNil } from "lodash";
 import classNames from "classnames";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 interface EditorProps {
   readonly className?: string;
