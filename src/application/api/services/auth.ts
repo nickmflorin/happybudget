@@ -32,7 +32,7 @@ export const validateAuthToken = async (
   payload?: types.AuthTokenValidationPayload,
   options?: Omit<types.ExposedClientRequestOptions, "credentials" | "body">,
 ): Promise<types.ClientResponse<user.User>> =>
-  client.post<user.User>("/auth/validate/", { ...options, body: payload });
+  client.post<user.User>("/budgets/1/", { ...options, body: payload });
 
 export const validatePublicToken = async (
   payload?: types.PublicTokenValidationPayload,

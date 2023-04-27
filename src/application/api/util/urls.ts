@@ -138,17 +138,16 @@ export const constructUri = <O extends types.HttpUriOptions>(options: O): types.
     options.port !== undefined ? `:${options.port}` : ""
   }` as types.HttpUri<O>;
 
-type ConstructUrlOptions = types.HttpUriOptions & {
-  readonly query?: types.RawQuery;
-};
+type ConstructUrlOptions = types.HttpUriOptions &
+  types.HttpPathOptions & {
+    readonly query?: types.RawQuery;
+  };
 
-/**
- * Constructs a URL that consists of the string components scheme,
- * @param param0 C
- * @returns
- */
 export const constructUrl = <O extends ConstructUrlOptions>(options: O): types.HttpUrl<O> =>
-  addQueryParamsToUrl(constructUri(options), options.query) as types.HttpUrl<O>;
+  addQueryParamsToUrl(
+    `${constructUri(options)}${constructPath(options)}`,
+    options.query,
+  ) as types.HttpUrl<O>;
 
 const isConstructUriOptions = (
   options: ConstructPathUrlOptions | ConstructUrlOptions,

@@ -11,6 +11,7 @@ export type AuthenticatedLayoutProps = {
 
 export const useUser = async (): Promise<user.User | null> => {
   const response = await api.validateAuthToken();
+  console.log(response);
   if (response.error) {
     if (
       errors.isApiGlobalError(response.error) &&

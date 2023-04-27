@@ -15,7 +15,7 @@ if (!["http", "https"].includes(API_SCHEME.toLowerCase())) {
   throw new TypeError("Expected 'NEXT_PUBLIC_API_SCHEME' to be 'http' or 'https'!");
 }
 const API_PORT = parseEnvVar(process.env.NEXT_PUBLIC_API_PORT, "NEXT_PUBLIC_API_PORT", {
-  type: "number",
+  type: "integer",
 });
 
 const CSRF_TOKEN_NAME = parseEnvVar(

@@ -416,7 +416,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
         ...options?.headers,
       },
     });
-
+    logger.error(this.constructUrl(path, options))
     try {
       response = await fetch(request);
     } catch (e) {
