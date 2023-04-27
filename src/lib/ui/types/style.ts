@@ -206,7 +206,7 @@ export type CSSSizeProperties<D extends SizeDimension | SizeAxis = SizeDimension
  */
 export type HexColor<T extends string = "__PHANTOM__"> = T extends "__PHANTOM__"
   ? `#${string}`
-  : T extends `#${infer P extends string}`
+  : T extends `#${infer P}`
   ? P extends HexColor<P>
     ? never
     : P extends `${string}#${string}`

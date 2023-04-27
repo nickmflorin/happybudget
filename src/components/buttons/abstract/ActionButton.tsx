@@ -2,8 +2,8 @@ import { useMemo } from "react";
 
 import classNames from "classnames";
 
+import { icons } from "lib/ui";
 import * as buttons from "lib/ui/buttons/types";
-import * as icons from "lib/ui/icons";
 import { Spinner } from "components/loading";
 
 import { Button, ButtonProps, Anchor, AnchorProps } from "./Button";

@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { find } from "lodash";
 
 import * as api from "application/api";
-import * as icons from "lib/ui/icons";
+import { icons } from "lib/ui";
 import { Icon, OrderingArrowIcon } from "components/icons";
 
 import {

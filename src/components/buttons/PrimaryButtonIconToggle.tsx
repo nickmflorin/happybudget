@@ -1,6 +1,6 @@
+import { icons } from "lib/ui";
 import * as buttons from "lib/ui/buttons/types";
 import { useLessThanBreakpoint } from "lib/ui/hooks";
-import * as icons from "lib/ui/icons";
 import { removeObjAttributes } from "lib/util";
 import { constants } from "style";
 

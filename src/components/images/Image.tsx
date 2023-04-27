@@ -3,9 +3,8 @@ import React, { useEffect, useState } from "react";
 
 import classNames from "classnames";
 
+import { icons } from "lib/ui";
 import * as ui from "lib/ui/types";
-
-import * as icons from "lib/ui/icons";
 import { Icon } from "components/icons";
 import { ShowHide } from "components/util";
 

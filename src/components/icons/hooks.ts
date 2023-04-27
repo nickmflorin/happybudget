@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 import classNames from "classnames";
 
-import * as icons from "lib/ui/icons";
+import { icons } from "lib/ui";
 
 /**
  * A hook that provides the props that are common for both the Icon and SVG components.

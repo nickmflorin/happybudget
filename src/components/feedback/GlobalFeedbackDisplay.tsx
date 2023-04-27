@@ -4,7 +4,8 @@ import classNames from "classnames";
 import { Optional } from "utility-types";
 
 import * as errors from "application/errors";
-import { feedback, ui } from "lib";
+import * as feedback from "lib/feedback";
+import * as ui from "lib/ui";
 
 import { GlobalFeedback } from "./GlobalFeedback";
 

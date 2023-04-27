@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { find } from "lodash";
 
 import * as fs from "lib/fs";
-import * as icons from "lib/ui/icons";
+import { icons } from "lib/ui";
 
 import { Icon } from "./Icon";
 

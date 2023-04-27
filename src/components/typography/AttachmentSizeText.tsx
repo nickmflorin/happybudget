@@ -2,7 +2,7 @@ import classNames from "classnames";
 
 import * as fs from "lib/fs";
 import { attachment } from "lib/model";
-import * as icons from "lib/ui/icons";
+import { icons } from "lib/ui";
 import * as ui from "lib/ui/types";
 import { Icon } from "components/icons";
 

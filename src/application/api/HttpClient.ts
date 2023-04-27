@@ -52,7 +52,11 @@ const mergeWithServiceOptions = <
   serviceOptions?: types.ServiceOptions<S, D>,
   options?: types.ClientRequestOptions<S, D>,
 ): types.ClientRequestOptions<S, D> => {
-  type Q = D extends { readonly query: infer Qi extends types.RawQuery } ? Qi : types.RawQuery;
+  type Q = D extends { readonly query: infer Qi }
+    ? Qi extends types.RawQuery
+      ? Qi
+      : types.RawQuery
+    : types.RawQuery;
 
   const serviceQuery = (serviceOptions?.query as Q) || ({} as Q);
   const dynamicQuery = (options?.query as Q) || ({} as Q);
@@ -327,7 +331,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
       const { done, value: chunk } = await reader.read();
       if (done) {
         loading = false;
-      } else {
+      } else if (chunk !== undefined) {
         chunks.push(chunk);
         received += chunk.length;
         if (options?.onProgress !== undefined) {
@@ -416,7 +420,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
         ...options?.headers,
       },
     });
-    logger.error(this.constructUrl(path, options))
+    logger.error(this.constructUrl(path, options));
     try {
       response = await fetch(request);
     } catch (e) {

@@ -3,8 +3,8 @@ import React, { useMemo } from "react";
 import classNames from "classnames";
 
 import { logger } from "internal";
+import { icons } from "lib/ui";
 import * as buttons from "lib/ui/buttons/types";
-import * as icons from "lib/ui/icons";
 import * as loading from "lib/ui/loading";
 import * as ui from "lib/ui/types";
 import { CaretIcon } from "components/icons";

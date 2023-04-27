@@ -4,12 +4,13 @@ import classNames from "classnames";
 import { Checkbox as RootCheckbox, CheckboxProps as RootCheckboxProps } from "antd";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
 
-import * as ui from "lib/ui/types";
+import * as ui from "lib/ui";
+import { forms } from "lib/ui";
 
 export type CheckboxProps<
-  D extends ui.FormData = ui.FormData,
-  N extends ui.FieldName<D> = ui.FieldName<D>,
-> = ui.FormInput<boolean, D, N, HTMLInputElement> &
+  D extends forms.FormData = forms.FormData,
+  N extends forms.FieldName<D> = forms.FieldName<D>,
+> = forms.FormInput<boolean, D, N, HTMLInputElement> &
   ui.ComponentProps<
     { readonly value?: boolean; readonly defaultValue?: boolean },
     {
@@ -18,8 +19,8 @@ export type CheckboxProps<
   >;
 
 export const Checkbox = <
-  D extends ui.FormData = ui.FormData,
-  N extends ui.FieldName<D> = ui.FieldName<D>,
+  D extends forms.FormData = forms.FormData,
+  N extends forms.FieldName<D> = forms.FieldName<D>,
 >({
   input,
   value: _value,

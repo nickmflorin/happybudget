@@ -1,9 +1,10 @@
-export * from "./buttons";
+export * as buttons from "./buttons";
 export * from "./charts";
 export * from "./colors";
-export * from "./forms";
+export * as forms from "./forms";
+export * as icons from "./icons";
 export * from "./loading";
 export * from "./pagination";
-export * from "./tooltip";
+export * as tooltip from "./tooltip";
 export * from "./types";
-export * from "./typography";
+export * as typography from "./typography";

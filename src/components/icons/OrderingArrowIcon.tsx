@@ -1,5 +1,5 @@
 import * as api from "application/api";
-import * as icons from "lib/ui/icons";
+import { icons } from "lib/ui";
 
 import { Icon } from "./Icon";
 

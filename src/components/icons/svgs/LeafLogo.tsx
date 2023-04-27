@@ -1,6 +1,6 @@
 import React from "react";
 
-import * as icons from "lib/ui/icons";
+import { icons } from "lib/ui";
 
 import { createSVG } from "./createSVG";
 

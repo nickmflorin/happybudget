@@ -4,8 +4,9 @@ import classNames from "classnames";
 import { Optional } from "utility-types";
 
 import * as errors from "application/errors";
-import { feedback, ui } from "lib";
-import * as icons from "lib/ui/icons";
+import * as feedback from "lib/feedback";
+import * as ui from "lib/ui";
+import { icons, buttons } from "lib/ui";
 import { BareActionButton } from "components/buttons";
 import { FeedbackIcon } from "components/icons";
 
@@ -22,10 +23,12 @@ type GlobalFeedbackErrorProps = ui.ComponentProps & {
 /*
 Props for the GlobalFeedback component for cases where the feedback is provided as a feedback
 object.
+
 Here, the type feedback.ManagedGlobalFeedback represents a feedback.GlobalFeedback element that is
 being managed by the Feedback Manager.  When globally scoped feedback is added to the
 Feedback Manager, the Feedback Manager adds a randomly generated ID and an optionally provided
 `onClose` callback to the feedback.GlobalFeedback element.
+
 (The ID is used to remove the feedback element from state when the onClose callback is triggered.)
 Since it is possible that this component is used for a feedback type that is not managed (i.e. just
 feedback.GlobalFeedback - without the ID or 'onClose' callback) - allowing those attributes to be
@@ -83,7 +86,7 @@ export const GlobalFeedback = <P extends feedback.FeedbackType = feedback.Feedba
         <BareActionButton
           className="button--global-feedback-close"
           icon={icons.IconNames.XMARK}
-          size={ui.ButtonSizes.MEDIUM}
+          size={buttons.ButtonSizes.MEDIUM}
           onClick={(e: MouseEvent<HTMLButtonElement>) => props.onClose?.(e)}
         />
       )}

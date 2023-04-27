@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { isFragment } from "react-is";
 
 import { ui, core, OneOrMany } from "lib";
-import * as icons from "lib/ui/icons";
+import { icons } from "lib/ui";
 import { Icon } from "components/icons";
 
 // Iterates over the child elements, removing fragments (<></>) recursively.

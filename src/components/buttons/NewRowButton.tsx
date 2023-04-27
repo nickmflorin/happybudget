@@ -1,6 +1,6 @@
 import classNames from "classnames";
 
-import * as icons from "lib/ui/icons";
+import { icons } from "lib/ui";
 
 import { BareActionButton, BareActionButtonProps } from "./BareActionButton";
 

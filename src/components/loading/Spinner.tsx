@@ -3,9 +3,8 @@ import React, { useMemo } from "react";
 import classNames from "classnames";
 
 import { logger } from "internal";
+import { icons } from "lib/ui";
 import * as ui from "lib/ui/types";
-
-import * as icons from "lib/ui/icons";
 import { Icon } from "components/icons";
 
 export type SpinnerProps = Omit<icons.IconProps, "axis" | "contain" | "icon" | "size" | "spin"> & {

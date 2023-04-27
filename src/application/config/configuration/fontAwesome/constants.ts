@@ -159,7 +159,6 @@ export const Icons = {
     IconNames.CIRCLE_NOTCH,
     IconNames.SERVER,
     IconNames.CARET_UP,
-    IconNames.CARET_DOWN,
     IconNames.CIRCLE_XMARK,
     IconNames.CIRCLE_PLUS,
     IconNames.FILTER,
@@ -172,4 +171,4 @@ export const Icons = {
     IconNames.BOOK,
     IconNames.TRIANGLE_EXCLAMATION,
   ] as const,
-};
+} as const;

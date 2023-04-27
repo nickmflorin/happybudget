@@ -1,7 +1,7 @@
 import classNames from "classnames";
 
 import * as feedback from "lib/feedback";
-import * as icons from "lib/ui/icons";
+import { icons } from "lib/ui";
 
 import { Icon } from "./Icon";
 

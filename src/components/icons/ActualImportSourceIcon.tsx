@@ -4,7 +4,7 @@ import { find } from "lodash";
 
 import { logger } from "internal";
 import { budgeting } from "lib/model";
-import * as icons from "lib/ui/icons";
+import { icons } from "lib/ui";
 
 import { Icon } from "./Icon";
 

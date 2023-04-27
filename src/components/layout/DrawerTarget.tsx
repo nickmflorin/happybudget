@@ -6,7 +6,7 @@ import classNames from "classnames";
 /* // import { store } from "application";
    import * as ui from "lib/ui/types"; */
 
-// import * as icons from "lib/ui/icons";
+// import { icons } from "lib/ui";
 import { BareActionButton } from "components/buttons";
 
 export type DrawerTargetProps = Omit<ui.ComponentProps, "id">;

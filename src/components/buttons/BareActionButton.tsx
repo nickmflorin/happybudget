@@ -1,7 +1,7 @@
 import classNames from "classnames";
 
+import { icons } from "lib/ui";
 import * as buttons from "lib/ui/buttons";
-import * as icons from "lib/ui/icons";
 
 import { ActionButton, ActionButtonProps, ActionAnchor, ActionAnchorProps } from "./abstract";
 

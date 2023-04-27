@@ -2,7 +2,7 @@ import React from "react";
 
 import { Subtract } from "utility-types";
 
-import * as icons from "lib/ui/icons";
+import { icons } from "lib/ui";
 
 import { useSVG } from "../hooks";
 
