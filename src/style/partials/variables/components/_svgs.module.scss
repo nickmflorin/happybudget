@@ -6,12 +6,17 @@
 @use "../../functions" as fn;
 @use "./icons.module" as icons;
 
-$leaf-logo-svg-name: "corsha-logo";
+$leaf-logo-svg-name: "leaf-logo";
+$text-logo-svg-name: "text-logo";
 
 $svg-bases: (
   $leaf-logo-svg-name: (
     height: 51.637px,
     width: 45.784px,
+  ),
+  $text-logo-svg-name: (
+    height: 58.169px,
+    width: 387.795px,
   ),
 );
 

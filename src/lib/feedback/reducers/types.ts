@@ -3,7 +3,7 @@ import { type Dispatch } from "react";
 import * as errors from "application/errors";
 import * as store from "application/store/types";
 
-import { enumeratedLiterals } from "../../util/literals";
+import { enumeratedLiterals, EnumeratedLiteralType } from "../../util/literals";
 import { OneOrMany } from "../../util/types/arrays";
 import * as types from "../types";
 

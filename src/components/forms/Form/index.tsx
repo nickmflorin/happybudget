@@ -1,6 +1,6 @@
 import classNames from "classnames";
 
-import * as core from "lib/core";
+import { core } from "lib";
 import * as ui from "lib/ui";
 import { forms, icons } from "lib/ui";
 import { Noop } from "lib/util";
@@ -8,14 +8,9 @@ import { GlobalFeedbackDisplay } from "components/feedback";
 import { Loading } from "components/loading";
 import { ShowHide } from "components/util";
 
-import {
-  CheckboxField,
-  CheckboxFieldProps,
-  AsyncSelectField,
-  AsyncSelectFieldProps,
-  TextInputField,
-  TextInputFieldProps,
-} from "../fields";
+import { AsyncSelectField, AsyncSelectFieldProps } from "../fields/AsyncSelectField";
+import { CheckboxField, CheckboxFieldProps } from "../fields/CheckboxField";
+import { TextInputField, TextInputFieldProps } from "../fields/TextInputField";
 
 import { FormFooter, FormFooterProps } from "./FormFooter";
 

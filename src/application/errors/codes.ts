@@ -39,7 +39,7 @@ export const ClientValidationErrorCodes = enumeratedLiterals([
   "valueAsNumber",
 ] as const);
 
-export type ClientValidationErrorCode = import("lib/util/types").EnumeratedLiteralType<
+export type ClientValidationErrorCode = import("lib/util/literals").EnumeratedLiteralType<
   typeof ClientValidationErrorCodes
 >;
 
@@ -60,13 +60,15 @@ export const AuthErrorCodes = enumeratedLiterals([
   "account_not_on_waitlist",
   "account_not_authenticated",
 ] as const);
-export type AuthErrorCode = import("lib/util/types").EnumeratedLiteralType<typeof AuthErrorCodes>;
+export type AuthErrorCode = import("lib/util/literals").EnumeratedLiteralType<
+  typeof AuthErrorCodes
+>;
 
 export const PermissionErrorCodes = enumeratedLiterals([
   "permission_error",
   "product_permission_error",
 ] as const);
-export type PermissionErrorCode = import("lib/util/types").EnumeratedLiteralType<
+export type PermissionErrorCode = import("lib/util/literals").EnumeratedLiteralType<
   typeof PermissionErrorCodes
 >;
 
@@ -75,7 +77,7 @@ export const BillingErrorCodes = enumeratedLiterals([
   "checkout_error",
   "checkout_session_inactive",
 ] as const);
-export type BillingErrorCode = import("lib/util/types").EnumeratedLiteralType<
+export type BillingErrorCode = import("lib/util/literals").EnumeratedLiteralType<
   typeof BillingErrorCodes
 >;
 
@@ -90,7 +92,7 @@ export const ApiFieldErrorCodes = enumeratedLiterals([
   UNKNOWN,
 ] as const);
 
-export type ApiFieldErrorCode = import("lib/util/types").EnumeratedLiteralType<
+export type ApiFieldErrorCode = import("lib/util/literals").EnumeratedLiteralType<
   typeof ApiFieldErrorCodes
 >;
 
@@ -110,7 +112,7 @@ export const ApiGlobalErrorCodes = enumeratedLiterals([
   "body_not_present",
 ] as const);
 
-export type ApiGlobalErrorCode = import("lib/util/types").EnumeratedLiteralType<
+export type ApiGlobalErrorCode = import("lib/util/literals").EnumeratedLiteralType<
   typeof ApiGlobalErrorCodes
 >;
 
@@ -118,10 +120,10 @@ export const ApiErrorCodes = enumeratedLiterals([
   ...ApiGlobalErrorCodes.__ALL__,
   ...ApiFieldErrorCodes.__ALL__,
 ] as const);
-export type ApiErrorCode = import("lib/util/types").EnumeratedLiteralType<typeof ApiErrorCodes>;
+export type ApiErrorCode = import("lib/util/literals").EnumeratedLiteralType<typeof ApiErrorCodes>;
 
 export const NetworkErrorCodes = enumeratedLiterals(["network"] as const);
-export type NetworkErrorCode = import("lib/util/types").EnumeratedLiteralType<
+export type NetworkErrorCode = import("lib/util/literals").EnumeratedLiteralType<
   typeof NetworkErrorCodes
 >;
 
@@ -170,8 +172,8 @@ export const ErrorTypeCodes: ErrorTypeCodes = {
 };
 
 export type ErrorCode<T extends CodedErrorType | undefined = undefined> = T extends undefined
-  ? import("lib/util/types").EnumeratedLiteralType<typeof ErrorCodes>
-  : import("lib/util/types").EnumeratedLiteralType<ErrorTypeCodes[T & keyof ErrorTypeCodes]>;
+  ? import("lib/util/literals").EnumeratedLiteralType<typeof ErrorCodes>
+  : import("lib/util/literals").EnumeratedLiteralType<ErrorTypeCodes[T & keyof ErrorTypeCodes]>;
 
 export const isErrorCode = <T extends CodedErrorType = CodedErrorType>(
   code: string,

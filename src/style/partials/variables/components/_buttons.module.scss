@@ -62,7 +62,7 @@ padding to shrink the size of the Icon or Spinner it contains.
 */
 $button-icon-padding: 2px;
 
-$button-font-weight: typography.get-font-weight("body", "regular");
+$button-font-weight: typography.get-font-weight("body", "medium");
 
 /*
 Note: The mapped values are not applicable for the Alternate Variant - just the buttons/anchors that
@@ -131,15 +131,15 @@ $button-action-secondary-sizes: (
 );
 
 $button-solid-font-sizes: (
-  "small": typography.get-font-size("body", 2),
-  "medium": typography.get-font-size("body", 1),
-  "large": typography.get-font-size("body", 1),
+  "small": typography.get-font-size("body", $level: 2),
+  "medium": typography.get-font-size("body", $level: 1),
+  "large": typography.get-font-size("body", $level: 1),
 );
 
 $button-alternate-font-sizes: (
-  "small": typography.get-font-size("body", 2),
+  "small": typography.get-font-size("body", $level: 2),
   "medium": 15px,
-  "large": typography.get-font-size("body", 1),
+  "large": typography.get-font-size("body", $level: 1),
 );
 
 @mixin button-hovered {

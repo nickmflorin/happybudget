@@ -2,16 +2,21 @@ import classNames from "classnames";
 
 import * as errors from "application/errors";
 import * as messages from "application/errors/messages";
-import { ui, feedback as Feedback } from "lib";
+import * as Feedback from "lib/feedback";
+import * as ui from "lib/ui";
+import { forms } from "lib/ui";
 
 export type FieldFeedbackProps<
-  D extends ui.FormData,
-  N extends ui.FieldName<D> = ui.FieldName<D>,
+  D extends forms.FormData,
+  N extends forms.FieldName<D> = forms.FieldName<D>,
 > = ui.ComponentProps<{
-  readonly feedback: errors.ClientValidationError | ui.FormFieldFeedback<D, N>;
+  readonly feedback: errors.ClientValidationError | forms.FormFieldFeedback<D, N>;
 }>;
 
-export const FieldFeedback = <D extends ui.FormData, N extends ui.FieldName<D> = ui.FieldName<D>>({
+export const FieldFeedback = <
+  D extends forms.FormData,
+  N extends forms.FieldName<D> = forms.FieldName<D>,
+>({
   feedback,
   ...props
 }: FieldFeedbackProps<D, N>): JSX.Element => (
@@ -19,12 +24,14 @@ export const FieldFeedback = <D extends ui.FormData, N extends ui.FieldName<D> =
     {...props}
     className={classNames(
       "field-feedback",
-      ui.isFormFieldFeedback(feedback)
+      forms.isFormFieldFeedback(feedback)
         ? `field-feedback--${feedback.feedbackType}`
         : `field-feedback--${Feedback.FeedbackTypes.ERROR}`,
       props.className,
     )}
   >
-    {ui.isFormFieldFeedback(feedback) ? feedback.message : messages.getErrorMessage(feedback.type)}
+    {forms.isFormFieldFeedback(feedback)
+      ? feedback.message
+      : messages.getErrorMessage(feedback.type)}
   </div>
 );

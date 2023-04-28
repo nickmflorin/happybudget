@@ -20,7 +20,6 @@ function _IconComponent(
   }: icons.IconComponentProps & { readonly ref?: ForwardedRef<SVGSVGElement> },
 ) {
   const iconProps = useIcon({ ...props, axis, size, contain, color });
-
   return <FontAwesomeIcon {...props} {...iconProps} ref={ref} icon={icons.getNativeIcon(icon)} />;
 }
 

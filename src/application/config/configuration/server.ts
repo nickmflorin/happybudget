@@ -1,5 +1,15 @@
-import { logger } from "internal";
+import { logger, createHotReloadIsolatedFn } from "internal";
 
-export const configureServerApplication = () => {
-  logger.info("Configuring server application.");
+import { configure as configureFontAwesome, FAConfigurationOptions } from "./fontAwesome";
+
+export type ConfigurationOptions = {
+  fontAwesome: FAConfigurationOptions;
 };
+
+export const configureServerApplication = createHotReloadIsolatedFn(
+  "serverApplicationConfigured",
+  (options: ConfigurationOptions) => {
+    logger.info("Configuring server application.");
+    configureFontAwesome(options.fontAwesome);
+  },
+);

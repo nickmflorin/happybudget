@@ -323,7 +323,7 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
 
     // Declare received as 0 initially
     let received = 0;
-    let loading = false;
+    let loading = true;
     const chunks: Uint8Array[] = [];
 
     // Loop through the response stream and extract the data chunks
@@ -350,19 +350,19 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
 
     const body = new Uint8Array(received);
     let position = 0;
+
     // Order the chunks by their respective position
     for (const chunk of chunks) {
       body.set(chunk, position);
       position += chunk.length;
     }
     const decodedBody = new TextDecoder("utf-8").decode(body);
-
     try {
       // TODO: Provide schema validation here.
       return { body: JSON.parse(decodedBody) as S, error: null };
     } catch (e: unknown) {
       if (e instanceof SyntaxError) {
-        logger.info("Response body was not serializable, inferring the error from the response.");
+        logger.warn("Response body was not serializable, inferring the error from the response.");
         return {
           body: null,
           error: new errors.ApiGlobalError({
@@ -407,20 +407,19 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
     let response: Response | null = null;
     let body: S | null = null;
     let error: errors.HttpError | null = null;
-
     const request = new Request(this.constructUrl(path, options), {
       method,
       body:
         options?.body !== undefined && !types.payloadIsFormData(options.body)
           ? JSON.stringify(this.filterPayload(options.body))
-          : undefined,
+          : options?.body,
       credentials: options?.credentials === undefined ? this.credentials : options?.credentials,
       headers: {
+        "Content-Type": "application/json",
         ...(typeof this.headers === "function" ? this.headers() : this.headers),
         ...options?.headers,
       },
     });
-    logger.error(this.constructUrl(path, options));
     try {
       response = await fetch(request);
     } catch (e) {
@@ -823,7 +822,8 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
    */
   public upload = <S extends types.ApiResponseBody | null>(
     path: types.RequestPath<string, "POST">,
-    file: File | types.FilepondFile | (File | types.FilepondFile)[] | FileList,
+    // file: File | types.FilepondFile | (File | types.FilepondFile)[] | FileList,
+    file: File | File[] | FileList,
     options?: Omit<types.ClientRequestOptions<S, { body: FormData }>, "body">,
   ): Promise<types.ClientResponse<S, { body: FormData }>> => {
     const formData = new FormData();
@@ -844,7 +844,8 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
   public createUploadService =
     <S extends types.ApiResponseBody | null>(url: types.RequestPath<string, "POST">) =>
     async (
-      file: File | types.FilepondFile | (File | types.FilepondFile)[] | FileList,
+      // file: File | types.FilepondFile | (File | types.FilepondFile)[] | FileList,
+      file: File | File[] | FileList,
       options?: Omit<types.ClientRequestOptions<S, { body: FormData }>, "body">,
     ): Promise<types.ClientResponse<S, { body: FormData }>> =>
       this.upload<S>(url, file, options);
@@ -856,7 +857,8 @@ export class HttpClient<O extends ClientUriOptions = ClientUriOptions> {
     ) =>
     async (
       params: types.UrlPathParamsObj<U>,
-      file: File | types.FilepondFile | (File | types.FilepondFile)[] | FileList,
+      // file: File | types.FilepondFile | (File | types.FilepondFile)[] | FileList,
+      file: File | File[] | FileList,
       options?: Omit<types.ClientRequestOptions<S, { body: FormData }>, "body">,
     ): Promise<types.ClientResponse<S, { body: FormData }>> =>
       this.upload<S>(

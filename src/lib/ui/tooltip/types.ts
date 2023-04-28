@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 import { TooltipPropsWithTitle } from "antd/es/tooltip";
 
 import * as formatters from "../../util/formatters";
-import { enumeratedLiterals } from "../../util/literals";
+import { enumeratedLiterals, EnumeratedLiteralType } from "../../util/literals";
 import { EnumeratedLiteralType } from "../../util/types/literals";
 import * as buttons from "../buttons";
 

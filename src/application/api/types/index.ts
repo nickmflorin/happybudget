@@ -13,10 +13,10 @@ export * from "./schemas";
 export * from "./urls";
 
 export const HttpMethods = enumeratedLiterals(["GET", "POST", "PATCH", "DELETE"] as const);
-export type HttpMethod = import("lib/util/types").EnumeratedLiteralType<typeof HttpMethods>;
+export type HttpMethod = import("lib/util/literals").EnumeratedLiteralType<typeof HttpMethods>;
 
 export const RequestCredentials = enumeratedLiterals(["same-origin", "include", "omit"] as const);
-export type RequestCredential = import("lib/util/types").EnumeratedLiteralType<
+export type RequestCredential = import("lib/util/literals").EnumeratedLiteralType<
   typeof RequestCredentials
 >;
 

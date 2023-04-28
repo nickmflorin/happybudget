@@ -43,6 +43,7 @@ import {
   faCirclePlus,
   faAddressBook,
   faBook,
+  faCopyright,
 } from "@fortawesome/free-solid-svg-icons";
 
 export const ICON_REGISTRY = [
@@ -84,4 +85,5 @@ export const ICON_REGISTRY = [
   faAddressBook,
   faBook,
   faCirclePlus,
+  faCopyright,
 ] as const;

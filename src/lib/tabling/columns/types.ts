@@ -5,7 +5,7 @@ import * as model from "../../model";
 import * as schemas from "../../schemas";
 import * as icons from "../../ui/icons";
 import * as formatters from "../../util/formatters";
-import { enumeratedLiterals } from "../../util/literals";
+import { enumeratedLiterals, EnumeratedLiteralType } from "../../util/literals";
 import { ExtractValues } from "../../util/types";
 import { EnumeratedLiteralType } from "../../util/types/literals";
 import * as events from "../events";

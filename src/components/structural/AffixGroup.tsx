@@ -3,8 +3,10 @@ import React, { Fragment, cloneElement } from "react";
 import classNames from "classnames";
 import { isFragment } from "react-is";
 
-import { ui, core, OneOrMany } from "lib";
+import { core } from "lib";
+import * as ui from "lib/ui";
 import { icons } from "lib/ui";
+import { OneOrMany } from "lib/util/types";
 import { Icon } from "components/icons";
 
 // Iterates over the child elements, removing fragments (<></>) recursively.
@@ -52,12 +54,10 @@ const AffixIcon = (props: {
 );
 
 type AffixProps = {
-  /*
-  The icons.IconBasicProp cannot be a child because it includes icons.Icon which is an object of form
-  { type: ..., name: ... }, and objects are not valid React children.  However, the icons.Icon type can
-  still be provided as an element in the `affixes` prop - and in that case it will be converted to
-  an `Icon` without using the `Affix` component here.
-  */
+  /* The icons.IconBasicProp cannot be a child because it includes icons.Icon which is an object of
+     for { type: ..., name: ... }, and objects are not valid React children.  However, the
+     icons.Icon type can still be provided as an element in the `affixes` prop - and in that case
+     it will be converted to an `Icon` without using the `Affix` component here. */
   readonly children: JSX.Element | icons.IconName | icons.IconElement;
   readonly spacing?: number;
   readonly index?: number;
@@ -68,7 +68,7 @@ type AffixProps = {
    This component is not meant to be exposed externally and its purpose is solely for the AffixGroup
    component below. */
 const Affix = (props: AffixProps): JSX.Element => {
-  if (ui.isIconName(props.children)) {
+  if (icons.isIconName(props.children)) {
     return <AffixIcon {...props} icon={props.children} />;
   } else if (props.spacing !== undefined && props.index !== 0) {
     return cloneElement(props.children, {
@@ -124,7 +124,7 @@ export const AffixGroup = ({
     {_getAffixes({ children, affixes }).map((a: ui.Affix, i: number) =>
       core.isSpecificReactElement<AffixProps>(a, { name: "Affix" }) ? (
         <Fragment key={i}>{React.cloneElement(a, { index: i, spacing })}</Fragment>
-      ) : ui.isIcon(a) ? (
+      ) : icons.isIcon(a) ? (
         <AffixIcon key={i} icon={a} index={i} spacing={spacing} />
       ) : (
         <Affix key={i} spacing={spacing} index={i}>

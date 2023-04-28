@@ -1,12 +1,12 @@
 import { enumeratedLiterals } from "lib/util/literals";
 
 export const DateLocalizationCodes = enumeratedLiterals(["DISPLAY", "API"] as const);
-export type DateLocalizationCode = import("lib/util/types").EnumeratedLiteralType<
+export type DateLocalizationCode = import("lib/util/literals").EnumeratedLiteralType<
   typeof DateLocalizationCodes
 >;
 
 export const TimeLocalizationCodes = enumeratedLiterals(["DISPLAY"] as const);
-export type TimeLocalizationCode = import("lib/util/types").EnumeratedLiteralType<
+export type TimeLocalizationCode = import("lib/util/literals").EnumeratedLiteralType<
   typeof TimeLocalizationCodes
 >;
 
@@ -15,7 +15,7 @@ export const DateTimeLocalizationCodes = enumeratedLiterals([
   "DISPLAY",
   "API",
 ] as const);
-export type DateTimeLocalizationCode = import("lib/util/types").EnumeratedLiteralType<
+export type DateTimeLocalizationCode = import("lib/util/literals").EnumeratedLiteralType<
   typeof DateTimeLocalizationCodes
 >;
 
@@ -41,7 +41,7 @@ export const DateTimeLocalizations = {
 export type DateTimeLocalization = typeof DateTimeLocalizations[keyof typeof DateTimeLocalizations];
 
 export const LocalizationTypes = enumeratedLiterals(["time", "date", "datetime"] as const);
-export type LocalizationType = import("lib/util/types").EnumeratedLiteralType<
+export type LocalizationType = import("lib/util/literals").EnumeratedLiteralType<
   typeof LocalizationTypes
 >;
 

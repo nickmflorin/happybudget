@@ -1,6 +1,7 @@
 import React from "react";
 
-import { RequireOne, selectedObjAttributesEqual } from "../util";
+import { type RequireOne } from "../util/types";
+import { selectedObjAttributesEqual } from "../util/util";
 
 /**
  * A typeguard that can be used to test whether or not a value is a {@link React.ReactElement}

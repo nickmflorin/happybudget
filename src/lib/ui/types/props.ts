@@ -5,7 +5,7 @@ import { RequiredKeys, OptionalKeys } from "utility-types";
 import { logger } from "internal";
 
 import { HTMLElementName, HTMLElementTag } from "../../core";
-import { enumeratedLiterals } from "../../util/literals";
+import { enumeratedLiterals, EnumeratedLiteralType } from "../../util/literals";
 import { IntersectionIfPopulated } from "../../util/types";
 import { EnumeratedLiteralType } from "../../util/types/literals";
 

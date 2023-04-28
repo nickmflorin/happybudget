@@ -11,8 +11,7 @@ import {
   IconPrefix,
 } from "application/config/configuration/fontAwesome/constants";
 
-import { enumeratedLiterals } from "../../util/literals";
-import { EnumeratedLiteralType } from "../../util/types/literals";
+import { enumeratedLiterals, EnumeratedLiteralType } from "../../util/literals";
 import * as types from "../types";
 
 export * from "application/config/configuration/fontAwesome/constants";

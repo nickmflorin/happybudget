@@ -1,0 +1,156 @@
+@use "partials";
+
+.layout--landing {
+  align-items: center;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+
+  &__content {
+    align-items: stretch;
+    -webkit-box-align: stretch;
+    -webkit-box-pack: start;
+    display: flex;
+    -ms-flex-align: stretch;
+    flex-direction: column;
+    -ms-flex-pack: start;
+    gap: 20px;
+    justify-content: flex-start;
+    max-width: 500px;
+    padding: 24px;
+
+    > h1 {
+      color: partials.$text-primary;
+      font-size: 62px;
+      font-weight: 900;
+      line-height: 1.1;
+
+      > span {
+        color: partials.$green;
+      }
+    }
+  }
+
+  // &__left {
+  //   @include partials.vertical-flex-c;
+
+  //   -webkit-box-align: center;
+  //   -webkit-box-pack: center;
+  //   box-shadow: 10px 0px 99px #777777;
+  //   display: flex;
+  //   flex-grow: 1;
+  //   height: 100vh;
+  //   position: relative;
+  //   width: 100%;
+  //   z-index: 1;
+
+  //   // @include partials.media(">=xl") {
+  //   //   width: 550px;
+  //   // }
+
+  //   > .layout--landing__logo-container {
+  //     > .svg {
+  //       display: inline-block;
+
+  //       // @include partials.media("<=xl") {
+  //       //   width: 75%;
+  //       // }
+
+  //       // @include partials.media(">=xl") {
+  //       //   display: none;
+  //       // }
+  //     }
+  //   }
+
+  // > .layout--landing__copyright {
+  //   bottom: 10px;
+  //   display: flex;
+  //   flex-direction: row;
+  //   justify-content: center;
+  //   position: absolute;
+  //   width: 100%;
+
+  //   > .icon {
+  //     @include partials.size(16px);
+  //     // color: partials.$text-primary;
+  //   }
+
+  //   > .layout--landing__copyright__copyright-text {
+  //     // color: partials.$text-primary;
+  //     font-size: 12px;
+  //     font-weight: 500;
+  //     line-height: 16px;
+  //     margin-left: 4px;
+  //   }
+  // }
+}
+
+// &__right {
+//   align-items: center;
+//   background: transparent linear-gradient(133deg, partials.$green 0%, partials.$dark-green 100%)
+//     0% 0% no-repeat padding-box;
+//   -webkit-box-align: center;
+//   -webkit-box-pack: center;
+//   display: flex;
+//   // display: none;
+//   flex-grow: 100;
+//   height: 100vh;
+//   justify-content: center;
+
+//   // @include partials.media(">=xl") {
+//   //   align-items: center;
+//   //   display: flex;
+//   //   justify-content: center;
+//   // }
+// }
+
+// .logo-container {
+//   text-align: center;
+// }
+
+// .landing-form-container {
+//   margin-top: 40px;
+//   max-width: 550px;
+//   padding: 20px 60px;
+//   width: 100%;
+
+//   @include media(">=medium") {
+//     padding: 20px 100px;
+//   }
+
+//   @include media(">=xl") {
+//     margin-top: 0px;
+//   }
+
+//   .title {
+//     font-family: $avenir;
+//     font-size: 28px;
+//     font-weight: 700;
+//     text-align: center;
+
+//     @include media("<=xl") {
+//       display: none;
+//     }
+//   }
+
+//   .sub-title {
+//     color: $text-secondary;
+//     font-family: $avenir;
+//     font-size: $xlarge-body-font-size;
+//     font-weight: 600;
+//     margin-bottom: 32px;
+//     text-align: center;
+
+//     @include media("<=xl") {
+//       display: none;
+//     }
+//   }
+
+//   .landing-form {
+//     margin-top: 20px;
+
+//     @include media("<=xl") {
+//       margin-bottom: 45px;
+//     }
+//   }
+// }

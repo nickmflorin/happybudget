@@ -2,7 +2,7 @@ import { RowClassParams } from "ag-grid-community";
 
 import * as model from "../../model";
 import * as ui from "../../ui";
-import { enumeratedLiterals } from "../../util/literals";
+import { enumeratedLiterals, EnumeratedLiteralType } from "../../util/literals";
 import { EnumeratedLiteralType } from "../../util/types/literals";
 import * as columns from "../columns";
 import { CellValue, FooterGridId, TableClassName } from "../types";

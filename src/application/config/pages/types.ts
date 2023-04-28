@@ -13,7 +13,7 @@ export type HeadOptions = MetaOptions & {
 export type ClientPath<P extends string = string> = api.RequestPath<P, "GET">;
 
 export const NavIds = enumeratedLiterals(["dashboard", "budgeting"] as const);
-export type NavId = import("lib/util/types").EnumeratedLiteralType<typeof NavIds>;
+export type NavId = import("lib/util/literals").EnumeratedLiteralType<typeof NavIds>;
 
 export type BaseNav<I extends NavId> = {
   readonly navId: I;
@@ -43,7 +43,7 @@ export const PageIds = enumeratedLiterals([
   "settings",
 ] as const);
 
-export type PageId = import("lib/util/types").EnumeratedLiteralType<typeof PageIds>;
+export type PageId = import("lib/util/literals").EnumeratedLiteralType<typeof PageIds>;
 
 export type PageCallbackParams = {
   readonly path: string;

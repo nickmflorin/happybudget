@@ -1,15 +1,16 @@
-import { ActualFileObject } from "filepond/types";
+// import { ActualFileObject } from "filepond/types";
 
 import * as schemas from "lib/schemas";
 
-export type FilepondFile = ActualFileObject;
+// export type FilepondFile = ActualFileObject;
 export type PayloadData = schemas.JsonObject;
 export type Payload<P extends PayloadData = PayloadData> = FormData | P;
 
 export const payloadIsFormData = <P extends PayloadData>(p: Payload<P>): p is FormData =>
   p instanceof FormData;
 
-export type SingleFile = File | FilepondFile;
+// export type SingleFile = File | FilepondFile;
+export type SingleFile = File;
 export type UploadableFileProp = SingleFile | FileList | SingleFile[];
 
 export const isSingleFile = (f: UploadableFileProp): f is SingleFile =>

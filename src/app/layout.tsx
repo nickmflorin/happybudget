@@ -1,11 +1,17 @@
-import { Metadata, ResolvingMetadata } from "next";
+import { Metadata } from "next";
+
+import { config, library } from "@fortawesome/fontawesome-svg-core";
+/* FontAwesome's stylesheet must be imported, before any internal components or stylesheets are
+   imported. */
+import "@fortawesome/fontawesome-svg-core/styles.css";
 
 import { configureServerApplication } from "application/config/configuration/server";
 import { MetaData } from "application/config/metadata";
+import "style/globals/index.scss";
 
-configureServerApplication();
+configureServerApplication({ fontAwesome: { config, library } });
 
-export async function generateMetadata(params: any, parent?: ResolvingMetadata): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   return MetaData;
 }
 

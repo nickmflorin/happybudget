@@ -62,7 +62,7 @@ export type UrlWithPathParams<
   : U;
 
 export const HttpSchemes = enumeratedLiterals(["http", "https"] as const);
-export type HttpScheme = import("lib/util/types").EnumeratedLiteralType<typeof HttpSchemes>;
+export type HttpScheme = import("lib/util/literals").EnumeratedLiteralType<typeof HttpSchemes>;
 
 type InvalidHostChars = "/" | "?" | ":" | "@" | "&" | "=" | "+" | "$" | ",";
 

@@ -7,7 +7,9 @@
 
 @mixin solid-variant() {
   @each $variant in partials.map-get(partials.$button-variant-map, "solid") {
-    @include partials.button-colors($variant: "solid", $sub-variant: $variant);
+    &.button--solid--#{$variant} {
+      @include partials.button-colors($variant: "solid", $sub-variant: $variant);
+    }
   }
 
   /*

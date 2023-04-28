@@ -1,4 +1,4 @@
-import { enumeratedLiterals } from "../../util/literals";
+import { enumeratedLiterals, EnumeratedLiteralType } from "../../util/literals";
 import * as parsers from "../../util/parsers";
 import { EnumeratedLiteralType } from "../../util/types/literals";
 import { StringHasLength } from "../../util/types/strings";

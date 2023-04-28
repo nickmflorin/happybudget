@@ -2,7 +2,7 @@ import * as fs from "../../fs";
 import * as model from "../../model";
 import * as ui from "../../ui";
 import * as icons from "../../ui/icons";
-import { enumeratedLiterals } from "../../util/literals";
+import { enumeratedLiterals, EnumeratedLiteralType } from "../../util/literals";
 import { SingleOrArray } from "../../util/types/arrays";
 import { EnumeratedLiteralType } from "../../util/types/literals";
 import * as columns from "../columns";

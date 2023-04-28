@@ -1,6 +1,6 @@
 import * as fs from "../../fs";
 import * as ui from "../../ui";
-import { enumeratedLiterals } from "../../util/literals";
+import { enumeratedLiterals, EnumeratedLiteralType } from "../../util/literals";
 import { EnumeratedLiteralType } from "../../util/types/literals";
 import * as attachment from "../attachment";
 import * as auth from "../auth";

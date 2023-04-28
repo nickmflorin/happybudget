@@ -55,7 +55,7 @@ export const IconPrefixes = enumeratedLiterals(["far", "fas"] as const);
  *
  * This type will typically take on values such as "far", "fab" or "fas".
  */
-export type IconPrefix = import("lib/util/types").EnumeratedLiteralType<typeof IconPrefixes>;
+export type IconPrefix = import("lib/util/literals").EnumeratedLiteralType<typeof IconPrefixes>;
 
 /**
  * An {@link IconCode} represents a more intuitive, human readable form of the FontAwesome prefix
@@ -70,7 +70,7 @@ export const IconCodes = enumeratedLiterals(["solid", "regular"] as const);
  *
  * @see IconPrefix
  */
-export type IconCode = import("lib/util/types").EnumeratedLiteralType<typeof IconCodes>;
+export type IconCode = import("lib/util/literals").EnumeratedLiteralType<typeof IconCodes>;
 
 export const IconPrefixMap = {
   [IconCodes.REGULAR]: IconPrefixes.FAR,
@@ -123,6 +123,7 @@ export const IconNames = enumeratedLiterals([
   "address-book",
   "book",
   "triangle-exclamation",
+  "copyright",
 ] as const);
 
 /* When an Icon is added to the registry, the name must be added to the appropriate IconCode key
@@ -159,6 +160,7 @@ export const Icons = {
     IconNames.CIRCLE_NOTCH,
     IconNames.SERVER,
     IconNames.CARET_UP,
+    IconNames.CARET_DOWN,
     IconNames.CIRCLE_XMARK,
     IconNames.CIRCLE_PLUS,
     IconNames.FILTER,
@@ -170,5 +172,6 @@ export const Icons = {
     IconNames.CAMERA,
     IconNames.BOOK,
     IconNames.TRIANGLE_EXCLAMATION,
+    IconNames.COPYRIGHT,
   ] as const,
 } as const;

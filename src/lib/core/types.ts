@@ -1,6 +1,6 @@
 import { ReactFragment, ReactNode, ReactPortal, ReactElement } from "react";
 
-import { ExtractValues } from "../util";
+import { ExtractValues } from "../util/types";
 
 /**
  * Returns the type for a modified {@link ReactNode} that excludes the types provided as the generic

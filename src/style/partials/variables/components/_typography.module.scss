@@ -65,7 +65,7 @@ $typography-levels: (
 
 $heading-default-level: 1;
 $body-default-level: 3;
-$label-default-level: 1;
+$label-default-level: 2;
 
 $typography-default-levels: (
   "body": $body-default-level,
@@ -399,8 +399,8 @@ $body-font-weight-names: (
 );
 
 $label-font-weight-names: (
-  1: "regular",
-  2: "regular",
+  1: "medium",
+  2: "medium",
   3: "regular",
 );
 

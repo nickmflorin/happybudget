@@ -1,6 +1,7 @@
 export * from "./AttachmentText";
 export * from "./AttachmentSizeText";
 export * from "./BodyText";
+export * from "./CopyrightText";
 export * from "./Date";
 export * from "./DateTime";
 export * from "./EntityText";

@@ -42,29 +42,29 @@ export const configureStore = (c: types.StoreConfig): types.Store<types.Applicat
   // const sagaMiddleware = createSagaMiddleware(sagaMiddlewareOptions);
 
   // let baseMiddleware: MD[] = [publicActionMiddleware, userActionMiddleware, sagaMiddleware];
-  let baseMiddleware: MD[] = [publicActionMiddleware, userActionMiddleware];
-  if (process.env.NODE_ENV === "development") {
-    /* eslint-disable-next-line @typescript-eslint/no-var-requires */
-    baseMiddleware = [require("redux-immutable-state-invariant").default(), ...baseMiddleware];
-  }
+  // let baseMiddleware: MD[] = [publicActionMiddleware, userActionMiddleware];
+  // if (process.env.NODE_ENV === "development") {
+  //   /* eslint-disable-next-line @typescript-eslint/no-var-requires */
+  //   baseMiddleware = [require("redux-immutable-state-invariant").default(), ...baseMiddleware];
+  // }
 
-  const middleware = applyMiddleware(...baseMiddleware);
+  // const middleware = applyMiddleware(...baseMiddleware);
 
-  let enhancers: [StoreEnhancer] | undefined = undefined;
-  if (process.env.NODE_ENV === "development") {
-    enhancers = [composeWithDevTools(middleware)];
-  } else if (process.env.NODE_ENV === "production") {
-    enhancers = [Sentry.createReduxEnhancer()];
-  }
+  /* let enhancers: [StoreEnhancer] | undefined = undefined;
+     if (process.env.NODE_ENV === "development") {
+       enhancers = [composeWithDevTools(middleware)];
+     } else if (process.env.NODE_ENV === "production") {
+       enhancers = [Sentry.createReduxEnhancer()];
+     } */
 
   const store: Omit<
     types.Store<types.ApplicationStore>,
     "injectSaga" | "ejectSaga" | "hasSaga"
   > = configureRootStore<types.ApplicationStore, types.Action>({
     reducer: applicationReducer,
-    devTools: process.env.NODE_ENV === "development",
+    // devTools: process.env.NODE_ENV === "development",
     preloadedState: initialState,
-    enhancers,
+    // enhancers,
   });
 
   /* Start the application saga and establish the saga injector.  This must be done after the store

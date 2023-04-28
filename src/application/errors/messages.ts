@@ -19,7 +19,7 @@ import * as errorTypes from "./errorTypes";
  * not defined.
  */
 export const ErrorMessageScopes = enumeratedLiterals(["user", "internal"] as const);
-export type ErrorMessageScope = import("lib/util/types").EnumeratedLiteralType<
+export type ErrorMessageScope = import("lib/util/literals").EnumeratedLiteralType<
   typeof ErrorMessageScopes
 >;
 

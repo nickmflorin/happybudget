@@ -1,7 +1,7 @@
 import classNames from "classnames";
 
-import * as ui from "lib/ui/types";
-
+import * as ui from "lib/ui";
+import { typography } from "lib/ui";
 import { HeadingText, HeadingTextProps } from "components/typography";
 
 import { AffixGroup, AffixGroupProps } from "./AffixGroup";
@@ -15,7 +15,7 @@ export type HeaderProps = Omit<HeadingTextProps, keyof ui.ComponentProps> &
 export const Header = ({
   affixes,
   affixesEnd,
-  level = ui.DEFAULT_HEADING_LEVEL,
+  level = typography.DEFAULT_HEADING_LEVEL,
   spacing = 10,
   children,
   ...props

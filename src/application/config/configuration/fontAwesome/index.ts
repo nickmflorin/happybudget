@@ -1,25 +1,57 @@
 /*
 Re: Configuring Font Awesome
 
-Dynamic Loading & Configuration
--------------------------------
-The size of the "@fortawesome/fontawesome-svg-core" package is very significant, and since that
-package is used when rendering Icons in the Sidebar on the initial page load (and we configure FA
-on the initial page load) the size of the initial bundle sent to the browser will be very large as
-a result.
+Bundle Size
+-----------
+The size of the "@fortawesome/fontawesome-svg-core" package is very significant, so the manner in
+which FontAwesome is configured and used in the application is optimized to reduce the size of this
+bundle.  The manner in which this is done depends on whether or not FontAwesome is being configured
+on the server or in the client.
 
-To avoid this, we allow the configuration to be dynamically imported and asynchronously performed
-such that the `<AppConfig />` component can dynamically perform the configuration routines while
-avoiding a direct import from "@fortawesome/fontawesome-svg-core" and decrease the overall size of
-the bundle sent to the browser on the initial page load.
+- Dynamic Loading & Configuration in the Client
 
-Because we cannot directly import from "@fortawesome/fontawesome-svg-core" due to its size, there
-are certain types that we would otherwise import from that package but instead have to be "stubbed"
-out to remove their reliances on the "@fortawesome/fontawesome-svg-core" package import.
+  We usually need to configure FontAwesome on the initial page load due to the likelihood that a
+  component on a given page will be rendering at least 1 icon.  As a result, when configuring
+  FontAwesome in the client, the initial size of the bundle that is sent to the browser is
+  substantially large.
 
-Note: The synchronous form of the `configure` method is still provided such that it can be used
-for test setup and teardown, but the `configureAsync` method will be run when the application is
-being loaded in a non-test environment.
+  To alleviate this, we allow the configuration to be dynamically imported and asynchronously
+  performed such that the initial page render can perform the import and configuration
+  asynchronously after the initial page load.
+
+  Because we cannot directly import from "@fortawesome/fontawesome-svg-core" due to its size, there
+  are certain types that we would otherwise import from that package but instead have to be
+  "stubbed" out to remove their reliances on the "@fortawesome/fontawesome-svg-core" package import.
+
+- Global Icon Library
+
+  When we configure FontAwesome, we need to register the Icons that we want to use in the
+  application with the global library.  This allows us to dramatically reduce the bundle size
+  because we are not including every icon from every "@fortawesome/free-<type>-svg-icons" package -
+  just the ones we need.
+
+  This is done inside of the `configure` method.
+
+  Even though this takes a millisecond (its very quick) - it still causes issues with NextJS:
+    Error: Hydration failed because the initial UI does not match what was rendered on the server.
+
+  See: https://nextjs.org/docs/messages/react-hydration-error
+
+  We see this error when using a specific library or application code in a component that is relying
+  on something that could differ between pre-rendering and the browser - which in our case is the
+  registration of the icons to the global library.
+
+  To fix this, we can either:
+
+  (a) Wrap the <FontAwesomeIcon /> return in the <Icon /> component in a state variable that is set
+      inside of a useEffect().  This is what NextJS's documentation suggests, but in their case it
+      is a simple variable, not a variable that depends on all of the props - so it cannot work in
+      this case.
+
+  (b) Simply use the "require" method of importing the { library } from FontAwesome, rather than
+      import statements.  I do not know why this works, but it does.
+
+  See https://github.com/FortAwesome/Font-Awesome/issues/19348
 
 NextJS CSS Loading
 ------------------
@@ -27,43 +59,13 @@ Since Next.js manages CSS differently than most web projects, if you just follow
 documentation to integrate react-fontawesome into the NextJS project we will see huge   This
 is because the icons are missing the accompanying CSS that makes them behave.
 
-In order for this to work with NextJS, we have to manually import the FontAwesome styles in the
-`pages/_app.tsx` file, and then set `autoAddCss` to false so that the FontAwesome core SVG library
-will not try to insert <style> elements into the <head> of the page - NextJS blocks this
-automatically.
+In order for this to work with NextJS, we have to manually import the FontAwesome styles and then
+set `autoAddCss` to false so that the FontAwesome core SVG library will not try to insert <style>
+elements into the <head> of the page - NextJS blocks this automatically.
 
 See: https://fontawesome.com/docs/web/use-with/react/use-with#getting-font-awesome-css-to-work
-
-Global Icon Library
--------------------
-When we configure FontAwesome, we need to register the Icons that we want to use in the application
-with the global library.  This allows us to dramatically reduce the bundle size because we are not
-including every icon from every "@fortawesome/free-<type>-svg-icons" package - just the ones we
-need.
-
-This is done inside of the `configure` method.
-
-Even though this takes a millisecond (its very quick) - it still causes issues with NextJS:
-  Error: Hydration failed because the initial UI does not match what was rendered on the server.
-
-See: https://nextjs.org/docs/messages/react-hydration-error
-
-We see this error when using a specific library or application code in a component that is relying
-on something that could differ between pre-rendering and the browser - which in our case is the
-registration of the icons to the global library.
-
-To fix this, we can either:
-
-(a) Wrap the <FontAwesomeIcon /> return in the <Icon /> component in a state variable that is set
-    inside of a useEffect().  This is what NextJS's documentation suggests, but in their case it
-    is a simple variable, not a variable that depends on all of the props - so it cannot work in
-    this case.
-
-(b) Simply use the "require" method of importing the { library } from FontAwesome, rather than
-    import statements.  I do not know why this works, but it does.
-
-See https://github.com/FortAwesome/Font-Awesome/issues/19348
 */
+import { logger } from "internal";
 import { getIconCode } from "lib/ui/icons/util";
 import { findDuplicates } from "lib/util/arrays";
 import { stringifyEnumerated } from "lib/util/formatters/attributes";
@@ -72,12 +74,12 @@ import { Icons, IconNames, IconPrefixes } from "./constants";
 import { NaiveFAIconDefinition, NaiveFAConfig } from "./types";
 
 /**
- * Represents the dynamically imported content required to configure Font Awesome.  These options
- * are only provided to the `configure` method when the `configure` method is being called from an
- * asynchronous context.
+ * Options that are used to configure FontAwesome.  Each option represents content that may be
+ * dynamically, asynchronously imported/loaded and provided to the method in the case that the
+ * configuration is being performed asynchronously in the client.
  */
-type ConfigurationOptions = {
-  registry: NaiveFAIconDefinition[];
+export type FAConfigurationOptions = {
+  registry?: NaiveFAIconDefinition[];
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   library: any;
   config: NaiveFAConfig;
@@ -85,57 +87,7 @@ type ConfigurationOptions = {
 
 type IconValidationError = { prefix?: string; iconName?: string; error: string };
 
-/**
- * Synchronously configures the application with FontAwesome.
- *
- * All icons in the registry (i.e. the icons that we use in the application) are first validated
- * to ensure type-safe usage and are subsequently loaded into the FontAwesome global library.
- *
- * The method exposes an `__options__` argument that should be used when the method is being called
- * from an asynchronous context and the content required to configure FontAwesome is dynamically
- * imported.
- *
- * Note About Validation
- * ---------------------
- * The constants in `src/config/fontAwesome/registry` are used to derive icon-related types, which
- * in turn are used to restrict icon rendering in the application such that it does not fail.  If
- * this validation is not performed, we would not be able to reliably use TypeScript to prevent
- * usage of icons that no longer exist, or exist but are being used in a context that they were not
- * imported for.
- *
- * Because the constants defined in `src/config/fontAwesome/registry` are used to derive the types
- * that are responsible for preventing cases where the <Icon /> component will fail or not properly
- * render, it is very, very important that they be validated before the application starts - when
- * configuring FontAwesome.
- *
- * @param {ConfigurationOptions} __options__
- *   Dynamically imported content that is required to configure FontAwesome when the configuration
- *   is being performed in an asynchronous context.
- */
-export const configure = (__options__?: ConfigurationOptions) => {
-  /* If the configuration method is being called from the asynchronous context, the library, config
-     and registry will have been dynamically imported already and provided to the method.  If the
-     configuration method is not being called from the asynchronous context, we have to use require
-     statements. */
-  let library: ConfigurationOptions["library"];
-  let config: ConfigurationOptions["config"];
-  let registry: ConfigurationOptions["registry"];
-
-  if (__options__ !== undefined) {
-    library = __options__.library;
-    config = __options__.config;
-    registry = __options__.registry;
-  } else {
-    /* eslint-disable-next-line @typescript-eslint/no-var-requires */
-    library = require("@fortawesome/fontawesome-svg-core").library;
-    /* eslint-disable-next-line @typescript-eslint/no-var-requires */
-    config = require("@fortawesome/fontawesome-svg-core").config;
-    /* eslint-disable-next-line @typescript-eslint/no-var-requires */
-    registry = require("./registry").IconRegistry;
-  }
-
-  config.autoAddCss = false;
-
+const validateRegistry = (registry: NaiveFAIconDefinition[]) => {
   type IconName = import("lib/ui/icons/types").IconName;
   type IconPrefix = import("lib/ui/icons/types").IconPrefix;
 
@@ -263,9 +215,76 @@ export const configure = (__options__?: ConfigurationOptions) => {
         .join("\n");
     throw new Error(message);
   }
+};
+
+/**
+ * Synchronously configures the application with FontAwesome.
+ *
+ * All icons in the registry (i.e. the icons that we use in the application) are first validated
+ * to ensure type-safe usage and are subsequently loaded into the FontAwesome global library.
+ *
+ * The method exposes an `__options__` argument that should be used when the method is being called
+ * from an asynchronous context and the content required to configure FontAwesome is dynamically
+ * imported.
+ *
+ * Note About Validation
+ * ---------------------
+ * The constants defined in this module are used to derive icon-related types, which in turn are
+ * used to restrict icon rendering in the application such that it does not fail.  If this
+ * validation is not performed, we would not be able to reliably use TypeScript to prevent usage of
+ * icons that no longer exist, or exist but are being used in a context that they were not imported
+ * for.
+ *
+ * Because these constants are used to derive the types that are responsible for preventing cases
+ * where the <Icon /> component will fail or not properly render, it is very, very important that
+ * they be validated before the application starts - when configuring FontAwesome.
+ *
+ * @param {ConfigurationOptions} __options__
+ *   Dynamically imported content that is required to configure FontAwesome when the configuration
+ *   is being performed in an asynchronous context or on the server.
+ */
+export const configure = (__options__?: FAConfigurationOptions) => {
+  /* If the configuration method is being called from the asynchronous context, the library, config
+     and registry will have been dynamically imported already and provided to the method.  If the
+     configuration method is not being called from the asynchronous context, we have to use require
+     statements. */
+  let library: FAConfigurationOptions["library"];
+  let config: FAConfigurationOptions["config"];
+  let registry: Exclude<FAConfigurationOptions["registry"], undefined>;
+
+  if (__options__ !== undefined) {
+    library = __options__.library;
+    config = __options__.config;
+    /* When configuring FontAwesome on the server, we need to provide the config and library to
+       the method - but can leave out the registry. */
+    if (__options__.registry === undefined) {
+      logger.info("Icon registry was not provided during configuration, importing directly...");
+      /* eslint-disable-next-line @typescript-eslint/no-var-requires */
+      registry = require("./registry").ICON_REGISTRY;
+    } else {
+      registry = __options__.registry;
+    }
+  } else {
+    logger.info(
+      "Icon registry and @fortawesome library & config were all not provided during " +
+        "configuration, importing directly...",
+    );
+    /* eslint-disable-next-line @typescript-eslint/no-var-requires */
+    library = require("@fortawesome/fontawesome-svg-core").library;
+    /* eslint-disable-next-line @typescript-eslint/no-var-requires */
+    config = require("@fortawesome/fontawesome-svg-core").config;
+    /* eslint-disable-next-line @typescript-eslint/no-var-requires */
+    registry = require("./registry").ICON_REGISTRY;
+  }
+
+  config.autoAddCss = false;
+  logger.info("Validating FontAwesome icon registry...");
+  validateRegistry(registry);
+
   /* Add the validated, registered icons to the global Font Awesome library.  At this point, it is
      guaranteed that the type bindings related to Icons are correct, because they stem from constant
      definitions that were validated above. */
+  logger.info(`Adding ${registry.length} icons to the FontAwesome global library...`);
   library.add(...registry);
 };
 

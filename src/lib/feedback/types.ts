@@ -2,9 +2,8 @@ import React from "react";
 
 import * as errors from "application/errors";
 
-import { enumeratedLiterals } from "../util/literals";
+import { enumeratedLiterals, EnumeratedLiteralType } from "../util/literals";
 import { OneOrMany } from "../util/types/arrays";
-import { EnumeratedLiteralType } from "../util/types/literals";
 
 export const FeedbackMetaTypes = enumeratedLiterals(["global", "field"] as const);
 export type FeedbackMetaType = EnumeratedLiteralType<typeof FeedbackMetaTypes>;

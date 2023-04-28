@@ -1,6 +1,6 @@
 import { GridApi as RootGridApi, ColumnApi as RootColumnApi, GridOptions } from "ag-grid-community";
 
-import { enumeratedLiterals } from "../../util/literals";
+import { enumeratedLiterals, EnumeratedLiteralType } from "../../util/literals";
 import { EnumeratedLiteralType } from "../../util/types/literals";
 import * as rows from "../rows";
 

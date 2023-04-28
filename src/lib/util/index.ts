@@ -5,6 +5,7 @@ export * as events from "./events";
 export * as html from "./html";
 export * as validators from "./validators";
 
+export * from "./arrays";
 export * from "./string";
 export * from "./types";
 export * from "./typeguards";
@@ -20,8 +21,3 @@ export const selectConsistent = <T = Record<string, unknown>>(array: T[], name: 
 
 export const generateRandomNumericId = (): number =>
   parseInt(Math.random().toString().slice(2, 11));
-
-export const getKeyValue =
-  <T extends Record<string, unknown>, U extends keyof T>(key: U) =>
-  (obj: T): T[U] =>
-    obj[key];

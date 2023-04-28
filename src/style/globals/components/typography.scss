@@ -101,8 +101,19 @@ h6 {
 @mixin typography-type-variants($type) {
   @each $level in map.get(partials.$typography-levels, $type) {
     &--#{$level} {
+      $size: partials.get-font-size($type, $level: $level);
+      $line-height: partials.get-line-height($type, $level: $level);
+
       // This will include the default font weight name for the given level.
       @include partials.font($type, $level: $level);
+
+      > .icon {
+        height: $size;
+        margin-right: 6px;
+        padding-bottom: 0.5 * ($line-height - $size);
+        padding-top: 0.5 * ($line-height - $size);
+        width: auto;
+      }
     }
   }
   @each $font-weight-name in partials.$font-weight-names {
@@ -140,12 +151,36 @@ h6 {
   @extend %typography-base;
   @include typography-type-variants("body");
 
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+
   &--transform-underline {
     text-decoration: underline;
   }
 
   &--transform-caps {
     text-transform: uppercase;
+  }
+
+  &--align-left {
+    justify-content: left;
+  }
+
+  &--align-center {
+    justify-content: center;
+  }
+
+  &--align-right {
+    justify-content: right;
+  }
+
+  > .icon {
+    color: inherit;
+    font-size: inherit;
+    font-style: inherit;
+    font-weight: inherit;
+    line-height: inherit;
   }
 }
 

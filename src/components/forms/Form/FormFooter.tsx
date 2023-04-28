@@ -3,7 +3,6 @@ import classNames from "classnames";
 import * as ui from "lib/ui";
 import { buttons } from "lib/ui";
 import { PrimaryButton, SecondaryButton } from "components/buttons";
-import { Separator } from "components/structural";
 
 export type FormFooterProps = ui.ComponentProps<{
   readonly submitButtonText?: string;
@@ -40,7 +39,6 @@ export const FormFooter = ({
   ...props
 }: FormFooterProps): JSX.Element => (
   <div {...props} className={classNames("form__footer", props.className)}>
-    <Separator />
     <div className="form__footer__buttons">
       {onCancel && (
         <SecondaryButton size={buttonSize} onClick={onCancel}>

@@ -1,3 +1,4 @@
+"use client";
 import { useMemo, useState } from "react";
 
 import { useForm as reactHookUseForm, type RegisterOptions } from "react-hook-form";
