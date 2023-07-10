@@ -11,6 +11,8 @@ process of being migrated towards the [NextJS][nextjs] framework.
 
 &copy; Nick Florin, 2022
 
+**This project is protected by registered U.S. copyright TXu 2-319-982.**
+
 ### System Requirements
 
 - [nvm][nvm]
