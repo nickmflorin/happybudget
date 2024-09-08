@@ -89,27 +89,27 @@
   flex-grow: 100;
   padding: 6px;
 
-	.color {
-		margin-bottom: 12px;
+  .color {
+    margin-bottom: 12px;
 
-		&:not(:last-child) {
-			margin-right: 12px;
-		}
-	}
+    &:not(:last-child) {
+      margin-right: 12px;
+    }
+  }
 
-	// if the ColorGrid is wrapped, the Color(s) will be displayed up until the
-	// right edge and then start on a new line.
+  // if the ColorGrid is wrapped, the Color(s) will be displayed up until the
+  // right edge and then start on a new line.
   &.wrapped {
     margin-bottom: -12px !important;
 
-		.color {
-			flex: 1 1 24px;
-			max-width: 24px;
-		}
+    .color {
+      flex: 1 1 24px;
+      max-width: 24px;
+    }
   }
 
-	// If the ColorGrid is not wrapped, it will be displayed with a certain number
-	// of colors per row.
+  // If the ColorGrid is not wrapped, it will be displayed with a certain number
+  // of colors per row.
   &:not(.wrapped) {
     flex-direction: column;
 

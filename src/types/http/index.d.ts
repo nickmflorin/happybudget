@@ -8,7 +8,15 @@ declare namespace Http {
     readonly cancelToken?: import("axios").CancelToken | undefined;
   };
 
-	type QueryParamValue = string | number | boolean;
+  type QueryParamValue =
+    | string
+    | number
+    | boolean
+    | string[]
+    | number[]
+    | Record<string, string | number | boolean | string[] | number[]>
+    | Record<string, string | number | boolean | string[] | number[]>[];
+
   type Query = Record<string, QueryParamValue>;
 
   type RawQuery = {

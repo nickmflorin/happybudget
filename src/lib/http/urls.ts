@@ -6,7 +6,7 @@ import { forEach, isNil, reduce, includes } from "lodash";
  *
  * @param url The URL for which we want to get the query parameters from.
  */
- export const getQueryParams = (url: string): Record<string, string> => {
+export const getQueryParams = (url: string): Record<string, string> => {
   const anchor = document.createElement("a");
   anchor.href = url;
 

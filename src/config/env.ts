@@ -90,7 +90,7 @@ export const WHY_DID_YOU_RENDER = config.BooleanConfig({
 
 export const SOCIAL_AUTHENTICATION_ENABLED = config.BooleanConfig({
   nodeSourceName: "SOCIAL_AUTHENTICATION_ENABLED",
-  defaultValue: true
+  defaultValue: false
 });
 
 export const GOOGLE_CLIENT_KEY = config.Config<string, string | undefined>({

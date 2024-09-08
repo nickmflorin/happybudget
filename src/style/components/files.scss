@@ -13,7 +13,7 @@
     }
 
     .text-wrapper {
-      font-size: $medium-text-size;;
+      font-size: $medium-text-size;
       font-family: $avenir;
       font-weight: 500;
       color: $text-secondary;
@@ -37,7 +37,7 @@
     }
 
     .file-action-wrapper {
-			@include vertical-flex-c();
+      @include vertical-flex-c();
       height: $standard-size;
       margin-right: 6px;
 
@@ -48,9 +48,9 @@
     }
 
     .button-action-wrapper {
-			@include vertical-flex-c();
+      @include vertical-flex-c();
       height: $standard-size;
-			margin-left: 4px;
+      margin-left: 4px;
 
       .btn {
         height: 22px;

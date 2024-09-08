@@ -16,7 +16,7 @@
 
     .application-spinner {
       z-index: 1000;
-			@include size(30px);
+      @include size(30px);
 
       .anticon {
         @include size(100%);
@@ -67,16 +67,16 @@
   @mixin calculate_layout_dimensions($collapsed, $sidebar_hidden, $mobile: false, $sidebar: true) {
     $sidebar-width: 0px;
 
-		@if $sidebar {
-			$sidebar-width: 260px;
-			@if $collapsed {
-				$sidebar-width: 60px;
-			} @else if $mobile {
-				// On mobile devices, the sidebar (when visible) takes up the full width
-				// of the screen.
-				$sidebar-width: 100%;
-			}
-		}
+    @if $sidebar {
+      $sidebar-width: 260px;
+      @if $collapsed {
+        $sidebar-width: 60px;
+      } @else if $mobile {
+        // On mobile devices, the sidebar (when visible) takes up the full width
+        // of the screen.
+        $sidebar-width: 100%;
+      }
+    }
 
     $sidebar-margin-left: 0px;
     @if $sidebar_hidden {
@@ -128,9 +128,9 @@
     &--collapsed {
       @include collapsed_layout_dimensions();
 
-			&.without-sidebar {
-				@include collapsed_layout_dimensions(false);
-			}
+      &.without-sidebar {
+        @include collapsed_layout_dimensions(false);
+      }
 
       .sidebar-container {
         // This is important to align the sidebar toggle button in the header.
@@ -167,30 +167,30 @@
       .content {
         display: flex;
         flex-direction: row;
-				flex-grow: 100;
+        flex-grow: 100;
 
-				.drawer {
-					max-width: 300px;
-					overflow-y: hidden;
-					display: flex;
-					flex-direction: column;
-					padding: 35px 15px 15px 15px;
-					border: $border;
-					position: relative;
+        .drawer {
+          max-width: 300px;
+          overflow-y: hidden;
+          display: flex;
+          flex-direction: column;
+          padding: 35px 15px 15px 15px;
+          border: $border;
+          position: relative;
 
-					.btn--drawer-close {
-						position: absolute;
-						top: 5px;
-						right: 5px;
-						@include size(26px);
-					}
+          .btn--drawer-close {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            @include size(26px);
+          }
 
-					.drawer-content {
-						display: flex;
-						flex-direction: column;
-						overflow-y: scroll;
-					}
-				}
+          .drawer-content {
+            display: flex;
+            flex-direction: column;
+            overflow-y: scroll;
+          }
+        }
 
         .sub-content {
           overflow-y: hidden;

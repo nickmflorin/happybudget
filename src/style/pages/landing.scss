@@ -14,7 +14,7 @@
     height: 100vh;
     box-shadow: 10px 0px 99px #777777;
     z-index: 1;
-		position: relative;
+    position: relative;
 
     @include media(">=xl") {
       width: 550px;
@@ -32,30 +32,30 @@
       }
     }
 
-		.copyright {
-			position: absolute;
-			bottom: 10px;
-			width: 100%;
-			justify-content: center;
-			display: flex;
-			flex-direction: row;
+    .copyright {
+      position: absolute;
+      bottom: 10px;
+      width: 100%;
+      justify-content: center;
+      display: flex;
+      flex-direction: row;
 
-			.icon-wrapper {
-				@include size(16px);
-				padding: 1px;
-				.icon {
-					color: $text-primary;
-				}
-			}
+      .icon-wrapper {
+        @include size(16px);
+        padding: 1px;
+        .icon {
+          color: $text-primary;
+        }
+      }
 
-			.copyright-text {
-				line-height: 16px;
-				margin-left: 4px;
-				font-size: 12px;
-				font-weight: 500;
-				color: $text-primary;
-			}
-		}
+      .copyright-text {
+        line-height: 16px;
+        margin-left: 4px;
+        font-size: 12px;
+        font-weight: 500;
+        color: $text-primary;
+      }
+    }
 
     .landing-form-container {
       margin-top: 40px;
@@ -83,7 +83,7 @@
       }
 
       .sub-title {
-        font-size: $xlarge-text-size;;
+        font-size: $xlarge-text-size;
         font-family: $avenir;
         font-weight: 600;
         color: $text-secondary;

@@ -61,45 +61,45 @@ p {
   margin-top: 0;
   font-family: $avenir;
   font-weight: 400;
-	font-size: 13px;
-	line-height: 16px;
+  font-size: 13px;
+  line-height: 16px;
 }
 
 h1 {
   @extend .header-base;
   font-weight: 700;
-	font-size: 28px;
-	line-height: 32px;
+  font-size: 28px;
+  line-height: 32px;
 }
 
 h2 {
   @extend .header-base;
-	font-size: 24px;
-	line-height: 28px;
+  font-size: 24px;
+  line-height: 28px;
 }
 
 h3 {
   @extend .header-base;
-	font-size: 18px;
-	line-height: 24px;
+  font-size: 18px;
+  line-height: 24px;
 }
 
 h4 {
   @extend .header-base;
-	font-size: 16px;
-	line-height: 22px;
+  font-size: 16px;
+  line-height: 22px;
 }
 
 h5 {
   @extend .header-base;
-	font-size: 14px;
-	line-height: 20px;
+  font-size: 14px;
+  line-height: 20px;
 }
 
 h6 {
   @extend .header-base;
-	font-size: 12px;
-	line-height: 20px;
+  font-size: 12px;
+  line-height: 20px;
 }
 
 .avenir {
@@ -122,7 +122,7 @@ h6 {
 }
 
 .label-base {
-  font-size: $medium-text-size;;
+  font-size: $medium-text-size;
   line-height: 22px;
   color: $text-secondary;
   font-family: $avenir;

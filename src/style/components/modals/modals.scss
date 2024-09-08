@@ -23,14 +23,14 @@
     flex-direction: column;
 
     .notifications {
-			margin-bottom: 15px;
+      margin-bottom: 15px;
     }
 
     .modal-text {
       font-family: $avenir;
       font-weight: 500;
       color: $text-secondary;
-      font-size: $large-text-size;;
+      font-size: $large-text-size;
     }
 
     .ant-modal-header {

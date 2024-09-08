@@ -40,7 +40,7 @@ const isNotificationObj = (n: InternalNotification | Error | string): n is Inter
  * @param {(InternalNotificationOptions)} opts:
  *   The options that affect how the notification is dispatched.
  */
- const shouldDispatchToSentry = (e: InternalNotification, opts?: InternalNotificationOptions): boolean => {
+const shouldDispatchToSentry = (e: InternalNotification, opts?: InternalNotificationOptions): boolean => {
   const optsSentry = opts?.dispatchToSentry !== undefined ? opts?.dispatchToSentry : true;
   if (isNotificationObj(e)) {
     return e.dispatchToSentry !== undefined ? e.dispatchToSentry : optsSentry;
@@ -91,7 +91,7 @@ const consoleMessage = (e: InternalNotification | Error | string): string | Erro
  * @param {(InternalNotificationOptions)} opts:
  *   The options that affect how the notification is dispatched.
  */
- export const notify = (e: InternalNotification, opts?: InternalNotificationOptions): void => {
+export const notify = (e: InternalNotification, opts?: InternalNotificationOptions): void => {
   const dispatchToSentry = shouldDispatchToSentry(e, opts);
   const level = notificationLevel(e, opts);
 

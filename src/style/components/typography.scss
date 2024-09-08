@@ -1,5 +1,5 @@
 .entity-text {
-  font-size: $medium-text-size;;
+  font-size: $medium-text-size;
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -26,7 +26,7 @@
   .link,
   .btn {
     line-height: 16px;
-    font-size: $medium-text-size;;
+    font-size: $medium-text-size;
     vertical-align: 0.225rem;
   }
 }
@@ -41,13 +41,13 @@
 
   .icon--attachment {
     color: $text-primary;
-		@include size(14px);
+    @include size(14px);
     line-height: 16px;
     vertical-align: -0.125em !important;
   }
 
   .content-text {
-    font-size: $medium-text-size;;
+    font-size: $medium-text-size;
     font-family: $avenir;
     font-weight: 400;
     color: $text-secondary;
@@ -56,7 +56,7 @@
 
   .additional-count {
     margin-left: 4px;
-    font-size: $medium-text-size;;
+    font-size: $medium-text-size;
     font-family: $avenir;
     font-weight: 400;
     color: $text-secondary;

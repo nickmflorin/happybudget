@@ -68,20 +68,20 @@
 }
 
 .btn-link-base {
-	padding: 0;
-    text-decoration: none !important;
-    height: auto;
-    border: none !important;
+  padding: 0;
+  text-decoration: none !important;
+  height: auto;
+  border: none !important;
 
-		&:hover,
-    &:focus {
-      background-color: transparent;
-    }
+  &:hover,
+  &:focus {
+    background-color: transparent;
+  }
 
-		.spinner {
-      @include size(14px);
-      color: $blue !important;
-    }
+  .spinner {
+    @include size(14px);
+    color: $blue !important;
+  }
 }
 
 .btn,
@@ -93,10 +93,10 @@
     @extend .btn-link-base;
   }
 
-	&--danger-link {
-		@extend .btn-link-base;
-		@include fg_danger();
-	}
+  &--danger-link {
+    @extend .btn-link-base;
+    @include fg_danger();
+  }
 
   &--default {
     @extend .btn;
@@ -140,10 +140,10 @@
     &.budget-table-menu {
       @include bare_color_set($text-secondary, $green);
 
-			&.active {
-				@include color_set($white);
-				@include bg_color_set(lighten($green, 5%), $green);
-			}
+      &.active {
+        @include color_set($white);
+        @include bg_color_set(lighten($green, 5%), $green);
+      }
     }
   }
 
@@ -176,54 +176,54 @@
         height: 12px;
         width: auto;
       }
-			.spinner {
-				@include size(12px !important);
-			}
+      .spinner {
+        @include size(12px !important);
+      }
     }
     &.icon-small {
       .icon {
         height: 14px;
         width: auto;
       }
-			.spinner {
-				@include size(14px !important);
-			}
+      .spinner {
+        @include size(14px !important);
+      }
     }
     &.icon-medium {
       .icon {
         height: 16px;
         width: auto;
       }
-			.spinner {
-				@include size(16px !important);
-			}
+      .spinner {
+        @include size(16px !important);
+      }
     }
     &.icon-standard {
       .icon {
         height: 20px;
         width: auto;
       }
-			.spinner {
-				@include size(20px !important);
-			}
+      .spinner {
+        @include size(20px !important);
+      }
     }
     &.icon-large {
       .icon {
         height: 22px;
         width: auto;
       }
-			.spinner {
-				@include size(22px !important);
-			}
+      .spinner {
+        @include size(22px !important);
+      }
     }
-		&.icon-xlarge {
+    &.icon-xlarge {
       .icon {
         height: 24px;
         width: auto;
       }
-			.spinner {
-				@include size(24px !important);
-			}
+      .spinner {
+        @include size(24px !important);
+      }
     }
 
     &.ag-grid-action-button {

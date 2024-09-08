@@ -81,7 +81,7 @@ export class ApiClient {
         if (method === HttpRequestMethods.GET && !isNil(ordering)) {
           rawQuery = { ...rawQuery, ordering: http.convertOrderingQueryToString(ordering) };
         }
-        url = http.addQueryParamsToUrl(url, rawQuery, { filter: [""] }) as Http.V1Url;
+        url = http.addQueryParamsToUrl(url, rawQuery, { exclude: [""] }) as Http.V1Url;
       }
     } else if (!url.endsWith("/")) {
       url = (url + "/") as Http.V1Url;
@@ -140,14 +140,14 @@ export class ApiClient {
     return response.data;
   };
 
-	/**
+  /**
    * Submits a GET request to the provided path.
    *
    * @param path     The path to send the GET request.
    * @param query    The query parameters to embed in the URL.
    * @param options  The options for the request.
    */
-	 get = async <T>(path: Http.V1Url, query?: Http.Query, options?: Http.RequestOptions): Promise<T> => {
+  get = async <T>(path: Http.V1Url, query?: Http.Query, options?: Http.RequestOptions): Promise<T> => {
     return this._request<T>(HttpRequestMethods.GET, path, query, {}, options);
   };
 
@@ -170,7 +170,11 @@ export class ApiClient {
    * @param query    The query parameters to embed in the URL.
    * @param options  The options for the request.
    */
-  list = async <T>(path: Http.V1Url, query?: Http.Query, options?: Http.RequestOptions): Promise<Http.ListResponse<T>> => {
+  list = async <T>(
+    path: Http.V1Url,
+    query?: Http.Query,
+    options?: Http.RequestOptions
+  ): Promise<Http.ListResponse<T>> => {
     return this._request<Http.ListResponse<T>>(HttpRequestMethods.GET, path, query, {}, options);
   };
 

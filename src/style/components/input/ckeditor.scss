@@ -40,7 +40,7 @@
   margin-bottom: 4px !important;
   font-family: $avenir !important;
   font-weight: 400;
-  font-size: $standard-text-size;;
+  font-size: $standard-text-size;
 }
 
 // we have to use !important here to prevent ckeditor from overriding padding to 0px
@@ -82,7 +82,7 @@
 .ck-content h4 {
   @extend .header-base;
   font-weight: 600;
-  font-size: $xlarge-text-size;;
+  font-size: $xlarge-text-size;
   line-height: 20px;
   margin-bottom: 4px !important;
   margin-top: var(--ck-spacing-small) !important;
@@ -92,7 +92,7 @@
 .ck-content h5 {
   @extend .header-base;
   font-weight: 500;
-  font-size: $xlarge-text-size;;
+  font-size: $xlarge-text-size;
   line-height: 20px;
   margin-bottom: 4px !important;
   margin-top: var(--ck-spacing-small) !important;
@@ -102,7 +102,7 @@
 .ck-content h6 {
   @extend .header-base;
   font-weight: 500;
-  font-size: $large-text-size;;
+  font-size: $large-text-size;
   line-height: 18px;
   margin-bottom: 4px !important;
   margin-top: var(--ck-spacing-small) !important;

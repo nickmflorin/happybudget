@@ -7,25 +7,25 @@
 }
 
 .ant-checkbox-checked .ant-checkbox-inner {
-	background-color: $blue;
-	border-color: $blue;
+  background-color: $blue;
+  border-color: $blue;
 }
 
 .ant-checkbox-wrapper {
-	color: $text-secondary;
-	font-family: $avenir;
-	font-size: $medium-text-size;
-	font-weight: 500 !important;
+  color: $text-secondary;
+  font-family: $avenir;
+  font-size: $medium-text-size;
+  font-weight: 500 !important;
 }
 
 .checkbox-wrapper {
   padding: 10px;
 
   .ant-checkbox-wrapper {
-		@include size(16px);
+    @include size(16px);
 
     .ant-checkbox {
-      font-size: $xlarge-text-size;;
+      font-size: $xlarge-text-size;
       line-height: 1;
       display: block;
       top: 0;
